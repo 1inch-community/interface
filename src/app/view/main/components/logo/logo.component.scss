@@ -1,0 +1,12 @@
+.logo-container {
+  display: grid;
+  align-items: center;
+  grid-template-columns: 50px 1fr;
+  gap: 4px;
+}
+
+.logo-text {
+  height: 36px;
+  width: 84px;
+  color: var(--1inch__static_white);
+}

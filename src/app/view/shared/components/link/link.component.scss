@@ -1,0 +1,10 @@
+:host {
+  color: var(--1inch__text-icons_gray-500);
+  text-decoration: none;
+  transition: color .2s;
+  font-size: 13px;
+
+  &:hover {
+    color: var(--1inch__text-icons_main);
+  }
+}

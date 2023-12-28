@@ -1,0 +1,38 @@
+html {
+  background: var(--1inch__bg_bg-body);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  font-family: Roboto, serif;
+  background: var(--1inch__bg_bg-body);
+  color: var(--1inch__text-icons_gray-500);
+}
+
+*::-moz-selection {
+  color: var(--1inch__text-icons_main);
+  background: var(--1inch__bg_info-2ry);
+}
+
+*::selection {
+  color: var(--1inch__text-icons_main);
+  background: var(--1inch__bg_info-2ry);
+}
+
+* {
+  outline: none;
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--1inch__text-icons_gray-300);
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 8px;
+}

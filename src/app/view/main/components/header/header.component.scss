@@ -1,0 +1,16 @@
+:host {
+  display: block;
+}
+
+.header-container {
+  height: 50px;
+  margin: 0 33px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.header-right {
+  display: flex;
+  gap: 8px;
+}

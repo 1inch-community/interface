@@ -1,0 +1,15 @@
+<div
+        [@show-hide]="animation$ | async"
+        (@show-hide.done)="onAnimationDone($event)"
+        class="modal-container"
+>
+    <div *ngIf="data.showHeader" class="modal-header">
+        <span class="modal-header-title">{{title$ | async}}</span>
+        <button inch-button color="flat" class="modal-header__close">
+            <svg (click)="onClose()" width="24" height="24">
+                <use xlink:href="assets/images/close_24.svg#close"></use>
+            </svg>
+        </button>
+    </div>
+    <ng-template cdkPortalOutlet></ng-template>
+</div>

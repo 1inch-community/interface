@@ -1,0 +1,20 @@
+<div class="background"></div>
+<div *ngIf="!(platform.isMobileView$ | async)" class="platform-container">
+  <inch-header/>
+  <div class="content-container">
+    <ng-container *ngTemplateOutlet="contentRef"/>
+  </div>
+  <inch-footer/>
+</div>
+
+<div *ngIf="(platform.isMobileView$ | async)" class="platform-container platform-container__mobile">
+  <inch-mobile-header/>
+  <div class="content-container content-container__mobile">
+    <ng-container *ngTemplateOutlet="contentRef"/>
+  </div>
+  <inch-mobile-footer/>
+</div>
+
+<ng-template #contentRef>
+  <router-outlet/>
+</ng-template>

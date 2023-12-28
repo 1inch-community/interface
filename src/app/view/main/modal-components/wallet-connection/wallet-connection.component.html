@@ -1,0 +1,23 @@
+<div class="wallet-connection-container">
+  <div class="wallet-connection-container__item-container">
+    <button *ngFor="let item of config"
+            class="wallet-connection-container__item"
+            [class.wallet-connection-container__item-disabled]="item.disabled"
+            [tabindex]="0"
+            inch-button
+            size="none"
+            color="flat"
+            (click)="onConnect(item)"
+    >
+      <img [width]="64" [height]="64" ngSrc="assets/images/wallets/{{item.iconName}}.svg" [alt]="item.displayName">
+      <span>{{item.displayName}}</span>
+    </button>
+  </div>
+  <div class="wallet-connection-container__terms">
+        <span>By connecting a wallet, you acknowledge that you have read and accepted
+            <a href="https://1inch.io/assets/1inch_network_terms_of_use.pdf" class="terms__link" target="_blank">Terms of Service</a>
+            and
+            <a href="https://1inch.io/assets/1inch_network_privacy_policy.pdf" class="terms__link" target="_blank">Privacy Policy</a>
+        </span>
+  </div>
+</div>

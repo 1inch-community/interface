@@ -1,0 +1,20 @@
+.mobile-footer-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 14px 16px;
+  background: var(--1inch__bg_bg-body);
+  border-top: 1px solid var(--1inch__border_border-2ry);
+  z-index: 9;
+  height: var(--mobile-footer-height);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.mobile-footer-right {
+  display: flex;
+  gap: 8px;
+}

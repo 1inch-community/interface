@@ -1,0 +1,30 @@
+<inch-card>
+    <div class="header">
+        <button (click)="onBack()" inch-button color="flat">
+            <svg width="16" height="16">
+                <use xlink:href="assets/images/icons/arrow.svg#arrow"></use>
+            </svg>
+        </button>
+        <div class="title">Select a token</div>
+    </div>
+    <div class="list-container">
+        <ng-container *ngLet="(wallet$ | async) as wallet">
+            <cdk-virtual-scroll-viewport itemSize="72" class="viewport">
+                <div *cdkVirtualFor="let id of tokensIdList$ | async" class="item-container">
+                    <div *ngIf="(id | selectTokenById: wallet) | async as view" (click)="onSelect(view.token.symbol)" class="item">
+                        <span class="item-img">
+                            <inch-token-icon [token]="view.token" [size]="40"/>
+                        </span>
+                        <div class="item-name-and-balance">
+                            <span class="item-name">{{view.token.name}}</span>
+                            <span class="item-balance">{{view.balance | toFixed: 4}} {{view.token.symbol}}</span>
+                        </div>
+                    </div>
+                </div>
+            </cdk-virtual-scroll-viewport>
+        </ng-container>
+        <div *ngIf="loaderStub$ | async" class="list-loader">
+          <img ngSrc="assets/images/icons/unicorn_run.svg" [width]="100" [height]="80" alt="unicorn_run">
+        </div>
+    </div>
+</inch-card>

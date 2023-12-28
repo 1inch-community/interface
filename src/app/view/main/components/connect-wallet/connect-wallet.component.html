@@ -1,0 +1,16 @@
+<button *ngIf="!(walletData.isConnected$ | async)" inch-button color="blue" (click)="onOpenConnectWalletModal()">
+    <svg width="24" height="24">
+        <use xlink:href="assets/images/wallet.svg#wallet"></use>
+    </svg>
+    Connect wallet
+</button>
+
+<button *ngIf="(walletData.isConnected$ | async)" inch-button color="none" class="container">
+    <img *ngIf="currentWalletConfigItem$ | async as item" [width]="24" [height]="24"
+         [ngSrc]="'assets/images/wallets/' + item.iconName + '.svg'" [alt]="item.displayName">
+    <span class="address-container">
+        <span class="address">
+            {{currentAddress$ | async | prettyHash}}
+        </span>
+    </span>
+</button>

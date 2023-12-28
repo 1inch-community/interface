@@ -1,0 +1,16 @@
+<button
+  *ngLet="stateService.state$ | async as state"
+  inch-button
+  [disabled]="isDisabled(state)"
+  [fullWidth]="true"
+  [contentCenter]="true"
+  [color]="getColor(state)"
+  [size]="'l'"
+  (click)="onClock(state)"
+>
+  <svg *ngIf="state === SwapButtonState.walletNotConnected" width="24" height="24">
+    <use xlink:href="assets/images/wallet.svg#wallet"></use>
+  </svg>
+  <img *ngIf="isShowLoader(state)" ngSrc="assets/images/icons/unicorn_run.svg" [width]="38" [height]="24" alt="unicorn_run">
+  <span>{{getText(state)}}</span>
+</button>

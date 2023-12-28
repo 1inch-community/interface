@@ -1,0 +1,58 @@
+/* To learn more about this file see: https://angular.io/config/tsconfig. */
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "outDir": "./dist/out-tsc",
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+    "esModuleInterop": true,
+    "sourceMap": true,
+    "declaration": false,
+    "experimentalDecorators": true,
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "ES2022",
+    "useDefineForClassFields": false,
+    "lib": [
+      "ES2022",
+      "dom"
+    ],
+    "paths": {
+      "@1inch/v3/env": [
+        "./src/environments/environment"
+      ],
+      "@1inch/v3/core/shared": [
+        "./src/app/core/shared"
+      ],
+      "@1inch/v3/core/interceptors": [
+        "./src/app/core/interceptors"
+      ],
+      "@1inch/v3/core/tokens": [
+        "./src/app/core/tokens"
+      ],
+      "@1inch/v3/core/wallet": [
+        "./src/app/core/wallet"
+      ],
+      "@1inch/v3/core/swap": [
+        "./src/app/core/swap"
+      ],
+      "@1inch/v3/view": [
+        "./src/app/view"
+      ],
+      "@1inch/v3/view/shared": [
+        "./src/app/view/shared"
+      ]
+    }
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true,
+    "strictTemplates": true
+  }
+}

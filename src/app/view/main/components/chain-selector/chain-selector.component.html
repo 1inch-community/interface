@@ -1,0 +1,46 @@
+<button
+  *ngLet="chainIdView$ | async as chainIdView"
+  inch-button
+  color="none"
+  [style.background-image]="chainIdView?.color"
+  (click)="onSwitch($event)"
+>
+  <svg width="24" height="24">
+    <use
+      attr.xlink:href="/assets/images/network-logos/{{chainIdView?.iconName}}-transparent.svg#{{chainIdView?.iconName}}"></use>
+  </svg>
+  <span *ngIf="!(platformService.isMobileView$ | async)" class="chain-name">{{chainIdView?.name}}</span>
+  <svg width="16" height="16" class="arrow" [class.arrow-flipped]="isOpen">
+    <use xlink:href="assets/images/icons/arrow.svg#arrow"></use>
+  </svg>
+</button>
+
+<div class="chain-selector-drop-down" [class.chain-selector-drop-down__open]="isOpen">
+  <ng-container *ngTemplateOutlet="chainSelector"/>
+</div>
+
+<ng-template #chainSelector>
+  <ng-container *ngLet="chainId$ | async as selectChainId">
+    <ng-container *ngFor="let chainId of chainIdList">
+      <ng-container *ngLet="chainViewRecord[chainId] as chainView">
+        <div
+          class="chain-selector-drop-down_item"
+          [class.chain-selector-drop-down_item-l2]="chainView.l2Chain"
+          [class.chain-selector-drop-down_item-select]="+chainId === selectChainId"
+          matRipple
+          inchCssVar
+          [cssVarName]="'ripple-color'"
+          [cssVarValue]="chainView.color"
+          (click)="onSelect(+chainId, $event)"
+        >
+          <svg *ngIf="chainView.l2Chain" width="24" height="24">
+            <use xlink:href="assets/images/icons/network-chain-level2.svg#network-chain-level2"></use>
+          </svg>
+          <img ngSrc="/assets/images/network-logos/{{chainView?.iconName}}.svg" [height]="24"
+               [width]="24"/>
+          <span>{{chainView?.name}}</span>
+        </div>
+      </ng-container>
+    </ng-container>
+  </ng-container>
+</ng-template>

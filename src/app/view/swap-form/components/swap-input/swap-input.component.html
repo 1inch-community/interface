@@ -1,0 +1,63 @@
+<div
+  class="swap-input-container"
+  [class.swap-input-container__focus]="isFocus"
+  [class.swap-input-container__disable]="tokenType === 'dstToken'"
+>
+  <div class="swap-input-mode-and-balance swap-input-mini-view swap-input-flex">
+    <ng-container [ngSwitch]="tokenType">
+      <span *ngSwitchCase="'srcToken'">You sell</span>
+      <span *ngSwitchCase="'dstToken'">You buy</span>
+    </ng-container>
+    <ng-container *ngIf="symbol$ | async">
+      <div *ngIf="balance$ | async as balance" class="swap-input-balance-container">
+        <span>Balance: {{balance | toFixed: 4}}</span>
+        <button
+          *ngIf="tokenType === 'srcToken'"
+          inch-button
+          size="s"
+          [color]="(maxButtonColor$ | async) ?? 'blue'"
+          (click)="onSetMax()"
+        >Max
+        </button>
+      </div>
+    </ng-container>
+  </div>
+
+  <div class="swap-input-token-and-amount">
+    <div class="swap-input-currency">
+      <button inch-button [color]="(selectCurrencyButtonColor$ | async) ?? 'blue'" (click)="onOpenSelectToken()">
+        <span *ngIf="token$ | async as token; else selectTokenRef" class="swap-input-currency-img-container">
+          <inch-token-icon [token]="token" [size]="24"/>
+        </span>
+        <ng-template #selectTokenRef>
+          <span class="swap-input-select-token">Select token</span>
+        </ng-template>
+        <span class="swap-input-currency-symbol">{{symbol$ | async}}</span>
+        <svg width="16" height="16">
+          <use xlink:href="assets/images/icons/arrow.svg#arrow"></use>
+        </svg>
+      </button>
+    </div>
+    <div class="swap-input-input-container">
+      <tui-input-number
+        class="swap-input-amount"
+        [class.swap-input-amount__loading]="isLoading$ | async"
+        [min]="0"
+        [maxlength]="23"
+        [precision]="6"
+        [decimal]="'not-zero'"
+        [formControl]="formControl"
+        (focusedChange)="onChangeFocus($event)"
+      ></tui-input-number>
+    </div>
+  </div>
+
+  <div class="swap-input-link-and-fiat-amount swap-input-mini-view swap-input-flex">
+    <a inch-link [href]="scanLink$ | async" target="_blank">{{name$ | async}}</a>
+    <span></span>
+  </div>
+</div>
+
+<ng-template>
+  <div></div>
+</ng-template>

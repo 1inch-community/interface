@@ -1,0 +1,12 @@
+<img
+  *ngIf="showImg"
+  [class.load]="load"
+  [ngSrc]="imgLink"
+  [alt]="token.name"
+  [width]="size"
+  [height]="size"
+  (error)="onError()"
+  (loadstart)="onLoadStart()"
+  (load)="onLoadComplete()"
+/>
+<span class="stub">{{symbolView}}</span>

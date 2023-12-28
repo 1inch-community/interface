@@ -1,0 +1,90 @@
+:root {
+  // all colors
+  // https://www.figma.com/file/dnWd2LD86qbtedRNcCSdAL/Core-Colors?type=design&node-id=9043-6185&mode=design&t=dNfQBzLwjnswNwRP-0
+
+  .dark_theme {
+    // static
+    --1inch__static_brand: #2F8AF5;
+    --1inch__static_brand-T50: rgba(47, 138, 245, 0.5); // #2F8AF5 16%
+    --1inch__static_white: #FFFFFF;
+    --1inch__static_white-T25: rgba(255, 255, 255, 0.25); // #FFFFFF 25%
+    --1inch__static_white-T60: rgba(255, 255, 255, 0.60); // #FFFFFF 60%
+    --1inch__static_black: #222222;
+    --1inch__static_green: #21C187;
+    // Text-Icons
+    --1inch__text-icons_main: #FBFBFB;
+    --1inch__text-icons_gray-500: #6C86AD;
+    --1inch__text-icons_gray-400: #44556F;
+    --1inch__text-icons_gray-300: #37445A;
+    --1inch__text-icons_approve: #21C187;
+    --1inch__text-icons_warning: #FF9C08;
+    --1inch__text-icons_error: #F04832;
+    // Background
+    --1inch__bg_bg-main: #141924;
+    --1inch__bg_bg-2ry: #10141C;
+    --1inch__bg_bg-3ry: #263042;
+    --1inch__bg_info-2ry: rgba(47, 138, 245, 0.16); // #2F8AF5 16%
+    --1inch__bg_success-2ry: rgba(38, 48, 66, 0.25); // #33776B 25%
+    --1inch__bg_warning-2ry: rgba(255, 156, 8, 0.25); // #FF9C08 25%
+    --1inch__bg_error-2ry: rgba(240, 72, 50, 0.16); // #F04832 16%
+    --1inch__bg_warning: #FF9C08;
+    --1inch__bg_error: #F04832;
+    --1inch__bg_input-main: #06070A;
+    --1inch__bg_input-2ry: #06070A;
+    --1inch__bg_tab-selected: #2B374A;
+    --1inch__bg_bg-body: #06070A;
+    --1inch__bg_input-3ry: #1E2633;
+    // Border
+    --1inch__border_border-main: #2F3B4D;
+    --1inch__border_border-2ry: #232C3D;
+    // States
+    --1inch__states_button-disabled: #263042;
+    --1inch__states_control-disabled: #232C3D;
+    --1inch__states_ripple: rgba(108, 134, 173, 0.16); // #6C86AD 16%
+    --1inch__states_brand-hover: #0B6FE5;
+    --1inch__states_info-2ry-hover: rgba(47, 138, 245, 0.24); // #2F8AF5 24%
+    --1inch__states_approve-hover: #199468;
+    --1inch__states_success-2ry-hover: rgba(51, 119, 107, 0.35); // #33776B 35%
+    --1inch__states_warning-hover: #D68100;
+    --1inch__states_warning-2ry-hover: rgba(255, 156, 8, 0.35); // #FF9C08 35%
+    --1inch__states_error-hover: #DF2810;
+    --1inch__states_error-2ry-hover: rgba(240, 72, 50, 0.24); // #F04832 24%
+    --1inch__states_button-transparent-hover: rgba(255, 255, 255, 0.2); // #FFFFFF 20%
+    --1inch__states_link-hover: #0056b3;
+    // Special \/ \/ \/
+    // not subtype
+    --1inch__special_logo-main: #FFFFFF;
+    --1inch__special_white-to-blue: #FFFFFF;
+    --1inch__special_bg-gray-to-white: #324054;
+    --1inch__special_bg-gray-to-lightBlue: #324054;
+    // Rainbow
+    --1inch__rainbow_pink: #D35F91;
+    --1inch__rainbow_violet: #9361DA;
+    --1inch__rainbow_indigo: #6466E3;
+    --1inch__rainbow_blue: #2F8AF5;
+    --1inch__rainbow_emerald: #45A39B;
+    --1inch__rainbow_green: #54AA46;
+    --1inch__rainbow_orange: #EB721B;
+    // Chains
+    --1inch__chains_ethereum: #627EEA;
+    --1inch__chains_bsc: #F0B90B;
+    --1inch__chains_optimism: #FF0420;
+    --1inch__chains_polygon: #8247E5;
+    --1inch__chains_arbitrum: #2D374B;
+    --1inch__chains_gnosis: #63A5A8;
+    --1inch__chains_avalanche: #D64F4A;
+    --1inch__chains_aurora: #86D65B;
+    --1inch__chains_klaytn: #C30B4C;
+    --1inch__chains_fantom: #0813EF;
+    --1inch__chains_zkSync: #141314;
+    // Gradients (Styles)
+    --1inch__gradients_background-blue-circle-radial: radial-gradient(50% 50% at 50% 50%, rgba(40, 94, 176, 0.41) 0%, rgba(6, 19, 31, 0) 100%);
+    --1inch__gradients_background-red-circle-radial: radial-gradient(50% 50% at 50% 50%, rgba(74, 39, 74, 0.74) 0%, rgba(76, 38, 73, 0) 100%);
+    --1inch__gradients_background-blue-linear: linear-gradient(340deg, var(--1inch__bg_bg-body) 46%, rgba(40, 94, 176, 0.41) 100%);
+    --1inch__gradients_counter-purple-linear: linear-gradient(90deg, #9C27B0 0%, #5E35B1 100%);
+    --1inch__gradients_banner-blue-circle-radial: radial-gradient(50.55% 130.18% at 79.21% 159.61%, rgba(0, 178, 255, 0.8) 0%, rgba(57, 22, 131, 0.25) 80%, rgba(57, 22, 131, 0) 100%);
+    // Shadow
+    --1inch__swap-form_reverse-link: 0 0 4px rgba(0, 0, 0, .1), 0 1px 2px rgba(0, 0, 0, .25)
+  }
+
+}

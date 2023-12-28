@@ -1,0 +1,160 @@
+///* ----------- iPhone 5, 5S, 5C and 5SE ----------- */
+//@mixin iphone5All {
+//  @media only screen
+//  and (min-device-width: 375px)
+//  and (max-device-width: 568px)
+//  and (-webkit-min-device-pixel-ratio: 2) {
+//    @content
+//  }
+//}
+//
+//@mixin iphone5Portrait {
+//  @media only screen
+//  and (min-device-width: 375px)
+//  and (max-device-width: 568px)
+//  and (-webkit-min-device-pixel-ratio: 2)
+//  and (orientation: portrait) {
+//    @content
+//  }
+//}
+//
+//@mixin iphone5Landscape {
+//  @media only screen
+//  and (min-device-width: 375px)
+//  and (max-device-width: 568px)
+//  and (-webkit-min-device-pixel-ratio: 2)
+//  and (orientation: landscape) {
+//    @content
+//  }
+//}
+//
+///* ----------- iPhone 6, 6S, 7 and 8 ----------- */
+//@mixin iphone6All {
+//  @media only screen
+//  and (min-device-width: 375px)
+//  and (max-device-width: 667px)
+//  and (-webkit-min-device-pixel-ratio: 2) {
+//    @content
+//  }
+//}
+//
+//@mixin iphone6Portrait {
+//  @media only screen
+//  and (min-device-width: 375px)
+//  and (max-device-width: 667px)
+//  and (-webkit-min-device-pixel-ratio: 2)
+//  and (orientation: portrait) {
+//    @content
+//  }
+//}
+//
+//@mixin iphone6Landscape {
+//  @media only screen
+//  and (min-device-width: 375px)
+//  and (max-device-width: 667px)
+//  and (-webkit-min-device-pixel-ratio: 2)
+//  and (orientation: landscape) {
+//    @content
+//  }
+//}
+//
+///* ----------- iPhone 6+, 7+ and 8+ ----------- */
+//@mixin iphone6PlusAll {
+//  @media only screen
+//  and (min-device-width: 414px)
+//  and (max-device-width: 736px)
+//  and (-webkit-min-device-pixel-ratio: 3) {
+//    @content
+//  }
+//}
+//
+//@mixin iphone6PlusPortrait {
+//  @media only screen
+//  and (min-device-width: 414px)
+//  and (max-device-width: 736px)
+//  and (-webkit-min-device-pixel-ratio: 3)
+//  and (orientation: portrait) {
+//    @content
+//  }
+//}
+//
+//@mixin iphone6PlusLandscape {
+//  @media only screen
+//  and (min-device-width: 414px)
+//  and (max-device-width: 736px)
+//  and (-webkit-min-device-pixel-ratio: 3)
+//  and (orientation: landscape) {
+//    @content
+//  }
+//}
+//
+///* ----------- iPhone X ----------- */
+//@mixin iphoneXAll {
+//  @media only screen
+//  and (min-device-width: 375px)
+//  and (max-device-width: 812px)
+//  and (-webkit-min-device-pixel-ratio: 3) {
+//    @content
+//  }
+//}
+//
+//@mixin iphoneXPortrait {
+//  @media only screen
+//  and (min-device-width: 375px)
+//  and (max-device-width: 812px)
+//  and (-webkit-min-device-pixel-ratio: 3)
+//  and (orientation: portrait) {
+//    @content
+//  }
+//}
+//
+//@mixin iphoneXLandscape {
+//  @media only screen
+//  and (min-device-width: 375px)
+//  and (max-device-width: 812px)
+//  and (-webkit-min-device-pixel-ratio: 3)
+//  and (orientation: landscape) {
+//    @content
+//  }
+//}
+//
+//@mixin iphoneLandscape {
+//  @media only screen
+//  and (min-device-width: 375px)
+//  and (max-device-width: 812px)
+//  and (-webkit-min-device-pixel-ratio: 3)
+//  and (orientation: landscape) {
+//    @content
+//  }
+//}
+
+@mixin media($media) {
+  @if $media == xs { // iPhone X, iPhone Xs, iPhone 11 Pro, iPhone 12 Mini, and iPhone 13 Mini:
+    @media only screen
+    and (width: 375px)
+    and (height: 812px)
+    and (-webkit-device-pixel-ratio: 3) {
+      @content
+    }
+  }
+  @else if $media == s { // iPhone 12, iPhone 12 Pro, iPhone 13, iPhone 13 Pro, and iPhone 14
+    @media only screen
+    and (width: 390px)
+    and (height: 844px)
+    and (-webkit-device-pixel-ratio: 3) {
+      @content
+    }
+  }
+  @else if $media == m { // iPhone 12 Pro Max, iPhone 13 Pro Max, and iPhone 14 Plus
+    @media only screen
+    and (min-device-width: 428px)
+    and (min-device-width: 926px)
+    and (-webkit-device-pixel-ratio: 3) {
+      @content
+    }
+  }
+  @else if $media == l { // Ipad
+
+  }
+
+}

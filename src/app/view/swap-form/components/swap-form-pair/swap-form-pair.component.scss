@@ -1,0 +1,39 @@
+.swap-form-pair-container {
+  display: flex;
+  flex-direction: column;
+}
+
+.swap-form-pair-reverse-container {
+  display: flex;
+  justify-content: center;
+  --overflow: -7px;
+  margin-top: var(--overflow);
+  margin-bottom: var(--overflow);
+  z-index: 10;
+}
+
+.swap-form-pair-reverse-link {
+  cursor: pointer;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+  border-radius: 50%;
+  background-color: var(--1inch__special_bg-gray-to-lightBlue);
+  color: var(--1inch__text-icons_main);
+  box-shadow: var(--1inch__swap-form_reverse-link);
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+  box-sizing: border-box;
+  transform: rotate(0deg);
+  transition: transform .3s;
+
+  svg {
+    overflow: hidden;
+    vertical-align: middle;
+  }
+
+  &:hover {
+    transform: rotate(180deg);
+  }
+}

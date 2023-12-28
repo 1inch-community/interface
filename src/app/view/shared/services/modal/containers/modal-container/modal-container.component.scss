@@ -1,0 +1,38 @@
+.modal-container {
+  background: var(--1inch__bg_bg-main);
+  color: var(--1inch__text-icons_main);
+  width: 420px;
+  border-radius: 24px;
+}
+
+.modal-header {
+    height: 56px;
+    padding: 12px;
+    box-sizing: border-box;
+    display: flex;
+    justify-content: center;
+    position: relative;
+
+    .modal-header__close {
+        padding: 6px;
+        position: absolute;
+        right: 10px;
+        top: 10px;
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+
+        &:hover, &:focus-visible {
+            background: var(--1inch__states_ripple);
+        }
+    }
+}
+
+.modal-header-title {
+  grid-column-start: 2;
+  grid-column-end: 3;
+  display: flex;
+  align-items: center;
+  font-size: 20px;
+  line-height: 24px;
+}

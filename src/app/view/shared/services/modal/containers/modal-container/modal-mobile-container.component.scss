@@ -1,0 +1,18 @@
+.modal-container {
+  background: var(--1inch__bg_bg-main);
+  color: var(--1inch__text-icons_main);
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  border-radius: 24px 24px 0 0;
+  max-height: 100vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  position: sticky;
+  top: 0;
+  z-index: 99;
+  background: var(--1inch__bg_bg-main);
+}
