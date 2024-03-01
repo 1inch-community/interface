@@ -1,0 +1,32 @@
+{
+  "name": "ui-components",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/ui-components/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "rollup -c libs/ui-components/rollup.config.js --bundleConfigAsCjs"
+        ]
+      }
+    },
+    "watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "rollup -c libs/ui-components/rollup.config.js --bundleConfigAsCjs -w --watch.buildDelay 500"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["{options.reportsDirectory}"],
+      "options": {
+        "reportsDirectory": "../../coverage/temp/ui-components"
+      }
+    }
+  },
+  "tags": []
+}
