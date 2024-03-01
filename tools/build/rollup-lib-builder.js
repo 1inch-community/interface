@@ -20,6 +20,11 @@ export function rollupLibBuilder(options) {
   const dist = path.resolve(projectRoot, 'dist', 'libs', libName)
   const tsconfigPath = path.resolve(projectRoot, 'libs', libName, 'tsconfig.lib.json')
 
+  try {
+    fs.rmSync(dist, { recursive: true, force: true });
+    console.log('remove lib dist dir')
+  } catch {}
+
   const modules = fundModules(libRoot)
   console.log('library modules found:', modules.map(m => `\n ->> ${m.moduleName}`).join(''))
 
@@ -32,14 +37,15 @@ export function rollupLibBuilder(options) {
     const modulePublicApiPathTypes = path.join(
       dist,
       moduleName,
-      modulePublicApiPath.replace(path.resolve(projectRoot, 'libs', libName), '')
+      modulePublicApiPath.replace(projectRoot, '')
     ).replace('.ts', '.d.ts')
 
     const typescriptConfig = {
       tsconfig: tsconfigPath,
       compilerOptions: {
-        rootDir: libRoot,
-        declarationDir: moduleDistPath
+        rootDir: projectRoot,
+        declarationDir: moduleDistPath,
+        checkJs: false,
       }
     }
 
@@ -55,6 +61,13 @@ export function rollupLibBuilder(options) {
         main,
         types,
         type: "module",
+        peerDependencies: {
+          "@lit/context": "1.1.x",
+          "@lit/task": "1.0.x",
+          "lit": "3.1.x",
+          "tslib": "2.3.0",
+          "viem": "2.7.22"
+        },
         exports: {
           '.': {
             import: module,
@@ -76,11 +89,11 @@ export function rollupLibBuilder(options) {
           sourcemap: true
         },
         plugins: [
-          typescript(typescriptConfig),
-          resolve(),
+          resolve({ browser: true }),
           commonjs(),
           dynamicImportVars(),
           renameOutput(nameReplace),
+          typescript(typescriptConfig),
         ]
       },
       {
@@ -94,12 +107,12 @@ export function rollupLibBuilder(options) {
           sourcemap: true
         },
         plugins: [
-          typescript(typescriptConfig),
-          resolve(),
+          resolve({ browser: true }),
           commonjs(),
           dynamicImportVars(),
           renameOutput(nameReplace),
           generatePackageJson(configPackageJson),
+          typescript(typescriptConfig),
         ]
       },
       {
@@ -110,9 +123,9 @@ export function rollupLibBuilder(options) {
           }
         ],
         plugins: [
-          dts(),
+          dts(typescriptConfig),
           del({
-            targets: path.resolve(moduleDistPath, 'src'),
+            targets: path.resolve(moduleDistPath, 'libs'),
             hook: 'buildEnd'
           })
         ],

@@ -2,6 +2,7 @@
   "compileOnSave": false,
   "compilerOptions": {
     "allowJs": true,
+    "checkJs": false,
     "rootDir": ".",
     "baseUrl": ".",
     "sourceMap": true,
@@ -23,7 +24,8 @@
       }
     ],
     "paths": {
-      "@one-inch-community/ui-components/*": ["dist/libs/ui-components/*"]
+      "@one-inch-community/ui-components/*": ["dist/libs/ui-components/*"],
+      "@one-inch-community/models": ["libs/models/src/index"]
     }
   },
   "exclude": ["node_modules", "tmp"]

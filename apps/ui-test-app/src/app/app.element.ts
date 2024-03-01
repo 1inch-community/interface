@@ -4,6 +4,7 @@ import '@one-inch-community/ui-components/button'
 import '@one-inch-community/ui-components/card'
 import '@one-inch-community/ui-components/icon'
 import '@one-inch-community/ui-components/segmented-control'
+import '@one-inch-community/ui-components/token-icon'
 import {
   MainColors,
   BrandColors,
@@ -169,6 +170,15 @@ export class AppElement extends LitElement {
         <inch-segmented-control .items="${this.data}" .select="${this.data[1]}"></inch-segmented-control>
         <inch-segmented-control .items="${this.data}" .select="${this.data[2]}"></inch-segmented-control>
         <inch-segmented-control .items="${this.dataAndTemplate}" .select="${this.data[2]}"></inch-segmented-control>
+      </inch-card>
+      
+      <inch-card>
+        <inch-token-icon symbol="USDT" address="0xdAC17F958D2ee523a2206206994597C13D831ec7" chainId="1" size="40"></inch-token-icon>
+        <inch-token-icon symbol="USDT" address="0xdAC17F958D2ee523a2206206994597C13D831ece" chainId="1"></inch-token-icon>
+        <inch-token-icon symbol="USDT" address="0xdAC17F958D2ee523a2206206994597C13D831ece" chainId="1" size="40"></inch-token-icon>
+        <inch-token-icon symbol="GRT" address="0xc944E90C64B2c07662A292be6244BDf05Cda44a7" chainId="1" size="40"></inch-token-icon>
+        <inch-token-icon symbol="GRT" address="0xc944E90C64B2c07662A292be6244BDf05Cda44A7" chainId="1" size="40"></inch-token-icon>
+        <inch-token-icon symbol="GRT" address="0xc944E90C64B2c07662A292be6244BDf05Cda44a7" chainId="1" size="40"></inch-token-icon>
       </inch-card>
     `
   }
