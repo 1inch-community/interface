@@ -1,16 +1,21 @@
-import { css, html, LitElement, PropertyValues } from 'lit';
+import { css, html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Task } from '@lit/task';
 import type { Address } from 'viem';
-import { ChainId } from '@one-inch-community/models';
 import { repositories } from './repositories';
 import { RepositoryPayload } from './repositories/repository.model';
+import { ChainId } from '@one-inch-community/models';
 
 @customElement(TokenIconElement.tagName)
 export class TokenIconElement extends LitElement {
   static tagName = 'inch-token-icon'
 
   static override styles = css`
+
+      :host {
+          user-select: none;
+          outline: none;
+      }
 
       .stub {
           display: flex;
@@ -62,6 +67,7 @@ export class TokenIconElement extends LitElement {
       complete: value => {
         value.width = this.size;
         value.height = this.size;
+        value.ondragstart = () => false
         return html `${value}`;
       }
     });

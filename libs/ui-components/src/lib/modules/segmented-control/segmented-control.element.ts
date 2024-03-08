@@ -8,8 +8,8 @@ import { buildEvent } from '../../utils/dom.utils';
 type SegmentedControlSize = 'm' | 'l'
 
 export interface SegmentedControlItem {
-  value: string
   label: string
+  value?: string | number
   template?: (item: SegmentedControlItem, isSelect: boolean, caretRef: HTMLElement | null) => TemplateResult
 }
 

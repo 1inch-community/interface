@@ -5,6 +5,7 @@ import '@one-inch-community/ui-components/card'
 import '@one-inch-community/ui-components/icon'
 import '@one-inch-community/ui-components/segmented-control'
 import '@one-inch-community/ui-components/token-icon'
+import type { SegmentedControlItem } from '@one-inch-community/ui-components/segmented-control'
 import {
   MainColors,
   BrandColors,
@@ -38,25 +39,25 @@ export class AppElement extends LitElement {
       }
   `
 
-  protected readonly data = [
+  protected readonly data: SegmentedControlItem[] = [
     { value: 1, label: 'data1' },
     { value: 2, label: 'data2' },
     { value: 3, label: 'data3' },
   ]
 
-  protected readonly dataAndTemplate = [
+  protected readonly dataAndTemplate: SegmentedControlItem[] = [
     ...this.data,
     { value: 4, template: () => html`<input placeholder="custom template" style="border: none; outline: none; background-color: transparent;">` }
   ]
 
-  protected readonly segmentedMainColorsData = [
+  protected readonly segmentedMainColorsData: SegmentedControlItem[] = [
     { label: 'Dark', value: MainColors.dark },
     { label: 'Dark blue', value: MainColors.darkBlue },
     { label: 'Light', value: MainColors.light },
     { label: 'Light blue', value: MainColors.lightBlue },
   ]
 
-  protected readonly segmentedBrandColorsData = [
+  protected readonly segmentedBrandColorsData: SegmentedControlItem[] = [
     { label: 'Community', value: BrandColors.community },
     { label: 'Orange', value: BrandColors.orange },
     { label: 'Violet', value: BrandColors.violet },
@@ -176,6 +177,7 @@ export class AppElement extends LitElement {
         <inch-token-icon symbol="USDT" address="0xdAC17F958D2ee523a2206206994597C13D831ec7" chainId="1" size="40"></inch-token-icon>
         <inch-token-icon symbol="USDT" address="0xdAC17F958D2ee523a2206206994597C13D831ece" chainId="1"></inch-token-icon>
         <inch-token-icon symbol="USDT" address="0xdAC17F958D2ee523a2206206994597C13D831ece" chainId="1" size="40"></inch-token-icon>
+        <inch-token-icon symbol="USDT" address="0xdAC17F958D2ee523a2206206994597C13D832ece" chainId="1" size="40"></inch-token-icon>
         <inch-token-icon symbol="GRT" address="0xc944E90C64B2c07662A292be6244BDf05Cda44a7" chainId="1" size="40"></inch-token-icon>
         <inch-token-icon symbol="GRT" address="0xc944E90C64B2c07662A292be6244BDf05Cda44A7" chainId="1" size="40"></inch-token-icon>
         <inch-token-icon symbol="GRT" address="0xc944E90C64B2c07662A292be6244BDf05Cda44a7" chainId="1" size="40"></inch-token-icon>
