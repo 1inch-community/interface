@@ -12,7 +12,8 @@ import renameOutput from './rollup-plugin-rename';
 
 export function rollupLibBuilder(options) {
   const {
-    libName
+    libName,
+    peerDependencies,
   } = options
 
   const projectRoot = path.dirname(path.dirname(__dirname))
@@ -26,9 +27,11 @@ export function rollupLibBuilder(options) {
   } catch {}
 
   const modules = fundModules(libRoot)
+  const oneModuleLibrary = modules.length === 1
   console.log('library modules found:', modules.map(m => `\n ->> ${m.moduleName}`).join(''))
 
-  function buildConfig({ modulePublicApiPath, moduleName }) {
+  function buildConfig({ modulePublicApiPath, moduleName: _moduleName }) {
+    const moduleName = oneModuleLibrary ? '' : _moduleName
     const moduleDistPath = path.resolve(dist, moduleName)
     const moduleFullName = `@${pkgGlobal.name}/${libName}/${moduleName}`
     const moduleMainCJSFile = path.resolve(moduleDistPath, 'index.cjs.js')
@@ -45,7 +48,16 @@ export function rollupLibBuilder(options) {
       compilerOptions: {
         rootDir: projectRoot,
         declarationDir: moduleDistPath,
-        checkJs: false,
+        declaration: true,
+        types: ["node"],
+        target: "esnext",
+        module: "esnext",
+        strict: true,
+        importHelpers: true,
+        allowSyntheticDefaultImports: true,
+        esModuleInterop: true,
+        sourceMap: true,
+        declarationMap: true
       }
     }
 
@@ -61,13 +73,7 @@ export function rollupLibBuilder(options) {
         main,
         types,
         type: "module",
-        peerDependencies: {
-          "@lit/context": "1.1.x",
-          "@lit/task": "1.0.x",
-          "lit": "3.1.x",
-          "tslib": "2.3.0",
-          "viem": "2.7.22"
-        },
+        peerDependencies: peerDependencies ?? {},
         exports: {
           '.': {
             import: module,
