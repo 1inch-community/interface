@@ -1,0 +1,66 @@
+import { html, LitElement } from 'lit';
+import { customElement } from 'lit/decorators.js';
+import '@one-inch-community/ui-components/icon'
+import { tokenPairSwitchStyle } from './token-pair-switch.style';
+import { asyncTimeout } from '@one-inch-community/utils';
+import { consume } from '@lit/context';
+import { swapContext } from '../../context';
+import { ISwapContext } from '@one-inch-community/models';
+
+@customElement(TokenPairSwitchElement.tagName)
+export class TokenPairSwitchElement extends LitElement {
+  static tagName = 'inch-token-pair-switch' as const
+
+  static override styles = tokenPairSwitchStyle
+
+  @consume({ context: swapContext })
+  context?: ISwapContext
+
+  protected override render() {
+    return html`
+      <button
+        @mouseover="${this.up}"
+        @mouseup="${this.down}"
+        @mouseleave="${this.down}"
+        @click="${this.onClick}"
+        class="switcher"
+      >
+        <inch-icon class="switcher-icon" icon="arrowDown24"></inch-icon>
+      </button>
+    `
+  }
+
+  protected up() {
+    const icon = this.renderRoot.querySelector('inch-icon')
+    if (!icon) return
+    if (icon.classList.contains('switcher-icon-up')) return;
+    icon.classList.remove('switcher-icon-off-transition', 'switcher-icon-down')
+    icon.classList.add('switcher-icon-up')
+  }
+
+  protected async down() {
+    const icon = this.renderRoot.querySelector('inch-icon')
+    if (!icon) return
+    if (!icon.classList.contains('switcher-icon-up')) return;
+    icon.classList.add('switcher-icon-down')
+    await asyncTimeout(300)
+    icon.classList.add('switcher-icon-off-transition')
+    icon.classList.remove('switcher-icon-up', 'switcher-icon-down')
+    await asyncTimeout(50)
+    icon.classList.remove('switcher-icon-off-transition')
+  }
+
+  protected onClick() {
+    const icon = this.renderRoot.querySelector('inch-icon')
+    if (!icon) return
+    if (!icon.classList.contains('switcher-icon-up')) return;
+    this.context?.switchPair()
+  }
+
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'inch-token-pair-switch': TokenPairSwitchElement
+  }
+}

@@ -24,8 +24,11 @@
       }
     ],
     "paths": {
+      "@one-inch-community/models": ["libs/models/src/index"],
+      "@one-inch-community/sdk/*": ["dist/libs/sdk/*"],
       "@one-inch-community/ui-components/*": ["dist/libs/ui-components/*"],
-      "@one-inch-community/models": ["libs/models/src/index"]
+      "@one-inch-community/widgets/*": ["dist/libs/widgets/*"],
+      "@one-inch-community/utils": ["libs/utils/src/index"]
     }
   },
   "exclude": ["node_modules", "tmp"]

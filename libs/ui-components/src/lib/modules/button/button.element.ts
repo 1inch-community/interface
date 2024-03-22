@@ -18,7 +18,7 @@ type ButtonType =
 
 @customElement(ButtonElement.tagName)
 export class ButtonElement extends LitElement {
-  static tagName = 'inch-button'
+  static tagName = 'inch-button' as const
 
   static override styles = [
     buttonStyle,
@@ -30,6 +30,8 @@ export class ButtonElement extends LitElement {
 
   @property({ type: String }) type: ButtonType = 'primary'
 
+  @property({ type: Boolean }) fullSize = false
+
   @property({ type: Boolean, attribute: true }) disabled = false
 
   @state() isIconButton = false
@@ -39,6 +41,7 @@ export class ButtonElement extends LitElement {
       [this.size]: true,
       [this.type]: true,
       'only-icon': this.isIconButton,
+      'full-size': this.fullSize,
       'active-box-shadow-inset': this.type.includes('secondary')
         && !this.type.includes('gray'),
     }

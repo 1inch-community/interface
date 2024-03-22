@@ -15,5 +15,10 @@ export const bodyStyle = css`
         animation: none;
         mix-blend-mode: normal;
     }
+    
+    * {
+        user-select: none;
+        outline: none;
+    }
 
 `

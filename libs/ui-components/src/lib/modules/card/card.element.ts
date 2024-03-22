@@ -4,7 +4,7 @@ import { cardStyle } from './card.style';
 
 @customElement(CardElement.tagName)
 export class CardElement extends LitElement {
-  static tagName = 'inch-card'
+  static tagName = 'inch-card' as const
 
   static override styles = cardStyle
 

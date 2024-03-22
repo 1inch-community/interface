@@ -17,7 +17,7 @@ export class IconElement extends LitElement {
     }
   `
 
-  @property({ type: String }) icon?: string
+  @property({ type: String, attribute: 'icon', reflect: true }) icon?: string
 
   private iconRecord?: IconsRecord
 

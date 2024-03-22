@@ -8,7 +8,7 @@ import { ChainId } from '@one-inch-community/models';
 
 @customElement(TokenIconElement.tagName)
 export class TokenIconElement extends LitElement {
-  static tagName = 'inch-token-icon'
+  static tagName = 'inch-token-icon' as const
 
   static override styles = css`
 
@@ -49,10 +49,10 @@ export class TokenIconElement extends LitElement {
   
   `
 
-  @property({ type: String }) symbol?: string
-  @property({ type: String }) address?: Address
-  @property({ type: Number }) chainId?: ChainId
-  @property({ type: Number }) size = 24
+  @property({ type: String, attribute: true, reflect: true }) symbol?: string
+  @property({ type: String, attribute: true, reflect: true }) address?: Address
+  @property({ type: Number, attribute: true, reflect: true }) chainId?: ChainId
+  @property({ type: Number, attribute: true, reflect: true }) size = 24
 
   private readonly task = new Task(this, {
     task: ([symbol, address, chainId], { signal }) => iconLoader(signal, chainId, symbol, address),
@@ -94,13 +94,19 @@ function iconLoader(signal: AbortSignal, chainId?: ChainId, symbol?: string, add
 }
 
 async function recursiveLoader(data: RepositoryPayload, index = 0) {
+  const repositoryLoader = repositories[index];
+  if (!repositoryLoader) throw new Error('token icon not fount');
   try {
-    const repositoryLoader = repositories[index];
-    if (!repositoryLoader) throw new Error('token icon not fount');
     const repository = await repositoryLoader();
     return await repository(data);
   }
   catch {
     return await recursiveLoader(data, index + 1);
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'inch-token-icon': TokenIconElement
   }
 }

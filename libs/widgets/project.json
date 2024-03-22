@@ -1,0 +1,29 @@
+{
+  "name": "widgets",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/widgets/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "rollup -c libs/widgets/rollup.config.js --bundleConfigAsCjs"
+        ]
+      }
+    },
+    "watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "rollup -c libs/widgets/rollup.config.js --bundleConfigAsCjs -w --watch.buildDelay 500"
+        ]
+      }
+    },
+    "publish": {
+      "command": "node tools/scripts/publish.mjs widgets {args.ver} {args.tag}",
+      "dependsOn": ["build"]
+    }
+  },
+  "tags": []
+}

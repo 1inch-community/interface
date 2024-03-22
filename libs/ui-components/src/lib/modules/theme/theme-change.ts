@@ -1,7 +1,7 @@
 import { brandColorMap, mainColorMap } from './themes';
-import { applyStyle } from '../../utils/dom.utils';
 import { mainColorStyleElement, brandColorStyleElement } from './theme-elements';
 import { MainColors, BrandColors } from './themes/themes';
+import { applyStyle } from '@one-inch-community/utils';
 
 let currentMainColor: MainColors
 let currentBrandColor: BrandColors

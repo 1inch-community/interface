@@ -9,6 +9,7 @@ export const buttonStyle = css`
         font-weight: 600;
         display: flex;
         align-items: center;
+        justify-content: center;
         gap: 8px;
         border: 1px solid var(--button-border-color, none);
         background-color: var(--button-background-color);
@@ -18,6 +19,10 @@ export const buttonStyle = css`
         outline: none;
         user-select: none;
         -webkit-tap-highlight-color: transparent;
+    }
+    
+    button.full-size {
+        width: 100%;
     }
     
     @media (hover: hover) {

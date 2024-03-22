@@ -3,7 +3,17 @@ import { ChainId } from '@one-inch-community/models';
 import { getAddress } from 'viem/utils';
 
 const chainName: Record<ChainId, string> = {
-    [ChainId.eth]: 'ethereum'
+    [ChainId.eth]: 'ethereum',
+    [ChainId.bnb]: '',
+    [ChainId.matic]: '',
+    [ChainId.op]: '',
+    [ChainId.arbitrum]: '',
+    [ChainId.gnosis]: '',
+    [ChainId.avalanche]: '',
+    [ChainId.fantom]: '',
+    [ChainId.aurora]: '',
+    [ChainId.klaytn]: '',
+    [ChainId.zkSyncEra]: '',
 }
 
 export const trustWalletRepository: Repository = ({ address, chainId }) => {

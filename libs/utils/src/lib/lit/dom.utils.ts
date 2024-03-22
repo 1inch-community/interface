@@ -24,3 +24,7 @@ export function applyStyle(target: HTMLStyleElement, css: CSSResult) {
 export function buildEvent<V>(type: string, value: V, event?: Event) {
   return new CustomEvent(type, { bubbles: true, composed: true, detail: { value, event } })
 }
+
+export function dispatchEvent<V>(ctx: HTMLElement, type: string, value: V, event?: Event): void {
+  ctx.dispatchEvent(buildEvent(type, value, event))
+}

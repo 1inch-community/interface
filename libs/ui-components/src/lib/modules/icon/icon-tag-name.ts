@@ -1,1 +1,1 @@
-export const iconTagName = 'inch-icon'
+export const iconTagName = 'inch-icon' as const

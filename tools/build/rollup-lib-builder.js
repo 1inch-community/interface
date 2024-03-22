@@ -14,6 +14,7 @@ export function rollupLibBuilder(options) {
   const {
     libName,
     peerDependencies,
+    oneModuleLibrary
   } = options
 
   const projectRoot = path.dirname(path.dirname(__dirname))
@@ -27,11 +28,11 @@ export function rollupLibBuilder(options) {
   } catch {}
 
   const modules = fundModules(libRoot)
-  const oneModuleLibrary = modules.length === 1
+  const _oneModuleLibrary = oneModuleLibrary ?? modules.length === 1
   console.log('library modules found:', modules.map(m => `\n ->> ${m.moduleName}`).join(''))
 
   function buildConfig({ modulePublicApiPath, moduleName: _moduleName }) {
-    const moduleName = oneModuleLibrary ? '' : _moduleName
+    const moduleName = _oneModuleLibrary ? '' : _moduleName
     const moduleDistPath = path.resolve(dist, moduleName)
     const moduleFullName = `@${pkgGlobal.name}/${libName}/${moduleName}`
     const moduleMainCJSFile = path.resolve(moduleDistPath, 'index.cjs.js')

@@ -3,12 +3,12 @@ import { customElement, property } from 'lit/decorators.js';
 import { segmentedControlContainerStyle, segmentedControlItemStyle } from './segmented-control.style';
 import { classMap } from 'lit/directives/class-map.js';
 import { map } from 'lit/directives/map.js';
-import { buildEvent } from '../../utils/dom.utils';
+import { buildEvent } from '@one-inch-community/utils';
 
 type SegmentedControlSize = 'm' | 'l'
 
 export interface SegmentedControlItem {
-  label: string
+  label: string | number
   value?: string | number
   template?: (item: SegmentedControlItem, isSelect: boolean, caretRef: HTMLElement | null) => TemplateResult
 }

@@ -2,6 +2,8 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "declaration": true,
+    "useDefineForClassFields": false,
+    "experimentalDecorators": true,
     "types": ["node"],
     "target": "esnext",
     "module": "esnext",
