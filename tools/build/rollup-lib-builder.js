@@ -59,6 +59,8 @@ export function rollupLibBuilder(options) {
         strict: true,
         importHelpers: true,
         allowSyntheticDefaultImports: true,
+        experimentalDecorators: true,
+        useDefineForClassFields: false,
         esModuleInterop: true,
         sourceMap: true,
         declarationMap: true

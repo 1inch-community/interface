@@ -36,6 +36,7 @@ export const sceneStyle = (config?: Partial<StyleConfig>) => {
           overflow: hidden;
           transition: height var(--animation-time-container), width var(--animation-time-container);
           border-radius: 16px;
+          padding: 1px;
       }
 
       .scene-container-animation {

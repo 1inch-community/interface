@@ -11,6 +11,7 @@ export interface TokenTable {
   symbol: string
   tags: string[]
   eip2612: boolean
+  isFavorite: boolean
 }
 
 export class TokenSchema extends Dexie {
@@ -30,12 +31,13 @@ export class TokenSchema extends Dexie {
         'name',
         'symbol',
         'tags',
-        'eip2612'
+        'eip2612',
+        'isFavorite'
       ].join(', ')
     })
   }
 
-  async setTokens(chainId: ChainId, tokens: Omit<TokenTable, 'id'>[]) {
+  async setTokens(chainId: ChainId, tokens: Omit<TokenTable, 'id' | 'isFavorite'>[]) {
     const tableTokens: TokenTable[] = []
     for (const token of tokens) {
       tableTokens.push({
@@ -46,6 +48,7 @@ export class TokenSchema extends Dexie {
         name: token.name,
         symbol: token.symbol,
         tags: token.tags,
+        isFavorite: false,
         chainId,
       })
     }

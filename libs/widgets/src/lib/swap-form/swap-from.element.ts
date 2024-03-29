@@ -12,13 +12,15 @@ import { swapContext } from './context';
 import { SwapContext } from '@one-inch-community/sdk';
 
 function hasChangedToken(value: IToken, oldValue: IToken): boolean {
+  if (!oldValue) return true
   return value.symbol !== oldValue.symbol
     || value.chainId !== oldValue.chainId
     || !isAddressEqual(value.address, oldValue.address)
     || value.decimals !== oldValue.decimals
 }
 
-function hasChangedAddress(value: Address, oldValue: Address): boolean {
+function hasChangedAddress(value: Address, oldValue?: Address): boolean {
+  if (!oldValue) return true
   return !isAddressEqual(value, oldValue)
 }
 

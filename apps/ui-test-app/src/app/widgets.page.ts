@@ -1,6 +1,7 @@
 import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import '@one-inch-community/widgets/swap-form';
+import '@one-inch-community/widgets/select-token';
 import { ChainId, IToken } from '@one-inch-community/models';
 import {
   BrandColors,
@@ -99,9 +100,7 @@ export class WidgetsPage extends LitElement {
             ></inch-swap-form>
           `,
           selectToken: () => html`
-            <div style="height: 200px; width: 100%; background-color: var(--color-background-bg-primary)"
-                 @click="${() => this.scene.back()}"
-            >select token view</div>
+            <inch-select-token></inch-select-token>
           `
         })}
       </inch-card>
