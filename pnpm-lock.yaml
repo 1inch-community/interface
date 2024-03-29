@@ -11,12 +11,24 @@ dependencies:
   '@lit/task':
     specifier: 1.0.0
     version: 1.0.0
+  '@maskito/core':
+    specifier: 2.2.0
+    version: 2.2.0
+  '@maskito/kit':
+    specifier: 2.2.0
+    version: 2.2.0(@maskito/core@2.2.0)
   '@vaadin/router':
-    specifier: ^1.7.5
+    specifier: 1.7.5
     version: 1.7.5
+  dexie:
+    specifier: 3.2.7
+    version: 3.2.7
   lit:
     specifier: 3.1.2
     version: 3.1.2
+  rxjs:
+    specifier: 7.8.1
+    version: 7.8.1
   tslib:
     specifier: ^2.3.0
     version: 2.6.2
@@ -49,6 +61,9 @@ devDependencies:
   '@rollup/plugin-node-resolve':
     specifier: ^15.2.3
     version: 15.2.3(rollup@4.12.0)
+  '@rollup/plugin-replace':
+    specifier: ^5.0.5
+    version: 5.0.5(rollup@4.12.0)
   '@rollup/plugin-typescript':
     specifier: ^11.1.6
     version: 11.1.6(rollup@4.12.0)(tslib@2.6.2)(typescript@5.3.3)
@@ -79,6 +94,9 @@ devDependencies:
   concurrently:
     specifier: ^8.2.2
     version: 8.2.2
+  dotenv:
+    specifier: ^16.4.5
+    version: 16.4.5
   eslint:
     specifier: ~8.48.0
     version: 8.48.0
@@ -1779,6 +1797,18 @@ packages:
       '@lit/reactive-element': 2.0.4
     dev: false
 
+  /@maskito/core@2.2.0:
+    resolution: {integrity: sha512-5FRtl62j2qW89u8RoOVYLHAAmFAy0wFcEga4eO9PaNuqVBuNJpaPA0EtZ67yKPffOivso0b3rMjSkgvYEscz+w==}
+    dev: false
+
+  /@maskito/kit@2.2.0(@maskito/core@2.2.0):
+    resolution: {integrity: sha512-hLFWOWPD4vkn+uFZzO7D2s+bNujQUDHe5ooYiS6I4gkIE+zkCOi7GS9QvOh54KfWSYGLWazJcuW/JrXeU7mDyw==}
+    peerDependencies:
+      '@maskito/core': ^2.2.0
+    dependencies:
+      '@maskito/core': 2.2.0
+    dev: false
+
   /@microsoft/api-extractor-model@7.28.13(@types/node@18.16.9):
     resolution: {integrity: sha512-39v/JyldX4MS9uzHcdfmjjfS6cYGAoXV+io8B5a338pkHiSt+gy2eXQ0Q7cGFJ7quSa1VqqlMdlPrB6sLR/cAw==}
     dependencies:
@@ -2323,6 +2353,20 @@ packages:
       is-builtin-module: 3.2.1
       is-module: 1.0.0
       resolve: 1.22.8
+      rollup: 4.12.0
+    dev: true
+
+  /@rollup/plugin-replace@5.0.5(rollup@4.12.0):
+    resolution: {integrity: sha512-rYO4fOi8lMaTg/z5Jb+hKnrHHVn8j2lwkqwyS4kTRhKyWOLf2wST2sWXr4WzWiTcoHTp2sTjqUbqIj2E39slKQ==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0||^4.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      '@rollup/pluginutils': 5.1.0(rollup@4.12.0)
+      magic-string: 0.30.8
       rollup: 4.12.0
     dev: true
 
@@ -4260,6 +4304,11 @@ packages:
       - supports-color
     dev: true
 
+  /dexie@3.2.7:
+    resolution: {integrity: sha512-2a+BXvVhY5op+smDRLxeBAivE7YcYaneXJ1la3HOkUfX9zKkE/AJ8CNgjiXbtXepFyFmJNGSbmjOwqbT749r/w==}
+    engines: {node: '>=6.0'}
+    dev: false
+
   /didyoumean2@4.1.0:
     resolution: {integrity: sha512-qTBmfQoXvhKO75D/05C8m+fteQmn4U46FWYiLhXtZQInzitXLWY0EQ/2oKnpAz9g2lQWW8jYcLcT+hPJGT+kig==}
     engines: {node: '>=10.13'}
@@ -4308,6 +4357,11 @@ packages:
 
   /dotenv@16.3.2:
     resolution: {integrity: sha512-HTlk5nmhkm8F6JcdXvHIzaorzCoziNQT9mGxLPVXW8wJF1TiGSL60ZGB4gHWabHOaMmWmhvk2/lPHfnBiT78AQ==}
+    engines: {node: '>=12'}
+    dev: true
+
+  /dotenv@16.4.5:
+    resolution: {integrity: sha512-ZmdL2rui+eB2YwhsWzjInR8LldtZHGDoQ1ugH85ppHKwpUHL7j7rN0Ti9NCnGiQbhaZ11FpR+7ao1dNsmduNUg==}
     engines: {node: '>=12'}
     dev: true
 
@@ -6820,7 +6874,6 @@ packages:
     resolution: {integrity: sha512-AA3TVj+0A2iuIoQkWEK/tqFjBq2j+6PO6Y0zJcvzLAFhEFIO3HL0vls9hWLncZbAAbK0mar7oZ4V079I/qPMxg==}
     dependencies:
       tslib: 2.6.2
-    dev: true
 
   /safe-buffer@5.1.2:
     resolution: {integrity: sha512-Gd2UZBJDkXlY7GbJxfsE8/nvKkUEU1G38c1siN6QP6a9PT9MmHB8GnpscSmMJSoF8LOIrt8ud/wPtojys4G6+g==}

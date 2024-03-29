@@ -19,28 +19,28 @@ export class ComponentsPage extends LitElement {
 
   static override styles = [
     css`
-    :host {
-        display: flex;
-        height: calc(100vh - 16px * 2);
-        padding: 16px;
-        gap: 8px;
-        flex-direction: column;
-        flex-wrap: wrap;
-    }
-      
-      .card-inner-layer {
-          display: grid;
-          gap: 8px;
-          grid-template-columns: 1fr 1fr 1fr;
-          align-items: center;
-          justify-items: center;
-      }
-      
-      .theme-control-layer {
-          grid-template-columns: 1fr 1fr 1fr 1fr;
-      }
-  `,
-    SceneController.styles
+        :host {
+            display: flex;
+            height: calc(100vh - 16px * 2);
+            padding: 16px;
+            gap: 8px;
+            flex-direction: column;
+            flex-wrap: wrap;
+        }
+
+        .card-inner-layer {
+            display: grid;
+            gap: 8px;
+            grid-template-columns: 1fr 1fr 1fr;
+            align-items: center;
+            justify-items: center;
+        }
+
+        .theme-control-layer {
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+        }
+    `,
+    SceneController.styles()
   ]
 
   protected readonly data: SegmentedControlItem[] = [
@@ -83,13 +83,17 @@ export class ComponentsPage extends LitElement {
 
   targetIcon = 'circle16'
 
-  private readonly scene = new SceneController('scene1')
+  private readonly scene = new SceneController('scene1', {
+    scene1: { width: 50, height: 50 },
+    scene2: { width: 50, height: 50 },
+  })
 
 
   protected render() {
     return html`
       <inch-card>
-        <inch-segmented-control 
+        <inch-card-header backButton closeButton headerText="Theme"></inch-card-header>
+        <inch-segmented-control
           .items="${this.segmentedMainColorsData}"
           .select="${this.segmentedMainColorsData[2]}"
           @change="${(event: CustomEvent) => themeChangeMainColor(event.detail.value, event.detail.event)}"
@@ -102,6 +106,7 @@ export class ComponentsPage extends LitElement {
       </inch-card>
       
       <inch-card>
+        <inch-card-header backButton closeButton headerTextPosition="left" headerText="Theme"></inch-card-header>
         <div class="card-inner-layer theme-control-layer">
           <inch-button @click="${(event: MouseEvent) => themeChangeMainColor(MainColors.dark, event)}"><span>Dark</span></inch-button>
           <inch-button @click="${(event: MouseEvent) => themeChangeMainColor(MainColors.darkBlue, event)}"><span>Dark Blue</span></inch-button>
@@ -111,6 +116,7 @@ export class ComponentsPage extends LitElement {
       </inch-card>
 
       <inch-card>
+        <inch-card-header closeButton headerTextPosition="left" headerText="Theme"></inch-card-header>
         <div class="card-inner-layer">
           <inch-button @click="${(event: MouseEvent) => themeChangeBrandColor(BrandColors.community, event)}"><span>Community</span></inch-button>
           <inch-button @click="${(event: MouseEvent) => themeChangeBrandColor(BrandColors.orange, event)}"><span>Orange</span></inch-button>
@@ -120,7 +126,7 @@ export class ComponentsPage extends LitElement {
       
       <inch-card>
         <div class="card-inner-layer">
-          <inch-button size="sm">
+          <inch-button size="l">
             <inch-icon icon="${this.targetIcon}"></inch-icon>
           </inch-button>
           <inch-button size="xl" disabled>
@@ -131,7 +137,7 @@ export class ComponentsPage extends LitElement {
           </inch-button>
           
           
-          <inch-button size="sm">
+          <inch-button size="l">
             <inch-icon icon="circle16"></inch-icon>
             <span>Button</span>
           </inch-button>
@@ -143,47 +149,47 @@ export class ComponentsPage extends LitElement {
             <inch-icon icon="circle24"></inch-icon>
           </inch-button>
           
-          <inch-button size="sm"><span>Button</span></inch-button>
+          <inch-button size="l"><span>Button</span></inch-button>
           <inch-button size="xl"><span>Button</span></inch-button>
           <inch-button size="xxl"><span>Button</span></inch-button>
 
-          <inch-button size="sm" type="primary-critical"><span>Button</span></inch-button>
+          <inch-button size="l" type="primary-critical"><span>Button</span></inch-button>
           <inch-button size="xl" type="primary-critical"><span>Button</span></inch-button>
           <inch-button size="xxl" type="primary-critical"><span>Button</span></inch-button>
 
-          <inch-button size="sm" type="primary-warning"><span>Button</span></inch-button>
+          <inch-button size="l" type="primary-warning"><span>Button</span></inch-button>
           <inch-button size="xl" type="primary-warning"><span>Button</span></inch-button>
           <inch-button size="xxl" type="primary-warning"><span>Button</span></inch-button>
 
-          <inch-button size="sm" type="secondary"><span>Button</span></inch-button>
+          <inch-button size="l" type="secondary"><span>Button</span></inch-button>
           <inch-button size="xl" type="secondary"><span>Button</span></inch-button>
           <inch-button size="xxl" type="secondary"><span>Button</span></inch-button>
 
-          <inch-button size="sm" type="secondary-critical"><span>Button</span></inch-button>
+          <inch-button size="l" type="secondary-critical"><span>Button</span></inch-button>
           <inch-button size="xl" type="secondary-critical"><span>Button</span></inch-button>
           <inch-button size="xxl" type="secondary-critical"><span>Button</span></inch-button>
 
-          <inch-button size="sm" type="secondary-warning"><span>Button</span></inch-button>
+          <inch-button size="l" type="secondary-warning"><span>Button</span></inch-button>
           <inch-button size="xl" type="secondary-warning"><span>Button</span></inch-button>
           <inch-button size="xxl" type="secondary-warning"><span>Button</span></inch-button>
 
-          <inch-button size="sm" type="secondary-gray"><span>Button</span></inch-button>
+          <inch-button size="l" type="secondary-gray"><span>Button</span></inch-button>
           <inch-button size="xl" type="secondary-gray"><span>Button</span></inch-button>
           <inch-button size="xxl" type="secondary-gray"><span>Button</span></inch-button>
 
-          <inch-button size="sm" type="secondary-gray" disabled><span>Button</span></inch-button>
+          <inch-button size="l" type="secondary-gray" disabled><span>Button</span></inch-button>
           <inch-button size="xl" type="secondary-gray" disabled><span>Button</span></inch-button>
           <inch-button size="xxl" type="secondary-gray" disabled><span>Button</span></inch-button>
 
-          <inch-button size="sm" type="tertiary"><span>Button</span></inch-button>
+          <inch-button size="l" type="tertiary"><span>Button</span></inch-button>
           <inch-button size="xl" type="tertiary"><span>Button</span></inch-button>
           <inch-button size="xxl" type="tertiary"><span>Button</span></inch-button>
 
-          <inch-button size="sm" type="tertiary-gray"><span>Button</span></inch-button>
+          <inch-button size="l" type="tertiary-gray"><span>Button</span></inch-button>
           <inch-button size="xl" type="tertiary-gray"><span>Button</span></inch-button>
           <inch-button size="xxl" type="tertiary-gray"><span>Button</span></inch-button>
 
-          <inch-button size="sm" disabled><span>Button</span></inch-button>
+          <inch-button size="l" disabled><span>Button</span></inch-button>
           <inch-button size="xl" disabled><span>Button</span></inch-button>
           <inch-button size="xxl" disabled><span>Button</span></inch-button>
         </div>
@@ -208,9 +214,9 @@ export class ComponentsPage extends LitElement {
       </inch-card>
       
       <inch-card>
-        <inch-button size="sm" @click="${() => this.scene.nextTo('scene1')}"><span>Scene 1</span></inch-button>
-        <inch-button size="sm" @click="${() => this.scene.nextTo('scene2')}"><span>Scene 2</span></inch-button>
-        <inch-button size="sm" @click="${() => this.scene.back()}"><span>Back</span></inch-button>
+        <inch-button size="l" @click="${() => this.scene.nextTo('scene1')}"><span>Scene 1</span></inch-button>
+        <inch-button size="l" @click="${() => this.scene.nextTo('scene2')}"><span>Scene 2</span></inch-button>
+        <inch-button size="l" @click="${() => this.scene.back()}"><span>Back</span></inch-button>
       </inch-card>
       
       <inch-card>

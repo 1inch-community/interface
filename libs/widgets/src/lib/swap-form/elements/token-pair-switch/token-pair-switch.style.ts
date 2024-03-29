@@ -15,7 +15,7 @@ export const tokenPairSwitchStyle = css`
         border-radius: 50%;
         border: none;
         background-color: var(--color-background-bg-primary);
-        color: var(--color-content-content-disabled);
+        color: var(--color-content-content-primary);
         box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.12), 0 1px 4px 0 rgba(0, 0, 0, 0.12);
         width: 32px;
         height: 32px;
@@ -28,8 +28,15 @@ export const tokenPairSwitchStyle = css`
         transition: color .2s;
     }
     
+    .switcher:disabled {
+        cursor: not-allowed;
+        pointer-events: none;
+        color: var(--color-content-content-disabled);
+        box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.12), 0 1px 4px 0 rgba(0, 0, 0, 0.12);
+    }
+    
     @media (hover: hover) {
-        .switcher:hover {
+        .switcher:not(:disabled):hover {
             color: var(--color-content-content-secondary);
         }
     }

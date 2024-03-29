@@ -4,7 +4,7 @@ import { bodyStyle } from './styles/body.style';
 import { themeChange } from './theme-change';
 import { BrandColors, MainColors } from './themes/themes';
 import { scrollbarStyle } from './styles/scrollbar.style';
-import { createAndApplyStyle } from '@one-inch-community/utils';
+import { createAndApplyStyle } from '../lit/dom.utils';
 
 export async function themeInit(
   mainColorName: MainColors = MainColors.light,

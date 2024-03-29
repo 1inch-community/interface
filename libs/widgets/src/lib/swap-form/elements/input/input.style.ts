@@ -4,13 +4,13 @@ export const inputStyle = css`
 
     .input-container {
         height: 128px;
-        max-width: 556px;
         border-radius: 16px;
         background-color: var(--color-background-bg-secondary);
         transition: box-shadow .2s;
         padding: 16px;
         box-sizing: border-box;
-        display: flex;
+        display: grid;
+        grid-template-columns: 1fr 2fr;
         justify-content: space-between;
     }
 
@@ -48,6 +48,9 @@ export const inputStyle = css`
         padding: 8px;
         margin-left: -8px;
         transition: background-color .2s;
+        outline: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
     }
     
     .symbol {
@@ -67,6 +70,31 @@ export const inputStyle = css`
         color: var(--color-content-content-secondary);
     }
     
+    .amount-input {
+        height: 40px;
+        color: var(--color-content-content-primary);
+        box-sizing: border-box;
+        font-size: 24px;
+        font-weight: 600;
+        line-height: 32px;
+        letter-spacing: 0;
+        text-align: right;
+        border: none;
+        background-color: transparent;
+        outline: none;
+        user-select: none;
+        width: 100%;
+    }
+
+    .amount-input[type="number"]::-webkit-inner-spin-button,
+    .amount-input[type="number"]::-webkit-outer-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+    .amount-input[type="number"] {
+        -moz-appearance: textfield;
+    }
+    
     @media (hover: hover) {
         .input-container:not(.disabled):hover {
             box-shadow: 0 0 0 1px var(--color-background-bg-positive-hover);
@@ -78,6 +106,12 @@ export const inputStyle = css`
     
     .symbol-container:active {
         transform: scale(.98);
+        background-color: var(--color-background-bg-positive-hover);
+    }
+    
+    .select-token-text {
+        word-wrap: break-word;
+        white-space: nowrap
     }
 
 `

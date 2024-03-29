@@ -8,6 +8,8 @@ import {
   themeChangeBrandColor,
   themeChangeMainColor
 } from '@one-inch-community/ui-components/theme';
+import { SceneController } from '@one-inch-community/ui-components/scene';
+import { getClient } from '@one-inch-community/sdk';
 
 @customElement('app-widgets')
 export class WidgetsPage extends LitElement {
@@ -35,12 +37,18 @@ export class WidgetsPage extends LitElement {
             grid-template-columns: 1fr 1fr 1fr 1fr;
         }
     `,
+    SceneController.styles()
   ]
+
+  private readonly scene = new SceneController('swapForm', {
+    swapForm: { width: 556, height: 376.5 },
+    selectToken: { width: 556, height: 400 }
+  })
 
   srcToken: IToken = {
     address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
     symbol: 'USDT',
-    decimal: 6,
+    decimals: 6,
     chainId: ChainId.eth,
     name: 'usdt token'
   }
@@ -48,12 +56,18 @@ export class WidgetsPage extends LitElement {
   dstToken: IToken = {
     address: '0x6b175474e89094c44da98b954eedeac495271d0f',
     symbol: 'DAI',
-    decimal: 18,
+    decimals: 18,
     chainId: ChainId.eth,
     name: 'dai token'
   }
 
+  // dstToken = undefined
+
   protected render() {
+    const client = getClient(ChainId.eth)
+    client.estimateFeesPerGas().then(console.log)
+    client.getGasPrice().then(console.log)
+
     return html`
       <inch-card>
         <div class="card-inner-layer theme-control-layer">
@@ -72,13 +86,30 @@ export class WidgetsPage extends LitElement {
         </div>
       </inch-card>
       
-      <inch-swap-form
-        chainId="1"
-        connectedWalletAddress="0x568D3086f5377e59BF2Ef77bd1051486b581b214"
-        .srcToken="${this.srcToken}"
-        .dstToken="${this.dstToken}"
-      ></inch-swap-form>
+      <inch-card>
+        ${this.scene.render({
+          swapForm: () => html`
+            <inch-swap-form
+              chainId="1"
+              connectedWalletAddress="0x568D3086f5377e59BF2Ef77bd1051486b581b214"
+              withoutBackingCard
+              .srcToken="${this.srcToken}"
+              .dstToken="${this.dstToken}"
+              @open-token-selector="${() => this.onOpenSelectToken()}"
+            ></inch-swap-form>
+          `,
+          selectToken: () => html`
+            <div style="height: 200px; width: 100%; background-color: var(--color-background-bg-primary)"
+                 @click="${() => this.scene.back()}"
+            >select token view</div>
+          `
+        })}
+      </inch-card>
     `
+  }
+
+  onOpenSelectToken() {
+    this.scene.nextTo('selectToken')
   }
 
 }

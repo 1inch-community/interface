@@ -47,8 +47,14 @@ export const buttonStyle = css`
 `
 
 export const buttonSizeStyle = css`
+    
+    .m {
+        padding: 6px 12px;
+        border-radius: 12px;
+        font-size: 14px;
+    }
 
-    .sm {
+    .l {
         padding: 8px 16px;
         border-radius: 12px;
         font-size: 14px;
@@ -66,7 +72,11 @@ export const buttonSizeStyle = css`
         font-size: 20px;
     }
 
-    .sm.only-icon {
+    .m.only-icon {
+        padding: 0;
+    }
+
+    .l.only-icon {
         padding: 6px;
     }
 

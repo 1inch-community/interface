@@ -2,9 +2,8 @@ import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { buttonSizeStyle, buttonStyle, buttonTypeStyle } from './button.style';
-import { iconTagName } from '../icon/icon-tag-name';
 
-type ButtonSize = 'sm' | 'xl' | 'xxl'
+type ButtonSize = 'm' | 'l' | 'xl' | 'xxl'
 type ButtonType =
   | 'primary'
   | 'primary-critical'
@@ -26,11 +25,11 @@ export class ButtonElement extends LitElement {
     buttonTypeStyle
   ]
 
-  @property({ type: String }) size: ButtonSize = 'xl'
+  @property({ type: String, attribute: true }) size: ButtonSize = 'xl'
 
-  @property({ type: String }) type: ButtonType = 'primary'
+  @property({ type: String, attribute: true }) type: ButtonType = 'primary'
 
-  @property({ type: Boolean }) fullSize = false
+  @property({ type: Boolean, attribute: true }) fullSize = false
 
   @property({ type: Boolean, attribute: true }) disabled = false
 
@@ -59,7 +58,7 @@ export class ButtonElement extends LitElement {
     const nodes = slot
       .assignedNodes({flatten: true})
       .filter(node => node.nodeName !== '#text');
-    this.isIconButton = nodes.length === 1 && nodes[0].nodeName.toLowerCase() === iconTagName
+    this.isIconButton = nodes.length === 1 && nodes[0].nodeName.toLowerCase() === 'inch-icon'
     this.requestUpdate()
   }
 }

@@ -1,10 +1,17 @@
 import { brandColorMap, mainColorMap } from './themes';
 import { mainColorStyleElement, brandColorStyleElement } from './theme-elements';
 import { MainColors, BrandColors } from './themes/themes';
-import { applyStyle } from '@one-inch-community/utils';
+import { applyStyle, setThemeColor } from '../lit/dom.utils';
 
 let currentMainColor: MainColors
 let currentBrandColor: BrandColors
+
+const themeColors: Record<MainColors, string> = {
+  [MainColors.light]: '#f1f1f1',
+  [MainColors.lightBlue]: '#f1f1f1',
+  [MainColors.dark]: '#0e0e0e',
+  [MainColors.darkBlue]: '#0e0e0e',
+}
 
 export async function themeChangeMainColor(mainColorName: MainColors, event?: MouseEvent) {
   return await themeChange(mainColorName, currentBrandColor, event)
@@ -24,6 +31,7 @@ export async function themeChange(
     const brandColor = await brandColorMap[brandColorName]()
     applyStyle(mainColorStyleElement, mainColor)
     applyStyle(brandColorStyleElement, brandColor)
+    setThemeColor(themeColors[mainColorName])
     currentMainColor = mainColorName
     currentBrandColor = brandColorName
   }

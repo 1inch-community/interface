@@ -9,7 +9,12 @@ export class CardElement extends LitElement {
   static override styles = cardStyle
 
   protected override render() {
-    return html`<slot></slot>`
+    return html`
+      <slot name="header"></slot>
+      <div class="card-content">
+        <slot></slot>
+      </div>
+    `
   }
 
 }

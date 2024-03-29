@@ -3,17 +3,19 @@ import { ContextProvider } from '@lit/context';
 import { customElement, property } from 'lit/decorators.js';
 import { type Address, isAddressEqual } from 'viem';
 import '@one-inch-community/ui-components/card'
+import "@one-inch-community/ui-components/icon"
+import "@one-inch-community/ui-components/button"
 import { ChainId, IToken } from '@one-inch-community/models';
-import { SwapContext } from '@one-inch-community/sdk/swap-context';
 import { swapFromStyle } from './swap-from.style';
 import './elements'
 import { swapContext } from './context';
+import { SwapContext } from '@one-inch-community/sdk';
 
 function hasChangedToken(value: IToken, oldValue: IToken): boolean {
   return value.symbol !== oldValue.symbol
     || value.chainId !== oldValue.chainId
     || !isAddressEqual(value.address, oldValue.address)
-    || value.decimal !== oldValue.decimal
+    || value.decimals !== oldValue.decimals
 }
 
 function hasChangedAddress(value: Address, oldValue: Address): boolean {
@@ -26,6 +28,8 @@ export class SwapFromElement extends LitElement {
 
   static override styles = swapFromStyle
 
+  @property({ type: Boolean }) withoutBackingCard = false
+
   @property({ type: Number }) chainId?: ChainId
 
   @property({ type: Object, hasChanged: hasChangedToken }) srcToken?: IToken
@@ -36,30 +40,50 @@ export class SwapFromElement extends LitElement {
 
   readonly context = new ContextProvider(this, { context: swapContext })
 
-  protected override render() {
-    if (!this.context.value) return
-    return html`
-      <inch-card>
-        <div class="input-container">
-          <inch-swap-form-input tokenType="source"></inch-swap-form-input>
-          <inch-token-pair-switch></inch-token-pair-switch>
-          <inch-swap-form-input disabled tokenType="destination"></inch-swap-form-input>
-        </div>
-
-        <inch-swap-button></inch-swap-button>
-      </inch-card>
-    `
-  }
-
-  protected override firstUpdated() {
+  override connectedCallback() {
+    super.connectedCallback();
     const { srcToken, dstToken, connectedWalletAddress, chainId } = this
     if (!chainId) throw new Error('swap form required chain id')
     const context = new SwapContext()
     context.setChainId(chainId)
     context.setPair({ srcToken, dstToken })
     context.setConnectedWalletAddress(connectedWalletAddress)
+    context.init()
     this.context.setValue(context)
     this.requestUpdate()
+  }
+
+  protected override render() {
+    if (!this.context.value) return
+    const form = html`
+      <div class="input-container">
+        <div class="input-header">
+          <span>Swap tokens</span>
+          <inch-button type="tertiary-gray" size="m">
+            <inch-icon icon="authRefresh36"></inch-icon>
+          </inch-button>
+        </div>
+        <inch-swap-form-input tokenType="source"></inch-swap-form-input>
+        <inch-token-pair-switch></inch-token-pair-switch>
+        <inch-swap-form-input disabled tokenType="destination"></inch-swap-form-input>
+      </div>
+
+      <inch-swap-button></inch-swap-button>
+    `
+
+    if (this.withoutBackingCard) {
+      return html`
+        <div class="swap-form-container">
+          ${form}
+        </div>
+      `
+    }
+
+    return html`
+      <inch-card>
+        ${form}
+      </inch-card>
+    `
   }
 }
 

@@ -1,11 +1,13 @@
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
-import '@one-inch-community/ui-components/icon'
-import { tokenPairSwitchStyle } from './token-pair-switch.style';
-import { asyncTimeout } from '@one-inch-community/utils';
 import { consume } from '@lit/context';
-import { swapContext } from '../../context';
+import { combineLatest, defer, map } from 'rxjs';
+import '@one-inch-community/ui-components/icon'
+import { asyncTimeout } from '@one-inch-community/ui-components/async';
+import { observe } from '@one-inch-community/ui-components/lit';
 import { ISwapContext } from '@one-inch-community/models';
+import { tokenPairSwitchStyle } from './token-pair-switch.style';
+import { swapContext } from '../../context';
 
 @customElement(TokenPairSwitchElement.tagName)
 export class TokenPairSwitchElement extends LitElement {
@@ -16,13 +18,23 @@ export class TokenPairSwitchElement extends LitElement {
   @consume({ context: swapContext })
   context?: ISwapContext
 
+  private readonly isDisabled$ = defer(() => {
+    if (!this.context) throw new Error('')
+    return combineLatest([
+      this.context.getTokenByType('source'),
+      this.context.getTokenByType('destination')
+    ])
+  }).pipe(
+    map(([ sourceToken, destinationToken ]) => !sourceToken || !destinationToken),
+  )
+
   protected override render() {
     return html`
       <button
         @mouseover="${this.up}"
-        @mouseup="${this.down}"
         @mouseleave="${this.down}"
         @click="${this.onClick}"
+        ?disabled="${observe(this.isDisabled$, false)}"
         class="switcher"
       >
         <inch-icon class="switcher-icon" icon="arrowDown24"></inch-icon>

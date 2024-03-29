@@ -1,62 +1,52 @@
-import { css } from 'lit';
+import { css, unsafeCSS } from 'lit';
+import { shiftAnimation, slideAnimation } from './transition-animations';
 
-export const sceneStyle = css`
+type StyleConfig = {
+  animationTime: string
+  sceneBackgroundColor: string
+  animation: 'slide' | 'shift'
+}
 
-    .scene-container {
-        min-height: 50px;
-        min-width: 50px;
-        position: relative;
-        overflow: hidden;
-        transition: height .2s, width .2s;
-    }
+const defaultConfig: StyleConfig = {
+  animationTime: '.6s',
+  sceneBackgroundColor: 'var(--color-background-bg-primary)',
+  animation: 'slide'
+}
 
-    .scene-wrapper {
-    }
-    
-    .scene-wrapper-hidden {
-        transform: translateX(100%);
-    }
+const animation = {
+  slide: slideAnimation,
+  shift: shiftAnimation
+}
 
-    .scene-wrapper-animate {
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        animation: show .2s ease-out;
-    }
-    
-    .scene-wrapper-animate-back {
-        position: absolute;
-        top: 0;
-        left: 0;
-        bottom: 0;
-        right: 0;
-        animation: show-back .2s ease-out;
-    }
-    
-    @keyframes show {
-        from {
-            transform: translateX(100%);
-        }
-        to {
-            transform: translateX(0);
-        }
-    }
+export const sceneStyle = (config?: Partial<StyleConfig>) => {
 
-    @keyframes show-back {
-        from {
-            transform: translateX(0);
-        }
-        to {
-            transform: translateX(100%);
-        }
-    }
-    
-    .scene-wrapper-header {
-        height: 68px;
-        display: flex;
-        align-items: center;
-    }
+  const _config: StyleConfig = { ...defaultConfig, ...config }
 
-`
+  return css`
+
+      :host {
+          --animation-time: ${unsafeCSS(_config.animationTime)};
+          --animation-time-container: .2s;
+      }
+
+      .scene-container {
+          min-height: 50px;
+          min-width: 50px;
+          position: relative;
+          overflow: hidden;
+          transition: height var(--animation-time-container), width var(--animation-time-container);
+          border-radius: 16px;
+      }
+
+      .scene-container-animation {
+          will-change: height, width;
+      }
+
+      .scene-wrapper {
+          background-color: ${unsafeCSS(_config.sceneBackgroundColor)};
+      }
+      
+      ${unsafeCSS(animation[_config.animation])}
+
+  `
+}

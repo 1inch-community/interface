@@ -49,10 +49,10 @@ export class TokenIconElement extends LitElement {
   
   `
 
-  @property({ type: String, attribute: true, reflect: true }) symbol?: string
-  @property({ type: String, attribute: true, reflect: true }) address?: Address
-  @property({ type: Number, attribute: true, reflect: true }) chainId?: ChainId
-  @property({ type: Number, attribute: true, reflect: true }) size = 24
+  @property({ type: String, attribute: true }) symbol?: string
+  @property({ type: String, attribute: true }) address?: Address
+  @property({ type: Number, attribute: true }) chainId?: ChainId
+  @property({ type: Number, attribute: true }) size = 24
 
   private readonly task = new Task(this, {
     task: ([symbol, address, chainId], { signal }) => iconLoader(signal, chainId, symbol, address),

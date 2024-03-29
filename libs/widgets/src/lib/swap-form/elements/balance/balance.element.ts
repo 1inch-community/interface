@@ -1,72 +1,59 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { consume } from '@lit/context';
-import { swapContext } from '../../context';
 import { ISwapContext } from '@one-inch-community/models';
-import { bindEmitter, getBalance, InternalEventEmitter } from '@one-inch-community/utils';
+import { swapContext } from '../../context';
+import { balanceStyles } from './balance.styles';
+import { catchError, combineLatest, defer, filter, map, switchMap } from 'rxjs';
 import { formatUnits } from 'viem';
+import { getBalance } from '@one-inch-community/sdk';
+import { observe } from '@one-inch-community/ui-components/lit';
 
 @customElement(BalanceElement.tagName)
 export class BalanceElement extends LitElement {
-  static tagName = 'inch-swap-balance'
+  static tagName = 'inch-swap-balance';
 
-  @property({ type: String, attribute: true, reflect: true }) tokenType?: 'source' | 'destination'
+  static override styles = balanceStyles;
+
+  @property({ type: String, attribute: true }) tokenType?: 'source' | 'destination';
 
   @consume({ context: swapContext })
-  context?: ISwapContext
+  context?: ISwapContext;
 
-  private readonly balanceEmitter = new InternalEventEmitter<string>(emitter => {
-    if (!this.context) throw new Error('')
-    if (!this.tokenType) throw new Error('')
-    const tokenEmitter = this.context.getTokenByType(this.tokenType)
-    const chainIdEmitter = this.context.chainId
-    const walletAddressEmitter = this.context.connectedWalletAddress
-    let token = tokenEmitter.getValue()
-    let chainId = chainIdEmitter.getValue()
-    let walletAddress = walletAddressEmitter.getValue()
+  readonly balance$ = defer(() => {
+    if (!this.context) throw new Error('');
+    if (!this.tokenType) throw new Error('');
+    return combineLatest([
+      this.context.connectedWalletAddress$,
+      this.context.getTokenByType(this.tokenType),
+      this.context.chainId$,
+    ]);
+  }).pipe(
+    filter(([address]) => !!address),
+    switchMap(([ walletAddress, token, chainId ]) => {
+      if (!walletAddress || !token) return [html`<br>`]
+      return defer(() => getBalance(chainId, walletAddress, token.address)).pipe(
+        map(balance => formatUnits(balance, token.decimals)),
+        map(balance => this.getBalanceView(balance)),
+        catchError(() => [html`<br>`])
+      )
+    }),
 
-    const update = async () => {
-      if (!token || !chainId || !walletAddress) return
-      console.log('update balance')
-      const balance = await getBalance(chainId, walletAddress, token.address)
-      const balanceView = formatUnits(balance, token.decimal)
-      emitter.emit(balanceView)
-    }
-
-    const tokenEmitterIndex = tokenEmitter.on(async newToken => {
-      token = newToken
-      await update()
-    })
-
-    const chainEmitterIndex = chainIdEmitter.on(async newChainId => {
-      chainId = newChainId
-      await update()
-    })
-
-    const walletAddressEmitterIndex = walletAddressEmitter.on( async newAddress => {
-      walletAddress = newAddress
-      await update()
-    })
-
-    update().then()
-
-    return () => {
-      tokenEmitter.off(tokenEmitterIndex)
-      chainIdEmitter.off(chainEmitterIndex)
-      walletAddressEmitter.off(walletAddressEmitterIndex)
-    }
-  })
-
-  private readonly balance = bindEmitter(this, () => this.balanceEmitter)
+  );
 
   protected override render() {
+    return html`${observe(this.balance$, html`<br>`)}`
+  }
+
+  private getBalanceView(balance: string) {
     return html`
-      <span>${this.balance.value}</span>
+      <span>Balance: ${balance}</span>
     `
   }
 }
+
 declare global {
   interface HTMLElementTagNameMap {
-    'inch-swap-balance': BalanceElement
+    'inch-swap-balance': BalanceElement;
   }
 }

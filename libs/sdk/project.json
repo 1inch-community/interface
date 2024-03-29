@@ -1,7 +1,7 @@
 {
   "name": "sdk",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/sdk/src",
+  "sourceRoot": "libs/utils/src",
   "projectType": "library",
   "targets": {
     "build": {
@@ -20,9 +20,12 @@
         ]
       }
     },
-    "publish": {
-      "command": "node tools/scripts/publish.mjs sdk {args.ver} {args.tag}",
-      "dependsOn": ["build"]
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["{options.reportsDirectory}"],
+      "options": {
+        "reportsDirectory": "../../coverage/temp/ui-components"
+      }
     }
   },
   "tags": []

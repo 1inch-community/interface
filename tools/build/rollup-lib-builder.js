@@ -1,6 +1,7 @@
 import * as path from 'path';
 import * as fs from 'fs';
 import typescript from '@rollup/plugin-typescript';
+import replace from '@rollup/plugin-replace';
 import resolve from '@rollup/plugin-node-resolve';
 import commonjs from '@rollup/plugin-commonjs';
 import dynamicImportVars from '@rollup/plugin-dynamic-import-vars';
@@ -21,6 +22,8 @@ export function rollupLibBuilder(options) {
   const libRoot = path.resolve(projectRoot, 'libs', libName)
   const dist = path.resolve(projectRoot, 'dist', 'libs', libName)
   const tsconfigPath = path.resolve(projectRoot, 'libs', libName, 'tsconfig.lib.json')
+
+  require('dotenv').config({ path: path.join(projectRoot, '.env') })
 
   try {
     fs.rmSync(dist, { recursive: true, force: true });
@@ -62,6 +65,12 @@ export function rollupLibBuilder(options) {
       }
     }
 
+    const replaceConfig = {
+      '__environment__': JSON.stringify({
+        oneInchDevPortalHost: process.env.ONE_INCH_DEV_PORTAL_HOST
+      })
+    }
+
     const module = `./${path.basename(moduleMainESMFile)}`
     const main = `./${path.basename(moduleMainCJSFile)}`
     const types = `./${path.basename(moduleMainTypesFile)}`
@@ -100,6 +109,7 @@ export function rollupLibBuilder(options) {
           commonjs(),
           dynamicImportVars(),
           renameOutput(nameReplace),
+          replace(replaceConfig),
           typescript(typescriptConfig),
         ]
       },
@@ -110,7 +120,6 @@ export function rollupLibBuilder(options) {
           entryFileNames: '[name].[format].js',
           name: moduleFullName,
           format: 'cjs',
-
           sourcemap: true
         },
         plugins: [
@@ -118,15 +127,17 @@ export function rollupLibBuilder(options) {
           commonjs(),
           dynamicImportVars(),
           renameOutput(nameReplace),
-          generatePackageJson(configPackageJson),
           typescript(typescriptConfig),
+          replace(replaceConfig),
+          generatePackageJson(configPackageJson),
         ]
       },
       {
         input: modulePublicApiPathTypes,
         output: [
           {
-            file: path.resolve(moduleDistPath, 'index.d.ts'), format: 'es'
+            file: path.resolve(moduleDistPath, 'index.d.ts'),
+            format: 'es'
           }
         ],
         plugins: [
@@ -136,6 +147,9 @@ export function rollupLibBuilder(options) {
             hook: 'buildEnd'
           })
         ],
+        watch: {
+          clearScreen: false
+        }
       }
     ]
   }

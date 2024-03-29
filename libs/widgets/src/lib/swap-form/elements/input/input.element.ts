@@ -1,15 +1,20 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { consume } from '@lit/context';
 import { classMap } from 'lit/directives/class-map.js'
 import { ifDefined } from 'lit/directives/if-defined.js'
-import { inputStyle } from './input.style';
-import { ISwapContext } from '@one-inch-community/models';
-import { consume } from '@lit/context';
-import { swapContext } from '../../context';
-import { bindEmitter, dispatchEvent } from '@one-inch-community/utils';
-import '../balance/balance.element'
+import { combineLatest, defer, filter, firstValueFrom, fromEvent, map, tap } from 'rxjs';
+import { Maskito } from '@maskito/core';
+import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import "@one-inch-community/ui-components/token-icon"
 import "@one-inch-community/ui-components/icon"
+import "@one-inch-community/ui-components/button"
+import { ISwapContext, IToken } from '@one-inch-community/models';
+import '../balance/balance.element'
+import { inputStyle } from './input.style';
+import { swapContext } from '../../context';
+import { observe, subscribe, dispatchEvent } from '@one-inch-community/ui-components/lit';
+import { formatUnits, parseUnits } from 'viem';
 
 @customElement(InputElement.tagName)
 export class InputElement extends LitElement {
@@ -24,34 +29,116 @@ export class InputElement extends LitElement {
   @consume({ context: swapContext })
   context?: ISwapContext
 
-  readonly token = bindEmitter(this, () => this.getTokenEventEmitter())
+  private readonly token$ = defer(() => this.getTokenEventEmitter())
+  private readonly chainId$ = defer(() => this.getChainEventEmitter())
+  private readonly amount$ = defer(() => this.getTokenAmountStream())
 
-  readonly chainId = bindEmitter(this, () => this.getChainEventEmitter())
+  private readonly symbol$ = this.token$.pipe(
+    map(token => token?.symbol ?? null)
+  )
+
+  private readonly address$ = this.token$.pipe(
+    map(token => token?.address ?? null)
+  )
+
+  private readonly name$ = this.token$.pipe(
+    map(token => token?.name ?? null)
+  )
+
+  private readonly input = document.createElement('input')
+  private maskedInput = this.buildMask(8);
+
+  private tokenView$ = this.token$.pipe(
+    map(token => {
+      if (!token) return this.selectTokenView()
+      return this.tokenView(token)
+    })
+  )
+
+  override connectedCallback() {
+    super.connectedCallback();
+
+    this.input.classList.add('amount-input')
+    this.input.inputMode = 'decimal'
+    this.input.autocomplete = 'off'
+    this.input.placeholder = this.tokenType === 'source' ? '0' : ''
+
+    const updateMask$ = this.token$.pipe(
+      tap(token => {
+        if (!token) return
+        this.maskedInput.destroy()
+        this.maskedInput = this.buildMask(token.decimals)
+      })
+    )
+
+    const onInput$ = fromEvent<InputEvent>(this.input, 'input').pipe(
+      tap(event => this.onInput(event))
+    )
+
+    const updateInputValue$ = combineLatest([
+      this.amount$,
+      this.token$
+    ]).pipe(
+      filter(([, token]) => !!token),
+      map(([amount, token]) => formatUnits(amount, token!.decimals)),
+      filter(amount => amount !== this.input.value),
+      tap(amount => this.input.value = amount)
+    )
+
+    subscribe(this, [
+      updateMask$,
+      onInput$,
+      updateInputValue$,
+    ], { requestUpdate: false })
+  }
+
+  override disconnectedCallback() {
+    super.disconnectedCallback();
+    this.maskedInput.destroy()
+  }
 
   protected override render() {
-    if (!this.token.value) return
-    const { symbol, address, chainId, name } = this.token.value
     const classes = {
       disabled: this.disabled
     }
+    this.input.disabled = this.tokenType === 'destination'
     return html`
       <div class="input-container ${classMap(classes)}">
         <div class="flex-container">
           <div class="input-title">${this.getInputTitle()}</div>
-          <button @click="${(event: MouseEvent) => dispatchEvent(this, 'open-token-selector', this.tokenType, event)}" class="symbol-container">
-            <inch-token-icon symbol="${symbol}" address="${address}" chainId="${chainId}"></inch-token-icon>
-            <span class="symbol">${symbol}</span>
-            <inch-icon icon="chevronDown16"></inch-icon>
-          </button>
-          <div class="token-name">${name}</div>
+          ${observe(this.tokenView$)}
         </div>
         
         <div class="flex-container">
           <inch-swap-balance tokenType="${ifDefined(this.tokenType)}"></inch-swap-balance>
-          <span></span>
-          <span></span>
+          ${this.input}
+          <br>
         </div>
       </div>
+    `
+  }
+
+  private selectTokenView() {
+    return html`
+      <inch-button type="secondary" size="l" @click="${(event: MouseEvent) => dispatchEvent(this, 'open-token-selector', this.tokenType, event)}">
+        <span class="select-token-text">Select token</span>
+        <inch-icon icon="chevronDown16"></inch-icon>
+      </inch-button>
+      <br>
+    `
+  }
+
+  private tokenView(token: IToken) {
+    const { name, symbol, address } = token
+    return html`
+      <button @click="${(event: MouseEvent) => dispatchEvent(this, 'open-token-selector', this.tokenType, event)}"
+              class="symbol-container">
+        <inch-token-icon symbol="${symbol}" address="${address}"
+                         chainId="${observe(this.chainId$)}"></inch-token-icon>
+        <span class="symbol">${symbol}</span>
+        <inch-icon icon="chevronDown16"></inch-icon>
+      </button>
+      <div class="token-name">${name}</div>
     `
   }
 
@@ -61,9 +148,15 @@ export class InputElement extends LitElement {
     return this.context.getTokenByType(this.tokenType)
   }
 
+  private getTokenAmountStream() {
+    if (!this.context) throw new Error('')
+    if (!this.tokenType) throw new Error('')
+    return this.context.getTokenAmountByType(this.tokenType)
+  }
+
   private getChainEventEmitter() {
     if (!this.context) throw new Error('')
-    return this.context.chainId
+    return this.context.chainId$
   }
 
   private getInputTitle() {
@@ -74,6 +167,24 @@ export class InputElement extends LitElement {
       return 'You receive'
     }
     throw new Error(`invalid token type ${this.tokenType} in swap input`)
+  }
+
+  private async onInput(event: InputEvent) {
+    if (!this.tokenType) return
+    const target = event.target as HTMLInputElement | null
+    const valueString: string = target?.value ?? '';
+    const token = await firstValueFrom(this.token$)
+    if (!token) return
+    const amount = parseUnits(valueString.replaceAll(' ', ''), token.decimals)
+    this.context?.setTokenAmountByType(this.tokenType, amount)
+  }
+
+  private buildMask(decimals: number) {
+    return new Maskito(this.input, maskitoNumberOptionsGenerator({
+      precision: decimals,
+      max: 9 * 10 ** 15,
+      min: 0,
+    }));
   }
 
 }

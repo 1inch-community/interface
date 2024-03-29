@@ -5,6 +5,6 @@ export interface IToken {
   readonly address: Address
   readonly chainId: ChainId
   readonly symbol: string
-  readonly decimal: number
+  readonly decimals: number
   readonly name: string
 }

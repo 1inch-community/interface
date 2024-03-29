@@ -6,7 +6,6 @@ export const bodyStyle = css`
         margin: 0;
         touch-action: manipulation;
         background-color: var(--color-background-bg-body);
-        height: 100vh;
         box-sizing: border-box;
     }
 

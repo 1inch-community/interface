@@ -3,7 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { segmentedControlContainerStyle, segmentedControlItemStyle } from './segmented-control.style';
 import { classMap } from 'lit/directives/class-map.js';
 import { map } from 'lit/directives/map.js';
-import { buildEvent } from '@one-inch-community/utils';
+import { buildEvent } from '../lit/dom.utils';
 
 type SegmentedControlSize = 'm' | 'l'
 

@@ -3,11 +3,11 @@ import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { Task } from '@lit/task';
 import { icons, IconsRecord } from './icons';
-import { iconTagName } from './icon-tag-name';
+// import { iconTagName } from './icon-tag-name';
 
 @customElement(IconElement.tagName)
 export class IconElement extends LitElement {
-  static tagName = iconTagName
+  static tagName = 'inch-icon' as const
 
   static override styles = css`
     :host {
@@ -49,6 +49,7 @@ export class IconElement extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
+    // @ts-ignore: TS2717
     'inch-icon': IconElement
   }
 }

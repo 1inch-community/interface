@@ -11,9 +11,9 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "target": "es2015",
+    "target": "es2022",
     "module": "esnext",
-    "lib": ["es2020", "dom"],
+    "lib": ["es2022", "dom"],
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "skipDefaultLibCheck": true,
@@ -25,10 +25,12 @@
     ],
     "paths": {
       "@one-inch-community/models": ["libs/models/src/index"],
-      "@one-inch-community/sdk/*": ["dist/libs/sdk/*"],
+      "@one-inch-community/sdk": [
+        "dist/libs/sdk/index",
+        "dist/libs/sdk/*"
+      ],
       "@one-inch-community/ui-components/*": ["dist/libs/ui-components/*"],
       "@one-inch-community/widgets/*": ["dist/libs/widgets/*"],
-      "@one-inch-community/utils": ["libs/utils/src/index"]
     }
   },
   "exclude": ["node_modules", "tmp"]
