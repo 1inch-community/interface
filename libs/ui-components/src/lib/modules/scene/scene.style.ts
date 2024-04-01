@@ -36,7 +36,6 @@ export const sceneStyle = (config?: Partial<StyleConfig>) => {
           overflow: hidden;
           transition: height var(--animation-time-container), width var(--animation-time-container);
           border-radius: 16px;
-          padding: 1px;
       }
 
       .scene-container-animation {
@@ -45,6 +44,8 @@ export const sceneStyle = (config?: Partial<StyleConfig>) => {
 
       .scene-wrapper {
           background-color: ${unsafeCSS(_config.sceneBackgroundColor)};
+          padding: 1px;
+          display: block;
       }
       
       ${unsafeCSS(animation[_config.animation])}

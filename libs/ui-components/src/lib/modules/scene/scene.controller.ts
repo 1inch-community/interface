@@ -1,6 +1,6 @@
 import { html, render, TemplateResult } from 'lit';
 import { sceneStyle } from './scene.style';
-import { asyncFrame } from '../async/async-frame';
+import { SceneWrapperElement } from './scene-wrapper.element'
 
 type RenderConfig<T extends string> = Record<T, () => TemplateResult>
 
@@ -64,7 +64,7 @@ export class SceneController<T extends string, U extends T> {
       const nextSceneFactory = this.getScene(sceneName)
       if (!nextSceneFactory) throw new Error(`Scene ${sceneName} not exist`);
       const nextSceneWrapper = this.buildSceneWrapper(nextSceneFactory(), sceneName)
-      const currentSceneWrapper = this.sceneContainer.firstChild as HTMLElement
+      const currentSceneWrapper = this.sceneContainer.firstChild as SceneWrapperElement
 
       const upScene = isBack ? currentSceneWrapper : nextSceneWrapper
       const downScene = !isBack ? currentSceneWrapper : nextSceneWrapper
@@ -73,6 +73,9 @@ export class SceneController<T extends string, U extends T> {
       const upSceneVector = isBack ? 'scene-up-out' : 'scene-up-in'
       const downSceneStart = isBack ? 'scene-down-out-start' : 'scene-down-in-start'
       const downSceneVector = isBack ? 'scene-down-out' : 'scene-down-in'
+
+      isBack ? upScene.animationOutStart() : upScene.animationInStart()
+      isBack ? downScene.animationOutStart() : downScene.animationInStart()
 
       this.sceneContainer.classList.add('scene-container-animation')
       upScene.classList.add('scene-up', upSceneStart)
@@ -100,23 +103,8 @@ export class SceneController<T extends string, U extends T> {
       )
       this.sceneContainer.removeChild(currentSceneWrapper)
 
-
-      // const hiddenClass = isBack ? 'scene-wrapper-hidden-back' : 'scene-wrapper-hidden'
-      // const animationClass = isBack ? 'scene-up-out' : 'scene-up-in'
-      // const backgroundEffectClass = isBack ? 'scene-wrapper-background-effect-back' : 'scene-wrapper-background-effect'
-      // const target = isBack ? currentSceneWrapper : nextSceneWrapper
-      // const backgroundEffectTarget = isBack ? nextSceneWrapper : currentSceneWrapper
-      // backgroundEffectTarget.classList.add(backgroundEffectClass);
-      // nextSceneWrapper.classList.add(hiddenClass)
-      // this.sceneContainerAppendChild(sceneName, nextSceneWrapper)
-      // if (!target) {
-      //   nextSceneWrapper.classList.remove(hiddenClass)
-      //   return
-      // }
-      // target.classList.add(animationClass)
-      // await waitAnimationEnd(target)
-      // nextSceneWrapper.classList.remove(hiddenClass)
-      // this.sceneContainer.firstChild && this.sceneContainer.removeChild(this.sceneContainer.firstChild)
+      isBack ? upScene.animationOutEnd() : upScene.animationInEnd()
+      isBack ? downScene.animationOutEnd() : downScene.animationInEnd()
     } finally {
       this.transitionInProgress = false
     }
@@ -147,8 +135,8 @@ export class SceneController<T extends string, U extends T> {
     }
   }
 
-  private buildSceneWrapper(content: TemplateResult, name: string) {
-    const sceneWrapper = document.createElement('div');
+  private buildSceneWrapper(content: TemplateResult, name: string): SceneWrapperElement {
+    const sceneWrapper = document.createElement(SceneWrapperElement.tagName) as SceneWrapperElement;
     sceneWrapper.id = name;
     sceneWrapper.classList.add('scene-wrapper', name);
     render(content, sceneWrapper)

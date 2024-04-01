@@ -11,6 +11,13 @@ export const cardHeaderStyle = css`
         border-top-left-radius: 32px;
         border-top-right-radius: 32px;
     }
+    
+    :host(.not-native-mode) {
+        margin-top: -16px;
+        margin-left: -16px;
+        width: calc(100% + 32px);
+        height: 60px;
+    }
 
     .card-header-container {
         display: grid;

@@ -10,6 +10,7 @@ import "@one-inch-community/ui-components/token-icon"
 import "@one-inch-community/ui-components/icon"
 import "@one-inch-community/ui-components/button"
 import { ISwapContext, IToken } from '@one-inch-community/models';
+import { formatNumber } from '@one-inch-community/sdk';
 import '../balance/balance.element'
 import { inputStyle } from './input.style';
 import { swapContext } from '../../context';
@@ -46,7 +47,7 @@ export class InputElement extends LitElement {
   )
 
   private readonly input = document.createElement('input')
-  private maskedInput = this.buildMask(8);
+  private maskedInput = this.buildMask(6);
 
   private tokenView$ = this.token$.pipe(
     map(token => {
@@ -82,7 +83,7 @@ export class InputElement extends LitElement {
       filter(([, token]) => !!token),
       map(([amount, token]) => formatUnits(amount, token!.decimals)),
       filter(amount => amount !== this.input.value),
-      tap(amount => this.input.value = amount)
+      tap(amount => this.input.value = formatNumber(amount, 6))
     )
 
     subscribe(this, [

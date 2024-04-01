@@ -1,9 +1,10 @@
-import { html, LitElement } from 'lit';
+import { html, LitElement, PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
+import { classMap } from 'lit/directives/class-map.js';
 import { cardHeaderStyle } from './card-header.style';
 import '@one-inch-community/ui-components/icon'
 import '@one-inch-community/ui-components/button'
-import { classMap } from 'lit/directives/class-map.js';
+import { dispatchEvent } from '../lit/dom.utils';
 
 @customElement(CardHeaderElement.tahName)
 export class CardHeaderElement extends LitElement {
@@ -32,15 +33,21 @@ export class CardHeaderElement extends LitElement {
           ${this.getHeader('left')}
         </div>
         <div class="position-container center-container">
-          <slot name="center-container"></slot>
+          <slot @slotchange="${() => this.onSlotChange('center')}" name="center-container"></slot>
           ${this.getHeader('center')}
         </div>
         <div class="position-container right-container">
-          <slot name="right-container"></slot>
+          <slot @slotchange="${() => this.onSlotChange('right')}" name="right-container"></slot>
           ${this.getCloseButton('right')}
         </div>
       </div>
     `
+  }
+
+  protected override firstUpdated() {
+    if (this.parentElement?.localName !== 'inch-card') {
+      this.classList.add('not-native-mode')
+    }
   }
 
   private getHeader(containerName: 'center' | 'left') {
@@ -58,7 +65,7 @@ export class CardHeaderElement extends LitElement {
   private getBackButton(containerName: 'left' | 'center' | 'right') {
     const isSlotDirty = this.slotDirty[containerName] ?? false
     return this.backButton && !isSlotDirty ? html`
-      <inch-button type="tertiary-gray">
+      <inch-button @click="${(event: Event) => dispatchEvent(this, 'backCard', null, event)}" size="l" type="tertiary-gray">
         <inch-icon icon="arrowLeft24"></inch-icon>
       </inch-button>
     ` : ''
@@ -67,7 +74,7 @@ export class CardHeaderElement extends LitElement {
   private getCloseButton(containerName: 'left' | 'center' | 'right') {
     const isSlotDirty = this.slotDirty[containerName] ?? false
     return this.closeButton && !isSlotDirty ? html`
-      <inch-button type="tertiary-gray">
+      <inch-button @click="${(event: Event) => dispatchEvent(this, 'closeCard', null, event)}" size="l" type="tertiary-gray">
         <inch-icon icon="cross24"></inch-icon>
       </inch-button>
     ` : ''

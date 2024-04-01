@@ -100,7 +100,7 @@ export class WidgetsPage extends LitElement {
             ></inch-swap-form>
           `,
           selectToken: () => html`
-            <inch-select-token></inch-select-token>
+            <inch-select-token @backCard="${() => this.scene.back()}"></inch-select-token>
           `
         })}
       </inch-card>

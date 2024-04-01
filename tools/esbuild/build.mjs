@@ -37,6 +37,8 @@ const logger = new Logger(`${libName} v${version}`, isWatch, modules.map(m => m.
 
 config({ path: path.join(projectRoot, '.env') })
 
+process.title = `${pkgGlobal.name}__${isWatch ? 'watch-build' : 'build'}_library_${libName}`
+
 const typesReady = {}
 
 function getBuildConfig(moduleName, entryPoint, dist, format) {
@@ -54,7 +56,7 @@ function getBuildConfig(moduleName, entryPoint, dist, format) {
 
   return {
     entryPoints: {
-      'index.ts': entryPoint
+      'index': entryPoint
     },
     bundle: true,
     splitting: format === 'esm',
@@ -126,7 +128,7 @@ async function watchBuilder(moduleName, entryPoint, config) {
     logger.setStatus(moduleName, 'watch')
   }, 100)
   await build()
-  fs.watch(path.dirname(entryPoint),  async () => {
+  fs.watch(path.dirname(entryPoint), { recursive: true },  async () => {
     if (isError || !context) {
       await build()
     } else {

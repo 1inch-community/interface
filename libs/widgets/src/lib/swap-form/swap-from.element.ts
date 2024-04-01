@@ -57,14 +57,22 @@ export class SwapFromElement extends LitElement {
 
   protected override render() {
     if (!this.context.value) return
+    const header = html`
+      <inch-card-header headerText="Swap tokens" headerTextPosition="left">
+        <inch-button slot="right-container" type="tertiary-gray" size="m">
+          <inch-icon icon="authRefresh36"></inch-icon>
+        </inch-button>
+      </inch-card-header>
+    `
+
     const form = html`
       <div class="input-container">
-        <div class="input-header">
-          <span>Swap tokens</span>
-          <inch-button type="tertiary-gray" size="m">
-            <inch-icon icon="authRefresh36"></inch-icon>
-          </inch-button>
-        </div>
+<!--        <div class="input-header">-->
+<!--          <span>Swap tokens</span>-->
+<!--          <inch-button type="tertiary-gray" size="m">-->
+<!--            <inch-icon icon="authRefresh36"></inch-icon>-->
+<!--          </inch-button>-->
+<!--        </div>-->
         <inch-swap-form-input tokenType="source"></inch-swap-form-input>
         <inch-token-pair-switch></inch-token-pair-switch>
         <inch-swap-form-input disabled tokenType="destination"></inch-swap-form-input>
@@ -76,6 +84,7 @@ export class SwapFromElement extends LitElement {
     if (this.withoutBackingCard) {
       return html`
         <div class="swap-form-container">
+          ${header}
           ${form}
         </div>
       `
@@ -83,6 +92,7 @@ export class SwapFromElement extends LitElement {
 
     return html`
       <inch-card>
+        ${header}
         ${form}
       </inch-card>
     `

@@ -4,6 +4,8 @@ import { defineConfig } from 'vite';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import * as path from 'node:path';
 
+process.title = 'one-inch-community__ui-test-app_serve'
+
 export default defineConfig({
   root: __dirname,
   cacheDir: '../../node_modules/.vite/apps/ui-test-app',

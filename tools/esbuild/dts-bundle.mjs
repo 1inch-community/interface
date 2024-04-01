@@ -1,6 +1,8 @@
 import {generateDtsBundle} from 'dts-bundle-generator'
-import * as fs from 'fs'
+import * as fsModule from 'fs'
 import * as path from 'path'
+
+const fs = fsModule.promises
 
 /**
  * Builds the entry points based on the given input.
@@ -31,16 +33,16 @@ function buildEntryPoints(entryPoints) {
  * @param {string[] | Record<string, string> | { in: string, out: string }[]} entryPoints - The entry points for which the declaration bundle is generated.
  * @return {void}
  */
-export function dtsBundle(logger, outDir, entryPoints) {
+export async function dtsBundle(logger, outDir, entryPoints) {
   const entryPointsRecord = buildEntryPoints(entryPoints);
   for (const fileName in entryPointsRecord) {
     const filePath = entryPointsRecord[fileName];
     const moduleName = path.basename(path.dirname(filePath))
     logger.setStatus(moduleName, 'build types', true)
-    // console.log('generate types', path.basename(path.dirname(filePath)), fileName)
     try {
       const data = generateDtsBundle([{ filePath, output: { noBanner: true } }]);
-      fs.writeFileSync(path.join(outDir, fileName), data[0])
+      const fileNameAnd = restoreFileName(fileName)
+      await fs.writeFile(path.join(outDir, fileNameAnd), data[0])
     } catch (error) {
       logger.setError(moduleName, error)
     }
@@ -59,9 +61,15 @@ export function dtsBundlePlugin(logger) {
     setup(build) {
       const entryPoints = build.initialOptions.entryPoints
       const outDir = build.initialOptions.outdir
-      build.onEnd(() => {
-        dtsBundle(logger, outDir, entryPoints)
+      build.onEnd(async () => {
+        await dtsBundle(logger, outDir, entryPoints)
       })
     }
   }
+}
+
+function restoreFileName(fileName) {
+  const extname = path.extname(fileName)
+  if (extname.toLowerCase().includes('d.ts')) return fileName
+  return fileName + '.d.ts';
 }

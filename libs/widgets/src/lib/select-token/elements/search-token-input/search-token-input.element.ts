@@ -3,6 +3,8 @@ import { customElement, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { searchTokenInputStyle } from './search-token-input.style';
 import '@one-inch-community/ui-components/icon';
+import { sceneContext, ISceneContext } from '@one-inch-community/ui-components/scene'
+import { consume } from '@lit/context';
 
 @customElement(SearchTokenInputElement.tagName)
 export class SearchTokenInputElement extends LitElement {
@@ -11,6 +13,9 @@ export class SearchTokenInputElement extends LitElement {
   static override styles = searchTokenInputStyle
 
   @state() private isFocused = false
+
+  @consume({ context: sceneContext })
+  sceneContext?: ISceneContext
 
   protected override render() {
     const classes = {
@@ -21,6 +26,9 @@ export class SearchTokenInputElement extends LitElement {
       <div class="${classMap(classes)}">
         <inch-icon icon="search24"></inch-icon>
         <input
+          id="search"
+          autofocus
+          autocomplete="off"
           @focus="${() => this.isFocused = true}"
           @blur="${() => this.isFocused = false}"
           placeholder="Search token by name or address"
@@ -28,6 +36,13 @@ export class SearchTokenInputElement extends LitElement {
         >
       </div>
     `
+  }
+
+  protected override async firstUpdated() {
+    const input = this.renderRoot.querySelector('#search') as HTMLInputElement
+    if (!input) return
+    await this.sceneContext?.animationInEnd
+    input.focus();
   }
 
 }
