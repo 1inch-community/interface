@@ -1,14 +1,14 @@
 {
   "name": "sdk",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/utils/src",
+  "sourceRoot": "libs/sdk/src",
   "projectType": "library",
   "targets": {
     "build": {
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "rollup -c libs/sdk/rollup.config.js --bundleConfigAsCjs"
+          "time node tools/esbuild/build.mjs --lib-name sdk"
         ]
       }
     },
@@ -16,7 +16,7 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "rollup -c libs/sdk/rollup.config.js --bundleConfigAsCjs -w --watch.buildDelay 500"
+          "time node tools/esbuild/build.mjs --lib-name sdk --watch"
         ]
       }
     },
