@@ -8,7 +8,7 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "rollup -c libs/ui-components/rollup.config.js --bundleConfigAsCjs"
+          "node tools/esbuild/build.mjs --lib-name ui-components"
         ]
       }
     },
@@ -16,7 +16,7 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "rollup -c libs/ui-components/rollup.config.js --bundleConfigAsCjs -w --watch.buildDelay 500"
+          "node tools/esbuild/build.mjs --lib-name ui-components --watch"
         ]
       }
     },
