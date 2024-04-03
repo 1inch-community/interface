@@ -24,13 +24,20 @@
       }
     ],
     "paths": {
-      "@one-inch-community/models": ["libs/models/src/index"],
+      "@one-inch-community/models": [
+        "dist/libs/models/index",
+        "dist/libs/models/*"
+      ],
       "@one-inch-community/sdk": [
         "dist/libs/sdk/index",
         "dist/libs/sdk/*"
       ],
-      "@one-inch-community/ui-components/*": ["dist/libs/ui-components/*"],
-      "@one-inch-community/widgets/*": ["dist/libs/widgets/*"],
+      "@one-inch-community/ui-components/*": [
+        "dist/libs/ui-components/*"
+      ],
+      "@one-inch-community/widgets/*": [
+        "dist/libs/widgets/*"
+      ],
     }
   },
   "exclude": ["node_modules", "tmp"]

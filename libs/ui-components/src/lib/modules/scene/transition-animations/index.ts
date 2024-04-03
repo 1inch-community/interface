@@ -1,2 +1,2 @@
 export * from './shift.animation'
-export * from './slide.nimation'
+export * from './slide.animation'

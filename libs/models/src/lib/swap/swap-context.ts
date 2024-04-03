@@ -1,7 +1,7 @@
+import { type Address } from 'viem';
+import { type Observable } from 'rxjs';
 import { ChainId } from '../chain/chain-id';
 import { IToken } from '../token/token';
-import { Address } from 'viem';
-import { Observable } from 'rxjs';
 
 export interface ISwapContext {
   readonly chainId$: Observable<ChainId>

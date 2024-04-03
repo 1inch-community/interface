@@ -1,5 +1,6 @@
-import { ChainId, IToken } from '@one-inch-community/models';
 import { Observable } from 'rxjs';
+import { ChainId } from '../chain/chain-id';
+import { IToken } from '../token/token';
 
 export interface ITokenRateProvider {
   getRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken): Promise<bigint | null>

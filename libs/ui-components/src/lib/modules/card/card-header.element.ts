@@ -1,4 +1,4 @@
-import { html, LitElement, PropertyValues } from 'lit';
+import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { cardHeaderStyle } from './card-header.style';
@@ -85,4 +85,10 @@ export class CardHeaderElement extends LitElement {
     this.requestUpdate()
   }
 
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'inch-card-header': CardHeaderElement
+  }
 }

@@ -2,10 +2,11 @@
   "name": "widgets",
   "version": "0.0.1",
   "peerDependencies": {
+    "@lit-labs/virtualizer": "2.0.x",
     "@lit/context": "1.1.x",
     "@lit/task": "1.0.x",
     "lit": "3.1.x",
     "tslib": "2.3.0",
-    "viem": "2.7.22"
+    "viem": "2.9.x"
   }
 }

@@ -1,7 +1,7 @@
 import { ChainId } from '@one-inch-community/models';
 import { createPublicClient, PublicClient } from 'viem';
 import { contextField } from '../utils/context-field';
-import { transportMap, transportWSMap } from './transport-map';
+import { batchConfig, transportMap, transportWSMap } from './transport-map';
 import { getChainById } from './viem-chain-map';
 
 const viemClients: Record<ChainId, PublicClient | null> = contextField('__chain_client', () => ({
@@ -36,6 +36,9 @@ function buildViemDefaultClient(chainId: ChainId) {
   const chain = getChainById(chainId);
   const transport = transportMap[chainId];
   return createPublicClient({
+    batch: {
+      multicall: batchConfig
+    },
     chain,
     transport,
   });

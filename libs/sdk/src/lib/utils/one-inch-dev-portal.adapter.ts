@@ -1,29 +1,27 @@
-import { ChainId } from '@one-inch-community/models';
+import { ChainId, ITokenDto } from '@one-inch-community/models';
 import type { Address } from 'viem';
 import { getEnvironmentValue } from '../environment';
-
-interface OneInchTokenDTO {
-  chainId: number
-  symbol: string
-  name: string
-  address: Address
-  decimals: number
-  logoURI: string
-  providers: string[]
-  eip2612: boolean
-  isFoT: boolean
-  displayedSymbol: string
-  tags: string[]
-}
 
 export class OneInchDevPortalAdapter {
 
   private readonly host: string = getEnvironmentValue('oneInchDevPortalHost')
 
-  getOneInchWhiteListedTokens(chainId: ChainId): Promise<OneInchTokenDTO[]> {
-    return fetch(`${this.host}/token/v1.2/${chainId}/token-list`)
-      .then(response => response.json())
-      .then(data => data.tokens);
+  async getWhiteListedTokens(chainId: ChainId): Promise<ITokenDto[]> {
+    const response = await fetch(`${this.host}/token/v1.2/${chainId}/token-list`);
+    const data: { tokens: ITokenDto[] } = await response.json();
+    return data.tokens;
+  }
+
+  async getBalancesByWalletAddress(chainId: ChainId, walletAddress: Address): Promise<Record<Address, string>> {
+
+    const response = await fetch(`${this.host}/balance/v1.2/${chainId}/balances/${walletAddress}`);
+    return await response.json();
+  }
+
+  async getTokenPrices(chainId: ChainId): Promise<Record<Address, string>> {
+    const queryParams = new URLSearchParams({ currency: 'USD' });
+    const response = await fetch(`${this.host}/price/v1.1/${chainId}?${queryParams}`);
+    return await response.json();
   }
 
 }

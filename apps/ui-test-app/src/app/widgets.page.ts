@@ -41,9 +41,9 @@ export class WidgetsPage extends LitElement {
     SceneController.styles()
   ]
 
-  private readonly scene = new SceneController('swapForm', {
+  private readonly scene = new SceneController('selectToken', {
     swapForm: { width: 556, height: 376.5 },
-    selectToken: { width: 556, height: 400 }
+    selectToken: { width: 556, height: 680 }
   })
 
   srcToken: IToken = {
@@ -100,7 +100,11 @@ export class WidgetsPage extends LitElement {
             ></inch-swap-form>
           `,
           selectToken: () => html`
-            <inch-select-token @backCard="${() => this.scene.back()}"></inch-select-token>
+            <inch-select-token
+              chainId="1"
+              connectedWalletAddress="0x568D3086f5377e59BF2Ef77bd1051486b581b214"
+              @backCard="${() => this.scene.back()}"
+            ></inch-select-token>
           `
         })}
       </inch-card>

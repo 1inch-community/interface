@@ -46,3 +46,9 @@ export class SearchTokenInputElement extends LitElement {
   }
 
 }
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'inch-search-token-input': SearchTokenInputElement
+  }
+}

@@ -13,7 +13,7 @@ import {
 } from 'rxjs';
 import { buildDefaultTokenRageProvider } from '../token-rate';
 import { TokenContext } from './token-context';
-import { BigMath } from '../utils/big-math';
+import { BigMath } from '../utils';
 
 export class SwapContext implements ISwapContext {
 

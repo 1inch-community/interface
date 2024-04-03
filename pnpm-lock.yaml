@@ -5,6 +5,9 @@ settings:
   excludeLinksFromLockfile: false
 
 dependencies:
+  '@lit-labs/virtualizer':
+    specifier: ^2.0.12
+    version: 2.0.12
   '@lit/context':
     specifier: 1.1.0
     version: 1.1.0
@@ -33,8 +36,8 @@ dependencies:
     specifier: ^2.3.0
     version: 2.6.2
   viem:
-    specifier: 2.8.9
-    version: 2.8.9(typescript@5.3.3)
+    specifier: 2.9.6
+    version: 2.9.6(typescript@5.3.3)
 
 devDependencies:
   '@nx/eslint':
@@ -104,11 +107,8 @@ devDependencies:
     specifier: ^9.3.1
     version: 9.3.1
   esbuild:
-    specifier: ^0.20.2
+    specifier: 0.20.2
     version: 0.20.2
-  esbuild-plugin-d.ts:
-    specifier: ^1.2.3
-    version: 1.2.3(typescript@5.3.3)
   eslint:
     specifier: ~8.48.0
     version: 8.48.0
@@ -1996,6 +1996,13 @@ packages:
 
   /@lit-labs/ssr-dom-shim@1.2.0:
     resolution: {integrity: sha512-yWJKmpGE6lUURKAaIltoPIE/wrbY3TEkqQt+X0m+7fQNnAv0keydnYvbiJFP1PnMhizmIWRWOG5KLhYyc/xl+g==}
+    dev: false
+
+  /@lit-labs/virtualizer@2.0.12:
+    resolution: {integrity: sha512-sL7AXhacSdzOJLEQFcPCrV7tu2rZQ10upeGMAxKmTT0Ae4kBFV8nwlFiUEQPBt1idUsAkiDG1yN91IgUWQXVNQ==}
+    dependencies:
+      lit: 3.1.2
+      tslib: 2.6.2
     dev: false
 
   /@lit/context@1.1.0:
@@ -4705,17 +4712,6 @@ packages:
 
   /es-module-lexer@1.4.1:
     resolution: {integrity: sha512-cXLGjP0c4T3flZJKQSuziYoq7MlT+rnvfZjfp7h+I7K9BNX54kP9nyWvdbwjQ4u1iWbOL4u96fgeZLToQlZC7w==}
-    dev: true
-
-  /esbuild-plugin-d.ts@1.2.3(typescript@5.3.3):
-    resolution: {integrity: sha512-JkNqcCTkv0N39izAOLaiAQcFA6DfbhDkef1ZO6NvnHtTT+7i+4VHjCcAM2yFslRTBTK1TuF41FLSwWvGm88N7w==}
-    engines: {node: '>=12.0.0'}
-    peerDependencies:
-      typescript: '*'
-    dependencies:
-      chalk: 4.1.2
-      lodash.merge: 4.6.2
-      typescript: 5.3.3
     dev: true
 
   /esbuild@0.19.12:
@@ -8053,8 +8049,8 @@ packages:
       extsprintf: 1.3.0
     dev: true
 
-  /viem@2.8.9(typescript@5.3.3):
-    resolution: {integrity: sha512-C9D4rlA95NY6MyO1d1JT/dTrP8iFdilBApJPPitLZOkpo2zkl4Oe3gMMXjUeOvsfnnO7kZI6TGxq5osHrVdM0Q==}
+  /viem@2.9.6(typescript@5.3.3):
+    resolution: {integrity: sha512-VVFWjGQei2wnWTvAB/xrIf22m6flCwxeBr8LnwejXMTSSi1EORWEswrw2lfKTmw3TlRPSG4uSiQMa/d0l0DKRg==}
     peerDependencies:
       typescript: '>=5.0.4'
     peerDependenciesMeta:

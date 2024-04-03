@@ -31,20 +31,59 @@ function buildEntryPoints(entryPoints) {
  * @param {Logger} logger
  * @param {string} outDir - The entry points for which the declaration bundle is generated.
  * @param {string[] | Record<string, string> | { in: string, out: string }[]} entryPoints - The entry points for which the declaration bundle is generated.
+ * @param {string} tsconfigPath
  * @return {void}
  */
-export async function dtsBundle(logger, outDir, entryPoints) {
+export async function dtsBundle(logger, outDir, entryPoints, tsconfigPath) {
   const entryPointsRecord = buildEntryPoints(entryPoints);
   for (const fileName in entryPointsRecord) {
     const filePath = entryPointsRecord[fileName];
     const moduleName = path.basename(path.dirname(filePath))
     logger.setStatus(moduleName, 'build types', true)
+    let data
     try {
-      const data = generateDtsBundle([{ filePath, output: { noBanner: true } }]);
+      const error = console.error
+      console.error = (...args) => {
+        logger.setError(moduleName, 'build types', {
+          message: 'Build types error',
+          stack: args.join('\n')
+        })
+      };
+      data = generateDtsBundle(
+        [
+          {
+            filePath,
+            libraries: {
+              inlinedLibraries: [
+                '@one-inch-community/models'
+              ]
+            },
+            output: {
+              noBanner: true,
+              exportReferencedTypes: false,
+              inlineDeclareGlobals: true
+            }
+          }
+        ],
+        {
+          preferredConfigPath: tsconfigPath,
+          followSymlinks: true
+        });
+      console.error = error
+      logger.setError(moduleName, 'build types', null)
+      logger.setError(moduleName, 'dts error', null)
+    } catch (error) {
+      logger.setError(moduleName, 'dts error', error)
+    }
+    try {
+      if (!data) {
+        return
+      }
       const fileNameAnd = restoreFileName(fileName)
       await fs.writeFile(path.join(outDir, fileNameAnd), data[0])
+      logger.setError(moduleName, 'save types', null)
     } catch (error) {
-      logger.setError(moduleName, error)
+      logger.setError(moduleName, 'save types', error)
     }
   }
 }
@@ -53,16 +92,17 @@ export async function dtsBundle(logger, outDir, entryPoints) {
  * Creates a dts-bundle plugin for a build process.
  *
  * @param {Logger} logger
+ * @param {string} tsconfigPath
  * @returns {Object} The dts-bundle plugin.
  */
-export function dtsBundlePlugin(logger) {
+export function dtsBundlePlugin(logger, tsconfigPath) {
   return {
     name: 'dts-bundle',
     setup(build) {
       const entryPoints = build.initialOptions.entryPoints
       const outDir = build.initialOptions.outdir
       build.onEnd(async () => {
-        await dtsBundle(logger, outDir, entryPoints)
+        await dtsBundle(logger, outDir, entryPoints, tsconfigPath)
       })
     }
   }

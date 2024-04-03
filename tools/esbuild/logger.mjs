@@ -22,11 +22,18 @@ export class Logger {
     this.show()
   }
 
-  setError(moduleName, error) {
+  setError(moduleName, errorName, error) {
     const statusContext = this.modules.get(moduleName) ?? defaultStatus()
-    statusContext.error = error
+    if (error === null) {
+      statusContext.error.delete(errorName)
+    } else {
+      statusContext.error.set(errorName, error)
+    }
     this.modules.set(moduleName, statusContext)
     this.show()
+    if (!this.isWatch) {
+      process.exit(-1)
+    }
   }
 
   addModule(moduleName) {
@@ -37,17 +44,13 @@ export class Logger {
     const scene = []
     for (const [moduleName, status] of this.modules) {
       const statusIcon = getStatusIcon(status)
-      const error = []
-      if (status.error) {
-        error.push(status.error.message)
-        error.push(status.error.stack)
-      }
+      const error = getError(status)
 
       scene.push([
         statusIcon,
         `[${moduleName}]`,
-        status.error ? null : status.statusName,
-        ...error
+        error ? null : status.statusName,
+        ...(error ?? [])
       ].filter(Boolean).join(' '))
     }
 
@@ -59,11 +62,25 @@ export class Logger {
 
 }
 
+function getError(status) {
+  if (status.error.size) {
+    const errorName = status.error.keys().next().value
+    const error = status.error.get(errorName) ?? {}
+    return [
+      `[${errorName}]`,
+      error.message,
+      error.stack
+    ]
+  }
+
+  return null
+}
+
 function defaultStatus() {
   return {
     isLoading: false,
     statusName: '',
-    error: null
+    error: new Map()
   }
 }
 
@@ -72,7 +89,7 @@ function getStatusIcon(status) {
     return '⏳'
   }
 
-  if (status.error) {
+  if (status.error.size) {
     return '❌'
   }
   return '✅'

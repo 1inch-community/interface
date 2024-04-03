@@ -2,7 +2,7 @@ import { ChainId, IToken, ITokenRateAdapter, ITokenRateProvider } from '@one-inc
 import { uniswapV2Adapter } from './adapters/uniswap-v2-adapter';
 // import { sushiswapV2Adapter } from './adapters/sushiswap-v2-adapter';
 import { pancakeswapV2Adapter } from './adapters/pancakeswap-v2-adapter';
-import { BigMath } from '../utils/big-math';
+import { BigMath } from '../utils';
 import { getBlockEmitter } from '../chain';
 import { startWith, switchMap } from 'rxjs';
 

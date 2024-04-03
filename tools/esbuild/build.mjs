@@ -45,7 +45,7 @@ function getBuildConfig(moduleName, entryPoint, dist, format) {
 
   const plugins = []
   if (!typesReady[entryPoint] || isWatch) {
-    plugins.push(dtsBundlePlugin(logger))
+    plugins.push(dtsBundlePlugin(logger, tsconfigPath))
   }
   typesReady[entryPoint] = true
   const moduleFullName = `@${pkgGlobal.name}/${libName}/${moduleName}`
@@ -106,10 +106,10 @@ async function watchBuilder(moduleName, entryPoint, config) {
     try {
       await context.rebuild()
       isError = false
-      logger.setError(moduleName, null)
+      logger.setError(moduleName, 'rebuild', null)
     } catch (error) {
       isError = true
-      logger.setError(moduleName, error)
+      logger.setError(moduleName, 'rebuild', error)
     }
     logger.setStatus(moduleName, 'watch')
   }, 300)
@@ -120,10 +120,10 @@ async function watchBuilder(moduleName, entryPoint, config) {
       logger.setStatus(moduleName, `build ${config.format}`, true)
       await esbuild.build(config)
       isError = false
-      logger.setError(moduleName, null)
+      logger.setError(moduleName, `build ${config.format}`, null)
     } catch (error) {
       isError = true
-      logger.setError(moduleName, error)
+      logger.setError(moduleName, `build ${config.format}`, error)
     }
     logger.setStatus(moduleName, 'watch')
   }, 100)

@@ -2,13 +2,15 @@ import {fallback, http, Transport, webSocket} from "viem";
 import { ChainId } from '@one-inch-community/models';
 import { contextField } from '../utils/context-field';
 
+export const batchConfig = {
+  wait: 50,
+  batchSize: 100
+}
+
 function buildFallbackTransport(rpcList: string[]) {
   return fallback(rpcList.map(rpc => http(rpc,
     {
-      batch: {
-        wait: 50,
-        batchSize: 20
-      }
+      batch: batchConfig
     })),
     {
     rank: {

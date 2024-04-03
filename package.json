@@ -5,6 +5,7 @@
   "scripts": {},
   "private": true,
   "dependencies": {
+    "@lit-labs/virtualizer": "^2.0.12",
     "@lit/context": "1.1.0",
     "@lit/task": "1.0.0",
     "@maskito/core": "2.2.0",
@@ -14,7 +15,7 @@
     "lit": "3.1.2",
     "rxjs": "7.8.1",
     "tslib": "^2.3.0",
-    "viem": "2.8.9"
+    "viem": "2.9.6"
   },
   "devDependencies": {
     "@nx/eslint": "18.0.4",

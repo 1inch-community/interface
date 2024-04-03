@@ -1,5 +1,5 @@
 import type { Address } from 'viem';
-import { ChainId } from '@one-inch-community/models';
+import { ChainId } from '../chain/chain-id';
 
 export interface IToken {
   readonly address: Address

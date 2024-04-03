@@ -46,6 +46,7 @@ export const sceneStyle = (config?: Partial<StyleConfig>) => {
           background-color: ${unsafeCSS(_config.sceneBackgroundColor)};
           padding: 1px;
           display: block;
+          height: 100%;
       }
       
       ${unsafeCSS(animation[_config.animation])}

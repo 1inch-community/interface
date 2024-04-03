@@ -57,7 +57,7 @@ export const slideAnimation = css`
         bottom: 0;
         right: 0;
         z-index: 8;
-        will-change: transform, filter
+        will-change: transform
     }
 
     .scene-down-in-start {

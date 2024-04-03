@@ -3,7 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { Task } from '@lit/task';
 import { icons, IconsRecord } from './icons';
-// import { iconTagName } from './icon-tag-name';
+
 
 @customElement(IconElement.tagName)
 export class IconElement extends LitElement {
@@ -17,7 +17,9 @@ export class IconElement extends LitElement {
     }
   `
 
-  @property({ type: String, attribute: 'icon', reflect: true }) icon?: string
+  @property({ type: String, attribute: 'icon' }) icon?: string
+  @property({ type: String, attribute: true }) width?: string
+  @property({ type: String, attribute: true }) height?: string
 
   private iconRecord?: IconsRecord
 
@@ -28,10 +30,18 @@ export class IconElement extends LitElement {
     )
 
   protected override render() {
-
+    const styles = {
+      width: this.width ?? this.iconRecord?.width,
+      height: this.height ?? this.iconRecord?.height
+    }
     return this.iconLoadTask.render({
-      pending: () => html`<div style="${styleMap({ width: this.iconRecord?.width, height: this.iconRecord?.height })}"></div>`,
-      complete: (svg) => svg
+      pending: () => html`<div style="${styleMap(styles)}"></div>`,
+      complete: (svg) => {
+        if (typeof svg === 'function') {
+          return svg({ ...styles })
+        }
+        return svg
+      }
     })
   }
 
