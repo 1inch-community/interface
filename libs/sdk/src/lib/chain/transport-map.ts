@@ -4,7 +4,7 @@ import { contextField } from '../utils/context-field';
 
 export const batchConfig = {
   wait: 50,
-  batchSize: 100
+  batchSize: 50
 }
 
 function buildFallbackTransport(rpcList: string[]) {

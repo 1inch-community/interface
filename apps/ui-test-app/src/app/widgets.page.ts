@@ -10,7 +10,6 @@ import {
   themeChangeMainColor
 } from '@one-inch-community/ui-components/theme';
 import { SceneController } from '@one-inch-community/ui-components/scene';
-import { getClient } from '@one-inch-community/sdk';
 
 @customElement('app-widgets')
 export class WidgetsPage extends LitElement {
@@ -65,9 +64,6 @@ export class WidgetsPage extends LitElement {
   // dstToken = undefined
 
   protected render() {
-    const client = getClient(ChainId.eth)
-    client.estimateFeesPerGas().then(console.log)
-    client.getGasPrice().then(console.log)
 
     return html`
       <inch-card>

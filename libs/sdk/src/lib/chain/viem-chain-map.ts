@@ -14,7 +14,7 @@ import {
   zkSync
 } from 'viem/chains';
 
-const viemChainId: Record<ChainId, Chain> = {
+const viemChainId: Readonly<Record<ChainId, Chain>> = {
   [ChainId.eth]: mainnet,
   [ChainId.bnb]: bsc,
   [ChainId.matic]: polygon,

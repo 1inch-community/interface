@@ -1,8 +1,11 @@
-import { contextField, OneInchDevPortalAdapter, JsonParser, storage } from '../../utils';
+import { contextField, OneInchDevPortalAdapter, JsonParser, storage } from '../utils';
 import { TokenSchema } from './token.schema';
 import { ChainId } from '@one-inch-community/models';
 import { Address } from 'viem';
-import { averageBlockTime } from '../../chain/average-block-time';
+import { averageBlockTime } from '../chain/average-block-time';
+import { TokenUsdOnChainPriceProvider } from './token-usd-on-chain-price.provider';
+import { TokenOnChainBalances } from './token-balances/token-on-chain-balances';
+import { liveQuery } from 'dexie';
 
 const lastUpdateTokenDatabaseTimestampStorageKey = `last-update-token-database-timestamp-v${TokenSchema.databaseVersion}`
 const lastUpdateTokenBalanceDatabaseTimestampStorageKey = `last-update-token-balance-database-timestamp-v${TokenSchema.databaseVersion}`
@@ -13,6 +16,8 @@ const tokenBalanceDatabaseTTL = averageBlockTime
 class TokenControllerImpl {
 
   private readonly schema = new TokenSchema()
+  private readonly tokenUsdPriceProvider = new TokenUsdOnChainPriceProvider()
+  private readonly tokenOnChainBalances = new TokenOnChainBalances()
   private readonly oneInchApiAdapter = new OneInchDevPortalAdapter()
   private lastUpdateTokenDatabaseTimestampStorage = storage.get<Record<ChainId, number>>(lastUpdateTokenDatabaseTimestampStorageKey, JsonParser)
   private lastUpdateTokenBalanceDatabaseTimestampStorage = storage.get<Record<string, number>>(lastUpdateTokenBalanceDatabaseTimestampStorageKey, JsonParser)
@@ -24,7 +29,10 @@ class TokenControllerImpl {
    * @param {Address} [walletAddress] - The connected wallet address. (Optional)
    * @returns {Promise<Address[]>} - A promise that resolves to an array of sorted token addresses.
    */
-  async getSortedForViewTokenAddresses(chainId: ChainId, walletAddress?: Address): Promise<Address[]> {
+  async getSortedForViewTokenAddresses(chainId: ChainId, walletAddress?: Address): Promise<{
+    notZero: Address[],
+    zero: Address[]
+  }> {
     await this.updateTokenDatabase(chainId)
     if (walletAddress) {
       await this.updateBalanceDatabase(chainId, walletAddress)
@@ -36,8 +44,55 @@ class TokenControllerImpl {
     return await this.schema.getToken(chainId, address)
   }
 
+  async getTokenList(chainId: ChainId, addresses: Address[]) {
+    return await this.schema.getTokenList(chainId, addresses)
+  }
+
+  async getTokenMap(chainId: ChainId, addresses: Address[]) {
+    return await this.schema.getTokenMap(chainId, addresses)
+  }
+
+  async getTokenBalanceMap(chainId: ChainId, walletAddress: Address, addresses: Address[]) {
+    return await this.schema.getTokenBalanceMap(chainId, walletAddress, addresses)
+  }
+
   async getTokenBalance(chainId: ChainId, tokenAddress: Address, walletAddress: Address) {
     return await this.schema.getTokenBalance(chainId, tokenAddress, walletAddress)
+  }
+
+  async getTokenUSDPrice(chainId: ChainId, tokenAddress: Address) {
+    const result = await this.getTokenUSDPrices(chainId, [tokenAddress])
+    return result[tokenAddress]
+  }
+
+  async setFavoriteState(chainId: ChainId, tokenAddress: Address, state: boolean) {
+    await this.schema.setFavoriteState(chainId, tokenAddress, state)
+  }
+
+  async getAllFavoriteTokenAddresses(chainId: ChainId) {
+    return await this.schema.getAllFavoriteTokenAddresses(chainId)
+  }
+
+  async getTokenUSDPrices(chainId: ChainId, tokenAddressList: Address[]): Promise<Record<Address, string>> {
+    const result: Record<Address, string> = {}
+    const prices = await this.oneInchApiAdapter.getTokenPrices(chainId).catch(() => null)
+    if (prices === null) {
+      /**
+       * on chain fallback
+       * */
+      const tokens = await this.schema.getTokens(chainId, tokenAddressList)
+      await Promise.all(
+        tokens
+          .map(token => this.tokenUsdPriceProvider.getPrice(chainId, token)
+            .catch(() => '0')
+            .then(price => result[token.address] = price))
+      )
+      return result
+    }
+    for (const address of tokenAddressList) {
+      result[address] = prices[address] ?? '0'
+    }
+    return result
   }
 
   /**
@@ -70,10 +125,22 @@ class TokenControllerImpl {
     const id = [chainId, walletAddress].join(':')
     const lastUpdateTime = this.lastUpdateTokenBalanceDatabaseTimestampStorage?.[id]
     if (lastUpdateTime && Date.now() - lastUpdateTime < tokenBalanceDatabaseTTL[chainId]) return
-    const balances = await this.oneInchApiAdapter.getBalancesByWalletAddress(chainId, walletAddress)
+    let balances = await this.oneInchApiAdapter.getBalancesByWalletAddress(chainId, walletAddress).catch(() => null)
+    if (balances === null) {
+      balances = await this.getBalancesOnChain(chainId, walletAddress)
+    }
     await this.schema.setBalances(chainId, walletAddress, balances)
     storage.updateEntity(lastUpdateTokenBalanceDatabaseTimestampStorageKey, id, Date.now())
     this.lastUpdateTokenBalanceDatabaseTimestampStorage = storage.get<Record<string, number>>(lastUpdateTokenBalanceDatabaseTimestampStorageKey, JsonParser)
+  }
+
+  liveQuery<T>(querier: () => T | Promise<T>) {
+    return liveQuery(querier)
+  }
+
+  private async getBalancesOnChain(chainId: ChainId, walletAddress: Address): Promise<Record<Address, string>> {
+    const tokens = await this.schema.getAllTokenAddresses(chainId)
+    return this.tokenOnChainBalances.getBalances(chainId, walletAddress, tokens)
   }
 }
 

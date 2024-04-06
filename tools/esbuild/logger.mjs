@@ -6,7 +6,7 @@ export class Logger {
   isWatch
 
   constructor(libName, isWatch, modules) {
-    for (const module of modules) {
+    for (const module of (modules ?? [])) {
       this.addModule(module)
     }
     this.libName = libName
@@ -31,7 +31,7 @@ export class Logger {
     }
     this.modules.set(moduleName, statusContext)
     this.show()
-    if (!this.isWatch) {
+    if (!this.isWatch && error !== null) {
       process.exit(-1)
     }
   }
@@ -68,8 +68,10 @@ function getError(status) {
     const error = status.error.get(errorName) ?? {}
     return [
       `[${errorName}]`,
-      error.message,
-      error.stack
+      [
+        error.message,
+        error.stack
+      ].join('\n')
     ]
   }
 

@@ -17,6 +17,20 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "skipDefaultLibCheck": true,
+    "typeRoots": [
+      "./dist/libs/models",
+      "./dist/libs/sdk",
+      "./dist/libs/ui-components/async",
+      "./dist/libs/ui-components/button",
+      "./dist/libs/ui-components/card",
+      "./dist/libs/ui-components/icon",
+      "./dist/libs/ui-components/lit",
+      "./dist/libs/ui-components/scene",
+      "./dist/libs/ui-components/segmented-control",
+      "./dist/libs/ui-components/theme",
+      "./dist/libs/ui-components/token-icon",
+      "./node_modules/@types"
+    ],
     "plugins": [
       {
         "name": "ts-lit-plugin",
@@ -37,7 +51,7 @@
       ],
       "@one-inch-community/widgets/*": [
         "dist/libs/widgets/*"
-      ],
+      ]
     }
   },
   "exclude": ["node_modules", "tmp"]

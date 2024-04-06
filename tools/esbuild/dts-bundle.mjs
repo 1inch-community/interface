@@ -28,17 +28,17 @@ function buildEntryPoints(entryPoints) {
 /**
  * Generates a TypeScript declaration (.d.ts) bundle for the given entry points.
  *
+ * @param {string} moduleName
  * @param {Logger} logger
  * @param {string} outDir - The entry points for which the declaration bundle is generated.
  * @param {string[] | Record<string, string> | { in: string, out: string }[]} entryPoints - The entry points for which the declaration bundle is generated.
  * @param {string} tsconfigPath
  * @return {void}
  */
-export async function dtsBundle(logger, outDir, entryPoints, tsconfigPath) {
+export async function dtsBundle(moduleName, logger, outDir, entryPoints, tsconfigPath) {
   const entryPointsRecord = buildEntryPoints(entryPoints);
   for (const fileName in entryPointsRecord) {
     const filePath = entryPointsRecord[fileName];
-    const moduleName = path.basename(path.dirname(filePath))
     logger.setStatus(moduleName, 'build types', true)
     let data
     try {
@@ -84,26 +84,6 @@ export async function dtsBundle(logger, outDir, entryPoints, tsconfigPath) {
       logger.setError(moduleName, 'save types', null)
     } catch (error) {
       logger.setError(moduleName, 'save types', error)
-    }
-  }
-}
-
-/**
- * Creates a dts-bundle plugin for a build process.
- *
- * @param {Logger} logger
- * @param {string} tsconfigPath
- * @returns {Object} The dts-bundle plugin.
- */
-export function dtsBundlePlugin(logger, tsconfigPath) {
-  return {
-    name: 'dts-bundle',
-    setup(build) {
-      const entryPoints = build.initialOptions.entryPoints
-      const outDir = build.initialOptions.outdir
-      build.onEnd(async () => {
-        await dtsBundle(logger, outDir, entryPoints, tsconfigPath)
-      })
     }
   }
 }

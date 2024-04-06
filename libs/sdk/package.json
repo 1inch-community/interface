@@ -2,6 +2,7 @@
   "name": "sdk",
   "version": "0.0.1",
   "peerDependencies": {
+    "@one-inch-community/models": "0.0.1",
     "dexie": "3.2.x",
     "tslib": "2.3.0",
     "viem": "2.9.x"

@@ -17,22 +17,22 @@ export class SceneWrapperElement extends LitElement {
 
   animationInStart() {
     const context = this.context.value
-    context.animationInStart$.next()
+    context.animationInStartNext()
   }
 
   animationInEnd() {
     const context = this.context.value
-    context.animationInEnd$.next()
+    context.animationInEndNext()
   }
 
   animationOutStart() {
     const context = this.context.value
-    context.animationOutStart$.next()
+    context.animationOutStartNext()
   }
 
   animationOutEnd() {
     const context = this.context.value
-    context.animationOutEnd$.next()
+    context.animationOutEndNext()
   }
 
   protected override render() {

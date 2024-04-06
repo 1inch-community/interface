@@ -1,7 +1,7 @@
 import { ChainId } from '@one-inch-community/models';
 
 // minimum 3s
-export const averageBlockTime: Record<ChainId, number> = {
+export const averageBlockTime: Readonly<Record<ChainId, number>> = {
   [ChainId.eth]: 11000,
   [ChainId.bnb]: 3000,
   [ChainId.matic]: 3000,

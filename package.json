@@ -2,7 +2,10 @@
   "name": "one-inch-community",
   "version": "0.0.1",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "dts": "dts-bundle-generator ./libs/widgets/src/lib/select-token/public-api.ts",
+    "postinstall": "sh ./scripts/postinstall.sh"
+  },
   "private": true,
   "dependencies": {
     "@lit-labs/virtualizer": "^2.0.12",

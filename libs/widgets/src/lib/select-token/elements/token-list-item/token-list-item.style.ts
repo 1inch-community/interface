@@ -5,6 +5,9 @@ export const tokenListItemStyle = css`
     :host {
         height: 72px;
         width: 100%;
+        outline: none;
+        user-select: none;
+        -webkit-tap-highlight-color: transparent;
     }
     
     .item-container {
@@ -39,46 +42,50 @@ export const tokenListItemStyle = css`
         font-weight: 400;
         line-height: 20px;
     }
-
-    .stub-loader {
-        will-change: filter;
-        animation: stub-loader-animation 3s ease-in-out infinite;
+    
+    .usd-balance {
+        color: var(--color-content-content-primary);
+        text-align: right;
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px;
+        white-space: nowrap
     }
-
-    .stub-token-icon {
-        min-width: 40px;
-        min-height: 40px;
-        border-radius: 50%;
-        background-color: var(--color-background-bg-secondary);
-    }
-
-    .name-stub {
-        background-color: var(--color-background-bg-secondary);
-        height: 24px;
-        width: 40%;
-        border-radius: 8px;
-    }
-
-    .balance-stub {
-        background-color: var(--color-background-bg-secondary);
-        height: 20px;
-        width: 30%;
-        border-radius: 8px;
-    }
-
-    @keyframes stub-loader-animation {
-        0%, 100% {
-            filter: contrast(1);
-        }
-        50% {
-            filter: contrast(0.8);
-        }
+    
+    .usd-balance-and-favorite-start {
+        display: flex;
+        gap: 8px;
+        align-items: center;
     }
     
     @media (hover: hover) {
-        .item-container:not(.stub-loader):hover {
+        .item-container:hover {
             background-color: var(--color-background-bg-secondary);
         }
+
+        .item-container:not(.is-favorite-token) .usd-balance {
+            transform: translateX(24px);
+            transition: transform .2s;
+        }
+
+        .item-container:not(.is-favorite-token) .is-favorite-start {
+            transform: scale(0);
+            transition: transform .2s;
+        }
+
+        .item-container:hover .is-favorite-start {
+            transform: scale(1);
+        }
+
+        .item-container:hover .usd-balance {
+            transform: translateX(0);
+        }
+        
+    }
+
+    .item-container:active {
+        background-color: var(--color-background-bg-secondary);
     }
 
 `

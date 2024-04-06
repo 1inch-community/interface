@@ -1,7 +1,8 @@
 import { ChainId, IToken, ITokenRateAdapter } from '@one-inch-community/models';
 import { Address, getAddress, isAddressEqual, parseAbi } from 'viem';
-import { getClient } from '../../chain';
-import { BigMath } from '../../utils/big-math';
+import { getClient } from '../../../chain';
+import { BigMath } from '../../../utils';
+import { BlockTimeCache, LongTimeCache } from '../../../cache';
 
 const FactoryContractABI = parseAbi([
   'function getPair(address tokenA, address tokenB) external view returns (address pair)'
@@ -15,9 +16,10 @@ const PoolContractABI = parseAbi([
 
 const zeroAddress: Address = '0x0000000000000000000000000000000000000000'
 
-export class UniswapV2BaseAdapter implements ITokenRateAdapter {
+export class UniswapV2BaseRateAdapter implements ITokenRateAdapter {
 
-  private readonly pools = new Map<string, [Address, Address]>()
+  private readonly pools = new LongTimeCache<string, [Address, Address]>(`${this.name}_pools`, 7)
+  private readonly rateCache = new BlockTimeCache<string, bigint>()
 
   constructor(
     public readonly name: string,
@@ -32,6 +34,13 @@ export class UniswapV2BaseAdapter implements ITokenRateAdapter {
 
   async getRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken): Promise<bigint | null> {
     try {
+      const id = [sourceToken, destinationToken].join(':')
+
+      const rateFromCache = this.rateCache.get(chainId, id)
+      if (rateFromCache !== null) {
+        return rateFromCache
+      }
+
       const srcTokenAddress = getAddress(sourceToken.address)
       const dstTokenAddress = getAddress(destinationToken.address)
       const [pool, token0]: [Address, Address] = await this.getPool(chainId, srcTokenAddress, dstTokenAddress)
@@ -40,13 +49,17 @@ export class UniswapV2BaseAdapter implements ITokenRateAdapter {
       }
       const reserves = await this.getReserves(chainId, pool)
       const isRevertRate = !isAddressEqual(sourceToken.address, token0)
-      return BigMath.dev(
+      const rate = BigMath.dev(
         isRevertRate ? reserves[1] : reserves[0],
         isRevertRate ? reserves[0] : reserves[1],
         sourceToken.decimals,
         destinationToken.decimals,
         destinationToken.decimals
       )
+
+      this.rateCache.set(chainId, id, rate)
+
+      return rate
     } catch (error) {
       console.error(`Error in UniswapV2BaseAdapter adapter name ${this.name}`, error)
       return null
@@ -56,11 +69,11 @@ export class UniswapV2BaseAdapter implements ITokenRateAdapter {
   private async getPool(chainId: ChainId, srcTokenAddress: Address, dstTokenAddress: Address): Promise<[Address, Address]> {
     const id1 = [chainId, srcTokenAddress, dstTokenAddress].join(':')
     if (this.pools.has(id1)) {
-      return (this.pools.get(id1) as any)
+      return (this.pools.get(id1)!)
     }
     const id2 = [chainId, dstTokenAddress, srcTokenAddress].join(':')
     if (this.pools.has(id2)) {
-      return (this.pools.get(id2) as any)
+      return (this.pools.get(id2)!)
     }
     const client = getClient(chainId)
     const pool: Address = await client.readContract({

@@ -7,6 +7,7 @@ import { selectTokenContext } from './context';
 import { SelectTokenContext } from './select-token.context';
 import './elements/search-token-input'
 import './elements/token-list'
+import './elements/favorite-tokens'
 import { ChainId } from '@one-inch-community/models';
 import { Address, isAddressEqual } from 'viem';
 
@@ -31,6 +32,7 @@ export class SelectTokenElement extends LitElement {
     return html`
       <inch-card-header backButton headerText="Select token"></inch-card-header>
       <inch-search-token-input></inch-search-token-input>
+      <inch-favorite-tokens></inch-favorite-tokens>
       <inch-token-list></inch-token-list>
     `
   }

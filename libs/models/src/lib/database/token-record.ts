@@ -1,15 +1,9 @@
-import type { Address } from 'viem';
-import { ChainId } from '../chain/chain-id';
+import { IToken } from '../token/token';
 
-export interface ITokenRecord {
-  id: string,
-  address: Address
-  chainId: ChainId
-  decimals: number
-  name: string
-  symbol: string
-  tags: string[]
-  eip2612: boolean
-  isFavorite: boolean
-  priority: number
+export interface ITokenRecord extends IToken {
+  readonly id: string,
+  readonly tags: string[]
+  readonly eip2612: boolean
+  readonly isFavorite: boolean
+  readonly priority: number
 }

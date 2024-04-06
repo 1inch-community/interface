@@ -21,6 +21,8 @@ export class IconElement extends LitElement {
   @property({ type: String, attribute: true }) width?: string
   @property({ type: String, attribute: true }) height?: string
 
+  @property({ type: Object }) props?: unknown
+
   private iconRecord?: IconsRecord
 
   private readonly iconLoadTask = new Task(
@@ -38,7 +40,7 @@ export class IconElement extends LitElement {
       pending: () => html`<div style="${styleMap(styles)}"></div>`,
       complete: (svg) => {
         if (typeof svg === 'function') {
-          return svg({ ...styles })
+          return svg({ ...styles, props: this.props })
         }
         return svg
       }

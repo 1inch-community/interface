@@ -1,5 +1,7 @@
 import { html, LitElement, TemplateResult } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
+import { map as litMap } from 'lit/directives/map.js';
+import { classMap } from 'lit/directives/class-map.js';
 import '@lit-labs/virtualizer'
 import '../token-list-item'
 import '@one-inch-community/ui-components/icon'
@@ -12,6 +14,8 @@ import { observe } from '@one-inch-community/ui-components/lit';
 import { scrollbarStyle } from '@one-inch-community/ui-components/theme';
 import { Address } from 'viem';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { ISceneContext, sceneContext } from '@one-inch-community/ui-components/scene';
+import '../token-list-stub-item'
 
 
 @customElement(TokenListElement.tagName)
@@ -26,6 +30,11 @@ export class TokenListElement extends LitElement {
   @consume({ context: selectTokenContext })
   context?: ISelectTokenContext
 
+  @consume({ context: sceneContext })
+  sceneContext?: ISceneContext
+
+  @state() private transitionReady = false
+
   private view$ = defer(() => combineLatest([
     this.getTokenAddressList(),
     this.getChainId(),
@@ -36,7 +45,15 @@ export class TokenListElement extends LitElement {
   )
 
   protected override render(): TemplateResult {
+    if (!this.transitionReady) return this.getLoaderView()
     return html`${observe(this.view$)}`
+  }
+
+  protected override async firstUpdated() {
+    if (this.sceneContext && this.sceneContext.animationInProgress) {
+      await this.sceneContext.animationInEnd
+    }
+    this.transitionReady = true
   }
 
   private getTokenAddressList() {
@@ -55,9 +72,12 @@ export class TokenListElement extends LitElement {
   }
 
   private getLoaderView() {
+    const classes = {
+      'loader-view-container': true
+    }
     return html`
-      <div class="loader-container">
-        <inch-icon width="100px" height="80px" icon="unicornRun"></inch-icon>
+      <div class="${classMap(classes)}">
+        ${litMap<unknown>(Array.from(Array(100).keys()), () => html`<inch-token-list-stub-item></inch-token-list-stub-item>`)}
       </div>
     `
   }
@@ -65,16 +85,25 @@ export class TokenListElement extends LitElement {
 
   private getTokenListView(tokenAddresses: Address[], chainId: ChainId, walletAddress?: Address): TemplateResult {
     const offsetHeight = this.offsetHeight
+
+    const virtualView = this.renderRoot.querySelector('lit-virtualizer')
+    if (virtualView) {
+      console.log('update list')
+      virtualView.items = tokenAddresses
+      return html`${virtualView}`
+    }
+
     return html`
       <lit-virtualizer
         scroller
         style="height: ${offsetHeight - 7}px;"
         .items=${tokenAddresses}
-        .renderItem=${(address: Address) => html`<inch-token-list-item
+        .keyFunction="${((address: Address) => [chainId, walletAddress, address].join(':')) as any}"
+        .renderItem=${((address: Address) => html`<inch-token-list-item
           tokenAddress="${address}"
           walletAddress="${ifDefined(walletAddress)}"
           chainId="${chainId}"
-        ></inch-token-list-item>`}
+        ></inch-token-list-item>`) as any}
       ></lit-virtualizer>
     `
   }

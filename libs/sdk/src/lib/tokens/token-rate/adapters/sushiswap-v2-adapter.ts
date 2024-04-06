@@ -1,4 +1,4 @@
-import { UniswapV2BaseAdapter } from '../base-adapters/uniswap-v2-base-adapter';
+import { UniswapV2BaseRateAdapter } from '../base-adapters/uniswap-v2-base-rate-adapter';
 import { ChainId } from '@one-inch-community/models';
 import { type Address } from 'viem';
 
@@ -12,7 +12,7 @@ const SushiSwapFactory: Record<number, Address> = {
   [ChainId.arbitrum]: '0xc35dadb65012ec5796536bd9864ed8773abc74c4',
 }
 
-export const sushiswapV2Adapter = new UniswapV2BaseAdapter(
+export const sushiswapV2Adapter = new UniswapV2BaseRateAdapter(
   'SushiSwapV2',
   (chainId) => SushiSwapFactory[chainId],
   [

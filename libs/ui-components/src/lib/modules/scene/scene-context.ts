@@ -1,6 +1,7 @@
 import { firstValueFrom, Subject } from 'rxjs';
 
 export interface ISceneContext {
+  readonly animationInProgress: boolean
   readonly animationInStart: Promise<void>
   readonly animationInEnd: Promise<void>
   readonly animationOutStart: Promise<void>
@@ -9,10 +10,12 @@ export interface ISceneContext {
 
 export class SceneContext implements ISceneContext {
 
-  animationInStart$ = new Subject<void>()
-  animationInEnd$ = new Subject<void>()
-  animationOutStart$ = new Subject<void>()
-  animationOutEnd$ = new Subject<void>()
+  animationInProgress = false
+
+  private animationInStart$ = new Subject<void>()
+  private animationInEnd$ = new Subject<void>()
+  private animationOutStart$ = new Subject<void>()
+  private animationOutEnd$ = new Subject<void>()
 
   get animationInStart() {
     return firstValueFrom(this.animationInStart$)
@@ -28,6 +31,26 @@ export class SceneContext implements ISceneContext {
 
   get animationOutEnd() {
     return firstValueFrom(this.animationOutEnd$)
+  }
+
+  animationInStartNext() {
+    this.animationInProgress = true
+    this.animationInStart$.next();
+  }
+
+  animationInEndNext() {
+    this.animationInProgress = false
+    this.animationInEnd$.next();
+  }
+
+  animationOutStartNext() {
+    this.animationInProgress = true
+    this.animationOutStart$.next();
+  }
+
+  animationOutEndNext() {
+    this.animationInProgress = false
+    this.animationOutEnd$.next();
   }
 
 }

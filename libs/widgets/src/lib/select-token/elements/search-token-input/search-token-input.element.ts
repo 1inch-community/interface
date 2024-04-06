@@ -41,7 +41,9 @@ export class SearchTokenInputElement extends LitElement {
   protected override async firstUpdated() {
     const input = this.renderRoot.querySelector('#search') as HTMLInputElement
     if (!input) return
-    await this.sceneContext?.animationInEnd
+    if (this.sceneContext && this.sceneContext.animationInProgress) {
+      await this.sceneContext.animationInEnd
+    }
     input.focus();
   }
 
