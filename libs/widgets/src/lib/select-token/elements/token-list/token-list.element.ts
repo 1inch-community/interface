@@ -1,6 +1,7 @@
 import { html, LitElement, TemplateResult } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { map as litMap } from 'lit/directives/map.js';
+import { cache } from 'lit/directives/cache.js';
 import { classMap } from 'lit/directives/class-map.js';
 import '@lit-labs/virtualizer'
 import '../token-list-item'
@@ -86,25 +87,27 @@ export class TokenListElement extends LitElement {
   private getTokenListView(tokenAddresses: Address[], chainId: ChainId, walletAddress?: Address): TemplateResult {
     const offsetHeight = this.offsetHeight
 
-    const virtualView = this.renderRoot.querySelector('lit-virtualizer')
-    if (virtualView) {
-      console.log('update list')
-      virtualView.items = tokenAddresses
-      return html`${virtualView}`
-    }
+    // const virtualView = this.renderRoot.querySelector('lit-virtualizer')
+    // if (virtualView) {
+    //   console.log('update list')
+    //   virtualView.items = tokenAddresses
+    //   return html`${virtualView}`
+    // }
 
     return html`
-      <lit-virtualizer
-        scroller
-        style="height: ${offsetHeight - 7}px;"
-        .items=${tokenAddresses}
-        .keyFunction="${((address: Address) => [chainId, walletAddress, address].join(':')) as any}"
-        .renderItem=${((address: Address) => html`<inch-token-list-item
+      ${cache(html`
+        <lit-virtualizer
+          scroller
+          style="height: ${offsetHeight - 7}px;"
+          .items=${tokenAddresses}
+          .keyFunction="${((address: Address) => [chainId, walletAddress, address].join(':')) as any}"
+          .renderItem=${((address: Address) => html`<inch-token-list-item
           tokenAddress="${address}"
           walletAddress="${ifDefined(walletAddress)}"
           chainId="${chainId}"
         ></inch-token-list-item>`) as any}
-      ></lit-virtualizer>
+        ></lit-virtualizer>
+      `)}
     `
   }
 }

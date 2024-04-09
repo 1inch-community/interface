@@ -15,7 +15,7 @@ export class TimeCache<Key, Value> implements ICache<Key, Value> {
   private autoCleanTimer?: any
 
   constructor(private readonly ttlMs: number,
-              private autoClean: boolean = false) {
+              private autoClean = false) {
     this.enabledAutoClean()
   }
 
@@ -60,6 +60,10 @@ export class TimeCache<Key, Value> implements ICache<Key, Value> {
       return false
     }
     return true
+  }
+
+  delete(key: Key) {
+    return this.cache.delete(key)
   }
 
 

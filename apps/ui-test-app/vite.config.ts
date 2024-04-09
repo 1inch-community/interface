@@ -11,7 +11,7 @@ export default defineConfig({
   cacheDir: '../../node_modules/.vite/apps/ui-test-app',
 
   server: {
-    port: 4200,
+    port: 4400,
     host: '0.0.0.0',
     // watch: {
     //   usePolling: true,

@@ -1,21 +1,13 @@
 import { css, unsafeCSS } from 'lit';
-import { shiftAnimation, slideAnimation } from './transition-animations';
 
 type StyleConfig = {
-  animationTime: string
+  animationContainerSizeChangeTime: string
   sceneBackgroundColor: string
-  animation: 'slide' | 'shift'
 }
 
 const defaultConfig: StyleConfig = {
-  animationTime: '.6s',
+  animationContainerSizeChangeTime: '.6s',
   sceneBackgroundColor: 'var(--color-background-bg-primary)',
-  animation: 'slide'
-}
-
-const animation = {
-  slide: slideAnimation,
-  shift: shiftAnimation
 }
 
 export const sceneStyle = (config?: Partial<StyleConfig>) => {
@@ -25,7 +17,7 @@ export const sceneStyle = (config?: Partial<StyleConfig>) => {
   return css`
 
       :host {
-          --animation-time: ${unsafeCSS(_config.animationTime)};
+          --animation-time: ${unsafeCSS(_config.animationContainerSizeChangeTime)};
           --animation-time-container: .2s;
       }
 
@@ -47,9 +39,7 @@ export const sceneStyle = (config?: Partial<StyleConfig>) => {
           padding: 1px;
           display: block;
           height: 100%;
+          will-change: transform
       }
-      
-      ${unsafeCSS(animation[_config.animation])}
-
   `
 }

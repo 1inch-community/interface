@@ -1,6 +1,8 @@
 import { html, render, TemplateResult } from 'lit';
 import { sceneStyle } from './scene.style';
 import { SceneWrapperElement } from './scene-wrapper.element'
+import { AnimationType } from './animations/animation-type';
+import { slideAnimation } from './animations/slide.animation';
 
 type RenderConfig<T extends string> = Record<T, () => TemplateResult>
 
@@ -24,7 +26,8 @@ export class SceneController<T extends string, U extends T> {
   private transitionInProgress = false
 
   constructor(private readonly rootSceneName: U,
-              private readonly config: SceneConfig<T>) {}
+              private readonly config: SceneConfig<T>,
+              private readonly animation: AnimationType = slideAnimation()) {}
 
   render(config: RenderConfig<T>): TemplateResult {
     this.currentScenes = config
@@ -35,7 +38,7 @@ export class SceneController<T extends string, U extends T> {
     }
     const sceneWrapper = this.buildSceneWrapper(sceneFactory(), sceneName)
     this.clearContainer()
-    this.sceneContainerAppendChild(sceneName, sceneWrapper).then()
+    this.sceneContainerAppendChild(sceneName, sceneWrapper)
     return html`${this.sceneContainer}`
   }
 
@@ -56,6 +59,26 @@ export class SceneController<T extends string, U extends T> {
     this.sceneStack = []
   }
 
+  updateSceneConfig(config: SceneConfigItem) {
+    const currentScene = this.getCurrentSceneName()
+    this.config[currentScene] = config
+    this.applySceneConfig(config)
+  }
+
+  getCurrentSceneName(): T {
+    let currentScene: T = this.rootSceneName
+    if (this.sceneContainer.firstChild) {
+      currentScene = (this.sceneContainer.firstChild as HTMLElement).id as T
+    }
+    return currentScene
+  }
+
+  private getCurrentScene() {
+    if (!this.currentScenes) return null
+    const currentScene = this.getCurrentSceneName()
+    return this.getScene(currentScene)
+  }
+
   private async transition(sceneName: T, isBack?: boolean) {
     this.transitionInProgress = true
     try {
@@ -69,38 +92,17 @@ export class SceneController<T extends string, U extends T> {
       const upScene = isBack ? currentSceneWrapper : nextSceneWrapper
       const downScene = !isBack ? currentSceneWrapper : nextSceneWrapper
 
-      const upSceneStart = isBack ? 'scene-up-out-start' : 'scene-up-in-start'
-      const upSceneVector = isBack ? 'scene-up-out' : 'scene-up-in'
-      const downSceneStart = isBack ? 'scene-down-out-start' : 'scene-down-in-start'
-      const downSceneVector = isBack ? 'scene-down-out' : 'scene-down-in'
-
       isBack ? upScene.animationOutStart() : upScene.animationInStart()
       isBack ? downScene.animationOutStart() : downScene.animationInStart()
 
       this.sceneContainer.classList.add('scene-container-animation')
-      upScene.classList.add('scene-up', upSceneStart)
-      downScene.classList.add('scene-down', downSceneStart)
 
-      await this.sceneContainerAppendChild(sceneName, nextSceneWrapper)
-
-      upScene.classList.add(upSceneVector)
-      downScene.classList.add(downSceneVector)
-
-      await waitAnimationEnd(upScene)
+      await this.animation.beforeAppend(upScene, downScene, isBack ?? false)
+      this.sceneContainerAppendChild(sceneName, nextSceneWrapper)
+      await this.animation.afterAppend(upScene, downScene, isBack ?? false)
 
       this.sceneContainer.classList.remove('scene-container-animation')
-      nextSceneWrapper.classList.remove(
-        'scene-up',
-        'scene-up-in-start',
-        'scene-up-out-start',
-        'scene-up-out',
-        'scene-up-in',
-        'scene-down',
-        'scene-down-in-start',
-        'scene-down-out-start',
-        'scene-down-out',
-        'scene-down-in'
-      )
+
       this.sceneContainer.removeChild(currentSceneWrapper)
 
       isBack ? upScene.animationOutEnd() : upScene.animationInEnd()
@@ -108,20 +110,6 @@ export class SceneController<T extends string, U extends T> {
     } finally {
       this.transitionInProgress = false
     }
-  }
-
-  private getCurrentScene() {
-    if (!this.currentScenes) return null
-    const currentScene = this.getCurrentSceneName()
-    return this.getScene(currentScene)
-  }
-
-  private getCurrentSceneName(): T {
-    let currentScene: T = this.rootSceneName
-    if (this.sceneContainer.firstChild) {
-      currentScene = (this.sceneContainer.firstChild as HTMLElement).id as T
-    }
-    return currentScene
   }
 
   private getScene(sceneName: T) {
@@ -143,9 +131,15 @@ export class SceneController<T extends string, U extends T> {
     return sceneWrapper;
   }
 
-  private async sceneContainerAppendChild(sceneName: T, sceneWrapper: HTMLElement) {
+  private sceneContainerAppendChild(sceneName: T, sceneWrapper: HTMLElement) {
     this.sceneContainer.appendChild(sceneWrapper)
     const config = this.config[sceneName]
+    this.applySceneConfig(config)
+  }
+
+  private applySceneConfig(config: SceneConfigItem) {
+    this.sceneContainer.style.width = ''
+    this.sceneContainer.style.height = ''
     if (config.width) {
       this.sceneContainer.style.width = (typeof config.width === 'number') ? `${config.width}px` : config.width
     }

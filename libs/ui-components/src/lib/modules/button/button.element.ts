@@ -48,7 +48,7 @@ export class ButtonElement extends LitElement {
       <button
         class="${classMap(classes)}"
         ?disabled="${this.disabled}"
-      ><slot @slotchange="${this.handleSlotChange}"></slot></button>
+      ><slot style="pointer-events: none;" @slotchange="${this.handleSlotChange}"></slot></button>
     `
   }
 

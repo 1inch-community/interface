@@ -47,7 +47,7 @@ export function buildDefaultTokenRageProvider() {
   return new TokenRateProvider([
     uniswapV2Adapter,
     // TODO viem tell invalid contract factory address
-    sushiswapV2Adapter,
-    pancakeswapV2Adapter
+    // sushiswapV2Adapter,
+    // pancakeswapV2Adapter
   ])
 }

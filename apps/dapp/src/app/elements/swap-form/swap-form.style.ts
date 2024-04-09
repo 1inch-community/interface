@@ -1,8 +1,8 @@
 import { css } from 'lit';
 
 export const swapFormStyle = css`
-
-    .swap-form-container {
+    
+    :host {
         display: flex;
         padding-top: 48px;
         justify-content: center;

@@ -2,14 +2,19 @@ import { html, LitElement, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenListItemStyle } from './token-list-item.style';
-import { Address, formatUnits } from 'viem';
-import { ChainId, IBalancesTokenRecord, ITokenRecord } from '@one-inch-community/models';
+import { Address, formatUnits, isAddressEqual } from 'viem';
+import { ChainId, IBalancesTokenRecord, ISelectTokenContext, ITokenRecord } from '@one-inch-community/models';
 import { Task } from '@lit/task';
-import { formatNumber, TokenController } from '@one-inch-community/sdk';
+import { formatNumber, getBlockEmitter, TokenController } from '@one-inch-community/sdk';
 import '@one-inch-community/ui-components/token-icon'
 import '@one-inch-community/ui-components/icon'
 import '../token-list-stub-item'
 import { asyncTimeout } from '@one-inch-community/ui-components/async';
+import { subscribe } from '@one-inch-community/ui-components/lit';
+import { filter, merge, Observable, switchMap } from 'rxjs';
+import { consume } from '@lit/context';
+import { selectTokenContext } from '../../context';
+import { emitSelectTokenEvent } from '../../events';
 
 
 @customElement(TokenListItemElement.tagName)
@@ -21,6 +26,9 @@ export class TokenListItemElement extends LitElement {
   @property({ type: String, attribute: true }) tokenAddress?: Address;
   @property({ type: String, attribute: true }) walletAddress?: Address;
   @property({ type: Number, attribute: true }) chainId?: ChainId;
+
+  @consume({ context: selectTokenContext })
+  context?: ISelectTokenContext;
 
   private isDestroy = false
 
@@ -48,6 +56,16 @@ export class TokenListItemElement extends LitElement {
   override disconnectedCallback() {
     super.disconnectedCallback();
     this.isDestroy = true
+  }
+
+  protected override firstUpdated() {
+    if (!this.chainId) throw new Error('')
+    subscribe(this, merge(
+      getBlockEmitter(this.chainId),
+      this.getTokenUpdateEmitter()
+    ).pipe(
+      switchMap(() => this.task.run([this.chainId, this.tokenAddress, this.walletAddress]))
+    ), { requestUpdate: false })
   }
 
   protected override render() {
@@ -86,7 +104,7 @@ export class TokenListItemElement extends LitElement {
     }
 
     this.preRenderTemplate = html`
-      <div class="${classMap(classes)}">
+      <div class="${classMap(classes)}" @click="${(event: UIEvent) => emitSelectTokenEvent(this, token, event)}">
         <inch-token-icon symbol="${token.symbol}" address="${token.address}" chainId="${token.chainId}"
                          size="40"></inch-token-icon>
         <div class="name-and-balance">
@@ -107,8 +125,18 @@ export class TokenListItemElement extends LitElement {
   private async onMarkFavoriteToken(event: UIEvent, token: ITokenRecord) {
     event.preventDefault()
     event.stopPropagation()
-    await TokenController.setFavoriteState(token.chainId, token.address, !token.isFavorite)
-    await this.task.run([this.chainId, this.tokenAddress, this.walletAddress])
+    await this.context?.setFavoriteTokenState(token.chainId, token.address, !token.isFavorite)
+  }
+
+  private getTokenUpdateEmitter() {
+    if (!this.context) throw new Error('')
+    return (this.context.changeFavoriteTokenState$ as Observable<[ChainId, Address]>).pipe(
+      // @ts-ignore
+      filter(([chainId, address]) => {
+        const token = this.task?.value?.[0] ?? null
+        return token && token.chainId === chainId && isAddressEqual(token.address, address)
+      })
+    )
   }
 
   private getStub() {

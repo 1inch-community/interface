@@ -7,6 +7,8 @@ export interface ISelectTokenContext {
   readonly connectedWalletAddress$: Observable<Address | null>
   readonly favoriteTokens$: Observable<Address[]>
   readonly tokenAddressList$: Observable<Address[]>
+  readonly changeFavoriteTokenState$: Observable<[ChainId, Address]> // token info
   setChainId(chainId: ChainId): void
   setConnectedWalletAddress(address?: Address): void
+  setFavoriteTokenState(chainId: ChainId, address: Address, state: boolean): Promise<void>
 }

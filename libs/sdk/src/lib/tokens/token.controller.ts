@@ -1,11 +1,12 @@
 import { contextField, OneInchDevPortalAdapter, JsonParser, storage } from '../utils';
 import { TokenSchema } from './token.schema';
 import { ChainId } from '@one-inch-community/models';
-import { Address } from 'viem';
+import { Address, formatUnits } from 'viem';
 import { averageBlockTime } from '../chain/average-block-time';
 import { TokenUsdOnChainPriceProvider } from './token-usd-on-chain-price.provider';
 import { TokenOnChainBalances } from './token-balances/token-on-chain-balances';
 import { liveQuery } from 'dexie';
+import { CacheActivePromise } from '../utils/decorators';
 
 const lastUpdateTokenDatabaseTimestampStorageKey = `last-update-token-database-timestamp-v${TokenSchema.databaseVersion}`
 const lastUpdateTokenBalanceDatabaseTimestampStorageKey = `last-update-token-balance-database-timestamp-v${TokenSchema.databaseVersion}`
@@ -29,22 +30,53 @@ class TokenControllerImpl {
    * @param {Address} [walletAddress] - The connected wallet address. (Optional)
    * @returns {Promise<Address[]>} - A promise that resolves to an array of sorted token addresses.
    */
-  async getSortedForViewTokenAddresses(chainId: ChainId, walletAddress?: Address): Promise<{
-    notZero: Address[],
-    zero: Address[]
-  }> {
+  async getSortedForViewTokenAddresses(chainId: ChainId, walletAddress?: Address): Promise<Address[]> {
     await this.updateTokenDatabase(chainId)
     if (walletAddress) {
       await this.updateBalanceDatabase(chainId, walletAddress)
     }
-    return await this.schema.getSortedForViewTokenAddresses(chainId, walletAddress)
+    const result = await this.schema.getSortedForViewTokenAddresses(chainId, walletAddress)
+    if (walletAddress) {
+      const prices = await this.getTokenUSDPrices(chainId, result.notZero)
+      const tokens = await this.getTokenMap(chainId, result.notZero)
+      const balances = await this.getTokenBalanceMap(chainId, walletAddress, result.notZero)
+      const favoriteTokenList = await this.getAllFavoriteTokenAddresses(chainId)
+      const favoriteTokenSet = new Set(favoriteTokenList)
+      const tokenAmount: Record<Address, number> = {}
+      for (const address of result.notZero) {
+        const token = tokens[address]
+        const tokenPrice = prices[address]
+        const balance = formatUnits(balances[address], token.decimals)
+        tokenAmount[address] = Number(balance) * Number(tokenPrice)
+      }
+      return [
+        ...result.notZero.sort((address1, address2) => {
+          const isFavoriteToken1 = favoriteTokenSet.has(address1)
+          const isFavoriteToken2 = favoriteTokenSet.has(address2)
+          if (isFavoriteToken1 === isFavoriteToken2) {
+            return tokenAmount[address2] - tokenAmount[address1]
+          }
+          if (isFavoriteToken1) {
+            return -1;
+          }
+          return 1
+        }),
+        ...result.zero
+      ];
+    }
+    return [
+      ...result.notZero,
+      ...result.zero
+    ]
   }
 
   async getToken(chainId: ChainId, address: Address) {
+    await this.updateTokenDatabase(chainId)
     return await this.schema.getToken(chainId, address)
   }
 
   async getTokenList(chainId: ChainId, addresses: Address[]) {
+    await this.updateTokenDatabase(chainId)
     return await this.schema.getTokenList(chainId, addresses)
   }
 
@@ -53,10 +85,12 @@ class TokenControllerImpl {
   }
 
   async getTokenBalanceMap(chainId: ChainId, walletAddress: Address, addresses: Address[]) {
+    await this.updateBalanceDatabase(chainId, walletAddress)
     return await this.schema.getTokenBalanceMap(chainId, walletAddress, addresses)
   }
 
   async getTokenBalance(chainId: ChainId, tokenAddress: Address, walletAddress: Address) {
+    await this.updateBalanceDatabase(chainId, walletAddress)
     return await this.schema.getTokenBalance(chainId, tokenAddress, walletAddress)
   }
 
@@ -104,6 +138,7 @@ class TokenControllerImpl {
    * @param {ChainId} chainId - The chain ID for which the token database should be updated.
    * @return {Promise<void>} - A Promise that resolves when the token database has been updated.
    */
+  @CacheActivePromise()
   async updateTokenDatabase(chainId: ChainId): Promise<void> {
     const lastUpdateTime = this.lastUpdateTokenDatabaseTimestampStorage?.[chainId]
     if (lastUpdateTime && Date.now() - lastUpdateTime < tokenDatabaseTTL) return
@@ -121,6 +156,7 @@ class TokenControllerImpl {
    *
    * @return {Promise<void>} - A Promise that resolves once the balance database is updated.
    */
+  @CacheActivePromise()
   async updateBalanceDatabase(chainId: ChainId, walletAddress: Address): Promise<void> {
     const id = [chainId, walletAddress].join(':')
     const lastUpdateTime = this.lastUpdateTokenBalanceDatabaseTimestampStorage?.[id]

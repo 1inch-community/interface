@@ -1,6 +1,7 @@
 import Dexie, { Table } from 'dexie';
 import { type Address, isAddressEqual } from 'viem';
 import { IBalancesTokenRecord, ChainId, ITokenRecord, ITokenDto } from '@one-inch-community/models';
+import { QueueCache } from '../cache';
 
 const TokenPriority: Record<string, number> = {
   'native': 1000,
@@ -23,6 +24,8 @@ export class TokenSchema extends Dexie {
 
   private tokens!: Table<ITokenRecord, string>;
   private balances!: Table<IBalancesTokenRecord, string>;
+
+  private readonly tokenCache = new QueueCache<string, ITokenRecord>(50)
 
   constructor() {
     super('one-inch-token');
@@ -51,10 +54,14 @@ export class TokenSchema extends Dexie {
 
   async getToken(chainId: ChainId, address: Address): Promise<ITokenRecord> {
     const recordId = getId(chainId, address);
+    if (this.tokenCache.has(recordId)) {
+      return this.tokenCache.get(recordId)!
+    }
     const records = await this.tokens
       .where('id')
       .equals(recordId)
       .toArray();
+    this.tokenCache.set(recordId, records[0])
     return records[0];
   }
 
@@ -134,6 +141,7 @@ export class TokenSchema extends Dexie {
         priority: calcTokenPriority(token)
       });
     }
+    this.tokenCache.clear()
     await this.tokens.bulkAdd(tableTokens);
   }
 
@@ -225,6 +233,7 @@ export class TokenSchema extends Dexie {
 
   async setFavoriteState(chainId: ChainId, tokenAddress: Address, state: boolean) {
     const recordId = getId(chainId, tokenAddress);
+    this.tokenCache.delete(recordId)
     await this.tokens.update(recordId, { isFavorite: state })
   }
 

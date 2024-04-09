@@ -1,6 +1,10 @@
 import { css } from 'lit';
 
 export const buttonStyle = css`
+    
+    :host {
+        display: block;
+    }
 
     button {
         cursor: pointer;
@@ -19,6 +23,7 @@ export const buttonStyle = css`
         outline: none;
         user-select: none;
         -webkit-tap-highlight-color: transparent;
+        will-change: background-color, color, box-shadow, transform;
     }
     
     button.full-size {

@@ -73,6 +73,10 @@ export class QueueCache<Key, Value> implements ICache<Key, Value> {
     return this.cache.has(key)
   }
 
+  delete(key: Key) {
+    return this.cache.delete(key)
+  }
+
   /**
    * Clears the cache storage.
    *

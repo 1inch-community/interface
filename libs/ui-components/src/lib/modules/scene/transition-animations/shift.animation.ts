@@ -11,7 +11,7 @@ export const shiftAnimation = css`
         bottom: 0;
         right: 0;
         z-index: 9;
-        will-change: transform
+        will-change: transform;
     }
 
     .scene-up-in-start {

@@ -121,7 +121,12 @@ export class InputElement extends LitElement {
 
   private selectTokenView() {
     return html`
-      <inch-button type="secondary" size="l" @click="${(event: MouseEvent) => dispatchEvent(this, 'open-token-selector', this.tokenType, event)}">
+      <inch-button type="secondary" size="l" @click="${(event: MouseEvent) => {
+        console.log(event, event.target)
+        event.preventDefault()
+        event.stopPropagation()
+        dispatchEvent(this, 'openTokenSelector', this.tokenType, event)
+      }}">
         <span class="select-token-text">Select token</span>
         <inch-icon icon="chevronDown16"></inch-icon>
       </inch-button>
@@ -132,7 +137,7 @@ export class InputElement extends LitElement {
   private tokenView(token: IToken) {
     const { name, symbol, address } = token
     return html`
-      <button @click="${(event: MouseEvent) => dispatchEvent(this, 'open-token-selector', this.tokenType, event)}"
+      <button @click="${(event: MouseEvent) => dispatchEvent(this, 'openTokenSelector', this.tokenType, event)}"
               class="symbol-container">
         <inch-token-icon symbol="${symbol}" address="${address}"
                          chainId="${observe(this.chainId$)}"></inch-token-icon>

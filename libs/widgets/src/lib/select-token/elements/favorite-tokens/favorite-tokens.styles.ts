@@ -1,28 +1,41 @@
 import { css } from 'lit';
 
 export const favoriteTokensStyles = css`
-    .favorite-container-scroll {
+    :host {
         display: flex;
-        height: 36px;
         width: 100%;
-        position: relative;
-        overflow-y: auto;
-        padding-bottom: 8px;
-        margin-bottom: 8px;
-        margin-top: 16px;
+        height: 60px;
+    }
+    
+    :host(.empty) {
+        height: 16px;
+        padding-bottom: 0;
+        margin-bottom: 0;
+    }
+    
+    :host(.transition-host) {
         transition: height .2s, padding-bottom .2s, margin-bottom .2s;
     }
     
-    .empty {
-        height: 0;
-        padding-bottom: 0;
-        margin-bottom: 0;
+    :host(.remove-favorite-token-show) .remove-favorite-token {
+        transform: scale(1) translate(0, 0);
+    }
+    
+    .favorite-container-scroll {
+        overflow-y: hidden;
+        overflow-x: auto;
+        position: relative;
+        width: 100%;
+        padding-top: 16px;
+        padding-bottom: 8px;
+        margin-bottom: 8px;
+        height: 36px;
     }
     
     .favorite-container {
         display: flex;
         gap: 12px;
-        max-height: 84px;
+        height: 36px;
         position: absolute;
     }
 
@@ -35,14 +48,43 @@ export const favoriteTokensStyles = css`
         background: var(--color-background-bg-primary);
     }
     
+    .favorite-token-item-container {
+        position: relative;
+    }
+    
+    .remove-favorite-token {
+        position: absolute;
+        top: -8px;
+        right: -8px;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: var(--color-background-bg-secondary);
+        z-index: 9;
+        transition: transform .2s;
+        transform: scale(0) translate(-16px, 16px);
+        cursor: pointer;
+        color: var(--color-content-content-primary);
+    }
+    
     @media (hover: hover) {
         .favorite-container-scroll:hover::-webkit-scrollbar-thumb {
             background: var(--primary);
         }
+        .favorite-token-item-container:hover .remove-favorite-token {
+            transform: scale(1) translate(0, 0);
+        }
+        .remove-favorite-token:hover {
+            background-color: var(--secondary-hover);
+        }
+        .edit-favorite-token-list {
+            display: none;
+        }
     }
-
-    .favorite-container-scroll:active::-webkit-scrollbar-thumb {
-        background: var(--primary);
-    }
+    
+    
 
 `

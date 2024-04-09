@@ -33,6 +33,8 @@ export const cardHeaderStyle = css`
         align-items: center;
         color: var(--color-content-content-primary);
         gap: 8px;
+        word-wrap: break-word;
+        white-space: nowrap;
     }
 
     .center-container {

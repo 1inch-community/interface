@@ -4,7 +4,7 @@ import { getEnvironmentValue } from '../environment';
 import { TimeCache } from '../cache';
 import { CacheActivePromise } from './decorators';
 
-const tokenPriceCache = new TimeCache<ChainId, Record<Address, string>>(5000)
+const tokenPriceCache = new TimeCache<ChainId, Record<Address, string>>(10000)
 
 export class OneInchDevPortalAdapter {
 

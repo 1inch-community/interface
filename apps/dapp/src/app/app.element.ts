@@ -8,11 +8,12 @@ import './elements/swap-form'
 import { fromEvent } from 'rxjs';
 import { subscribe } from '@one-inch-community/ui-components/lit';
 import { Router } from '@vaadin/router';
+import { getMobileMatchMedia } from './platform/match-media';
 
 @customElement('app-root')
 export class AppElement extends LitElement {
 
-  private mobileMedia = matchMedia('(max-width: 450px)')
+  private mobileMedia = getMobileMatchMedia()
 
   connectedCallback() {
     super.connectedCallback();

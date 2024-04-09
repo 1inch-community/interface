@@ -18,11 +18,8 @@ export class WidgetsPage extends LitElement {
     css`
         :host {
             display: flex;
-            height: calc(100vh - 16px * 2);
-            padding: 16px;
-            gap: 8px;
-            flex-direction: column;
-            flex-wrap: wrap;
+            padding-top: 48px;
+            justify-content: center;
         }
 
         .card-inner-layer {
@@ -40,7 +37,7 @@ export class WidgetsPage extends LitElement {
     SceneController.styles()
   ]
 
-  private readonly scene = new SceneController('selectToken', {
+  private readonly scene = new SceneController('swapForm', {
     swapForm: { width: 556, height: 376.5 },
     selectToken: { width: 556, height: 680 }
   })
@@ -53,35 +50,13 @@ export class WidgetsPage extends LitElement {
     name: 'usdt token'
   }
 
-  dstToken: IToken = {
-    address: '0x6b175474e89094c44da98b954eedeac495271d0f',
-    symbol: 'DAI',
-    decimals: 18,
-    chainId: ChainId.eth,
-    name: 'dai token'
-  }
+  dstToken: IToken | null = null
 
   // dstToken = undefined
 
   protected render() {
 
     return html`
-      <inch-card>
-        <div class="card-inner-layer theme-control-layer">
-          <inch-button @click="${(event: MouseEvent) => themeChangeMainColor(MainColors.dark, event)}"><span>Dark</span></inch-button>
-          <inch-button @click="${(event: MouseEvent) => themeChangeMainColor(MainColors.darkBlue, event)}"><span>Dark Blue</span></inch-button>
-          <inch-button @click="${(event: MouseEvent) => themeChangeMainColor(MainColors.light, event)}"><span>Light</span></inch-button>
-          <inch-button @click="${(event: MouseEvent) => themeChangeMainColor(MainColors.lightBlue, event)}"><span>Light Blue</span></inch-button>
-        </div>
-      </inch-card>
-
-      <inch-card>
-        <div class="card-inner-layer">
-          <inch-button @click="${(event: MouseEvent) => themeChangeBrandColor(BrandColors.community, event)}"><span>Community</span></inch-button>
-          <inch-button @click="${(event: MouseEvent) => themeChangeBrandColor(BrandColors.orange, event)}"><span>Orange</span></inch-button>
-          <inch-button @click="${(event: MouseEvent) => themeChangeBrandColor(BrandColors.violet, event)}"><span>Violet</span></inch-button>
-        </div>
-      </inch-card>
       
       <inch-card>
         ${this.scene.render({
@@ -91,8 +66,8 @@ export class WidgetsPage extends LitElement {
               connectedWalletAddress="0x568D3086f5377e59BF2Ef77bd1051486b581b214"
               withoutBackingCard
               .srcToken="${this.srcToken}"
-              .dstToken="${this.dstToken}"
-              @open-token-selector="${() => this.onOpenSelectToken()}"
+              .dstToken="${this.dstToken ?? undefined}"
+              @openTokenSelector="${() => this.onOpenSelectToken()}"
             ></inch-swap-form>
           `,
           selectToken: () => html`

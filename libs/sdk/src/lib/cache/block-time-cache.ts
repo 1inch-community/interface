@@ -1,6 +1,6 @@
 import { ChainId } from "@one-inch-community/models";
 import { TimeCache } from './time-cache';
-import { averageBlockTime } from '../chain/average-block-time';
+import { averageBlockTime } from '../chain';
 
 export class BlockTimeCache<Key, Value> {
 

@@ -34,9 +34,9 @@ export class SwapFromElement extends LitElement {
 
   @property({ type: Number }) chainId?: ChainId
 
-  @property({ type: Object, hasChanged: hasChangedToken }) srcToken?: IToken
+  @property({ type: Object, hasChanged: hasChangedToken }) srcToken: IToken | null = null
 
-  @property({ type: Object, hasChanged: hasChangedToken }) dstToken?: IToken
+  @property({ type: Object, hasChanged: hasChangedToken }) dstToken: IToken | null = null
 
   @property({ type: String, hasChanged: hasChangedAddress }) connectedWalletAddress?: Address
 
@@ -48,11 +48,13 @@ export class SwapFromElement extends LitElement {
     if (!chainId) throw new Error('swap form required chain id')
     const context = new SwapContext()
     context.setChainId(chainId)
-    context.setPair({ srcToken, dstToken })
-    context.setConnectedWalletAddress(connectedWalletAddress)
+    context.setPair({
+      srcToken: srcToken ?? undefined,
+      dstToken: dstToken ?? undefined,
+    })
+    context.setConnectedWalletAddress(connectedWalletAddress as Address | undefined)
     context.init()
     this.context.setValue(context)
-    this.requestUpdate()
   }
 
   protected override render() {
@@ -67,12 +69,6 @@ export class SwapFromElement extends LitElement {
 
     const form = html`
       <div class="input-container">
-<!--        <div class="input-header">-->
-<!--          <span>Swap tokens</span>-->
-<!--          <inch-button type="tertiary-gray" size="m">-->
-<!--            <inch-icon icon="authRefresh36"></inch-icon>-->
-<!--          </inch-button>-->
-<!--        </div>-->
         <inch-swap-form-input tokenType="source"></inch-swap-form-input>
         <inch-token-pair-switch></inch-token-pair-switch>
         <inch-swap-form-input disabled tokenType="destination"></inch-swap-form-input>

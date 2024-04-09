@@ -4,6 +4,8 @@ import { headerStyle } from './header.style';
 import { subscribe } from '@one-inch-community/ui-components/lit';
 import '@one-inch-community/ui-components/icon';
 import { fromEvent } from 'rxjs';
+import { getHeaderHeight, getMobileMatchMedia } from '../../platform/match-media';
+import { styleMap } from 'lit/directives/style-map.js';
 
 @customElement(HeaderElement.tagName)
 export class HeaderElement extends LitElement {
@@ -11,7 +13,7 @@ export class HeaderElement extends LitElement {
 
   static override styles = headerStyle
 
-  private mobileMedia = matchMedia('(max-width: 450px)')
+  private mobileMedia = getMobileMatchMedia()
 
   connectedCallback() {
     super.connectedCallback();
@@ -29,8 +31,11 @@ export class HeaderElement extends LitElement {
   }
 
   private getDesktopHeader() {
+    const styles = {
+      height: getHeaderHeight()
+    }
     return html`
-      <div class="header-container">
+      <div class="header-container" style="${styleMap(styles)}">
         <inch-icon icon="logoFull"></inch-icon>
       </div>
     `
@@ -42,5 +47,11 @@ export class HeaderElement extends LitElement {
         <inch-icon icon="logoFull"></inch-icon>
       </div>
     `
+  }
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'inch-header': HeaderElement
   }
 }

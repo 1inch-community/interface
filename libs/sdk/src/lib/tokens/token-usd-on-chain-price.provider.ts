@@ -1,4 +1,4 @@
-import { ChainId, IToken } from "@one-inch-community/models";
+import { ChainId, IToken } from '@one-inch-community/models';
 import { Address, formatUnits, isAddressEqual } from 'viem';
 import { buildDefaultTokenRageProvider } from './token-rate/token-rate.provider';
 

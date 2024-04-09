@@ -3,6 +3,7 @@ import { Address, getAddress, isAddressEqual, parseAbi } from 'viem';
 import { getClient } from '../../../chain';
 import { BigMath } from '../../../utils';
 import { BlockTimeCache, LongTimeCache } from '../../../cache';
+import { CacheActivePromise } from '../../../utils/decorators';
 
 const FactoryContractABI = parseAbi([
   'function getPair(address tokenA, address tokenB) external view returns (address pair)'
@@ -32,11 +33,12 @@ export class UniswapV2BaseRateAdapter implements ITokenRateAdapter {
     return this.supportedChain.includes(chainId)
   }
 
+  @CacheActivePromise((_, chainId: ChainId, sourceToken: IToken, destinationToken: IToken) => [chainId, sourceToken.address, destinationToken.address].join(':'))
   async getRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken): Promise<bigint | null> {
+    const id = [sourceToken.address, destinationToken.address].join(':')
     try {
-      const id = [sourceToken, destinationToken].join(':')
 
-      const rateFromCache = this.rateCache.get(chainId, id)
+      const rateFromCache = this.rateCache.get(chainId, id) ?? null
       if (rateFromCache !== null) {
         return rateFromCache
       }
@@ -62,18 +64,18 @@ export class UniswapV2BaseRateAdapter implements ITokenRateAdapter {
       return rate
     } catch (error) {
       console.error(`Error in UniswapV2BaseAdapter adapter name ${this.name}`, error)
-      return null
+      return this.rateCache.get(chainId, id)
     }
   }
 
   private async getPool(chainId: ChainId, srcTokenAddress: Address, dstTokenAddress: Address): Promise<[Address, Address]> {
     const id1 = [chainId, srcTokenAddress, dstTokenAddress].join(':')
     if (this.pools.has(id1)) {
-      return (this.pools.get(id1)!)
+      return this.pools.get(id1)!
     }
     const id2 = [chainId, dstTokenAddress, srcTokenAddress].join(':')
     if (this.pools.has(id2)) {
-      return (this.pools.get(id2)!)
+      return this.pools.get(id2)!
     }
     const client = getClient(chainId)
     const pool: Address = await client.readContract({
