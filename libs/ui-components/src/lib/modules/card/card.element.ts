@@ -1,5 +1,5 @@
 import { html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { cardStyle } from './card.style';
 
 @customElement(CardElement.tagName)
@@ -8,6 +8,8 @@ export class CardElement extends LitElement {
 
   static override styles = cardStyle
 
+  @property({ type: Boolean }) forMobileView = false
+
   protected override render() {
     return html`
       <slot name="header"></slot>
@@ -15,6 +17,12 @@ export class CardElement extends LitElement {
         <slot></slot>
       </div>
     `
+  }
+
+  protected override firstUpdated() {
+    if (this.forMobileView) {
+      this.classList.add('mobile')
+    }
   }
 
 }

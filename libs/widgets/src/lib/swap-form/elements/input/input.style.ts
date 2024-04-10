@@ -1,3 +1,4 @@
+import { mobileMediaCSS } from '@one-inch-community/ui-components/lit';
 import { css } from 'lit';
 
 export const inputStyle = css`
@@ -94,6 +95,10 @@ export const inputStyle = css`
     .amount-input[type="number"] {
         -moz-appearance: textfield;
     }
+    .amount-input:disabled {
+        opacity: 1;
+        color: var(--color-content-content-primary);
+    }
     
     @media (hover: hover) {
         .input-container:not(.disabled):hover {
@@ -103,6 +108,22 @@ export const inputStyle = css`
             background-color: var(--color-background-bg-positive-hover);
         }
     }
+
+    ${mobileMediaCSS(css`
+        .symbol, .amount-input {
+            font-size: 20px;
+        }
+        .input-title, .token-name {
+            font-size: 14px;
+        }
+        .input-container {
+            height: 116px;
+            //padding: 16px 8px;
+        }
+        .symbol-container {
+            padding: 4px 8px;
+        }
+    `)}
     
     .symbol-container:active {
         transform: scale(.98);

@@ -5,7 +5,6 @@ export const headerStyle = css`
         width: 100%;
         box-sizing: border-box;
         padding: 16px 24px;
-        border: 1px solid red;
     }
     
     .mobile-header {

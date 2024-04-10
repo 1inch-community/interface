@@ -1,10 +1,9 @@
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { headerStyle } from './header.style';
-import { subscribe } from '@one-inch-community/ui-components/lit';
+import { changeMobileMatchMedia, getMobileMatchMedia } from '@one-inch-community/ui-components/lit';
 import '@one-inch-community/ui-components/icon';
-import { fromEvent } from 'rxjs';
-import { getHeaderHeight, getMobileMatchMedia } from '../../platform/match-media';
+import { getHeaderHeight } from '../../platform/sizes';
 import { styleMap } from 'lit/directives/style-map.js';
 
 @customElement(HeaderElement.tagName)
@@ -17,9 +16,7 @@ export class HeaderElement extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    subscribe(this, [
-      fromEvent(this.mobileMedia, 'change')
-    ])
+    changeMobileMatchMedia(this)
   }
 
   protected render() {

@@ -1,4 +1,4 @@
-import { contextField } from './context-field';
+import { singletonField } from './singleton-field';
 
 type StorageConfig = {
   storagePrefix?: string
@@ -102,7 +102,7 @@ export function JsonParser<T>(value: string): T {
   return JSON.parse(value)
 }
 
-export const storage = contextField('__storage_controller', () => new Storage({
+export const storage = singletonField('__storage_controller', () => new Storage({
   storagePrefix: 'one-inch',
   storageSeparator: ':'
 }))

@@ -6,9 +6,8 @@ import './elements/header'
 import './elements/footer'
 import './elements/swap-form'
 import { fromEvent } from 'rxjs';
-import { subscribe } from '@one-inch-community/ui-components/lit';
+import { getMobileMatchMedia, subscribe } from '@one-inch-community/ui-components/lit';
 import { Router } from '@vaadin/router';
-import { getMobileMatchMedia } from './platform/match-media';
 
 @customElement('app-root')
 export class AppElement extends LitElement {

@@ -25,6 +25,7 @@
       "./dist/libs/ui-components/card",
       "./dist/libs/ui-components/icon",
       "./dist/libs/ui-components/lit",
+      "./dist/libs/ui-components/overlay",
       "./dist/libs/ui-components/scene",
       "./dist/libs/ui-components/segmented-control",
       "./dist/libs/ui-components/theme",

@@ -1,4 +1,5 @@
 import { css } from 'lit';
+import { mobileMediaCSS } from '@one-inch-community/ui-components/lit';
 
 export const swapFormStyle = css`
     
@@ -7,9 +8,10 @@ export const swapFormStyle = css`
         padding-top: 48px;
         justify-content: center;
     }
-    
-    .swap-form-container-mobile {
-        padding-top: 24px;
-    }
-    
+
+    ${mobileMediaCSS(css`
+        :host {
+            padding-top: 24px;
+        }
+    `)}
 `

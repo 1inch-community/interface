@@ -1,5 +1,5 @@
 import { AnimationType } from './animation-type';
-import { appendStyle } from './append-style';
+import { appendStyle } from '../../lit/append-style';
 
 export function slideAnimation(): AnimationType {
   const initStyle = {

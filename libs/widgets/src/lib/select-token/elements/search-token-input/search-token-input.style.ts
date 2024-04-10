@@ -8,7 +8,9 @@ export const searchTokenInputStyle = css`
         height: 48px;
         border-radius: 12px;
         color: var(--color-content-content-tertiary);
-        padding: 12px;
+        align-items: center;
+        padding-left: 12px;
+        padding-right: 12px;
         box-sizing: border-box;
         gap: 8px;
         margin-top: 5px;

@@ -1,6 +1,4 @@
-export function getMobileMatchMedia() {
-  return matchMedia('(max-width: 450px)')
-}
+import { getMobileMatchMedia } from '@one-inch-community/ui-components/lit';
 
 export function getHeaderHeight() {
   const mobileMedia = getMobileMatchMedia()

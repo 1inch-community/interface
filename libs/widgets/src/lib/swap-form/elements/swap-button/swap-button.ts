@@ -1,11 +1,11 @@
-import { html, LitElement } from 'lit';
+import { html, LitElement, PropertyValues } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import '@one-inch-community/ui-components/button'
 import { consume } from '@lit/context';
 import { swapContext } from '../../context';
 import { ISwapContext } from '@one-inch-community/models';
-import { defer, map } from 'rxjs';
-import { observe } from '@one-inch-community/ui-components/lit';
+import { defer, fromEvent, map } from 'rxjs';
+import { observe, subscribe } from '@one-inch-community/ui-components/lit';
 
 @customElement(SwapButton.tagName)
 export class SwapButton extends LitElement {
@@ -13,6 +13,8 @@ export class SwapButton extends LitElement {
 
   @consume({ context: swapContext })
   context?: ISwapContext
+
+  private readonly mobileMedia = matchMedia('(max-width: 450px)')
 
   private readonly connectedWalletAddress$ = defer(() => this.getConnectedWalletAddress())
 
@@ -24,9 +26,15 @@ export class SwapButton extends LitElement {
     map(address => address ? 'Swap' : 'Connect wallet'),
   )
 
+  protected override firstUpdated() {
+    subscribe(this, [
+      fromEvent(this.mobileMedia, 'change')
+    ])
+  }
+
   protected override render() {
     return html`
-      <inch-button type="${observe(this.buttonType$, 'secondary')}" size="xxl" fullSize>
+      <inch-button type="${observe(this.buttonType$, 'secondary')}" size="${this.mobileMedia.matches ? 'xl' : 'xxl'}" fullSize>
         ${observe(this.buttonText$)}
       </inch-button>
     `

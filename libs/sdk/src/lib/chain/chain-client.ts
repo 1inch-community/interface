@@ -1,10 +1,10 @@
 import { ChainId } from '@one-inch-community/models';
 import { createPublicClient, PublicClient } from 'viem';
-import { contextField } from '../utils/context-field';
+import { singletonField } from '../utils/singleton-field';
 import { batchConfig, transportMap, transportWSMap } from './transport-map';
 import { getChainById } from './viem-chain-map';
 
-const viemClients: Record<ChainId, PublicClient | null> = contextField('__chain_client', () => ({
+const viemClients: Record<ChainId, PublicClient | null> = singletonField('__chain_client', () => ({
   [ChainId.eth]: null,
   [ChainId.bnb]: null,
   [ChainId.matic]: null,
@@ -18,7 +18,7 @@ const viemClients: Record<ChainId, PublicClient | null> = contextField('__chain_
   [ChainId.zkSyncEra]: null,
 }));
 
-const viemWSClients: Record<ChainId, PublicClient | null> = contextField('__chain_ws_client', () => ({
+const viemWSClients: Record<ChainId, PublicClient | null> = singletonField('__chain_ws_client', () => ({
   [ChainId.eth]: null,
   [ChainId.bnb]: null,
   [ChainId.matic]: null,

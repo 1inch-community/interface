@@ -4,6 +4,7 @@ export const appStyle = css`
     
     :host {
         overflow: hidden;
+        display: block;
     }
 
     .content {

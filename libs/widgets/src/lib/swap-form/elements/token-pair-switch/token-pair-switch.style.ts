@@ -7,6 +7,9 @@ export const tokenPairSwitchStyle = css`
         position: relative;
         outline: none;
         user-select: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         -webkit-tap-highlight-color: transparent;
     }
     
@@ -22,7 +25,6 @@ export const tokenPairSwitchStyle = css`
         display: flex;
         justify-content: center;
         align-items: center;
-        left: 50%;
         top: -13px;
         cursor: pointer;
         transition: color .2s;

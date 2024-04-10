@@ -1,6 +1,6 @@
 import {fallback, http, Transport, webSocket} from "viem";
 import { ChainId } from '@one-inch-community/models';
-import { contextField } from '../utils/context-field';
+import { singletonField } from '../utils/singleton-field';
 
 export const batchConfig = {
   wait: 50,
@@ -43,7 +43,7 @@ function buildFallbackWSTransport(rpcList: string[]) {
   })
 }
 
-export const transportMap: Record<ChainId, Transport> = contextField('__transport_map', () => ({
+export const transportMap: Record<ChainId, Transport> = singletonField('__transport_map', () => ({
   [ChainId.eth]: buildFallbackTransport([
     'https://ethereum.publicnode.com',
     'https://rpc.mevblocker.io',
@@ -121,7 +121,7 @@ export const transportMap: Record<ChainId, Transport> = contextField('__transpor
   ]),
 }))
 
-export const transportWSMap: Record<ChainId, Transport> = contextField('__transport_ws_map', () => ({
+export const transportWSMap: Record<ChainId, Transport> = singletonField('__transport_ws_map', () => ({
   [ChainId.eth]: buildFallbackWSTransport([
     'wss://ethereum.publicnode.com',
   ]),

@@ -1,14 +1,15 @@
 import { html, LitElement } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
 import '@one-inch-community/ui-components/card';
 import '@one-inch-community/widgets/swap-form';
 import '@one-inch-community/widgets/select-token';
 import { swapFormStyle } from './swap-form.style';
 import { fromEvent, tap } from 'rxjs';
-import { subscribe } from '@one-inch-community/ui-components/lit';
+import { changeMobileMatchMedia, getMobileMatchMedia, subscribe } from '@one-inch-community/ui-components/lit';
 import { SceneController } from '@one-inch-community/ui-components/scene';
+import { OverlayMobileController } from '@one-inch-community/ui-components/overlay';
 import { ChainId, IToken } from '@one-inch-community/models';
-import { getFooterHeight, getHeaderHeight, getMobileMatchMedia } from '../../platform/match-media';
+import { getFooterHeight, getHeaderHeight } from '../../platform/sizes';
 
 @customElement(SwapFormElement.tagName)
 export class SwapFormElement extends LitElement {
@@ -23,25 +24,26 @@ export class SwapFormElement extends LitElement {
 
   private targetSelectToken: 'source' | 'destination' | null = null
 
-  private srcToken: IToken | null = {
+  @state() private srcToken: IToken | null = {
     address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
     symbol: 'USDT',
     decimals: 6,
     chainId: ChainId.eth,
     name: 'usdt token'
   }
-  private dstToken: IToken | null = null
+
+  @state() private dstToken: IToken | null = null
 
   private readonly desktopScene = new SceneController('swapForm', {
     swapForm: { width: 556, height: 376.5 },
     selectToken: { width: 556, height: this.calculateSelectTokenHeight() }
   })
 
+  private readonly mobileOverlay = new OverlayMobileController('app-root')
+
   connectedCallback() {
     super.connectedCallback();
-    subscribe(this, [
-      fromEvent(this.mobileMedia, 'change')
-    ])
+    changeMobileMatchMedia(this)
     subscribe(this, fromEvent(window, 'resize').pipe(
       tap(() => this.updateViewSize())
     ), { requestUpdate: false })
@@ -59,7 +61,11 @@ export class SwapFormElement extends LitElement {
       <inch-card>
         <inch-swap-form
           withoutBackingCard
+          connectedWalletAddress="0x568D3086f5377e59BF2Ef77bd1051486b581b214"
           chainId="1"
+          .srcToken="${this.srcToken}"
+          .dstToken="${this.dstToken}"
+          @openTokenSelector="${(event: CustomEvent) => this.onOpenMobileSelectToken(event)}"
         ></inch-swap-form>
       </inch-card>
     `;
@@ -84,7 +90,10 @@ export class SwapFormElement extends LitElement {
               chainId="1"
               connectedWalletAddress="0x568D3086f5377e59BF2Ef77bd1051486b581b214"
               @backCard="${() => this.desktopScene.back()}"
-              @selectToken="${(event: CustomEvent) => this.onSelectToken(event)}"
+              @selectToken="${async (event: CustomEvent) => {
+                this.onSelectToken(event);
+                await this.desktopScene.back()
+              }}"
             ></inch-select-token>
           `
         })}
@@ -97,14 +106,30 @@ export class SwapFormElement extends LitElement {
     this.targetSelectToken = event.detail.value
   }
 
-  private async onSelectToken(event: CustomEvent) {
+  private onSelectToken(event: CustomEvent) {
     if (this.targetSelectToken === 'source') {
       this.srcToken = event.detail.value
     }
     if (this.targetSelectToken === 'destination') {
       this.dstToken = event.detail.value
     }
-    await this.desktopScene.back()
+  }
+
+  private async onOpenMobileSelectToken(event: CustomEvent) {
+    const close = await this.mobileOverlay.open(html`
+      <inch-card forMobileView style="width: 100%; height: 100%; display: flex;">
+        <inch-select-token
+          chainId="1"
+          connectedWalletAddress="0x568D3086f5377e59BF2Ef77bd1051486b581b214"
+          @backCard="${() => close()}"
+          @selectToken="${async (event: CustomEvent) => {
+            this.onSelectToken(event)
+            await close()
+          }}"
+        ></inch-select-token>
+      </inch-card>
+    `)
+    this.targetSelectToken = event.detail.value
   }
 
   private updateViewSize() {

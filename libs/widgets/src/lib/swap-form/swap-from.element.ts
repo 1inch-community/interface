@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit';
+import { html, LitElement, PropertyValues } from 'lit';
 import { ContextProvider } from '@lit/context';
 import { customElement, property } from 'lit/decorators.js';
 import { type Address, isAddressEqual } from 'viem';
@@ -55,6 +55,22 @@ export class SwapFromElement extends LitElement {
     context.setConnectedWalletAddress(connectedWalletAddress as Address | undefined)
     context.init()
     this.context.setValue(context)
+  }
+
+  protected override updated(changedProperties: PropertyValues) {
+    const context =   this.context.value
+    if (changedProperties.has('chainId') && this.chainId) {
+      context.setChainId(this.chainId)
+    }
+    if (changedProperties.has('srcToken') || changedProperties.has('dstToken')) {
+      context.setPair({
+        srcToken: this.srcToken ?? undefined,
+        dstToken: this.dstToken ?? undefined,
+      })
+    }
+    if (changedProperties.has('connectedWalletAddress')) {
+      context.setConnectedWalletAddress(this.connectedWalletAddress as Address | undefined)
+    }
   }
 
   protected override render() {

@@ -64,11 +64,11 @@ export class FavoriteTokensElement extends LitElement {
               (token: ITokenRecord | null) => when(
                 token,
                 (token) => html`
-                <div class="favorite-token-item-container" @click="${(event: UIEvent) => emitSelectTokenEvent(this, token, event)}">
-                  <div class="remove-favorite-token" @click="${() => this.onRemoveFavoriteToken(token)}">
+                <div class="favorite-token-item-container">
+                  <div class="remove-favorite-token" @click="${(event: UIEvent) => this.onRemoveFavoriteToken(token, event)}">
                     <inch-icon icon="cross8"></inch-icon>
                   </div>
-                  <inch-button size="m" type="secondary" class="favorite-token-item">
+                  <inch-button size="m" type="secondary" class="favorite-token-item" @click="${(event: UIEvent) => emitSelectTokenEvent(this, token, event)}">
                     <inch-token-icon symbol="${token.symbol}" address="${token.address}"
                                      chainId="${token.chainId}"></inch-token-icon>
                     <span>${token.symbol}</span>
@@ -112,7 +112,9 @@ export class FavoriteTokensElement extends LitElement {
     return this.context.chainId$;
   }
 
-  private async onRemoveFavoriteToken(token: ITokenRecord) {
+  private async onRemoveFavoriteToken(token: ITokenRecord, event: UIEvent) {
+    event.stopPropagation()
+    event.preventDefault()
     await this.context?.setFavoriteTokenState(token.chainId, token.address, false);
   }
 }

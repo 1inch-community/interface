@@ -2,9 +2,8 @@ import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { footerStyle } from './footer.style';
-import { fromEvent } from 'rxjs';
-import { subscribe } from '@one-inch-community/ui-components/lit';
-import { getFooterHeight, getMobileMatchMedia } from '../../platform/match-media';
+import { getMobileMatchMedia, changeMobileMatchMedia } from '@one-inch-community/ui-components/lit';
+import { getFooterHeight } from '../../platform/sizes';
 
 @customElement(FooterElement.tagName)
 export class FooterElement extends LitElement {
@@ -16,9 +15,7 @@ export class FooterElement extends LitElement {
 
   connectedCallback() {
     super.connectedCallback();
-    subscribe(this, [
-      fromEvent(this.mobileMedia, 'change')
-    ])
+    changeMobileMatchMedia(this)
   }
 
   protected render() {

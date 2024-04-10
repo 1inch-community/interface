@@ -44,7 +44,7 @@ export class SearchTokenInputElement extends LitElement {
     if (this.sceneContext && this.sceneContext.animationInProgress) {
       await this.sceneContext.animationInEnd
     }
-    input.focus();
+    // requestAnimationFrame(() => input.focus())
   }
 
 }

@@ -41,3 +41,10 @@ export function setThemeColor(color: string) {
   }
   themeMetaElement.content = color
 }
+
+export function vibrate(pattern: VibratePattern = 40) {
+  try {
+    navigator.vibrate(pattern);
+  } catch (error) {
+  }
+}

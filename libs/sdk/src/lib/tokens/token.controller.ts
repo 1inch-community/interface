@@ -1,4 +1,4 @@
-import { contextField, OneInchDevPortalAdapter, JsonParser, storage } from '../utils';
+import { singletonField, OneInchDevPortalAdapter, JsonParser, storage } from '../utils';
 import { TokenSchema } from './token.schema';
 import { ChainId } from '@one-inch-community/models';
 import { Address, formatUnits } from 'viem';
@@ -180,4 +180,4 @@ class TokenControllerImpl {
   }
 }
 
-export const TokenController = contextField('__token-db_controller', () => new TokenControllerImpl())
+export const TokenController = singletonField('__token-db_controller', () => new TokenControllerImpl())

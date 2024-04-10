@@ -2,6 +2,7 @@ import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { buttonSizeStyle, buttonStyle, buttonTypeStyle } from './button.style';
+import { vibrate } from '../lit/dom.utils';
 
 type ButtonSize = 'm' | 'l' | 'xl' | 'xxl'
 type ButtonType =
@@ -33,6 +34,8 @@ export class ButtonElement extends LitElement {
 
   @property({ type: Boolean, attribute: true }) disabled = false
 
+  @property({ type: Boolean, attribute: true }) disabledSlotPointerEvent = false
+
   @state() isIconButton = false
 
   protected override render() {
@@ -44,11 +47,13 @@ export class ButtonElement extends LitElement {
       'active-box-shadow-inset': this.type.includes('secondary')
         && !this.type.includes('gray'),
     }
+
     return html`
       <button
         class="${classMap(classes)}"
+        @click="${() => vibrate()}"
         ?disabled="${this.disabled}"
-      ><slot style="pointer-events: none;" @slotchange="${this.handleSlotChange}"></slot></button>
+      ><slot style="${this.disabledSlotPointerEvent ? 'pointer-events: none;' : ''}" @slotchange="${this.handleSlotChange}"></slot></button>
     `
   }
 

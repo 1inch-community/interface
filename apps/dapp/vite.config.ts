@@ -24,22 +24,22 @@ export default defineConfig({
 
   plugins: [
     nxViteTsPaths(),
-    {
-      name: 'watch-custom-folder',
-      configureServer(server) {
-        const distLibs = path.resolve(path.dirname(path.dirname(__dirname)), 'dist', 'libs')
-        server.watcher.add(distLibs)
-        // const send = debounce(() => {
-        //   server.ws.send({ type: 'full-reload' })
-        //   console.log('full reload')
-        // }, 1000)
-        // server.watcher.on('change', (filePath) => {
-        //   if (filePath.includes('dist/libs')) {
-        //     send()
-        //   }
-        // });
-      }
-    }
+    // {
+    //   name: 'watch-custom-folder',
+    //   configureServer(server) {
+    //     const distLibs = path.resolve(path.dirname(path.dirname(__dirname)), 'dist', 'libs')
+    //     server.watcher.add(distLibs)
+    //     // const send = debounce(() => {
+    //     //   server.ws.send({ type: 'full-reload' })
+    //     //   console.log('full reload')
+    //     // }, 1000)
+    //     // server.watcher.on('change', (filePath) => {
+    //     //   if (filePath.includes('dist/libs')) {
+    //     //     send()
+    //     //   }
+    //     // });
+    //   }
+    // }
   ],
 
   // Uncomment this if you are using workers.

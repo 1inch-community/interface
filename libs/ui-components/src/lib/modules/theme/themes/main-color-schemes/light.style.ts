@@ -3,6 +3,8 @@ import { css } from 'lit';
 export const themeLight = css`
   
   :root {
+      --logo-text-color: #1B314F;
+      
       --color-background-bg-active: #ffffff;
       --color-background-bg-body: #f1f1f1;
       --color-background-bg-critical: #f048322e;

@@ -15,6 +15,8 @@ export class TokenIconElement extends LitElement {
       :host {
           user-select: none;
           outline: none;
+          -webkit-user-select: none;
+          -webkit-tap-highlight-color: transparent;
       }
 
       .stub {
@@ -35,6 +37,13 @@ export class TokenIconElement extends LitElement {
           border-bottom-color: var(--secondary);
           border-top-color: var(--secondary);
           animation: spin 1s linear infinite;
+      }
+      
+      img {
+          user-select: none;
+          outline: none;
+          -webkit-user-select: none;
+          -webkit-tap-highlight-color: transparent;
       }
 
       @keyframes spin {

@@ -47,3 +47,10 @@ export class SelectTokenElement extends LitElement {
     this.context.setValue(context)
   }
 }
+
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'inch-select-token': SelectTokenElement
+  }
+}

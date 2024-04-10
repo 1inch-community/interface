@@ -1,10 +1,10 @@
-import { contextField } from '../utils/context-field';
+import { singletonField } from '../utils/singleton-field';
 import { ChainId } from '@one-inch-community/models';
 import { Block } from 'viem';
 import { getWSClient } from './chain-client';
 import { Observable, shareReplay } from 'rxjs';
 
-const blockEmitterMap: Record<ChainId, Observable<Block> | null> = contextField('__block_emitter_map', () => ({
+const blockEmitterMap: Record<ChainId, Observable<Block> | null> = singletonField('__block_emitter_map', () => ({
   [ChainId.eth]: null,
   [ChainId.bnb]: null,
   [ChainId.matic]: null,

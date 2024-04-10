@@ -34,18 +34,6 @@ export class InputElement extends LitElement {
   private readonly chainId$ = defer(() => this.getChainEventEmitter())
   private readonly amount$ = defer(() => this.getTokenAmountStream())
 
-  private readonly symbol$ = this.token$.pipe(
-    map(token => token?.symbol ?? null)
-  )
-
-  private readonly address$ = this.token$.pipe(
-    map(token => token?.address ?? null)
-  )
-
-  private readonly name$ = this.token$.pipe(
-    map(token => token?.name ?? null)
-  )
-
   private readonly input = document.createElement('input')
   private maskedInput = this.buildMask(6);
 
@@ -121,12 +109,7 @@ export class InputElement extends LitElement {
 
   private selectTokenView() {
     return html`
-      <inch-button type="secondary" size="l" @click="${(event: MouseEvent) => {
-        console.log(event, event.target)
-        event.preventDefault()
-        event.stopPropagation()
-        dispatchEvent(this, 'openTokenSelector', this.tokenType, event)
-      }}">
+      <inch-button disabledSlotPointerEvent type="secondary" size="l" @click="${(event: MouseEvent) => dispatchEvent(this, 'openTokenSelector', this.tokenType, event)}">
         <span class="select-token-text">Select token</span>
         <inch-icon icon="chevronDown16"></inch-icon>
       </inch-button>

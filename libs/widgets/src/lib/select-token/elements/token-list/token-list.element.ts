@@ -10,7 +10,7 @@ import { tokenListStyle } from './token-list.style';
 import { consume } from '@lit/context';
 import { ChainId, ISelectTokenContext } from '@one-inch-community/models';
 import { selectTokenContext } from '../../context';
-import { combineLatest, defer, map, startWith } from 'rxjs';
+import { combineLatest, debounceTime, defer, map, startWith } from 'rxjs';
 import { observe } from '@one-inch-community/ui-components/lit';
 import { scrollbarStyle } from '@one-inch-community/ui-components/theme';
 import { Address } from 'viem';
@@ -41,13 +41,17 @@ export class TokenListElement extends LitElement {
     this.getChainId(),
     this.getConnectedWalletAddress(),
   ])).pipe(
+    debounceTime(0),
     map(([ tokenAddresses, chainId, walletAddress ]) => this.getTokenListView(tokenAddresses, chainId, walletAddress ?? undefined)),
     startWith(this.getLoaderView()),
   )
 
   protected override render(): TemplateResult {
     if (!this.transitionReady) return this.getLoaderView()
-    return html`${observe(this.view$)}`
+    return html`
+      <div class="list-container">
+        ${observe(this.view$)}
+      </div>`
   }
 
   protected override async firstUpdated() {
@@ -78,7 +82,7 @@ export class TokenListElement extends LitElement {
     }
     return html`
       <div class="${classMap(classes)}">
-        ${litMap<unknown>(Array.from(Array(100).keys()), () => html`<inch-token-list-stub-item></inch-token-list-stub-item>`)}
+        ${litMap<unknown>(Array.from(Array(10).keys()), () => html`<inch-token-list-stub-item></inch-token-list-stub-item>`)}
       </div>
     `
   }
@@ -87,18 +91,11 @@ export class TokenListElement extends LitElement {
   private getTokenListView(tokenAddresses: Address[], chainId: ChainId, walletAddress?: Address): TemplateResult {
     const offsetHeight = this.offsetHeight
 
-    // const virtualView = this.renderRoot.querySelector('lit-virtualizer')
-    // if (virtualView) {
-    //   console.log('update list')
-    //   virtualView.items = tokenAddresses
-    //   return html`${virtualView}`
-    // }
-
     return html`
       ${cache(html`
         <lit-virtualizer
           scroller
-          style="height: ${offsetHeight - 7}px;"
+          style="height: ${offsetHeight}px;"
           .items=${tokenAddresses}
           .keyFunction="${((address: Address) => [chainId, walletAddress, address].join(':')) as any}"
           .renderItem=${((address: Address) => html`<inch-token-list-item
@@ -110,6 +107,21 @@ export class TokenListElement extends LitElement {
       `)}
     `
   }
+
+  // private listenScrollOverflow() {
+  //   this.reset$.next()
+  //   debugger
+  //   if (!this.scrollViewRef.value) {
+  //     setTimeout(() => {
+  //       this.listenScrollOverflow()
+  //     }, 100)
+  //     return
+  //   }
+  //   subscribe(this, fromEvent(this.scrollViewRef.value!, 'scroll').pipe(
+  //     filter(() => this.scrollViewRef.value!.scrollTop < 0),
+  //     tap((event) => { console.log('overflow', this.scrollViewRef.value!.scrollTop) })
+  //   ), { requestUpdate: false })
+  // }
 }
 
 declare global {

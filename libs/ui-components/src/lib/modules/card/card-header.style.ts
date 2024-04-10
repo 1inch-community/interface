@@ -1,4 +1,5 @@
 import { css } from 'lit';
+import { mobileMediaCSS } from '../lit/match-media';
 
 export const cardHeaderStyle = css`
 
@@ -60,5 +61,21 @@ export const cardHeaderStyle = css`
     .card-header-title__left:not(.card-header-title__and-back) {
         margin-left: 8px;
     }
+
+    ${mobileMediaCSS(css`
+        .card-header-title {
+            font-size: 16px;
+        }
+        :host {
+            height: 52px;
+            padding: 8px 8px 0;
+        }
+        :host(.not-native-mode) {
+            margin-top: -8px;
+            margin-left: -8px;
+            width: calc(100% + 16px);
+            height: 52px;
+        }
+    `)}
 
 `
