@@ -95,33 +95,20 @@ export class TokenListElement extends LitElement {
       ${cache(html`
         <lit-virtualizer
           scroller
-          style="height: ${offsetHeight}px;"
+          style="height: ${offsetHeight}px; overflow-x: hidden;"
           .items=${tokenAddresses}
           .keyFunction="${((address: Address) => [chainId, walletAddress, address].join(':')) as any}"
-          .renderItem=${((address: Address) => html`<inch-token-list-item
-          tokenAddress="${address}"
-          walletAddress="${ifDefined(walletAddress)}"
-          chainId="${chainId}"
-        ></inch-token-list-item>`) as any}
+          .renderItem=${((address: Address) => html`
+            <inch-token-list-item
+              tokenAddress="${address}"
+              walletAddress="${ifDefined(walletAddress)}"
+              chainId="${chainId}"
+            ></inch-token-list-item>`
+          ) as any}
         ></lit-virtualizer>
       `)}
     `
   }
-
-  // private listenScrollOverflow() {
-  //   this.reset$.next()
-  //   debugger
-  //   if (!this.scrollViewRef.value) {
-  //     setTimeout(() => {
-  //       this.listenScrollOverflow()
-  //     }, 100)
-  //     return
-  //   }
-  //   subscribe(this, fromEvent(this.scrollViewRef.value!, 'scroll').pipe(
-  //     filter(() => this.scrollViewRef.value!.scrollTop < 0),
-  //     tap((event) => { console.log('overflow', this.scrollViewRef.value!.scrollTop) })
-  //   ), { requestUpdate: false })
-  // }
 }
 
 declare global {

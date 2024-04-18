@@ -34,6 +34,8 @@ export class TokenListItemElement extends LitElement {
 
   private preRenderTemplate: TemplateResult | null = null
 
+  private isFavorite = false
+
   private task = new Task(this,
     async ([chainId, tokenAddress, walletAddress]) => {
       if (!chainId || !tokenAddress) return []
@@ -85,6 +87,7 @@ export class TokenListItemElement extends LitElement {
   }
 
   private getTokenView(token: ITokenRecord, balance: IBalancesTokenRecord | null, balanceUsd: number | null) {
+    this.isFavorite = token.isFavorite
     let balanceFormat = '0'
     if (balance) {
       balanceFormat = formatNumber(formatUnits(BigInt(balance.amount), token.decimals), 6)
@@ -94,7 +97,7 @@ export class TokenListItemElement extends LitElement {
       balanceUsdFormat = '$' + formatNumber(balanceUsd.toString(), 2)
     }
     let startColor = { border: 'var(--color-border-border-secondary)', body: 'none' }
-    if (token.isFavorite) {
+    if (this.isFavorite) {
       startColor = { border: 'var(--color-core-orange-warning)', body: 'var(--color-core-orange-warning)' }
     }
 
@@ -125,17 +128,18 @@ export class TokenListItemElement extends LitElement {
   private async onMarkFavoriteToken(event: UIEvent, token: ITokenRecord) {
     event.preventDefault()
     event.stopPropagation()
+    this.isFavorite = !token.isFavorite
+    this.requestUpdate()
     await this.context?.setFavoriteTokenState(token.chainId, token.address, !token.isFavorite)
   }
 
   private getTokenUpdateEmitter() {
     if (!this.context) throw new Error('')
     return (this.context.changeFavoriteTokenState$ as Observable<[ChainId, Address]>).pipe(
-      // @ts-ignore
-      filter(([chainId, address]) => {
+      filter((([chainId, address]: [ChainId, Address]) => {
         const token = this.task?.value?.[0] ?? null
         return token && token.chainId === chainId && isAddressEqual(token.address, address)
-      })
+      }) as any)
     )
   }
 

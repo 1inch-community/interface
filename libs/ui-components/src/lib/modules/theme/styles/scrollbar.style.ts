@@ -1,10 +1,12 @@
 import { css } from 'lit';
+import { mobileMediaCSS } from '../../lit/match-media';
 
 export const scrollbarStyle = css`
 
     /* width */
     ::-webkit-scrollbar {
         width: 7px;
+        height: 7px;
     }
 
     /* Track */
@@ -23,5 +25,12 @@ export const scrollbarStyle = css`
         background: var(--primary-hover);
         width: 10px;
     }
+    
+    ${mobileMediaCSS(css`
+        ::-webkit-scrollbar {
+            width: 3px;
+            height: 7px;
+        }
+    `)}
   
 `

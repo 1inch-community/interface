@@ -1,3 +1,4 @@
+import { mobileMediaCSS } from '@one-inch-community/ui-components/lit';
 import { css } from 'lit';
 
 export const tokenListItemStyle = css`
@@ -24,7 +25,7 @@ export const tokenListItemStyle = css`
         display: flex;
         flex-direction: column;
         gap: 4px;
-        width: 100%;
+        max-width: 50%;
     }
 
     .name-and-balance .name {
@@ -33,6 +34,9 @@ export const tokenListItemStyle = css`
         font-style: normal;
         font-weight: 500;
         line-height: 24px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
     }
 
     .name-and-balance .balance {
@@ -41,6 +45,9 @@ export const tokenListItemStyle = css`
         font-style: normal;
         font-weight: 400;
         line-height: 20px;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        white-space: nowrap;
     }
     
     .usd-balance {
@@ -57,6 +64,7 @@ export const tokenListItemStyle = css`
         display: flex;
         gap: 8px;
         align-items: center;
+        margin-left: auto;
     }
     
     @media (hover: hover) {
@@ -81,8 +89,14 @@ export const tokenListItemStyle = css`
         .item-container:hover .usd-balance {
             transform: translateX(0);
         }
-        
     }
+    
+    ${mobileMediaCSS(css`
+        .item-container {
+            padding: 8px 0;
+            gap: 4px;
+        }
+    `)}
 
     .item-container:active {
         background-color: var(--color-background-bg-secondary);

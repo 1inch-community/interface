@@ -2,6 +2,9 @@ import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import '@one-inch-community/widgets/swap-form';
 import '@one-inch-community/widgets/select-token';
+import '@one-inch-community/widgets/wallet-manage';
+import '@one-inch-community/ui-components/card';
+import '@one-inch-community/ui-components/button';
 import { ChainId, IToken } from '@one-inch-community/models';
 import {
   BrandColors,
@@ -10,6 +13,8 @@ import {
   themeChangeMainColor
 } from '@one-inch-community/ui-components/theme';
 import { SceneController } from '@one-inch-community/ui-components/scene';
+import { connectWalletController } from './connect-wallet-controller';
+import { observe } from '@one-inch-community/ui-components/lit';
 
 @customElement('app-widgets')
 export class WidgetsPage extends LitElement {
@@ -19,7 +24,8 @@ export class WidgetsPage extends LitElement {
         :host {
             display: flex;
             padding-top: 48px;
-            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
         }
 
         .card-inner-layer {
@@ -79,6 +85,16 @@ export class WidgetsPage extends LitElement {
           <inch-button @click="${(event: MouseEvent) => themeChangeBrandColor(BrandColors.violet, event)}"><span>Violet</span></inch-button>
         </div>
       </inch-card>
+
+      <inch-card>
+        <span>Chain id ${observe(connectWalletController.data.chainId$)}</span>
+        <div class="card-inner-layer">
+          <inch-button @click="${() => connectWalletController.changeChain(ChainId.eth)}"><span>ETH</span></inch-button>
+          <inch-button @click="${() => connectWalletController.changeChain(ChainId.bnb)}"><span>BNB</span></inch-button>
+          <inch-button @click="${() => connectWalletController.changeChain(ChainId.matic)}"><span>MATIC</span></inch-button>
+        </div>
+      </inch-card>
+      
       
       <inch-card>
         ${this.scene.render({
@@ -101,6 +117,9 @@ export class WidgetsPage extends LitElement {
           `
         })}
       </inch-card>
+      
+      <inch-connect-wallet-view .controller="${connectWalletController}"></inch-connect-wallet-view>
+      <inch-wallet-manage .controller="${connectWalletController}"></inch-wallet-manage>
     `
   }
 

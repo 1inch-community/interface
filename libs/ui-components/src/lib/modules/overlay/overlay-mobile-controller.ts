@@ -69,7 +69,7 @@ export class OverlayMobileController implements IOverlayController {
       position: 'fixed',
       display: 'flex',
       width: '100vw',
-      height: '97svh',
+      height: '97%',
       overflow: 'hidden',
       bottom: '0',
       left: '0'

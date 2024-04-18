@@ -1,3 +1,4 @@
+import { mobileMediaCSS } from '@one-inch-community/ui-components/lit';
 import { css } from 'lit';
 
 export const tokenListStubItemStyle = css`
@@ -58,5 +59,12 @@ export const tokenListStubItemStyle = css`
             filter: opacity(0.5);
         }
     }
+
+    ${mobileMediaCSS(css`
+        .item-container {
+            padding: 8px 0;
+            gap: 4px;
+        }
+    `)}
 
 `
