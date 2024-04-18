@@ -35,7 +35,7 @@ export class ConnectWalletViewElement extends LitElement {
       <div class="connect-wallet-view-container">
         <img class="connect-wallet-view-icon" alt="${observe(this.name$)}" src="${observe(this.icon$)}">
         ${when(!this.mobileMatchMedia.matches, () => html`<inch-wallet-view-address-balance address="${observe(this.activeAddress$)}" chainId="${observe(this.chainId$)}"></inch-wallet-view-address-balance>`)}
-        <inch-button type="secondary" size="l">
+        <inch-button type="secondary" size="m">
           ${observe(this.activeAddressView$)}
         </inch-button>
       </div>
