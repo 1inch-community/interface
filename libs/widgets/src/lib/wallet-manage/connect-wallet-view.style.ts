@@ -9,6 +9,8 @@ export const connectWalletViewStyle = css`
         gap: 8px;
         border-radius: 12px;
         background: var(--color-background-bg-primary);
+        height: 40px;
+        box-sizing: border-box;
     }
     
     .connect-wallet-view-icon {

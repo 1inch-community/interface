@@ -1,2 +1,2 @@
 export * from './wallet-manage.element'
-export * from './elements/connect-wallet-view'
+export * from './connect-wallet-view.element'

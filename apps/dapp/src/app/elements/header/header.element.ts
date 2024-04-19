@@ -3,8 +3,10 @@ import { customElement } from 'lit/decorators.js';
 import { headerStyle } from './header.style';
 import { changeMobileMatchMedia, getMobileMatchMedia } from '@one-inch-community/ui-components/lit';
 import '@one-inch-community/ui-components/icon';
+import '@one-inch-community/widgets/wallet-manage';
 import { getHeaderHeight } from '../../platform/sizes';
 import { styleMap } from 'lit/directives/style-map.js';
+import { connectWalletController } from '../../controllers/connect-wallet-controller';
 
 @customElement(HeaderElement.tagName)
 export class HeaderElement extends LitElement {
@@ -29,11 +31,16 @@ export class HeaderElement extends LitElement {
 
   private getDesktopHeader() {
     const styles = {
-      height: getHeaderHeight()
+      height: `${getHeaderHeight()}px`
     }
     return html`
       <div class="header-container" style="${styleMap(styles)}">
-        <inch-icon icon="logoFull"></inch-icon>
+        <div class="left-content">
+          <inch-icon icon="logoFull"></inch-icon>
+        </div>
+        <div class="right-content">
+          <inch-connect-wallet-view .controller="${connectWalletController}"></inch-connect-wallet-view>
+        </div>
       </div>
     `
   }

@@ -14,6 +14,8 @@ export const cardStyle = css`
     :host(.mobile) {
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
+        width: 100%;
+        height: fit-content;
     }
     
     .card-content {

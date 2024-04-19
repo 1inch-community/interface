@@ -82,7 +82,7 @@ export class TokenListElement extends LitElement {
     }
     return html`
       <div class="${classMap(classes)}">
-        ${litMap<unknown>(Array.from(Array(10).keys()), () => html`<inch-token-list-stub-item></inch-token-list-stub-item>`)}
+        ${litMap<unknown>(Array.from(Array(30).keys()), () => html`<inch-token-list-stub-item></inch-token-list-stub-item>`)}
       </div>
     `
   }

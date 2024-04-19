@@ -103,7 +103,7 @@ export class SceneController<T extends string, U extends T> {
 
       this.sceneContainer.classList.remove('scene-container-animation')
 
-      this.sceneContainer.removeChild(currentSceneWrapper)
+      this.sceneContainer.firstChild && this.sceneContainer.removeChild(this.sceneContainer.firstChild)
 
       isBack ? upScene.animationOutEnd() : upScene.animationInEnd()
       isBack ? downScene.animationOutEnd() : downScene.animationInEnd()

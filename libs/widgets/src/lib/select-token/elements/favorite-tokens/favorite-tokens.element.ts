@@ -43,8 +43,8 @@ export class FavoriteTokensElement extends LitElement {
         this.classList.add('empty');
       }
     }),
-    tap((tokens: (ITokenRecord | null)[]) => {
-      if (tokens && tokens.length && !this.classList.contains('transition-host')) {
+    tap(() => {
+      if (!this.classList.contains('transition-host')) {
         setTimeout(() => {
           this.classList.add('transition-host');
         }, 100);

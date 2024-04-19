@@ -5,12 +5,15 @@ export const footerStyle = css`
     .footer-container {
         width: 100%;
         box-sizing: border-box;
-        border: 1px solid rebeccapurple;
+        display: flex;
+        align-items: center;
     }
     
     .mobile-footer {
         height: 72px;
         position: fixed;
+        padding: 16px;
+        border-top: 1px solid var(--color-border-border-tertiary);
     }
 
 `

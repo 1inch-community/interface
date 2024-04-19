@@ -7,6 +7,7 @@ import '../wallet-view'
 import { consume } from '@lit/context';
 import { controllerContext } from '../../context';
 import { IConnectWalletController } from '@one-inch-community/models';
+import '@one-inch-community/ui-components/icon';
 
 @customElement(WalletListElement.tagName)
 export class WalletListElement extends LitElement {
@@ -24,9 +25,11 @@ export class WalletListElement extends LitElement {
 
   protected override render() {
     return this.task.render({
-      pending: () => html`<span>Loading...</span>`,
+      pending: () => html`<inch-icon icon="unicornRun"></inch-icon>`,
       complete: (infoList) => html`
-        ${map(infoList, info => html`<inch-wallet-view .info="${info}"></inch-wallet-view>`)}
+        <div class="scroll-container">
+          ${map(infoList, info => html`<inch-wallet-view .info="${info}"></inch-wallet-view>`)}
+        </div>
       `
     })
   }

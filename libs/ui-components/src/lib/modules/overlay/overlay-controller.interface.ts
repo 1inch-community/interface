@@ -1,5 +1,7 @@
 import { TemplateResult } from 'lit';
 
 export interface IOverlayController {
-  open(openTarget: TemplateResult | HTMLElement): Promise<() => Promise<void>> // return close function
+  readonly isOpen: boolean
+  open(openTarget: TemplateResult | HTMLElement): Promise<number>
+  close(overlayId: number): Promise<void>
 }

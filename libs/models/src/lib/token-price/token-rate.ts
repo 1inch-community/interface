@@ -1,5 +1,5 @@
 import { Observable } from 'rxjs';
-import { ChainId } from '../chain/chain-id';
+import { ChainId } from '../chain';
 import { IToken } from '../token/token';
 
 export interface ITokenRateProvider {

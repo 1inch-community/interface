@@ -1,11 +1,11 @@
-import { html, LitElement, PropertyValues } from 'lit';
+import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import '@one-inch-community/ui-components/button'
 import { consume } from '@lit/context';
 import { swapContext } from '../../context';
 import { ISwapContext } from '@one-inch-community/models';
 import { defer, fromEvent, map } from 'rxjs';
-import { observe, subscribe } from '@one-inch-community/ui-components/lit';
+import { getMobileMatchMedia, observe, subscribe } from '@one-inch-community/ui-components/lit';
 
 @customElement(SwapButton.tagName)
 export class SwapButton extends LitElement {
@@ -14,7 +14,7 @@ export class SwapButton extends LitElement {
   @consume({ context: swapContext })
   context?: ISwapContext
 
-  private readonly mobileMedia = matchMedia('(max-width: 450px)')
+  private readonly mobileMedia = getMobileMatchMedia()
 
   private readonly connectedWalletAddress$ = defer(() => this.getConnectedWalletAddress())
 

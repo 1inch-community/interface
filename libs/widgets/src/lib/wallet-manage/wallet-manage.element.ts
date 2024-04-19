@@ -6,6 +6,8 @@ import './elements/wallet-list'
 import { IConnectWalletController } from '@one-inch-community/models';
 import { ContextProvider } from '@lit/context';
 import { controllerContext } from './context';
+import { getMobileMatchMedia, changeMobileMatchMedia } from '@one-inch-community/ui-components/lit';
+import { ifDefined } from 'lit/directives/if-defined.js';
 
 @customElement(WalletManageElement.tagName)
 export class WalletManageElement extends LitElement {
@@ -15,7 +17,13 @@ export class WalletManageElement extends LitElement {
 
   @property({ type: Object, attribute: false }) controller?: IConnectWalletController
 
+  private readonly mobileMedia = getMobileMatchMedia()
+
   private readonly context = new ContextProvider(this, { context: controllerContext })
+
+  protected override firstUpdated() {
+    changeMobileMatchMedia(this)
+  }
 
   protected override render() {
     if (!this.controller) {
@@ -25,8 +33,9 @@ export class WalletManageElement extends LitElement {
       this.context.setValue(this.controller)
     }
     const headerText = this.controller.isConnected ? 'Wallet management' : 'Connect wallet'
+
     return html`
-      <inch-card>
+      <inch-card forMobileView="${ifDefined(this.mobileMedia.matches ? '' : undefined)}">
         <inch-card-header closeButton headerText="${headerText}"></inch-card-header>
         <inch-wallet-list></inch-wallet-list>
       </inch-card>

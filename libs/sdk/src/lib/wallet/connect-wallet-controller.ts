@@ -12,6 +12,7 @@ import {
   setActiveWallet
 } from './storage';
 import { adapterId } from './adapter-id';
+import { getInjectedProviderDetail, getInjectedProviderSupported } from './injected-provider-detail';
 
 export class WalletControllerImpl implements IConnectWalletController, IConnectWalletControllerInternal {
 
@@ -33,62 +34,16 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
   }
 
   async init(): Promise<void> {
+    await this.initWallets()
     await this.restoreChainId()
     await this.restoreWalletConnection()
     this.update$.next()
   }
 
-  getSupportedWallets() {
-    return new Promise<EIP6963ProviderInfo[]>(resolve => {
-      let skipInjectedProvider = false
-      const info: EIP6963ProviderInfo[] = []
-      fromEvent<CustomEvent<EIP6963ProviderDetail>>(window, 'eip6963:announceProvider').pipe(
-        tap((event) => {
-          skipInjectedProvider = window.ethereum === event.detail.provider
-          const id = adapterId(event.detail.info)
-          info.push(event.detail.info)
-          if (!this.adapters.has(id)) {
-            this.adapters.set(id, new UniversalBrowserExtensionAdapter(event.detail))
-          }
-        }),
-        debounceTime(100),
-        take(1),
-        takeUntil(timer(100)),
-        defaultIfEmpty(null),
-        tap(() => {
-          const injectedProviderDetail = getInjectedProviderDetail()
-          if (!skipInjectedProvider && injectedProviderDetail) {
-            const id = adapterId(injectedProviderDetail.info)
-            if (!this.adapters.has(id)) {
-              this.adapters.set(id, new UniversalBrowserExtensionAdapter(injectedProviderDetail))
-              info.push(injectedProviderDetail.info)
-            }
-          }
-          resolve(info.sort((info1, info2) => {
-            const id1 = adapterId(info1)
-            const id2 = adapterId(info2)
-            if (id1 === this.currentActiveAdapterId && id2 !== this.currentActiveAdapterId) {
-              return -1
-            }
-            if (id1 !== this.currentActiveAdapterId && id2 === this.currentActiveAdapterId) {
-              return 1
-            }
-            if (this.activeAdapters.has(id1) && this.activeAdapters.has(id2)) {
-              return 0
-            }
-            if (this.activeAdapters.has(id1) && !this.activeAdapters.has(id2)) {
-              return -1
-            }
-            if (!this.activeAdapters.has(id1) && this.activeAdapters.has(id2)) {
-              return 1
-            }
-
-            return 0
-          }))
-        }),
-      ).subscribe()
-      window.dispatchEvent(new Event("eip6963:requestProvider"))
-    })
+  async getSupportedWallets() {
+    const info: EIP6963ProviderInfo[] = []
+    this.adapters.forEach(adapter => info.push(adapter.data.getInfo()))
+    return info
   }
 
   async connect(info: EIP6963ProviderInfo) {
@@ -233,6 +188,36 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
     await this.setActiveAddressInner(activeWalletId, activeAddressFromStore)
   }
 
+  private initWallets() {
+    return new Promise<void>(resolve => {
+      let skipInjectedProvider = false
+      fromEvent<CustomEvent<EIP6963ProviderDetail>>(window, 'eip6963:announceProvider').pipe(
+        tap((event) => {
+          skipInjectedProvider = window.ethereum === event.detail.provider
+          const id = adapterId(event.detail.info)
+          if (!this.adapters.has(id)) {
+            this.adapters.set(id, new UniversalBrowserExtensionAdapter(event.detail))
+          }
+        }),
+        debounceTime(100),
+        take(1),
+        takeUntil(timer(100)),
+        defaultIfEmpty(null),
+        tap(async () => {
+          if (!skipInjectedProvider && getInjectedProviderSupported()) {
+            const injectedProviderDetail = await getInjectedProviderDetail()
+            const id = adapterId(injectedProviderDetail.info)
+            if (!this.adapters.has(id)) {
+              this.adapters.set(id, new UniversalBrowserExtensionAdapter(injectedProviderDetail))
+            }
+          }
+          resolve()
+        }),
+      ).subscribe()
+      window.dispatchEvent(new Event("eip6963:requestProvider"))
+    })
+  }
+
   private afterConnectWallet(connectState: boolean, id: string) {
     if (connectState) {
       this.currentActiveAdapterId = id;
@@ -252,20 +237,6 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
         adapter.disconnect().catch()
         this.activeAdapters.delete(id)
       }
-    }
-  }
-
-}
-
-function getInjectedProviderDetail(): EIP6963ProviderDetail | null {
-  if (!window.ethereum) return null;
-  return {
-    provider: window.ethereum,
-    info: {
-      walletId: 'injectedWalletId',
-      uuid: 'injectedWallet',
-      name: 'Browser wallet',
-      icon: ''
     }
   }
 }

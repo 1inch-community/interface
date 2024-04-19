@@ -116,15 +116,15 @@ export class SwapFormElement extends LitElement {
   }
 
   private async onOpenMobileSelectToken(event: CustomEvent) {
-    const close = await this.mobileOverlay.open(html`
+    const id = await this.mobileOverlay.open(html`
       <inch-card forMobileView style="width: 100%; height: 100%; display: flex;">
         <inch-select-token
           chainId="1"
           connectedWalletAddress="0x568D3086f5377e59BF2Ef77bd1051486b581b214"
-          @backCard="${() => close()}"
+          @backCard="${() => this.mobileOverlay.close(id)}"
           @selectToken="${async (event: CustomEvent) => {
             this.onSelectToken(event)
-            await close()
+            await this.mobileOverlay.close(id)
           }}"
         ></inch-select-token>
       </inch-card>

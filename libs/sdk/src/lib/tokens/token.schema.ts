@@ -20,7 +20,7 @@ const TokenPriority: Record<string, number> = {
 
 export class TokenSchema extends Dexie {
 
-  static databaseVersion = 2;
+  static databaseVersion = 3;
 
   private tokens!: Table<ITokenRecord, string>;
   private balances!: Table<IBalancesTokenRecord, string>;
@@ -132,7 +132,7 @@ export class TokenSchema extends Dexie {
         id: getId(chainId, token.address),
         address: token.address,
         decimals: token.decimals,
-        eip2612: token.eip2612,
+        eip2612: token.extensions?.eip2612 ?? false,
         name: token.name,
         symbol: token.symbol,
         tags: token.tags,

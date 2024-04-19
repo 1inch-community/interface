@@ -1,9 +1,14 @@
 import './app/app.element';
 import { themeInit, MainColors } from '@one-inch-community/ui-components/theme'
+import { connectWalletController } from './app/controllers/connect-wallet-controller';
 
-themeInit(MainColors.dark)
+Promise.all([
+  themeInit(MainColors.dark),
+  connectWalletController.init()
+])
   .then(() => {
     const main = document.createElement('app-root')
+    main.id = 'app-root'
     document.body.appendChild(main)
   })
 

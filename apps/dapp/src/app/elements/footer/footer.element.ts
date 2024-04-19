@@ -3,7 +3,9 @@ import { customElement } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { footerStyle } from './footer.style';
 import { getMobileMatchMedia, changeMobileMatchMedia } from '@one-inch-community/ui-components/lit';
+import '@one-inch-community/widgets/wallet-manage';
 import { getFooterHeight } from '../../platform/sizes';
+import { connectWalletController } from '../../controllers/connect-wallet-controller';
 
 @customElement(FooterElement.tagName)
 export class FooterElement extends LitElement {
@@ -40,7 +42,7 @@ export class FooterElement extends LitElement {
   private getMobileFooter() {
     return html`
       <div class="footer-container mobile-footer">
-        
+        <inch-connect-wallet-view .controller="${connectWalletController}"></inch-connect-wallet-view>
       </div>
     `
   }

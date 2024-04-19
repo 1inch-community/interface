@@ -8,7 +8,7 @@ export interface ITokenDto {
   decimals: number
   logoURI: string
   providers: string[]
-  eip2612: boolean
+  extensions?: { eip2612: boolean }
   isFoT: boolean
   displayedSymbol: string
   tags: string[]
