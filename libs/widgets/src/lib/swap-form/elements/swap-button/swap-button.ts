@@ -4,14 +4,14 @@ import '@one-inch-community/ui-components/button'
 import { consume } from '@lit/context';
 import { swapContext } from '../../context';
 import { ISwapContext } from '@one-inch-community/models';
-import { defer, fromEvent, map } from 'rxjs';
-import { getMobileMatchMedia, observe, subscribe } from '@one-inch-community/ui-components/lit';
+import { defer, firstValueFrom, fromEvent, map } from 'rxjs';
+import { getMobileMatchMedia, observe, subscribe, dispatchEvent } from '@one-inch-community/ui-components/lit';
 
 @customElement(SwapButton.tagName)
 export class SwapButton extends LitElement {
   static tagName = 'inch-swap-button' as const
 
-  @consume({ context: swapContext })
+  @consume({ context: swapContext, subscribe: true })
   context?: ISwapContext
 
   private readonly mobileMedia = getMobileMatchMedia()
@@ -34,10 +34,18 @@ export class SwapButton extends LitElement {
 
   protected override render() {
     return html`
-      <inch-button type="${observe(this.buttonType$, 'secondary')}" size="${this.mobileMedia.matches ? 'xl' : 'xxl'}" fullSize>
+      <inch-button @click="${() => this.onClick()}" type="${observe(this.buttonType$, 'secondary')}" size="${this.mobileMedia.matches ? 'xl' : 'xxl'}" fullSize>
         ${observe(this.buttonText$)}
       </inch-button>
     `
+  }
+
+  private async onClick() {
+    const address = await firstValueFrom(this.connectedWalletAddress$)
+    if (!address) {
+      dispatchEvent(this, 'connectWallet', null)
+      return
+    }
   }
 
   private getConnectedWalletAddress() {

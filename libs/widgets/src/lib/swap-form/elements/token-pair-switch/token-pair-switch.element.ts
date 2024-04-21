@@ -15,7 +15,7 @@ export class TokenPairSwitchElement extends LitElement {
 
   static override styles = tokenPairSwitchStyle
 
-  @consume({ context: swapContext })
+  @consume({ context: swapContext, subscribe: true })
   context?: ISwapContext
 
   private readonly isDisabled$ = defer(() => {

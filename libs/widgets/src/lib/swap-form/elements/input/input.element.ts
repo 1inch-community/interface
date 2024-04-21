@@ -27,7 +27,7 @@ export class InputElement extends LitElement {
 
   @property({ type: String, attribute: true, reflect: true }) tokenType?: 'source' | 'destination'
 
-  @consume({ context: swapContext })
+  @consume({ context: swapContext, subscribe: true })
   context?: ISwapContext
 
   private readonly token$ = defer(() => this.getTokenEventEmitter())

@@ -42,34 +42,26 @@ export class SwapFromElement extends LitElement {
 
   readonly context = new ContextProvider(this, { context: swapContext })
 
-  override connectedCallback() {
-    super.connectedCallback();
-    const { srcToken, dstToken, connectedWalletAddress, chainId } = this
-    if (!chainId) throw new Error('swap form required chain id')
-    const context = new SwapContext()
-    context.setChainId(chainId)
-    context.setPair({
-      srcToken: srcToken ?? undefined,
-      dstToken: dstToken ?? undefined,
-    })
-    context.setConnectedWalletAddress(connectedWalletAddress as Address | undefined)
-    context.init()
-    this.context.setValue(context)
-  }
-
   protected override updated(changedProperties: PropertyValues) {
-    const context =   this.context.value
+    const context =   this.getContext()
+    let isDirty = false
     if (changedProperties.has('chainId') && this.chainId) {
       context.setChainId(this.chainId)
+      isDirty = true
     }
     if (changedProperties.has('srcToken') || changedProperties.has('dstToken')) {
       context.setPair({
         srcToken: this.srcToken ?? undefined,
         dstToken: this.dstToken ?? undefined,
       })
+      isDirty = true
     }
     if (changedProperties.has('connectedWalletAddress')) {
       context.setConnectedWalletAddress(this.connectedWalletAddress as Address | undefined)
+      isDirty = true
+    }
+    if (isDirty) {
+      this.requestUpdate()
     }
   }
 
@@ -108,6 +100,21 @@ export class SwapFromElement extends LitElement {
         ${form}
       </inch-card>
     `
+  }
+
+  private getContext() {
+    if (!this.context.value) {
+      const context = new SwapContext()
+      this.chainId && context.setChainId(this.chainId)
+      context.setPair({
+        srcToken: this.srcToken ?? undefined,
+        dstToken: this.dstToken ?? undefined,
+      })
+      this.connectedWalletAddress && context.setConnectedWalletAddress(this.connectedWalletAddress as Address | undefined)
+      this.context.setValue(context);
+      context.init()
+    }
+    return this.context.value
   }
 }
 

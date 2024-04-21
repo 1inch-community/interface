@@ -43,7 +43,27 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
   async getSupportedWallets() {
     const info: EIP6963ProviderInfo[] = []
     this.adapters.forEach(adapter => info.push(adapter.data.getInfo()))
-    return info
+    return info.sort((info1, info2) => {
+      const id1 = adapterId(info1)
+      const id2 = adapterId(info2)
+      if (id1 === this.currentActiveAdapterId && id2 !== this.currentActiveAdapterId) {
+        return -1
+      }
+      if (id1 !== this.currentActiveAdapterId && id2 === this.currentActiveAdapterId) {
+        return 1
+      }
+      if (this.activeAdapters.has(id1) && this.activeAdapters.has(id2)) {
+        return 0
+      }
+      if (this.activeAdapters.has(id1) && !this.activeAdapters.has(id2)) {
+        return -1
+      }
+      if (!this.activeAdapters.has(id1) && this.activeAdapters.has(id2)) {
+        return 1
+      }
+
+      return 0
+    })
   }
 
   async connect(info: EIP6963ProviderInfo) {
@@ -123,11 +143,15 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
     if (!adapter) {
       throw new Error(`Invalid wallet id`)
     }
+    console.log('[ios debug]', 'start connect')
     let connectState: boolean
     if (!this.activeAdapters.has(walletId) || retry) {
+      console.log('[ios debug]', 'adapter has')
       try {
         connectState = await adapter.connect(chainId);
+        console.log('[ios debug]', 'connect complete', connectState)
       } catch (error) {
+        console.log('[ios debug]', 'connect error', error)
         connectState = false
       }
       connectState && this.activeAdapters.set(walletId, adapter)
@@ -193,7 +217,7 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
       let skipInjectedProvider = false
       fromEvent<CustomEvent<EIP6963ProviderDetail>>(window, 'eip6963:announceProvider').pipe(
         tap((event) => {
-          skipInjectedProvider = window.ethereum === event.detail.provider
+          skipInjectedProvider = isEqualsProviders(window.ethereum, event.detail.provider)
           const id = adapterId(event.detail.info)
           if (!this.adapters.has(id)) {
             this.adapters.set(id, new UniversalBrowserExtensionAdapter(event.detail))
@@ -239,6 +263,19 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
       }
     }
   }
+}
+
+function isEqualsProviders(provider1: any, provider2: any): boolean {
+  if (provider1 === provider2) return true
+  const keys1 = Object.keys(provider1)
+  const keys2 = Object.keys(provider2)
+  if (keys1.length !== keys2.length) return false;
+  for (const key of keys1) {
+    if (provider1[key] !== provider2[key]) {
+      return false;
+    }
+  }
+  return true
 }
 
 export function createConnectWalletController(): IConnectWalletController {

@@ -23,7 +23,7 @@ export class OverlayController implements IOverlayController {
       target: HTMLElement | 'center'
     ) {
         this.mobileOverlay = new OverlayMobileController(rootNodeName)
-        this.desktopOverlay = new OverlayDesktopController(target)
+        this.desktopOverlay = new OverlayDesktopController(target, rootNodeName)
     }
 
     async open(openTarget: TemplateResult | HTMLElement): Promise<number> {

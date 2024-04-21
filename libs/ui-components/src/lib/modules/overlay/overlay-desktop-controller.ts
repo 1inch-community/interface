@@ -16,28 +16,35 @@ export class OverlayDesktopController implements IOverlayController {
 
   private readonly container = getContainer()
 
-  constructor(private readonly target: HTMLElement | 'center') {
+  constructor(private readonly target: HTMLElement | 'center',
+              private readonly rootNodeName: string) {
   }
 
   async open(openTarget: TemplateResult | HTMLElement): Promise<number> {
     const position = await this.getPosition(openTarget)
     const overlayContainer = this.createOverlayContainer(openTarget)
-    appendStyle(overlayContainer, {
-      top: `${position[1]}px`,
-      left: `${position[0]}px`,
-    })
+    if (this.target === 'center') {
+      appendStyle(overlayContainer, {
+        top: `0px`,
+        left: `0px`,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '100%',
+        height: '100%'
+      })
+    } else {
+      appendStyle(overlayContainer, {
+        top: `${position[1]}px`,
+        left: `${position[0]}px`,
+      })
+    }
 
-    await overlayContainer.animate([
-      {clipPath: 'circle(0 at 90% 0)', opacity: 0},
-      {clipPath: `circle(100%)`, opacity: 1},
-    ],{
-      duration: 500,
-      easing: 'cubic-bezier(.2, .8, .2, 1)'
-    }).finished
+    await this.animateEnter(overlayContainer)
 
     const id = getOverlayId()
-    this.subscribeOnResize(id)
     this.activeOverlayMap.set(id, overlayContainer)
+    this.subscribe(id)
     return id
   }
 
@@ -47,15 +54,9 @@ export class OverlayDesktopController implements IOverlayController {
     }
     const overlayContainer = this.activeOverlayMap.get(overlayId)!
 
-    await overlayContainer.animate([
-      {clipPath: `circle(100%)`, opacity: 1},
-      {clipPath: 'circle(0 at 90% 0)', opacity: 0},
-    ],{
-      duration: 500,
-      easing: 'cubic-bezier(.2, .8, .2, 1)'
-    }).finished
+    await this.animateLeave(overlayContainer)
 
-    this.unsubscribeOnResize(overlayId)
+    this.unsubscribe(overlayId)
     overlayContainer.remove();
     this.activeOverlayMap.delete(overlayId)
   }
@@ -100,15 +101,26 @@ export class OverlayDesktopController implements IOverlayController {
     return overlayContainer
   }
 
-  private subscribeOnResize(overlayId: number) {
-    if (this.target === 'center') return;
-    const subscription = fromEvent(window, 'resize').pipe(
-      tap(() => this.updatePosition(overlayId))
-    ).subscribe()
+  private subscribe(overlayId: number) {
+    const subscription = new Subscription()
+    if (this.target === 'center') {
+      const overlayContainer = this.activeOverlayMap.get(overlayId)
+      if (!overlayContainer) return;
+      subscription.add(
+        fromEvent(overlayContainer, 'click').subscribe((event) => {
+          if (event.target !== overlayContainer) return
+          this.updatePosition(overlayId)
+        })
+      )
+      return
+    }
+    subscription.add(
+      fromEvent(window, 'resize').subscribe(() => this.updatePosition(overlayId))
+    )
     this.subscriptions.set(overlayId, subscription)
   }
 
-  private unsubscribeOnResize(overlayId: number) {
+  private unsubscribe(overlayId: number) {
     if (!this.subscriptions.has(overlayId)) return
     const subscription = this.subscriptions.get(overlayId)!
     if (subscription.closed) return;
@@ -116,9 +128,69 @@ export class OverlayDesktopController implements IOverlayController {
   }
 
   private updatePosition(overlayId: number) {
-    if (!this.subscriptions.has(overlayId)) return
-    if (this.target === 'center') return;
     this.close(overlayId).catch()
+  }
+
+  private async animateEnter(overlayContainer: HTMLElement) {
+    const options = {
+      duration: 500,
+      easing: 'cubic-bezier(.2, .8, .2, 1)'
+    }
+    if (this.target === 'center') {
+      const rootNode = document.querySelector(this.rootNodeName) as HTMLElement
+      await Promise.all([
+        rootNode.animate([
+          {filter: 'blur(0)'},
+          {filter: 'blur(3px)'},
+        ], options),
+        overlayContainer.animate([
+          {transform: 'scale(.3)', opacity: 0.3},
+          {transform: 'scale(1)', opacity: 1},
+        ], options).finished
+      ])
+      appendStyle(rootNode, {
+        filter: 'blur(3px)'
+      })
+      return
+    }
+
+
+    await overlayContainer.animate([
+      {clipPath: 'circle(0 at 90% 0)', opacity: 0.3},
+      {clipPath: `circle(100%)`, opacity: 1},
+    ], options).finished
+  }
+
+  private async animateLeave(overlayContainer: HTMLElement) {
+    const options = {
+      duration: 500,
+      easing: 'cubic-bezier(.2, .8, .2, 1)'
+    }
+    if (this.target === 'center') {
+      const rootNode = document.querySelector(this.rootNodeName) as HTMLElement
+      await Promise.all([
+        rootNode.animate([
+          {filter: 'blur(3px)'},
+          {filter: 'blur(0)'},
+        ], options),
+        overlayContainer.animate([
+          {transform: 'scale(1)', opacity: 1},
+          {transform: 'scale(0)', opacity: 0},
+        ], {
+          ...options,
+          duration: 300,
+        }).finished
+      ])
+      appendStyle(rootNode, {
+        filter: ''
+      })
+      return
+    }
+
+    await overlayContainer.animate([
+      {clipPath: `circle(100%)`, opacity: 1},
+      {clipPath: 'circle(0 at 90% 0)', opacity: 0.3},
+    ],options).finished
   }
 
 }

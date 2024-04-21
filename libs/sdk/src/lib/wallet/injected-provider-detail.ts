@@ -11,16 +11,27 @@ export async function getInjectedProviderDetail(): Promise<EIP6963ProviderDetail
     info: {
       walletId: 'injectedWalletId',
       uuid: 'injectedWallet',
-      name: 'Browser wallet',
+      name: getName(),
       icon: await getIcon()
     }
   }
 }
 
 const icons = {
-  default: () => import('./injected-wallet-icons/default-icon').then(m => m.icon)
+  default: () => import('./injected-wallet-icons/default-icon').then(m => m.icon),
+  oneInchWallet: () => import('./injected-wallet-icons/one-inch-wallet-icon').then(m => m.icon)
 }
 
 export function getIcon() {
+  if (window.ethereum?.isOneInchWallet) {
+    return icons.oneInchWallet()
+  }
   return icons.default()
+}
+
+function getName() {
+  if (window.ethereum?.isOneInchWallet) {
+    return '1inch wallet'
+  }
+  return 'Browser wallet'
 }

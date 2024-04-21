@@ -30,21 +30,19 @@ export class OverlayMobileController implements IOverlayController {
       right: '0',
       bottom: '0',
     })
+    const options = {
+      duration: 500,
+      easing: 'cubic-bezier(.2, .8, .2, 1)'
+    }
     await Promise.all([
       overlayContainer.animate([
         { transform: 'translate3d(0, 100%, 0)' },
         { transform: 'translate3d(0, 0, 0)' },
-      ], {
-        duration: 500,
-        easing: 'cubic-bezier(.2, .8, .2, 1)'
-      }).finished,
+      ], options).finished,
       rootNode.animate([
         { filter: 'blur(0)', transform: 'scale(1) translate3d(0, 0, 0)' },
         { filter: 'blur(3px)', transform: 'scale(.9) translate3d(0, -6%, 0)' },
-      ],{
-        duration: 500,
-        easing: 'cubic-bezier(.2, .8, .2, 1)'
-      }).finished
+      ], options).finished
     ])
     appendStyle(rootNode, {
       filter: 'blur(3px)',
@@ -63,22 +61,19 @@ export class OverlayMobileController implements IOverlayController {
     }
     const overlayContainer = this.activeOverlayMap.get(overlayId)!
     const rootNode = document.querySelector(this.rootNodeName) as HTMLElement
-
+    const options = {
+      duration: 500,
+      easing: 'cubic-bezier(.2, .8, .2, 1)'
+    }
     await Promise.all([
       overlayContainer.animate([
         { transform: 'translate3d(0, 0, 0)' },
         { transform: 'translate3d(0, 100%, 0)' },
-      ], {
-        duration: 500,
-        easing: 'cubic-bezier(.2, .8, .2, 1)'
-      }).finished,
+      ], options).finished,
       rootNode.animate([
         { filter: 'blur(3px)', transform: 'scale(.9) translate3d(0, -6%, 0)' },
         { filter: 'blur(0)', transform: 'scale(1) translate3d(0, 0, 0)' },
-      ],{
-        duration: 500,
-        easing: 'cubic-bezier(.2, .8, .2, 1)'
-      }).finished
+      ],options).finished
     ])
     appendStyle(rootNode, {
       filter: '',

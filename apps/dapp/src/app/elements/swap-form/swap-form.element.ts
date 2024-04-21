@@ -5,11 +5,13 @@ import '@one-inch-community/widgets/swap-form';
 import '@one-inch-community/widgets/select-token';
 import { swapFormStyle } from './swap-form.style';
 import { fromEvent, tap } from 'rxjs';
-import { changeMobileMatchMedia, getMobileMatchMedia, subscribe } from '@one-inch-community/ui-components/lit';
+import { changeMobileMatchMedia, getMobileMatchMedia, observe, subscribe } from '@one-inch-community/ui-components/lit';
 import { SceneController } from '@one-inch-community/ui-components/scene';
-import { OverlayMobileController } from '@one-inch-community/ui-components/overlay';
+import { OverlayMobileController, OverlayController } from '@one-inch-community/ui-components/overlay';
 import { ChainId, IToken } from '@one-inch-community/models';
 import { getFooterHeight, getHeaderHeight } from '../../platform/sizes';
+import { connectWalletController } from '../../controllers/connect-wallet-controller';
+import "@one-inch-community/widgets/wallet-manage"
 
 @customElement(SwapFormElement.tagName)
 export class SwapFormElement extends LitElement {
@@ -34,12 +36,17 @@ export class SwapFormElement extends LitElement {
 
   @state() private dstToken: IToken | null = null
 
+  private readonly chainId$ = connectWalletController.data.chainId$
+  private readonly activeAddress$ = connectWalletController.data.activeAddress$
+
   private readonly desktopScene = new SceneController('swapForm', {
     swapForm: { width: 556, height: 376.5 },
     selectToken: { width: 556, height: this.calculateSelectTokenHeight() }
   })
 
-  private readonly mobileOverlay = new OverlayMobileController('app-root')
+  private readonly selectTokenMobileOverlay = new OverlayMobileController('app-root')
+
+  private readonly conenctWalletOverlay = new OverlayController('app-root', 'center')
 
   connectedCallback() {
     super.connectedCallback();
@@ -62,10 +69,11 @@ export class SwapFormElement extends LitElement {
         <inch-swap-form
           withoutBackingCard
           connectedWalletAddress="0x568D3086f5377e59BF2Ef77bd1051486b581b214"
-          chainId="1"
+          chainId="${observe(this.chainId$)}"
           .srcToken="${this.srcToken}"
           .dstToken="${this.dstToken}"
           @openTokenSelector="${(event: CustomEvent) => this.onOpenMobileSelectToken(event)}"
+          @connectWallet="${() => this.onOpenConnectWalletView()}"
         ></inch-swap-form>
       </inch-card>
     `;
@@ -77,18 +85,19 @@ export class SwapFormElement extends LitElement {
         ${this.desktopScene.render({
           swapForm: () => html`
             <inch-swap-form
-              chainId="1"
-              connectedWalletAddress="0x568D3086f5377e59BF2Ef77bd1051486b581b214"
+              chainId="${observe(this.chainId$)}"
+              connectedWalletAddress="${observe(this.activeAddress$)}"
               withoutBackingCard
               .srcToken="${this.srcToken}"
               .dstToken="${this.dstToken}"
               @openTokenSelector="${(event: CustomEvent) => this.onOpenSelectToken(event)}"
+              @connectWallet="${() => this.onOpenConnectWalletView()}"
             ></inch-swap-form>
           `,
           selectToken: () => html`
             <inch-select-token
-              chainId="1"
-              connectedWalletAddress="0x568D3086f5377e59BF2Ef77bd1051486b581b214"
+              chainId="${observe(this.chainId$)}"
+              connectedWalletAddress="${observe(this.activeAddress$)}"
               @backCard="${() => this.desktopScene.back()}"
               @selectToken="${async (event: CustomEvent) => {
                 this.onSelectToken(event);
@@ -115,16 +124,25 @@ export class SwapFormElement extends LitElement {
     }
   }
 
+  private async onOpenConnectWalletView() {
+    const id = await this.conenctWalletOverlay.open(html`
+      <inch-wallet-manage
+        @closeCard="${() => this.conenctWalletOverlay.close(id)}"
+        .controller="${connectWalletController}"
+      ></inch-wallet-manage>
+    `)
+  }
+
   private async onOpenMobileSelectToken(event: CustomEvent) {
-    const id = await this.mobileOverlay.open(html`
+    const id = await this.selectTokenMobileOverlay.open(html`
       <inch-card forMobileView style="width: 100%; height: 100%; display: flex;">
         <inch-select-token
-          chainId="1"
-          connectedWalletAddress="0x568D3086f5377e59BF2Ef77bd1051486b581b214"
-          @backCard="${() => this.mobileOverlay.close(id)}"
+          chainId="${observe(this.chainId$)}"
+          connectedWalletAddress="${observe(this.activeAddress$)}"
+          @backCard="${() => this.selectTokenMobileOverlay.close(id)}"
           @selectToken="${async (event: CustomEvent) => {
             this.onSelectToken(event)
-            await this.mobileOverlay.close(id)
+            await this.selectTokenMobileOverlay.close(id)
           }}"
         ></inch-select-token>
       </inch-card>

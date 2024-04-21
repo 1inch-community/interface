@@ -12,12 +12,16 @@ export async function createClientAndSyncChain(
     provider,
     address
   )
-  await client.requestAddresses()
+  console.log('[ios debug]', 'start deep connect')
+  const addresses = await client.requestAddresses()
     .catch((error) => {
-      if (error.core === 4001 || error.message?.toLowerCase()?.includes('user reject')) throw error;
-      provider.enable();
+      if (
+        error.core === 4001
+        || error.message?.toLowerCase()?.includes('user reject')
+        || error.details === 'Cancelled') throw error;
     });
   const walletChainId: ChainId = await client.getChainId();
+  console.log('[ios debug]', 'connect complete', walletChainId, addresses)
   if (chainId !== walletChainId) {
     await client.switchChain(getChainById(chainId));
   }

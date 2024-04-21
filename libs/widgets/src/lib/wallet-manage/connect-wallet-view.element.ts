@@ -78,7 +78,6 @@ export class ConnectWalletViewElement extends LitElement {
 
   @CacheActivePromise()
   private async onOpenConnectView() {
-    debugger
     if (this.overlay.isOpen) {
       await this.overlay.close(this.overlayId ?? 0)
       this.overlayId = null
