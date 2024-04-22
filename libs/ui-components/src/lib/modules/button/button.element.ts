@@ -9,6 +9,7 @@ type ButtonType =
   | 'primary'
   | 'primary-critical'
   | 'primary-warning'
+  | 'primary-gray'
   | 'secondary'
   | 'secondary-critical'
   | 'secondary-warning'

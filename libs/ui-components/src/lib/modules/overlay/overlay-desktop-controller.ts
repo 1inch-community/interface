@@ -3,7 +3,7 @@ import { html, render, TemplateResult } from 'lit';
 import { appendStyle } from '../lit/append-style';
 import { getContainer } from './overlay-container';
 import { getOverlayId } from './overlay-id-generator';
-import { fromEvent, Subscription, tap } from 'rxjs';
+import { fromEvent, Subscription } from 'rxjs';
 
 export class OverlayDesktopController implements IOverlayController {
 
@@ -18,6 +18,10 @@ export class OverlayDesktopController implements IOverlayController {
 
   constructor(private readonly target: HTMLElement | 'center',
               private readonly rootNodeName: string) {
+  }
+
+  isOpenOverlay(overlayId: number): boolean {
+    return this.activeOverlayMap.has(overlayId)
   }
 
   async open(openTarget: TemplateResult | HTMLElement): Promise<number> {
@@ -37,6 +41,8 @@ export class OverlayDesktopController implements IOverlayController {
       appendStyle(overlayContainer, {
         top: `${position[1]}px`,
         left: `${position[0]}px`,
+        borderRadius: '32px',
+        boxShadow: '0px 1px 4px 0px rgba(0, 0, 0, 0.12), 0px 4px 12px 0px rgba(0, 0, 0, 0.12)'
       })
     }
 
@@ -94,7 +100,7 @@ export class OverlayDesktopController implements IOverlayController {
       overflow: 'hidden',
       alignItems: 'flex-end',
       width: 'fit-content',
-      height: 'fit-content',
+      height: 'fit-content'
     })
     render(html`${openTarget}`, overlayContainer)
     this.container.appendChild(overlayContainer)
@@ -103,9 +109,9 @@ export class OverlayDesktopController implements IOverlayController {
 
   private subscribe(overlayId: number) {
     const subscription = new Subscription()
+    const overlayContainer = this.activeOverlayMap.get(overlayId)
+    if (!overlayContainer) return;
     if (this.target === 'center') {
-      const overlayContainer = this.activeOverlayMap.get(overlayId)
-      if (!overlayContainer) return;
       subscription.add(
         fromEvent(overlayContainer, 'click').subscribe((event) => {
           if (event.target !== overlayContainer) return
@@ -115,7 +121,18 @@ export class OverlayDesktopController implements IOverlayController {
       return
     }
     subscription.add(
-      fromEvent(window, 'resize').subscribe(() => this.updatePosition(overlayId))
+      fromEvent(window, 'resize').subscribe(() => this.updatePosition(overlayId)),
+    )
+    subscription.add(
+      fromEvent(overlayContainer, 'click').subscribe((event) => {
+        event.stopPropagation()
+        event.preventDefault()
+      }),
+    )
+    subscription.add(
+      fromEvent(document, 'click').subscribe(() => {
+        this.updatePosition(overlayId)
+      }),
     )
     this.subscriptions.set(overlayId, subscription)
   }

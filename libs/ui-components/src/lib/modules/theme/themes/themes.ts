@@ -1,7 +1,13 @@
 export enum MainColors {
-  dark, darkBlue, light, lightBlue
+  systemSync,
+  dark,
+  darkBlue,
+  light,
+  lightBlue
 }
 
 export enum BrandColors {
-  community, orange, violet
+  community,
+  orange,
+  violet
 }

@@ -26,6 +26,13 @@ export class OverlayController implements IOverlayController {
         this.desktopOverlay = new OverlayDesktopController(target, rootNodeName)
     }
 
+    isOpenOverlay(overlayId: number): boolean {
+        if (this.mobileMedia.matches) {
+            return this.mobileOverlay.isOpenOverlay(overlayId);
+        }
+        return this.desktopOverlay.isOpenOverlay(overlayId);
+    }
+
     async open(openTarget: TemplateResult | HTMLElement): Promise<number> {
         if (this.mobileMedia.matches) {
             return await this.mobileOverlay.open(openTarget);

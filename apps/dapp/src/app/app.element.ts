@@ -31,6 +31,4 @@ export class AppElement extends LitElement {
       <inch-footer></inch-footer>
     `
   }
-
-
 }

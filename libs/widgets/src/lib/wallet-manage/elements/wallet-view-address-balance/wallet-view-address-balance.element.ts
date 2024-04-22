@@ -1,10 +1,12 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Task } from '@lit/task';
-import { formatNumber, getChainById, TokenController } from '@one-inch-community/sdk';
+import { formatNumber, getChainById, LongTimeCache, TokenController } from '@one-inch-community/sdk';
 import { ChainId } from '@one-inch-community/models';
 import { Address, formatUnits } from 'viem';
 import { walletViewAddressBalanceStyle } from './wallet-view-address-balance.style';
+
+const storage = new LongTimeCache<string, string>('inch-wallet-view-address-balance', 7)
 
 @customElement(WalletViewAddressBalanceElement.tagName)
 export class WalletViewAddressBalanceElement extends LitElement {
@@ -19,21 +21,34 @@ export class WalletViewAddressBalanceElement extends LitElement {
     async ([chainId, address]) => {
       if (!chainId || !address) throw new Error('')
       const balanceRecord = await TokenController.getTokenBalance(chainId, '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', address);
-      return formatNumber(formatUnits(BigInt(balanceRecord.amount), 18), 6)
+      const balance = formatNumber(formatUnits(BigInt(balanceRecord.amount), 18), 6)
+      storage.set([this.chainId, this.address].join(':'), balance)
+      return balance
     },
     () => [this.chainId, this.address] as const
   );
 
   protected override render() {
     return this.task.render({
-      pending: () => html`<div class="loader"></div>`,
-      error: () => html`<div class="loader"></div>`,
+      pending: () => this.getLoader(),
+      error: () => this.getLoader(),
       complete: balance => {
         if (this.chainId === undefined) throw new Error('')
         const chain = getChainById(this.chainId)
         return html`<span>${balance} ${chain.nativeCurrency.symbol}</span>`
       }
     })
+  }
+
+  private getLoader() {
+    const loader = () => html`<div class="loader"></div>`
+    if (!this.chainId || !this.address) return loader()
+    const balance = storage.get([this.chainId, this.address].join(':'))
+    const chain = getChainById(this.chainId)
+    if (balance) {
+      return html`<span>${balance} ${chain.nativeCurrency.symbol}</span>`
+    }
+    return loader()
   }
 }
 

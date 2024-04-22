@@ -3,7 +3,7 @@ import { themeInit, MainColors } from '@one-inch-community/ui-components/theme'
 import { connectWalletController } from './app/controllers/connect-wallet-controller';
 
 Promise.all([
-  themeInit(MainColors.dark),
+  themeInit(MainColors.systemSync),
   connectWalletController.init()
 ])
   .then(() => {

@@ -22,3 +22,8 @@ export function changeMobileMatchMedia(context: ReactiveControllerHost) {
     fromEvent(getMobileMatchMedia(), 'change')
   ])
 }
+
+export function getMobileMatchMediaAndSubscribe(context: ReactiveControllerHost) {
+  changeMobileMatchMedia(context)
+  return getMobileMatchMedia()
+}

@@ -19,6 +19,10 @@ export class OverlayMobileController implements IOverlayController {
   constructor(private readonly rootNodeName: string) {
   }
 
+  isOpenOverlay(overlayId: number): boolean {
+    return this.activeOverlayMap.has(overlayId)
+  }
+
   async open(openTarget: TemplateResult | HTMLElement): Promise<number> {
     const rootNode = document.querySelector(this.rootNodeName) as HTMLElement
     const overlayContainer = this.createOverlayContainer(openTarget)
@@ -93,11 +97,12 @@ export class OverlayMobileController implements IOverlayController {
 
   private createOverlayContainer(openTarget: TemplateResult | HTMLElement) {
     const overlayContainer = document.createElement('div')
+    const height = 97 * window.innerHeight / 100
     appendStyle(overlayContainer, {
       position: 'fixed',
       display: 'flex',
       width: '100vw',
-      height: '97%',
+      height: `${height}px`,
       overflow: 'hidden',
       alignItems: 'flex-end',
       bottom: '0',

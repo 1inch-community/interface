@@ -22,6 +22,7 @@ export const cardStyle = css`
         padding: 16px;
         display: flex;
         width: 100%;
+        height: 100%;
         box-sizing: border-box;
         flex-direction: column;
         gap: 8px;

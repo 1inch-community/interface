@@ -12,6 +12,10 @@ export class Logger {
     this.libName = libName
     this.isWatch = isWatch
     this.show()
+
+    setInterval(() => {
+      this.show()
+    }, 500)
   }
 
   setStatus(moduleName, statusName, isLoading) {

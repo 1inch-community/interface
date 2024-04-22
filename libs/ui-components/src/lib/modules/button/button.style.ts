@@ -117,6 +117,13 @@ export const buttonTypeStyle = css`
         --button-box-shadow-color-active: var(--color-background-bg-warning);
         --button-text-color: var(--color-core-white);
     }
+
+    .primary-gray {
+        --button-background-color: var(--color-background-bg-primary);
+        --button-background-color-hover: var(--color-background-bg-secondary);
+        --button-box-shadow-color-active: var(--color-background-bg-secondary);
+        --button-text-color: var(--color-content-content-primary);
+    }
     
     .secondary {
         --button-background-color: var(--secondary);

@@ -6,11 +6,19 @@ import { applyStyle, setThemeColor } from '../lit/dom.utils';
 let currentMainColor: MainColors
 let currentBrandColor: BrandColors
 
-const themeColors: Record<MainColors, string> = {
-  [MainColors.light]: '#f1f1f1',
-  [MainColors.lightBlue]: '#f1f1f1',
-  [MainColors.dark]: '#0e0e0e',
-  [MainColors.darkBlue]: '#0e0e0e',
+const themeColors: Record<MainColors, (() => string)> = {
+  [MainColors.systemSync]: () => getThemeColorsSystem(),
+  [MainColors.light]: () => '#f1f1f1',
+  [MainColors.lightBlue]: () => '#f1f1f1',
+  [MainColors.dark]: () => '#0e0e0e',
+  [MainColors.darkBlue]: () => '#0e0e0e',
+}
+
+function getThemeColorsSystem() {
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    return themeColors[MainColors.dark]();
+  }
+  return themeColors[MainColors.light]();
 }
 
 export async function themeChangeMainColor(mainColorName: MainColors, event?: MouseEvent) {
@@ -20,6 +28,12 @@ export async function themeChangeMainColor(mainColorName: MainColors, event?: Mo
 export async function themeChangeBrandColor(brandColorName: BrandColors, event?: MouseEvent) {
   return await themeChange(currentMainColor, brandColorName, event)
 }
+
+window.matchMedia('(prefers-color-scheme: dark)').onchange = () => {
+  if (currentMainColor !== MainColors.systemSync) return
+  return themeChange(MainColors.systemSync, currentBrandColor)
+}
+
 
 export async function themeChange(
   mainColorName: MainColors,
@@ -31,7 +45,7 @@ export async function themeChange(
     const brandColor = await brandColorMap[brandColorName]()
     applyStyle(mainColorStyleElement, mainColor)
     applyStyle(brandColorStyleElement, brandColor)
-    setThemeColor(themeColors[mainColorName])
+    setThemeColor(themeColors[mainColorName]())
     currentMainColor = mainColorName
     currentBrandColor = brandColorName
   }

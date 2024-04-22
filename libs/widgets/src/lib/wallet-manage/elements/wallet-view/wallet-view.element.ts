@@ -10,7 +10,7 @@ import { map as litMap } from 'lit/directives/map.js';
 import '@one-inch-community/ui-components/icon';
 import { appendStyle, async, subscribe } from '@one-inch-community/ui-components/lit';
 import { tap } from 'rxjs';
-import { Address, isAddressEqual } from 'viem';
+import { Address } from 'viem';
 import { consume } from '@lit/context';
 import { controllerContext } from '../../context';
 import '../wallet-view-address-balance'

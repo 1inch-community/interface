@@ -22,6 +22,9 @@ export const headerStyle = css`
     }
     
     .right-content {
+        display: flex;
+        align-items: center;
+        gap: 8px;
     }
 
 `
