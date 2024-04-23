@@ -14,12 +14,12 @@ import {
   combineLatest, tap, subscribeOn, asapScheduler, filter
 } from 'rxjs';
 import { Address, isAddressEqual, ProviderRpcError } from 'viem';
-import { getChainId, setActiveAddress, setChainId } from './storage';
+import { getChainIdFromStorage, setActiveAddress, setChainIdInStorage } from './storage';
 import { adapterId } from './adapter-id';
 
 export class GlobalDataAdapter implements IDataAdapter, IGlobalDataAdapterInternal, IGlobalDataAdapter {
 
-  private chainIdInner$ = new BehaviorSubject<ChainId>(getChainId() ?? ChainId.eth);
+  private chainIdInner$ = new BehaviorSubject<ChainId>(getChainIdFromStorage() ?? ChainId.eth);
 
   private readonly currentActiveAdapter$ = defer(() => this.dataProvider.update$).pipe(
     startWith(null),
@@ -55,7 +55,7 @@ export class GlobalDataAdapter implements IDataAdapter, IGlobalDataAdapterIntern
     this.chainIdInner$
   ]).pipe(
     switchMap(([data, chainId]) => data?.chainId$ ?? of(chainId)),
-    tap(chainId => chainId && setChainId(chainId)),
+    tap(chainId => chainId && setChainIdInStorage(chainId)),
     shareReplay({ bufferSize: 1, refCount: true })
   );
   readonly disconnect$: Observable<ProviderRpcError> = this.currentActiveAdapterData$.pipe(

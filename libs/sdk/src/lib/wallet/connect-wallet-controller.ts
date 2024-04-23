@@ -6,7 +6,7 @@ import { GlobalDataAdapter } from './global-data-adapter';
 import {
   addConnectedWallet, getActiveAddress,
   getActiveWallet,
-  getChainId,
+  getChainIdFromStorage,
   getConnectedWallet,
   removeConnectedWallet,
   setActiveWallet
@@ -184,7 +184,7 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
   }
 
   private async restoreChainId() {
-    const chainId = getChainId()
+    const chainId = getChainIdFromStorage()
     if (!chainId) return
     await this.changeChain(chainId)
   }

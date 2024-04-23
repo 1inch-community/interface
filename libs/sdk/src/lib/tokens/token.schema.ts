@@ -39,6 +39,7 @@ export class TokenSchema extends Dexie {
         'symbol',
         '*tags',
         'eip2612',
+        'logoURL',
         'isFavorite',
         'priority'
       ].join(', '),
@@ -63,6 +64,14 @@ export class TokenSchema extends Dexie {
       .toArray();
     this.tokenCache.set(recordId, records[0])
     return records[0];
+  }
+
+  getTokenBySymbol(chainId: ChainId, symbol: string) {
+    return this.tokens
+      .where('chainId')
+      .equals(chainId)
+      .filter(record => record.symbol === symbol)
+      .toArray()
   }
 
   async getTokenMap(chainId: ChainId, addresses: Address[]): Promise<Record<Address, ITokenRecord>> {
@@ -136,6 +145,7 @@ export class TokenSchema extends Dexie {
         name: token.name,
         symbol: token.symbol,
         tags: token.tags,
+        logoURL: token.logoURI,
         isFavorite: false,
         chainId,
         priority: calcTokenPriority(token)

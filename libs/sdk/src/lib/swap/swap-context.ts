@@ -11,7 +11,7 @@ import {
   Subject,
   switchMap, takeUntil, tap
 } from 'rxjs';
-import { buildDefaultTokenRageProvider } from '../tokens/token-rate';
+import { buildDefaultTokenRageProvider } from '../tokens';
 import { TokenContext } from './token-context';
 import { BigMath } from '../utils';
 
