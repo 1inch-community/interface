@@ -5,7 +5,7 @@ export const cardStyle = css`
     
     :host {
         background-color: var(--color-background-bg-primary);
-        border-radius: 32px;
+        border-radius: 24px;
         width: fit-content;
         height: fit-content;
         display: block;
@@ -19,7 +19,7 @@ export const cardStyle = css`
     }
     
     .card-content {
-        padding: 16px;
+        padding: 8px;
         display: flex;
         width: 100%;
         height: 100%;
