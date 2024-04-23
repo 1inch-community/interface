@@ -20,13 +20,17 @@ function hasChangedToken(value: IToken, oldValue: IToken): boolean {
 }
 
 function hasChangedAddress(value: Address, oldValue?: Address): boolean {
-  if (!oldValue) return true
-  return !isAddressEqual(value, oldValue)
+  try {
+    if (!oldValue || !value) return true
+    return !isAddressEqual(value, oldValue)
+  } catch {
+    return true
+  }
 }
 
 @customElement(SwapFromElement.tagName)
 export class SwapFromElement extends LitElement {
-  static tagName = 'inch-swap-form'
+  static tagName = 'inch-swap-form' as const
 
   static override styles = swapFromStyle
 

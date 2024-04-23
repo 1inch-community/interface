@@ -6,7 +6,7 @@ import { Address, formatUnits, isAddressEqual } from 'viem';
 import { ChainId, IBalancesTokenRecord, ISelectTokenContext, ITokenRecord } from '@one-inch-community/models';
 import { Task } from '@lit/task';
 import { formatNumber, getBlockEmitter, TokenController } from '@one-inch-community/sdk';
-import '@one-inch-community/ui-components/token-icon';
+import '@one-inch-community/widgets/token-icon';
 import '@one-inch-community/ui-components/icon';
 import '../token-list-stub-item';
 import { asyncTimeout } from '@one-inch-community/ui-components/async';
@@ -90,8 +90,11 @@ export class TokenListItemElement extends LitElement {
     `;
   }
 
-  private getTokenView(token: ITokenRecord, balance: IBalancesTokenRecord | null, balanceUsd: number | null) {
-    this.isFavorite = token.isFavorite;
+  private getTokenView(token: ITokenRecord | undefined, balance: IBalancesTokenRecord | null, balanceUsd: number | null) {
+    if (!token) {
+      return html``
+    }
+    this.isFavorite = token.isFavorite ?? false;
     let balanceFormat = '0';
     if (balance) {
       balanceFormat = formatNumber(formatUnits(BigInt(balance.amount), token.decimals), 6);

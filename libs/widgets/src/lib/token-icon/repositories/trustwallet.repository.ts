@@ -4,16 +4,16 @@ import { getAddress } from 'viem/utils';
 
 const chainName: Record<ChainId, string> = {
     [ChainId.eth]: 'ethereum',
-    [ChainId.bnb]: '',
-    [ChainId.matic]: '',
-    [ChainId.op]: '',
-    [ChainId.arbitrum]: '',
+    [ChainId.bnb]: 'binance',
+    [ChainId.matic]: 'polygon',
+    [ChainId.op]: 'optimism',
+    [ChainId.arbitrum]: 'arbitrum',
     [ChainId.gnosis]: '',
-    [ChainId.avalanche]: '',
-    [ChainId.fantom]: '',
-    [ChainId.aurora]: '',
+    [ChainId.avalanche]: 'avalanchec',
+    [ChainId.fantom]: 'fantom',
+    [ChainId.aurora]: 'aurora',
     [ChainId.klaytn]: '',
-    [ChainId.zkSyncEra]: '',
+    [ChainId.zkSyncEra]: 'zksync',
 }
 
 export const trustWalletRepository: Repository = ({ address, chainId }) => {

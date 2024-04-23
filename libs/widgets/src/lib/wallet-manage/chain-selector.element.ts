@@ -10,8 +10,6 @@ import { when } from 'lit/directives/when.js';
 import { OverlayController } from '@one-inch-community/ui-components/overlay';
 import { isL2Chain } from '@one-inch-community/sdk';
 import './elements/chain-selector-list'
-import { ContextProvider } from '@lit/context';
-import { controllerContext } from './context';
 
 type ChainViewInfo = {
   name: string
@@ -38,7 +36,7 @@ const chainViewConfig: Record<ChainId, ChainViewInfo> = {
 };
 
 const chainList: ChainViewFull[] = Object.keys(chainViewConfig)
-  .map((chainId) => ({ ...(chainViewConfig as any)[chainId], chainId }))
+  .map((chainId) => ({ ...(chainViewConfig as any)[chainId], chainId: Number(chainId) }))
   .sort((info1: ChainViewFull, info2: ChainViewFull) => {
     if (info1.chainId == ChainId.eth) return -1;
     if (info2.chainId == ChainId.eth) return 1;

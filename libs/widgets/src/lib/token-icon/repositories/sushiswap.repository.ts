@@ -7,6 +7,6 @@ export const sushiSwapRepository: Repository = ({ address, chainId }) => {
         const img = new Image();
         img.onload = () => resolve(img);
         img.onerror = reject;
-        img.src = `https://cdn.sushi.com/image/upload/f_auto,c_limit,w_96/d_unknown.png/tokens/${chainId}/${getAddress(address.toLowerCase())}.jpg`;
+        img.src = `https://cdn.sushi.com/image/upload/f_auto,c_limit,w_64/d_unknown.png/tokens/${chainId}/${getAddress(address.toLowerCase())}.jpg`;
     });
 };

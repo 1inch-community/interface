@@ -6,7 +6,7 @@ import { ifDefined } from 'lit/directives/if-defined.js'
 import { combineLatest, defer, filter, firstValueFrom, fromEvent, map, tap } from 'rxjs';
 import { Maskito } from '@maskito/core';
 import { maskitoNumberOptionsGenerator } from '@maskito/kit';
-import "@one-inch-community/ui-components/token-icon"
+import "@one-inch-community/widgets/token-icon"
 import "@one-inch-community/ui-components/icon"
 import "@one-inch-community/ui-components/button"
 import { ISwapContext, IToken } from '@one-inch-community/models';

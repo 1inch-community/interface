@@ -1,4 +1,4 @@
-import { html, LitElement } from 'lit';
+import { html, LitElement, PropertyValues } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 import '@one-inch-community/ui-components/card';
@@ -29,6 +29,7 @@ export class SelectTokenElement extends LitElement {
   readonly context = new ContextProvider(this, { context: selectTokenContext })
 
   protected override render() {
+    this.initContext()
     return html`
       <inch-card-header backButton headerText="Select token"></inch-card-header>
       <inch-search-token-input></inch-search-token-input>
@@ -37,10 +38,26 @@ export class SelectTokenElement extends LitElement {
     `
   }
 
-  override connectedCallback() {
-    super.connectedCallback()
+  protected override updated(changedProperties: PropertyValues) {
+    let isDirty = false
+    const context = this.context.value
+    if (changedProperties.has('chainId') && this.chainId) {
+      context.setChainId(this.chainId)
+      isDirty = true
+    }
+    if (changedProperties.has('connectedWalletAddress')) {
+      context.setConnectedWalletAddress(this.connectedWalletAddress)
+      isDirty = true
+    }
+    if (isDirty) {
+      this.requestUpdate()
+    }
+  }
+
+  private initContext() {
+    if (this.context.value) return
     const { chainId, connectedWalletAddress } = this
-    if (!chainId || !connectedWalletAddress) throw new Error('')
+    if (!chainId) throw new Error('')
     const context = new SelectTokenContext()
     context.setChainId(chainId)
     context.setConnectedWalletAddress(connectedWalletAddress)

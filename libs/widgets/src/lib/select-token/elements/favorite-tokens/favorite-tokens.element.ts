@@ -5,7 +5,7 @@ import { consume } from '@lit/context';
 import { selectTokenContext } from '../../context';
 import { ISelectTokenContext, ITokenRecord } from '@one-inch-community/models';
 import '@one-inch-community/ui-components/button';
-import '@one-inch-community/ui-components/token-icon';
+import '@one-inch-community/widgets/token-icon';
 import '@one-inch-community/ui-components/icon';
 import { favoriteTokensStyles } from './favorite-tokens.styles';
 import { BehaviorSubject, combineLatest, defer, map, shareReplay, startWith, switchMap, tap } from 'rxjs';

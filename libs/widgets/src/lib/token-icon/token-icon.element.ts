@@ -4,7 +4,8 @@ import { Task } from '@lit/task';
 import type { Address } from 'viem';
 import { repositories } from './repositories';
 import { RepositoryPayload } from './repositories/repository.model';
-import { ChainId } from '@one-inch-community/models';
+import { ChainId, IToken } from '@one-inch-community/models';
+import { getWrapperNativeToken, isNativeToken, TokenController } from '@one-inch-community/sdk';
 
 @customElement(TokenIconElement.tagName)
 export class TokenIconElement extends LitElement {
@@ -64,7 +65,9 @@ export class TokenIconElement extends LitElement {
   @property({ type: Number, attribute: true }) size = 24
 
   private readonly task = new Task(this, {
-    task: ([symbol, address, chainId], { signal }) => iconLoader(signal, chainId, symbol, address),
+    task: ([symbol, address, chainId], { signal }) => {
+      return iconLoader(signal, chainId, symbol, address)
+    },
     args: () => [this.symbol, this.address, this.chainId] as [string | undefined, Address | undefined, number | undefined]
   })
 
@@ -98,20 +101,59 @@ function symbolView(size: number, symbol?: string, showLoader?: boolean) {
   `;
 }
 
-function iconLoader(signal: AbortSignal, chainId?: ChainId, symbol?: string, address?: Address) {
-  return recursiveLoader({ chainId, symbol, address, signal });
+async function iconLoader(signal: AbortSignal, chainId?: ChainId, symbol?: string, address?: Address): Promise<HTMLImageElement> {
+  let result = await loadFromDatabase({ chainId, symbol, address, signal });
+  if (result === null) {
+    result = await loadFromRepository({ chainId, symbol, address, signal });
+  }
+  if (result === null) {
+    result = await loadIconFromMultiChain({ chainId, symbol, address, signal })
+  }
+  if (result === null) {
+    throw new Error('token icon not fount');
+  }
+  return result
 }
 
-async function recursiveLoader(data: RepositoryPayload, index = 0) {
+async function loadFromDatabase(data: RepositoryPayload): Promise<HTMLImageElement | null> {
+  if (!data.chainId || !data.address) {
+    return null
+  }
+  const token = await TokenController.getToken(data.chainId, data.address)
+  if (!token.logoURL) {
+    return null
+  }
+  return await new Promise((resolve) => {
+    const img = new Image();
+    img.onerror = () => resolve(null)
+    img.onload = () => resolve(img)
+    img.src = token.logoURL
+  })
+}
+
+async function loadFromRepository(data: RepositoryPayload, index = 0): Promise<HTMLImageElement | null> {
   const repositoryLoader = repositories[index];
-  if (!repositoryLoader) throw new Error('token icon not fount');
+  if (!repositoryLoader) return null;
   try {
     const repository = await repositoryLoader();
-    return await repository(data);
+    return await repository(data)
+  } catch (error) {
+    return await loadFromRepository(data, index + 1);
   }
-  catch {
-    return await recursiveLoader(data, index + 1);
+}
+
+async function loadIconFromMultiChain(data: RepositoryPayload): Promise<HTMLImageElement | null> {
+  if (data.chainId === ChainId.eth || !data.symbol) return null
+  const tokens: IToken[] = await TokenController.getTokenBySymbol(ChainId.eth, data.symbol)
+  if (data.chainId && data.address && isNativeToken(data.address)) {
+    const wrapToken = getWrapperNativeToken(data.chainId)
+    tokens.push(wrapToken)
   }
+  for (const token of tokens) {
+    const result = await loadFromRepository({ ...data, chainId: token.chainId, address: token.address })
+    if (result) return result
+  }
+  return null
 }
 
 declare global {
