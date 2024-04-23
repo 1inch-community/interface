@@ -1,6 +1,6 @@
 import { css as LitCss, CSSResult, type ReactiveControllerHost, unsafeCSS } from 'lit';
 import { subscribe } from './subscribe-reactive-controller';
-import { fromEvent } from 'rxjs';
+import { Observable, defer, fromEvent, shareReplay } from 'rxjs';
 
 const mobileMediaString = 'screen and (max-width: 600px)' as const
 const mobileMatchMedia = matchMedia(mobileMediaString)
@@ -17,10 +17,16 @@ export function mobileMediaCSS(style: CSSResult) {
   `
 }
 
+const emitter$ = defer(() => fromEvent(getMobileMatchMedia(), 'change')).pipe(
+  shareReplay({ bufferSize: 0, refCount: true }),
+)
+
 export function changeMobileMatchMedia(context: ReactiveControllerHost) {
-  subscribe(context, [
-    fromEvent(getMobileMatchMedia(), 'change')
-  ])
+  subscribe(context, [emitter$])
+}
+
+export function getMobileMatchMediaEmitter(): Observable<Event> {
+  return emitter$
 }
 
 export function getMobileMatchMediaAndSubscribe(context: ReactiveControllerHost) {

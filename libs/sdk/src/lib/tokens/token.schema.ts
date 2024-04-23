@@ -2,6 +2,7 @@ import Dexie, { Table } from 'dexie';
 import { type Address, isAddressEqual } from 'viem';
 import { IBalancesTokenRecord, ChainId, ITokenRecord, ITokenDto } from '@one-inch-community/models';
 import { QueueCache } from '../cache';
+import { nativeTokenAddress } from '../chain';
 
 const TokenPriority: Record<string, number> = {
   'native': 1000,
@@ -64,6 +65,10 @@ export class TokenSchema extends Dexie {
       .toArray();
     this.tokenCache.set(recordId, records[0])
     return records[0];
+  }
+
+  async getNativeToken(chainId: ChainId) {
+    return this.getToken(chainId, nativeTokenAddress)
   }
 
   getTokenBySymbol(chainId: ChainId, symbol: string) {

@@ -5,8 +5,8 @@ export const scrollbarStyle = css`
 
     /* width */
     ::-webkit-scrollbar {
-        width: 7px;
-        height: 7px;
+        width: 4px;
+        height: 4px;
     }
 
     /* Track */
@@ -23,13 +23,12 @@ export const scrollbarStyle = css`
     /* Handle on hover */
     ::-webkit-scrollbar-thumb:hover {
         background: var(--primary-hover);
-        width: 10px;
     }
     
     ${mobileMediaCSS(css`
         ::-webkit-scrollbar {
-            width: 3px;
-            height: 7px;
+            width: 2px;
+            height: 2px;
         }
     `)}
   

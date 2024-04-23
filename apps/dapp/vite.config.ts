@@ -33,7 +33,7 @@ export default defineConfig({
       format: {
         comments: false
       },
-      compress: true
+      compress: true,
     },
     commonjsOptions: {
       transformMixedEsModules: true,

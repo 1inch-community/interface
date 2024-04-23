@@ -29,7 +29,6 @@
       "./dist/libs/ui-components/scene",
       "./dist/libs/ui-components/segmented-control",
       "./dist/libs/ui-components/theme",
-      "./dist/libs/ui-components/token-icon",
       "./node_modules/@types"
     ],
     "plugins": [

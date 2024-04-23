@@ -75,6 +75,11 @@ class TokenControllerImpl {
     return await this.schema.getToken(chainId, address)
   }
 
+  async getNativeToken(chainId: ChainId) {
+    await this.updateTokenDatabase(chainId)
+    return await this.schema.getNativeToken(chainId)
+  }
+
   async getTokenBySymbol(chainId: ChainId, symbol: string) {
     await this.updateTokenDatabase(chainId)
     return this.schema.getTokenBySymbol(chainId, symbol)

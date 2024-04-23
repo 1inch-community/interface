@@ -14,7 +14,8 @@ export class AppElement extends LitElement {
     const router = new Router(this.shadowRoot?.querySelector('#outlet'));
     await router.setRoutes([
       {
-        path: '/', component: 'inch-swap-form-container',
+        path: '/',
+        component: 'inch-swap-form-container',
       },
     ]);
   }

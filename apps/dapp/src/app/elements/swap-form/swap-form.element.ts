@@ -1,17 +1,18 @@
 import { html, LitElement } from 'lit';
+import { filter, fromEvent, tap } from 'rxjs';
 import { customElement, state } from 'lit/decorators.js';
 import '@one-inch-community/ui-components/card';
 import '@one-inch-community/widgets/swap-form';
 import '@one-inch-community/widgets/select-token';
-import { swapFormStyle } from './swap-form.style';
-import { fromEvent, tap } from 'rxjs';
-import { changeMobileMatchMedia, getMobileMatchMedia, observe, subscribe } from '@one-inch-community/ui-components/lit';
-import { SceneController } from '@one-inch-community/ui-components/scene';
+import "@one-inch-community/widgets/wallet-manage"
+import { isTokensEqual, storage, TokenController } from '@one-inch-community/sdk';
+import { getMobileMatchMediaAndSubscribe, observe, subscribe } from '@one-inch-community/ui-components/lit';
 import { OverlayMobileController, OverlayController } from '@one-inch-community/ui-components/overlay';
+import { SceneController } from '@one-inch-community/ui-components/scene';
 import { ChainId, IToken } from '@one-inch-community/models';
+import { swapFormStyle } from './swap-form.style';
 import { getFooterHeight, getHeaderHeight } from '../../platform/sizes';
 import { connectWalletController } from '../../controllers/connect-wallet-controller';
-import "@one-inch-community/widgets/wallet-manage"
 
 @customElement(SwapFormElement.tagName)
 export class SwapFormElement extends LitElement {
@@ -22,17 +23,11 @@ export class SwapFormElement extends LitElement {
     SceneController.styles()
   ]
 
-  private mobileMedia = getMobileMatchMedia()
+  private mobileMedia = getMobileMatchMediaAndSubscribe(this)
 
   private targetSelectToken: 'source' | 'destination' | null = null
 
-  @state() private srcToken: IToken | null = {
-    address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-    symbol: 'USDT',
-    decimals: 6,
-    chainId: ChainId.eth,
-    name: 'usdt token'
-  }
+  @state() private srcToken: IToken | null = null
 
   @state() private dstToken: IToken | null = null
 
@@ -46,14 +41,25 @@ export class SwapFormElement extends LitElement {
 
   private readonly selectTokenMobileOverlay = new OverlayMobileController('app-root')
 
-  private readonly conenctWalletOverlay = new OverlayController('app-root', 'center')
+  private readonly connectWalletOverlay = new OverlayController('app-root', 'center')
 
-  connectedCallback() {
+  constructor() {
+    super();
+    this.initTokens().catch()
+  }
+
+  async connectedCallback() {
     super.connectedCallback();
-    changeMobileMatchMedia(this)
-    subscribe(this, fromEvent(window, 'resize').pipe(
-      tap(() => this.updateViewSize())
-    ), { requestUpdate: false })
+
+    subscribe(this, [
+      fromEvent(window, 'resize').pipe(
+        tap(() => this.updateViewSize())
+      ),
+      this.chainId$.pipe(
+        filter(Boolean),
+        tap((chainId) => this.syncTokens(chainId))
+      )
+    ], { requestUpdate: false })
   }
 
   protected render() {
@@ -61,6 +67,40 @@ export class SwapFormElement extends LitElement {
       return this.getMobileSwapForm()
     }
     return this.getDesktopSwapForm()
+  }
+
+  private async syncTokens(chainId: ChainId) {
+    const srcTokenSymbol = this.srcToken?.symbol
+    const dstTokenSymbol = this.dstToken?.symbol
+    if (srcTokenSymbol) {
+      const tokenList = await TokenController.getTokenBySymbol(chainId, srcTokenSymbol)
+      if (!tokenList.length) {
+        this.srcToken = await TokenController.getNativeToken(chainId)
+      } else {
+        this.srcToken = tokenList[0]
+      }
+
+    }
+    if (dstTokenSymbol) {
+      const tokenList = await TokenController.getTokenBySymbol(chainId, dstTokenSymbol)
+      this.dstToken = tokenList[0]
+    }
+  }
+
+  private async initTokens() {
+    const srcTokenSymbol: string | null = storage.get('src-token-symbol', JSON.parse)
+    const dstTokenSymbol: string | null = storage.get('dst-token-symbol', JSON.parse)
+    if (!srcTokenSymbol && !dstTokenSymbol) return
+    const chainId = await connectWalletController.data.getChainId()
+    if (!chainId) return
+    if (srcTokenSymbol) {
+      const tokenList = await TokenController.getTokenBySymbol(chainId, srcTokenSymbol)
+      this.srcToken = tokenList[0]
+    }
+    if (dstTokenSymbol) {
+      const tokenList = await TokenController.getTokenBySymbol(chainId, dstTokenSymbol)
+      this.dstToken = tokenList[0]
+    }
   }
 
   private getMobileSwapForm() {
@@ -116,18 +156,32 @@ export class SwapFormElement extends LitElement {
   }
 
   private onSelectToken(event: CustomEvent) {
+    const token: IToken = event.detail.value
     if (this.targetSelectToken === 'source') {
-      this.srcToken = event.detail.value
+      if (this.dstToken && isTokensEqual(token, this.dstToken)) {
+        this.dstToken = this.srcToken
+        storage.set('dst-token-symbol', this.dstToken?.symbol)
+      }
+      this.srcToken = token
+      storage.set('src-token-symbol', this.srcToken?.symbol)
     }
     if (this.targetSelectToken === 'destination') {
-      this.dstToken = event.detail.value
+      if (!this.dstToken && this.srcToken && isTokensEqual(token, this.srcToken)) {
+        return
+      }
+      if (this.srcToken && isTokensEqual(token, this.srcToken)) {
+        this.srcToken = this.dstToken
+        storage.set('src-token-symbol', this.srcToken?.symbol)
+      }
+      this.dstToken = token
+      storage.set('dst-token-symbol', this.dstToken?.symbol)
     }
   }
 
   private async onOpenConnectWalletView() {
-    const id = await this.conenctWalletOverlay.open(html`
+    const id = await this.connectWalletOverlay.open(html`
       <inch-wallet-manage
-        @closeCard="${() => this.conenctWalletOverlay.close(id)}"
+        @closeCard="${() => this.connectWalletOverlay.close(id)}"
         .controller="${connectWalletController}"
       ></inch-wallet-manage>
     `)
