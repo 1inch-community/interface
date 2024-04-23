@@ -6,4 +6,5 @@ export interface ITokenRecord extends IToken {
   readonly eip2612: boolean
   readonly isFavorite: boolean
   readonly priority: number
+  readonly logoURL: string
 }

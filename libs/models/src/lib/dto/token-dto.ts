@@ -7,9 +7,9 @@ export interface ITokenDto {
   address: Address
   decimals: number
   logoURI: string
-  providers: string[]
-  extensions?: { eip2612: boolean }
-  isFoT: boolean
-  displayedSymbol: string
   tags: string[]
+  isFoT?: boolean
+  displayedSymbol?: string
+  extensions?: { eip2612: boolean }
+  providers?: string[]
 }
