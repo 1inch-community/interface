@@ -1,1 +1,1 @@
-export * from './swap-form.element'
+export * from './swap-form-page.element'

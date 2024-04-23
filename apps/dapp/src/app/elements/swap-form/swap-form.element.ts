@@ -1,8 +1,9 @@
 import { html, LitElement } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import '@one-inch-community/ui-components/card';
 import '@one-inch-community/widgets/swap-form';
 import '@one-inch-community/widgets/select-token';
+import "@one-inch-community/widgets/wallet-manage"
 import { swapFormStyle } from './swap-form.style';
 import { fromEvent, tap } from 'rxjs';
 import { changeMobileMatchMedia, getMobileMatchMedia, observe, subscribe } from '@one-inch-community/ui-components/lit';
@@ -11,11 +12,12 @@ import { OverlayMobileController, OverlayController } from '@one-inch-community/
 import { ChainId, IToken } from '@one-inch-community/models';
 import { getFooterHeight, getHeaderHeight } from '../../platform/sizes';
 import { connectWalletController } from '../../controllers/connect-wallet-controller';
-import "@one-inch-community/widgets/wallet-manage"
+import { Router } from '@vaadin/router';
+
 
 @customElement(SwapFormElement.tagName)
 export class SwapFormElement extends LitElement {
-  static tagName = 'inch-swap-form-container' as const
+  static tagName = 'inch-swap-form-view' as const
 
   static styles = [
     swapFormStyle,
@@ -26,34 +28,41 @@ export class SwapFormElement extends LitElement {
 
   private targetSelectToken: 'source' | 'destination' | null = null
 
-  @state() private srcToken: IToken | null = {
-    address: '0xdac17f958d2ee523a2206206994597c13d831ec7',
-    symbol: 'USDT',
-    decimals: 6,
-    chainId: ChainId.eth,
-    name: 'usdt token'
-  }
-
-  @state() private dstToken: IToken | null = null
+  @property({ type: Number }) chainId?: number
+  @property({ type: Object }) srcToken: IToken | null = null
+  @property({ type: Object }) dstToken: IToken | null = null
 
   private readonly chainId$ = connectWalletController.data.chainId$
   private readonly activeAddress$ = connectWalletController.data.activeAddress$
 
   private readonly desktopScene = new SceneController('swapForm', {
     swapForm: { width: 556, height: 376.5 },
-    selectToken: { width: 556, height: this.calculateSelectTokenHeight() }
+    selectToken: { width: 556, height: calculateSelectTokenHeight() }
   })
 
   private readonly selectTokenMobileOverlay = new OverlayMobileController('app-root')
 
-  private readonly conenctWalletOverlay = new OverlayController('app-root', 'center')
+  private readonly connectWalletOverlay = new OverlayController('app-root', 'center')
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    console.warn('disconnectedCallback, view')
+  }
 
   connectedCallback() {
     super.connectedCallback();
+    console.warn('connectedCallback, view')
     changeMobileMatchMedia(this)
-    subscribe(this, fromEvent(window, 'resize').pipe(
-      tap(() => this.updateViewSize())
-    ), { requestUpdate: false })
+    subscribe(this, [
+      fromEvent(window, 'resize').pipe(
+        tap(() => this.updateViewSize())
+      ),
+      // this.chainId$.pipe(
+      //   distinctUntilChanged(),
+      //   filter((chainId) => chainId !== this.chainId),
+      //   tap(() => this.updateRouterPath())
+      // )
+    ], { requestUpdate: false })
   }
 
   protected render() {
@@ -102,6 +111,7 @@ export class SwapFormElement extends LitElement {
               @selectToken="${async (event: CustomEvent) => {
                 this.onSelectToken(event);
                 await this.desktopScene.back()
+                await this.updateRouterPath()
               }}"
             ></inch-select-token>
           `
@@ -125,9 +135,9 @@ export class SwapFormElement extends LitElement {
   }
 
   private async onOpenConnectWalletView() {
-    const id = await this.conenctWalletOverlay.open(html`
+    const id = await this.connectWalletOverlay.open(html`
       <inch-wallet-manage
-        @closeCard="${() => this.conenctWalletOverlay.close(id)}"
+        @closeCard="${() => this.connectWalletOverlay.close(id)}"
         .controller="${connectWalletController}"
       ></inch-wallet-manage>
     `)
@@ -143,6 +153,7 @@ export class SwapFormElement extends LitElement {
           @selectToken="${async (event: CustomEvent) => {
             this.onSelectToken(event)
             await this.selectTokenMobileOverlay.close(id)
+            await this.updateRouterPath()
           }}"
         ></inch-select-token>
       </inch-card>
@@ -152,27 +163,46 @@ export class SwapFormElement extends LitElement {
 
   private updateViewSize() {
     if (this.desktopScene.getCurrentSceneName() === 'swapForm') return
-    this.desktopScene.updateSceneConfig({ width: 556, height: this.calculateSelectTokenHeight() })
+    this.desktopScene.updateSceneConfig({ width: 556, height: calculateSelectTokenHeight() })
   }
 
-  private calculateSelectTokenHeight() {
-    if (window.innerHeight > 897) {
-      return 680
-    }
-    let padding = 48
-    if (this.mobileMedia.matches) {
-      padding = 24
-    }
-    const result = window.innerHeight
-      - getHeaderHeight()
-      - getFooterHeight()
-      - padding // top padding
-      - 32 // card border 16px top + 16px bottom
+  private async updateRouterPath() {
+    const chainId = await connectWalletController.data.getChainId() ?? ChainId.eth
+    const srcTokenSymbol = this.srcToken?.symbol
+    const dstTokenSymbol = this.dstToken?.symbol
+    Router.go([
+      chainId,
+      'swap',
+      srcTokenSymbol,
+      dstTokenSymbol
+    ].join('/'))
+  }
+}
 
-    if (result < 376.5) {
-      return 376.5
-    }
+function calculateSelectTokenHeight() {
+  const mobileMedia = getMobileMatchMedia()
+  if (window.innerHeight > 897) {
+    return 680
+  }
+  let padding = 48
+  if (mobileMedia.matches) {
+    padding = 24
+  }
+  const result = window.innerHeight
+    - getHeaderHeight()
+    - getFooterHeight()
+    - padding // top padding
+    - 32 // card border 16px top + 16px bottom
 
-    return result
+  if (result < 376.5) {
+    return 376.5
+  }
+
+  return result
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'inch-swap-form-view': SwapFormElement
   }
 }
