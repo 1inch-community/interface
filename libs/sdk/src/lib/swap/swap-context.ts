@@ -107,21 +107,23 @@ export class SwapContext implements ISwapContext {
 
   getTokenAmountByType(type: 'source' | 'destination'): Observable<bigint> {
     return this.getContextByTypeStream(type).pipe(
-      switchMap(context => context.amountForView$),
-      distinctUntilChanged()
+      switchMap(context => context.amountForView$)
     )
   }
 
   getTokenRawAmountByType(type: 'source' | 'destination'): Observable<bigint> {
     return this.getContextByTypeStream(type).pipe(
       switchMap(context => context.amount$),
-      distinctUntilChanged()
     )
   }
 
-  setTokenAmountByType(type: 'source' | 'destination', value: string): void;
-  setTokenAmountByType(type: 'source' | 'destination', value: bigint): void;
-  setTokenAmountByType(type: 'source' | 'destination', value: any): void {
+  setTokenAmountByType(type: 'source' | 'destination', value: string, markDirty?: boolean): void;
+  setTokenAmountByType(type: 'source' | 'destination', value: bigint, markDirty?: boolean): void;
+  setTokenAmountByType(type: 'source' | 'destination', value: any, markDirty?: boolean): void {
+    if (markDirty) {
+      this.getContextByType(type).setAmountAndMarkDirty(value)
+      return
+    }
     this.getContextByType(type).setAmount(value)
   }
 

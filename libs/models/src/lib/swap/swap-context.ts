@@ -13,8 +13,9 @@ export interface ISwapContext {
   setConnectedWalletAddress(address?: Address): void
   getTokenByType(type: 'source' | 'destination'): Observable<IToken | null>
   getTokenAmountByType(type: 'source' | 'destination'): Observable<bigint>
-  setTokenAmountByType(type: 'source' | 'destination', value: string): void
-  setTokenAmountByType(type: 'source' | 'destination', value: bigint): void
+  getTokenRawAmountByType(type: 'source' | 'destination'): Observable<bigint>
+  setTokenAmountByType(type: 'source' | 'destination', value: string, markDirty?: boolean): void
+  setTokenAmountByType(type: 'source' | 'destination', value: bigint, markDirty?: boolean): void
   destroy(): void;
 }
 

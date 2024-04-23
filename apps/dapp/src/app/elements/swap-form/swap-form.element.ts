@@ -5,7 +5,7 @@ import '@one-inch-community/ui-components/card';
 import '@one-inch-community/widgets/swap-form';
 import '@one-inch-community/widgets/select-token';
 import "@one-inch-community/widgets/wallet-manage"
-import { isTokensEqual, storage, TokenController } from '@one-inch-community/sdk';
+import { isTokensEqual, storage, TokenController, getChainById } from '@one-inch-community/sdk';
 import { getMobileMatchMediaAndSubscribe, observe, subscribe } from '@one-inch-community/ui-components/lit';
 import { OverlayMobileController, OverlayController } from '@one-inch-community/ui-components/overlay';
 import { SceneController } from '@one-inch-community/ui-components/scene';
@@ -88,11 +88,12 @@ export class SwapFormElement extends LitElement {
   }
 
   private async initTokens() {
-    const srcTokenSymbol: string | null = storage.get('src-token-symbol', JSON.parse)
-    const dstTokenSymbol: string | null = storage.get('dst-token-symbol', JSON.parse)
-    if (!srcTokenSymbol && !dstTokenSymbol) return
     const chainId = await connectWalletController.data.getChainId()
     if (!chainId) return
+    const chain = getChainById(chainId)
+    const srcTokenSymbol: string | null = storage.get('src-token-symbol', JSON.parse) ?? chain.nativeCurrency.symbol
+    const dstTokenSymbol: string | null = storage.get('dst-token-symbol', JSON.parse)
+    if (!srcTokenSymbol && !dstTokenSymbol) return
     if (srcTokenSymbol) {
       const tokenList = await TokenController.getTokenBySymbol(chainId, srcTokenSymbol)
       this.srcToken = tokenList[0]

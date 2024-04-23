@@ -1,6 +1,6 @@
 {
   "name": "one-inch-community",
-  "version": "0.0.1",
+  "version": "0.1.0-preview",
   "license": "MIT",
   "scripts": {
     "dts": "dts-bundle-generator ./libs/widgets/src/lib/select-token/public-api.ts",
