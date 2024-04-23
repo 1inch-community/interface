@@ -13,6 +13,7 @@ export const footerStyle = css`
         height: 72px;
         position: fixed;
         padding: 16px;
+        justify-content: space-between;
         border-top: 1px solid var(--color-border-border-tertiary);
     }
 
