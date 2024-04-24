@@ -1,13 +1,19 @@
 import { css } from 'lit';
 
 export const bodyStyle = css`
+    
+    html {
+        background-color: var(--color-background-bg-body);
+        position: fixed;
+        width: 100vw;
+        height: 100vh;
+    }
 
     body {
         margin: 0;
         touch-action: pan-y;
         background-color: var(--color-background-bg-body);
         box-sizing: border-box;
-        overflow: hidden;
     }
 
     ::view-transition-old(root),

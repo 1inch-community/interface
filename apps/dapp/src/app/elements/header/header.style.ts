@@ -10,6 +10,7 @@ export const headerStyle = css`
         justify-content: space-between;
         max-width: 1400px;
         margin: 0 auto;
+        background-color: var(--color-background-bg-body);
     }
     
     .mobile-header {

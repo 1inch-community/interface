@@ -16,8 +16,10 @@ const themeColors: Record<MainColors, (() => string)> = {
 
 function getThemeColorsSystem() {
   if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    if ((window as any)?.ethereum?.isOneInchIOSWallet) return themeColors[MainColors.darkBlue]();
     return themeColors[MainColors.dark]();
   }
+  if ((window as any)?.ethereum?.isOneInchIOSWallet) return themeColors[MainColors.lightBlue]();
   return themeColors[MainColors.light]();
 }
 

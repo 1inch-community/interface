@@ -10,12 +10,13 @@ export const footerStyle = css`
         position: relative;
         border-top: 1px solid var(--color-border-border-tertiary);
         padding: 0 72px;
+        background-color: var(--color-background-bg-body);
     }
     
     .mobile-footer {
         height: 72px;
         position: fixed;
-        padding: 16px;
+        padding: 16px 8px;
         justify-content: space-between;
     }
     

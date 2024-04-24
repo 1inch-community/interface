@@ -5,10 +5,10 @@
   "sourceRoot": "apps/dapp/src",
   "tags": [],
   "targets": {
-    "run:app-and-deps": {
+    "build-and-deploy": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "concurrently --kill-others \"nx run dapp:serve\" \"nx run ui-components:watch\""
+        "command": "nx run dapp:build && firebase deploy"
       }
     }
   }
