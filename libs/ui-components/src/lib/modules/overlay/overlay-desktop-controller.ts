@@ -171,7 +171,6 @@ export class OverlayDesktopController implements IOverlayController {
       return
     }
 
-
     await overlayContainer.animate([
       {clipPath: 'circle(0 at 90% 0)', opacity: 0.3},
       {clipPath: `circle(100%)`, opacity: 1},

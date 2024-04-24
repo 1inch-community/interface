@@ -63,9 +63,7 @@ export class ChainSelectorListElement extends LitElement {
   private getDesktopList() {
     return html`
       <inch-card>
-        <div class="scroll-container">
-          ${this.getList()}
-        </div>
+        ${this.getList()}
       </inch-card>
     `
   }

@@ -1,6 +1,10 @@
 import { css } from 'lit';
 
 export const chainSelectorListItemStyle = css`
+    
+    :host {
+        display: block;
+    }
 
     .container {
         display: flex;
