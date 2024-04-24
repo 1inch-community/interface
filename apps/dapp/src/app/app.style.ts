@@ -7,10 +7,12 @@ export const appStyle = css`
         display: block;
         overflow-y: auto;
         overflow-x: hidden;
+        height: 100svh;
     }
 
     .content {
-        height: calc(100svh - 65px - 72px);
+        height: calc(100svh - 72px - 72px);
+        min-height: calc(400px + 72px + 72px);
     }
     
     ${mobileMediaCSS(css`

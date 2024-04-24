@@ -8,6 +8,10 @@ export const swapFormStyle = css`
         padding-top: 48px;
         justify-content: center;
     }
+    
+    .shadow-swap-form-card {
+        box-shadow: 0 12px 24px var(--primary-50);
+    }
 
     ${mobileMediaCSS(css`
         :host {

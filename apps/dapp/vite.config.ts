@@ -29,6 +29,7 @@ export default defineConfig({
   build: {
     outDir: '../../dist/apps/dapp',
     reportCompressedSize: true,
+    sourcemap: true,
     terserOptions: {
       format: {
         comments: false

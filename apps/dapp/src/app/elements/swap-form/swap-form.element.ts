@@ -106,7 +106,7 @@ export class SwapFormElement extends LitElement {
 
   private getMobileSwapForm() {
     return html`
-      <inch-card>
+      <inch-card class="shadow-swap-form-card">
         <inch-swap-form
           withoutBackingCard
           connectedWalletAddress="0x568D3086f5377e59BF2Ef77bd1051486b581b214"
@@ -122,7 +122,7 @@ export class SwapFormElement extends LitElement {
 
   private getDesktopSwapForm() {
     return html`
-      <inch-card>
+      <inch-card class="shadow-swap-form-card">
         ${this.desktopScene.render({
           swapForm: () => html`
             <inch-swap-form

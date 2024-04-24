@@ -30,11 +30,11 @@ export class FooterElement extends LitElement {
 
   private getDesktopFooter() {
     const styles = {
-      height: getFooterHeight()
+      height: `${getFooterHeight()}px`
     }
     return html`
       <div class="footer-container" style="${styleMap(styles)}">
-        
+        <span class="power-by">© ${new Date().getFullYear()} Powered by 1inch</span>
       </div>
     `
   }

@@ -141,19 +141,22 @@
 :root {
     /* Community */
     /* colors */
-    --primary: #00a0b5;
+    --primary: #00a0b5; /* #00a0b5 */
+    --primary-50: rgb(0 160 181 / 50%);
     --primary-hover: #007e8f;
     --secondary: #00a0b51f;
     --secondary-hover: #00a0b53d;
     /* Orange */
     /* colors */
     --primary: #f79009;
+    --primary-50: rgb(247 144 9 / 50%);
     --primary-hover: #dc6803;
     --secondary: #f790091f;
     --secondary-hover: #dc68033d;
     /* Violet */
     /* colors */
     --primary: #9e77ed;
+    --primary-50: rgb(158 119 237 / 50%);
     --primary-hover: #7f56d9;
     --secondary: #9e77ed1f;
     --secondary-hover: #7f56d93d;
