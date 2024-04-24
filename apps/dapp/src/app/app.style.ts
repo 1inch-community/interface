@@ -18,6 +18,7 @@ export const appStyle = css`
     ${mobileMediaCSS(css`
         .content {
             height: calc(100svh - 56px - 72px);
+            min-height: 0;
         }
     `)}
 
