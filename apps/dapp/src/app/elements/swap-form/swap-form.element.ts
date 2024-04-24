@@ -3,7 +3,6 @@ import { filter, fromEvent, tap } from 'rxjs';
 import { customElement, state } from 'lit/decorators.js';
 import '@one-inch-community/ui-components/card';
 import '@one-inch-community/widgets/swap-form';
-import '@one-inch-community/widgets/select-token';
 import "@one-inch-community/widgets/wallet-manage"
 import { isTokensEqual, storage, TokenController, getChainById } from '@one-inch-community/sdk';
 import { getMobileMatchMediaAndSubscribe, observe, subscribe } from '@one-inch-community/ui-components/lit';
@@ -60,6 +59,8 @@ export class SwapFormElement extends LitElement {
         tap((chainId) => this.syncTokens(chainId))
       )
     ], { requestUpdate: false })
+
+    await import('@one-inch-community/widgets/select-token')
   }
 
   protected render() {

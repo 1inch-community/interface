@@ -9,7 +9,6 @@ import { defer, filter, map } from 'rxjs';
 import { when } from 'lit/directives/when.js';
 import { OverlayController } from '@one-inch-community/ui-components/overlay';
 import { isL2Chain } from '@one-inch-community/sdk';
-import './elements/chain-selector-list'
 
 type ChainViewInfo = {
   name: string
@@ -78,6 +77,11 @@ export class ChainSelectorElement extends LitElement {
       return chainViewConfig[chainId].name;
     })
   );
+
+  override connectedCallback() {
+    super.connectedCallback();
+    import('./elements/chain-selector-list')
+  }
 
   protected override render() {
     return html`
