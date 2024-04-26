@@ -1,9 +1,11 @@
+import { mobileMediaCSS } from '@one-inch-community/ui-components/lit';
 import { css } from 'lit';
 
 export const chainSelectorListItemStyle = css`
     
     :host {
-        display: block;
+        width: 100%;
+        height: 100%;
     }
 
     .container {
@@ -42,5 +44,12 @@ export const chainSelectorListItemStyle = css`
     .container:active {
         background-color: var(--color-background-bg-secondary);
     }
+
+    ${mobileMediaCSS(css`
+        .container {
+            height: 50px;
+            font-size: 16px;
+        }
+    `)}
 
 `

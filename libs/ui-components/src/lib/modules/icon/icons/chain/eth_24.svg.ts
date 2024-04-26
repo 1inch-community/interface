@@ -1,7 +1,8 @@
 import { svg } from 'lit';
+import { IconContext } from '../icon-context';
 
-export const eth24Svg = svg`
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+export const eth24Svg = ({ width, height }: IconContext) => svg`
+<svg width="${width ?? 24}" height="${height ?? 24}" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
   <g clip-path="url(#clip0_6718_21374)">
     <circle cx="12" cy="12" r="12" fill="#627EEA"/>
     <g clip-path="url(#clip1_6718_21374)">
