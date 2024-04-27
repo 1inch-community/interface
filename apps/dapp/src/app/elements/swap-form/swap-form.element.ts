@@ -1,6 +1,7 @@
 import { html, LitElement } from 'lit';
-import { filter, fromEvent, tap } from 'rxjs';
+import { combineLatest, distinctUntilChanged, filter, fromEvent, map, Subject, tap } from 'rxjs';
 import { customElement, state } from 'lit/decorators.js';
+import { ref, createRef } from 'lit/directives/ref.js';
 import '@one-inch-community/ui-components/card';
 import '@one-inch-community/widgets/swap-form';
 import "@one-inch-community/widgets/wallet-manage"
@@ -42,6 +43,9 @@ export class SwapFormElement extends LitElement {
 
   private readonly connectWalletOverlay = new OverlayController('app-root', 'center')
 
+  private readonly swapFormRef = createRef<HTMLElement>()
+  private readonly update$ = new Subject<void>()
+
   constructor() {
     super();
     this.initTokens().catch()
@@ -49,6 +53,8 @@ export class SwapFormElement extends LitElement {
 
   async connectedCallback() {
     super.connectedCallback();
+    let initialGamma: number | null = null
+    let initialBeta: number | null = null
 
     subscribe(this, [
       fromEvent(window, 'resize').pipe(
@@ -57,7 +63,48 @@ export class SwapFormElement extends LitElement {
       this.chainId$.pipe(
         filter(Boolean),
         tap((chainId) => this.syncTokens(chainId))
+      ),
+      combineLatest([
+        fromEvent<DeviceOrientationEvent>(window, 'deviceorientation'),
+        this.update$
+      ]).pipe(
+        map(([event]) => {
+          const beta = event.beta
+          const gamma = event.gamma
+          if (beta === null || gamma === null) {
+            return [ beta, gamma ]
+          }
+          const multiplier = 100
+          return [ Math.round(beta * multiplier) / multiplier, Math.round(gamma * multiplier) / multiplier ]
+        }),
+        distinctUntilChanged(([x1, y1], [x2, y2]) => x1 === x2 || y1 === y2),
+        map(([beta, gamma]) => {
+          if (initialGamma === null || initialBeta === null) {
+            initialGamma = gamma
+            initialBeta = beta
+          }
+          if (!this.swapFormRef.value) {
+            return [ 0, 12 ]
+          }
+          const gammaDiff = (gamma ?? 0) - (initialGamma ?? 0)
+          const betaDiff = (beta ?? 0) - (initialBeta ?? 0)
+
+          // if (Math.abs(betaDiff) > 70) {
+          //   initialBeta = beta
+          // }
+
+          const x = gammaDiff * 0.5
+          const y = betaDiff * 0.5
+          return [x, y] as const
+        }),
+        // distinctUntilChanged(([x1, y1], [x2, y2]) => x1 === x2 && y1 === y2),
+        tap(([x, y]) => {
+          if (!this.swapFormRef.value) return
+          this.swapFormRef.value.style.setProperty('--orientation-x', `${x}px`)
+          this.swapFormRef.value.style.setProperty('--orientation-y', `${y}px`)
+        })
       )
+
     ], { requestUpdate: false })
 
     await import('@one-inch-community/widgets/select-token')
@@ -106,8 +153,9 @@ export class SwapFormElement extends LitElement {
   }
 
   private getMobileSwapForm() {
+    requestAnimationFrame(() => this.update$.next())
     return html`
-      <inch-card class="shadow-swap-form-card">
+      <inch-card ${ref(this.swapFormRef)} class="shadow-swap-form-card">
         <inch-swap-form
           withoutBackingCard
           connectedWalletAddress="0x568D3086f5377e59BF2Ef77bd1051486b581b214"
