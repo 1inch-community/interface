@@ -73,7 +73,6 @@ export class OverlayDesktopController implements IOverlayController {
     }
     const rect = this.target.getBoundingClientRect()
     const rectContent = await this.getRect(openTarget)
-    console.log(rectContent)
     return [
       rect.right - (rectContent.width),
       rect.top + rect.height + 8
@@ -115,13 +114,17 @@ export class OverlayDesktopController implements IOverlayController {
       subscription.add(
         fromEvent(overlayContainer, 'click').subscribe((event) => {
           if (event.target !== overlayContainer) return
-          this.updatePosition(overlayId)
+          this.close(overlayId).catch()
         })
       )
       return
     }
     subscription.add(
-      fromEvent(window, 'resize').subscribe(() => this.updatePosition(overlayId)),
+      fromEvent(window, 'resize').subscribe(() => this.close(overlayId).catch()),
+    )
+    const rootNode = document.querySelector(this.rootNodeName) as HTMLElement
+    subscription.add(
+      fromEvent(rootNode, 'scroll').subscribe(() => this.updatePosition(overlayId)),
     )
     subscription.add(
       fromEvent(overlayContainer, 'click').subscribe((event) => {
@@ -131,7 +134,7 @@ export class OverlayDesktopController implements IOverlayController {
     )
     subscription.add(
       fromEvent(document, 'click').subscribe(() => {
-        this.updatePosition(overlayId)
+        this.close(overlayId).catch()
       }),
     )
     this.subscriptions.set(overlayId, subscription)
@@ -145,7 +148,19 @@ export class OverlayDesktopController implements IOverlayController {
   }
 
   private updatePosition(overlayId: number) {
-    this.close(overlayId).catch()
+    if (this.target === 'center') return;
+    if (!this.activeOverlayMap.has(overlayId)) {
+      return
+    }
+    const overlayContainer = this.activeOverlayMap.get(overlayId)!
+    const rect = this.target.getBoundingClientRect()
+    const rectContent = overlayContainer.getBoundingClientRect()
+    const top = rect.top + rect.height + 8
+    const left = rect.right - (rectContent.width)
+    appendStyle(overlayContainer, {
+      top: `${top}px`,
+      left: `${left}px`,
+    })
   }
 
   private async animateEnter(overlayContainer: HTMLElement) {

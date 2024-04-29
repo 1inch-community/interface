@@ -157,7 +157,7 @@ export class TokenSchema extends Dexie {
       });
     }
     this.tokenCache.clear()
-    await this.tokens.bulkAdd(tableTokens);
+    await this.tokens.bulkPut(tableTokens);
   }
 
   async setBalances(chainId: ChainId, walletAddress: Address, balances: Record<Address, string>) {
