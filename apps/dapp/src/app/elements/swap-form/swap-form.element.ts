@@ -1,5 +1,5 @@
 import { html, LitElement } from 'lit';
-import { combineLatest, distinctUntilChanged, filter, fromEvent, map, Subject, tap } from 'rxjs';
+import { distinctUntilChanged, filter, fromEvent, map, Subject, tap } from 'rxjs';
 import { customElement, state } from 'lit/decorators.js';
 import { ref, createRef } from 'lit/directives/ref.js';
 import '@one-inch-community/ui-components/card';
@@ -53,8 +53,8 @@ export class SwapFormElement extends LitElement {
 
   async connectedCallback() {
     super.connectedCallback();
-    let initialGamma: number | null = null
-    let initialBeta: number | null = null
+    // let initialGamma: number | null = null
+    // let initialBeta: number | null = null
 
     subscribe(this, [
       fromEvent(window, 'resize').pipe(
@@ -64,46 +64,61 @@ export class SwapFormElement extends LitElement {
         filter(Boolean),
         tap((chainId) => this.syncTokens(chainId))
       ),
-      combineLatest([
-        fromEvent<DeviceOrientationEvent>(window, 'deviceorientation'),
-        this.update$
-      ]).pipe(
-        map(([event]) => {
-          const beta = event.beta
-          const gamma = event.gamma
-          if (beta === null || gamma === null) {
-            return [ beta, gamma ]
-          }
-          const multiplier = 100
-          return [ Math.round(beta * multiplier) / multiplier, Math.round(gamma * multiplier) / multiplier ]
+      fromEvent<MouseEvent>(window, 'mousemove').pipe(
+        map((event) => {
+          return [ event.clientX, event.clientY ]
         }),
         distinctUntilChanged(([x1, y1], [x2, y2]) => x1 === x2 || y1 === y2),
-        map(([beta, gamma]) => {
-          if (initialGamma === null || initialBeta === null) {
-            initialGamma = gamma
-            initialBeta = beta
-          }
-          if (!this.swapFormRef.value) {
-            return [ 0, 12 ]
-          }
-          const gammaDiff = (gamma ?? 0) - (initialGamma ?? 0)
-          const betaDiff = (beta ?? 0) - (initialBeta ?? 0)
-
-          // if (Math.abs(betaDiff) > 70) {
-          //   initialBeta = beta
-          // }
-
-          const x = gammaDiff * 0.5
-          const y = betaDiff * 0.5
-          return [x, y] as const
-        }),
-        // distinctUntilChanged(([x1, y1], [x2, y2]) => x1 === x2 && y1 === y2),
-        tap(([x, y]) => {
+        tap(([ clientX, clientY ]) => {
           if (!this.swapFormRef.value) return
-          this.swapFormRef.value.style.setProperty('--orientation-x', `${x}px`)
-          this.swapFormRef.value.style.setProperty('--orientation-y', `${y}px`)
+          const rect = this.swapFormRef.value.getBoundingClientRect()
+          const x = clientX - rect.left - rect.width / 2;
+          const y = clientY - rect.top - rect.height / 2;
+          this.swapFormRef.value.style.setProperty('--orientation-x', `${x * 0.03}px`)
+          this.swapFormRef.value.style.setProperty('--orientation-y', `${y * 0.03}px`)
         })
-      )
+      ),
+      // Parallax for mobile
+      // combineLatest([
+      //   fromEvent<DeviceOrientationEvent>(window, 'deviceorientation'),
+      //   this.update$
+      // ]).pipe(
+      //   map(([event]) => {
+      //     const beta = event.beta
+      //     const gamma = event.gamma
+      //     if (beta === null || gamma === null) {
+      //       return [ beta, gamma ]
+      //     }
+      //     const multiplier = 100
+      //     return [ Math.round(beta * multiplier) / multiplier, Math.round(gamma * multiplier) / multiplier ]
+      //   }),
+      //   distinctUntilChanged(([x1, y1], [x2, y2]) => x1 === x2 || y1 === y2),
+      //   map(([beta, gamma]) => {
+      //     if (initialGamma === null || initialBeta === null) {
+      //       initialGamma = gamma
+      //       initialBeta = beta
+      //     }
+      //     if (!this.swapFormRef.value) {
+      //       return [ 0, 12 ]
+      //     }
+      //     const gammaDiff = (gamma ?? 0) - (initialGamma ?? 0)
+      //     const betaDiff = (beta ?? 0) - (initialBeta ?? 0)
+      //
+      //     // if (Math.abs(betaDiff) > 70) {
+      //     //   initialBeta = beta
+      //     // }
+      //
+      //     const x = gammaDiff * 0.5
+      //     const y = betaDiff * 0.5
+      //     return [x, y] as const
+      //   }),
+      //   // distinctUntilChanged(([x1, y1], [x2, y2]) => x1 === x2 && y1 === y2),
+      //   tap(([x, y]) => {
+      //     if (!this.swapFormRef.value) return
+      //     this.swapFormRef.value.style.setProperty('--orientation-x', `${x}px`)
+      //     this.swapFormRef.value.style.setProperty('--orientation-y', `${y}px`)
+      //   })
+      // )
 
     ], { requestUpdate: false })
 
@@ -171,7 +186,7 @@ export class SwapFormElement extends LitElement {
 
   private getDesktopSwapForm() {
     return html`
-      <inch-card class="shadow-swap-form-card">
+      <inch-card ${ref(this.swapFormRef)} class="shadow-swap-form-card">
         ${this.desktopScene.render({
           swapForm: () => html`
             <inch-swap-form

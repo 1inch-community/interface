@@ -11,7 +11,6 @@ export const swapFormStyle = css`
     
     .shadow-swap-form-card {
         box-shadow: var(--orientation-x, 0) var(--orientation-y, 12px) 50px var(--primary-50);
-        transition: box-shadow .03s;
     }
 
     ${mobileMediaCSS(css`
