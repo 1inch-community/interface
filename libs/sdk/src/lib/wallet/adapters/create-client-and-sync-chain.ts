@@ -12,7 +12,6 @@ export async function createClientAndSyncChain(
     provider,
     address
   )
-  console.log('[ios debug]', 'start deep connect')
   const addresses = await client.requestAddresses()
     .catch((error) => {
       if (
@@ -21,7 +20,6 @@ export async function createClientAndSyncChain(
         || error.details === 'Cancelled') throw error;
     });
   const walletChainId: ChainId = await client.getChainId();
-  console.log('[ios debug]', 'connect complete', walletChainId, addresses)
   if (chainId !== walletChainId) {
     await client.switchChain(getChainById(chainId));
   }

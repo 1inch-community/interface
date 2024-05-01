@@ -143,15 +143,11 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
     if (!adapter) {
       throw new Error(`Invalid wallet id`)
     }
-    console.log('[ios debug]', 'start connect')
     let connectState: boolean
     if (!this.activeAdapters.has(walletId) || retry) {
-      console.log('[ios debug]', 'adapter has')
       try {
         connectState = await adapter.connect(chainId);
-        console.log('[ios debug]', 'connect complete', connectState)
       } catch (error) {
-        console.log('[ios debug]', 'connect error', error)
         connectState = false
       }
       connectState && this.activeAdapters.set(walletId, adapter)

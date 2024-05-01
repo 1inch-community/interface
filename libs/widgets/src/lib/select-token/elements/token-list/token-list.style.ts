@@ -1,12 +1,21 @@
+import { mobileMediaCSS } from '@one-inch-community/ui-components/lit';
 import { css } from 'lit';
 
 export const tokenListStyle = css`
 
     :host {
-        height: 100%;
+        height: 50vh;
         width: 100%;
         position: relative;
     }
+    
+    ${mobileMediaCSS(css`
+        :host {
+            height: 100%;
+            width: 100%;
+            position: relative;
+        }
+    `)}
     
     .list-container {
         position: absolute;

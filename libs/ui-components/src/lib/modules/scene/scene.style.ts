@@ -26,19 +26,15 @@ export const sceneStyle = (config?: Partial<StyleConfig>) => {
           min-width: 50px;
           position: relative;
           overflow: hidden;
-          transition: height var(--animation-time-container), width var(--animation-time-container);
           border-radius: 16px;
-      }
-
-      .scene-container-animation {
-          will-change: height, width;
       }
 
       .scene-wrapper {
           background-color: ${unsafeCSS(_config.sceneBackgroundColor)};
           padding: 1px;
+          box-sizing: border-box;
           display: block;
-          height: 100%;
+          height: fit-content;
           will-change: transform
       }
   `

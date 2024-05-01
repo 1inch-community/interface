@@ -102,7 +102,6 @@ export class WidgetsPage extends LitElement {
             <inch-swap-form
               chainId="1"
               connectedWalletAddress="0x568D3086f5377e59BF2Ef77bd1051486b581b214"
-              withoutBackingCard
               .srcToken="${this.srcToken}"
               .dstToken="${this.dstToken}"
               @openTokenSelector="${() => this.onOpenSelectToken()}"

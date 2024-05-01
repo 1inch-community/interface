@@ -1,6 +1,7 @@
 import { html, LitElement } from 'lit';
-import { filter, fromEvent, tap } from 'rxjs';
+import { filter, tap } from 'rxjs';
 import { customElement, state } from 'lit/decorators.js';
+import { createRef, ref } from 'lit/directives/ref.js';
 import '@one-inch-community/ui-components/card';
 import '@one-inch-community/widgets/swap-form';
 import "@one-inch-community/widgets/wallet-manage"
@@ -33,9 +34,11 @@ export class SwapFormElement extends LitElement {
   private readonly chainId$ = connectWalletController.data.chainId$
   private readonly activeAddress$ = connectWalletController.data.activeAddress$
 
+  private readonly swapFormRef = createRef<HTMLElement>()
+
   private readonly desktopScene = new SceneController('swapForm', {
-    swapForm: { width: 556, height: 376.5 },
-    selectToken: { width: 556, height: this.calculateSelectTokenHeight() }
+    swapForm: { minWidth: 556, minHeight: 376.5 },
+    selectToken: { minWidth: 556, minHeight: 376.5, maxHeight: 680 }
   })
 
   private readonly selectTokenMobileOverlay = new OverlayMobileController('app-root')
@@ -51,9 +54,6 @@ export class SwapFormElement extends LitElement {
     super.connectedCallback();
 
     subscribe(this, [
-      fromEvent(window, 'resize').pipe(
-        tap(() => this.updateViewSize())
-      ),
       this.chainId$.pipe(
         filter(Boolean),
         tap((chainId) => this.syncTokens(chainId))
@@ -109,7 +109,6 @@ export class SwapFormElement extends LitElement {
     return html`
       <inch-card class="shadow-swap-form-card">
         <inch-swap-form
-          withoutBackingCard
           connectedWalletAddress="0x568D3086f5377e59BF2Ef77bd1051486b581b214"
           chainId="${observe(this.chainId$)}"
           .srcToken="${this.srcToken}"
@@ -127,9 +126,9 @@ export class SwapFormElement extends LitElement {
         ${this.desktopScene.render({
           swapForm: () => html`
             <inch-swap-form
+              ${ref(this.swapFormRef)}
               chainId="${observe(this.chainId$)}"
               connectedWalletAddress="${observe(this.activeAddress$)}"
-              withoutBackingCard
               .srcToken="${this.srcToken}"
               .dstToken="${this.dstToken}"
               @openTokenSelector="${(event: CustomEvent) => this.onOpenSelectToken(event)}"
@@ -206,20 +205,13 @@ export class SwapFormElement extends LitElement {
     this.targetSelectToken = event.detail.value
   }
 
-  private updateViewSize() {
-    if (this.desktopScene.getCurrentSceneName() === 'swapForm') return
-    this.desktopScene.updateSceneConfig({ width: 556, height: this.calculateSelectTokenHeight() })
-  }
-
   private calculateSelectTokenHeight() {
-    if (window.innerHeight > 897) {
-      return 680
-    }
     let padding = 48
     if (this.mobileMedia.matches) {
       padding = 24
     }
-    const result = window.innerHeight
+    const result =
+      window.innerHeight
       - getHeaderHeight()
       - getFooterHeight()
       - padding // top padding

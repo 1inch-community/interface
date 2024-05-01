@@ -10,6 +10,7 @@ import { swapFromStyle } from './swap-from.style';
 import './elements'
 import { swapContext } from './context';
 import { SwapContext } from '@one-inch-community/sdk';
+import { when } from 'lit/directives/when.js';
 
 function hasChangedToken(value: IToken, oldValue: IToken): boolean {
   if (!oldValue) return true
@@ -33,8 +34,6 @@ export class SwapFromElement extends LitElement {
   static tagName = 'inch-swap-form' as const
 
   static override styles = swapFromStyle
-
-  @property({ type: Boolean }) withoutBackingCard = false
 
   @property({ type: Number }) chainId?: ChainId
 
@@ -71,38 +70,27 @@ export class SwapFromElement extends LitElement {
 
   protected override render() {
     if (!this.context.value) return
-    const header = html`
-      <inch-card-header headerText="Swap tokens" headerTextPosition="left">
-        <inch-button slot="right-container" type="tertiary-gray" size="m">
-          <inch-icon icon="authRefresh36"></inch-icon>
-        </inch-button>
-      </inch-card-header>
-    `
 
-    const form = html`
-      <div class="input-container">
-        <inch-swap-form-input tokenType="source"></inch-swap-form-input>
-        <inch-token-pair-switch></inch-token-pair-switch>
-        <inch-swap-form-input disabled tokenType="destination"></inch-swap-form-input>
-      </div>
-
-      <inch-swap-button></inch-swap-button>
-    `
-
-    if (this.withoutBackingCard) {
-      return html`
-        <div class="swap-form-container">
-          ${header}
-          ${form}
-        </div>
-      `
-    }
+    const isConnectWallet = !!this.connectedWalletAddress
 
     return html`
-      <inch-card>
-        ${header}
-        ${form}
-      </inch-card>
+      <div class="swap-form-container">
+        <inch-card-header headerText="Swap tokens" headerTextPosition="left">
+          <inch-button slot="right-container" type="tertiary-gray" size="m">
+            <inch-icon icon="authRefresh36"></inch-icon>
+          </inch-button>
+        </inch-card-header>
+        
+        <div class="input-container">
+          <inch-swap-form-input tokenType="source"></inch-swap-form-input>
+          <inch-token-pair-switch></inch-token-pair-switch>
+          <inch-swap-form-input disabled tokenType="destination"></inch-swap-form-input>
+        </div>
+        
+        ${when(isConnectWallet, () => html`<inch-fusion-swap-info></inch-fusion-swap-info>`)}
+
+        <inch-swap-button></inch-swap-button>
+      </div>
     `
   }
 
