@@ -31,7 +31,7 @@ export class BalanceElement extends LitElement {
   }).pipe(
     filter(([address]) => !!address),
     switchMap(([ walletAddress, token, chainId ]) => {
-      if (!walletAddress || !token) return [html`<br>`]
+      if (!walletAddress || !token || !chainId) return [html`<br>`]
       return defer(() => getBalance(chainId, walletAddress, token.address)).pipe(
         map(balance => formatNumber(formatUnits(balance, token.decimals), 6)),
         map(balance => this.getBalanceView(balance)),

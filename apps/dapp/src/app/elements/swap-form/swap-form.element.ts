@@ -8,10 +8,9 @@ import "@one-inch-community/widgets/wallet-manage"
 import { isTokensEqual, storage, TokenController, getChainById } from '@one-inch-community/sdk';
 import { getMobileMatchMediaAndSubscribe, observe, subscribe } from '@one-inch-community/ui-components/lit';
 import { OverlayMobileController, OverlayController } from '@one-inch-community/ui-components/overlay';
-import { SceneController } from '@one-inch-community/ui-components/scene';
+import { SceneController, sceneLazyValue } from '@one-inch-community/ui-components/scene';
 import { ChainId, IToken } from '@one-inch-community/models';
 import { swapFormStyle } from './swap-form.style';
-import { getFooterHeight, getHeaderHeight } from '../../platform/sizes';
 import { connectWalletController } from '../../controllers/connect-wallet-controller';
 
 @customElement(SwapFormElement.tagName)
@@ -37,7 +36,7 @@ export class SwapFormElement extends LitElement {
   private readonly swapFormRef = createRef<HTMLElement>()
 
   private readonly desktopScene = new SceneController('swapForm', {
-    swapForm: { minWidth: 556, minHeight: 376.5 },
+    swapForm: { minWidth: 556, minHeight: 376.5, lazyRender: true },
     selectToken: { minWidth: 556, minHeight: 376.5, maxHeight: 680 }
   })
 
@@ -109,10 +108,9 @@ export class SwapFormElement extends LitElement {
     return html`
       <inch-card class="shadow-swap-form-card">
         <inch-swap-form
-          connectedWalletAddress="0x568D3086f5377e59BF2Ef77bd1051486b581b214"
-          chainId="${observe(this.chainId$)}"
           .srcToken="${this.srcToken}"
           .dstToken="${this.dstToken}"
+          .walletController="${connectWalletController}"
           @openTokenSelector="${(event: CustomEvent) => this.onOpenMobileSelectToken(event)}"
           @connectWallet="${() => this.onOpenConnectWalletView()}"
         ></inch-swap-form>
@@ -125,16 +123,15 @@ export class SwapFormElement extends LitElement {
       <inch-card class="shadow-swap-form-card">
         ${this.desktopScene.render({
           swapForm: () => html`
-            <inch-swap-form
-              ${ref(this.swapFormRef)}
-              chainId="${observe(this.chainId$)}"
-              connectedWalletAddress="${observe(this.activeAddress$)}"
-              .srcToken="${this.srcToken}"
-              .dstToken="${this.dstToken}"
-              @openTokenSelector="${(event: CustomEvent) => this.onOpenSelectToken(event)}"
-              @connectWallet="${() => this.onOpenConnectWalletView()}"
-            ></inch-swap-form>
-          `,
+              <inch-swap-form
+                ${ref(this.swapFormRef)}
+                .srcToken="${sceneLazyValue(this, () => this.srcToken)}"
+                .dstToken="${sceneLazyValue(this, () => this.dstToken)}"
+                .walletController="${connectWalletController}"
+                @openTokenSelector="${(event: CustomEvent) => this.onOpenSelectToken(event)}"
+                @connectWallet="${() => this.onOpenConnectWalletView()}"
+              ></inch-swap-form>
+            `,
           selectToken: () => html`
             <inch-select-token
               chainId="${observe(this.chainId$)}"
@@ -204,23 +201,10 @@ export class SwapFormElement extends LitElement {
     `)
     this.targetSelectToken = event.detail.value
   }
+}
 
-  private calculateSelectTokenHeight() {
-    let padding = 48
-    if (this.mobileMedia.matches) {
-      padding = 24
-    }
-    const result =
-      window.innerHeight
-      - getHeaderHeight()
-      - getFooterHeight()
-      - padding // top padding
-      - 32 // card border 16px top + 16px bottom
-
-    if (result < 376.5) {
-      return 376.5
-    }
-
-    return result
+declare global {
+  interface HTMLElementTagNameMap {
+    'inch-swap-form-container': SwapFormElement
   }
 }

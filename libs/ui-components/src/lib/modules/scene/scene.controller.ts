@@ -1,9 +1,10 @@
-import { html, render, TemplateResult } from 'lit';
+import { html, LitElement, render, TemplateResult } from 'lit';
 import { sceneStyle } from './scene.style';
 import { SceneWrapperElement } from './scene-wrapper.element';
 import { AnimationType } from './animations/animation-type';
 import { slideAnimation } from './animations/slide.animation';
 import { appendStyle } from '../lit/append-style';
+import { customElement } from 'lit/decorators.js';
 
 type RenderConfig<T extends string> = Record<T, () => TemplateResult>
 
@@ -14,6 +15,7 @@ interface SceneConfigItem {
   maxWidth?: number | string;
   minHeight?: number | string;
   maxHeight?: number | string;
+  lazyRender?: boolean
 }
 
 export class SceneController<T extends string, U extends T> {
@@ -34,15 +36,20 @@ export class SceneController<T extends string, U extends T> {
   }
 
   render(config: RenderConfig<T>): TemplateResult {
+    const isFirstRender = !this.currentScenes
     this.currentScenes = config;
     const sceneName = this.getCurrentSceneName();
-    const sceneFactory = this.getScene(sceneName);
-    if (!sceneFactory) {
-      throw new Error(`Scene not exist`);
+    const currentSceneConfig = this.config[sceneName];
+    const isLazyRenderScene = currentSceneConfig.lazyRender ?? false
+    if (!isLazyRenderScene || isFirstRender) {
+      const sceneFactory = this.getScene(sceneName);
+      if (!sceneFactory) {
+        throw new Error(`Scene not exist`);
+      }
+      const sceneWrapper = this.buildSceneWrapper(sceneFactory(), sceneName);
+      this.clearContainer();
+      this.sceneContainerAppendChild(sceneName, sceneWrapper);
     }
-    const sceneWrapper = this.buildSceneWrapper(sceneFactory(), sceneName);
-    this.clearContainer();
-    this.sceneContainerAppendChild(sceneName, sceneWrapper);
     return html`${this.sceneContainer}`;
   }
 
@@ -146,8 +153,17 @@ export class SceneController<T extends string, U extends T> {
 }
 
 function buildSceneContainer() {
-  const sceneContainer = document.createElement('div');
+  const sceneContainer = document.createElement(SceneLayout.tagName) as SceneLayout;
   sceneContainer.id = 'scene-container';
   sceneContainer.classList.add('scene-container');
   return sceneContainer;
+}
+
+@customElement(SceneLayout.tagName)
+class SceneLayout extends LitElement {
+  static tagName = 'inch-scene-layout' as const;
+
+  protected override render(): unknown {
+    return html`<slot></slot>`
+  }
 }

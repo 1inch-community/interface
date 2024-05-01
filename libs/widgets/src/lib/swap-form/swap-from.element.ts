@@ -1,16 +1,17 @@
 import { html, LitElement, PropertyValues } from 'lit';
 import { ContextProvider } from '@lit/context';
 import { customElement, property } from 'lit/decorators.js';
-import { type Address, isAddressEqual } from 'viem';
+import { isAddressEqual } from 'viem';
 import '@one-inch-community/ui-components/card'
 import "@one-inch-community/ui-components/icon"
 import "@one-inch-community/ui-components/button"
-import { ChainId, IToken } from '@one-inch-community/models';
-import { swapFromStyle } from './swap-from.style';
-import './elements'
-import { swapContext } from './context';
+import { IConnectWalletController, IToken } from '@one-inch-community/models';
 import { SwapContext } from '@one-inch-community/sdk';
-import { when } from 'lit/directives/when.js';
+import { defer, distinctUntilChanged, map } from 'rxjs';
+import { observe } from '@one-inch-community/ui-components/lit';
+import { swapFromStyle } from './swap-from.style';
+import { swapContext } from './context';
+import './elements'
 
 function hasChangedToken(value: IToken, oldValue: IToken): boolean {
   if (!oldValue) return true
@@ -20,58 +21,49 @@ function hasChangedToken(value: IToken, oldValue: IToken): boolean {
     || value.decimals !== oldValue.decimals
 }
 
-function hasChangedAddress(value: Address, oldValue?: Address): boolean {
-  try {
-    if (!oldValue || !value) return true
-    return !isAddressEqual(value, oldValue)
-  } catch {
-    return true
-  }
-}
-
 @customElement(SwapFromElement.tagName)
 export class SwapFromElement extends LitElement {
   static tagName = 'inch-swap-form' as const
 
   static override styles = swapFromStyle
 
-  @property({ type: Number }) chainId?: ChainId
-
   @property({ type: Object, hasChanged: hasChangedToken }) srcToken: IToken | null = null
 
   @property({ type: Object, hasChanged: hasChangedToken }) dstToken: IToken | null = null
 
-  @property({ type: String, hasChanged: hasChangedAddress }) connectedWalletAddress?: Address
+  @property({ type: Object, attribute: false }) walletController?: IConnectWalletController
 
   readonly context = new ContextProvider(this, { context: swapContext })
 
+  private readonly fusionView$ = defer(() => this.getWalletController().data.activeAddress$).pipe(
+    distinctUntilChanged(),
+    map(address => {
+      if (!address) return html``
+
+      return html`<inch-fusion-swap-info></inch-fusion-swap-info>`
+    })
+  )
+
+  override disconnectedCallback() {
+    super.disconnectedCallback();
+    this.context.value?.destroy()
+  }
+
   protected override updated(changedProperties: PropertyValues) {
     const context =   this.getContext()
-    let isDirty = false
-    if (changedProperties.has('chainId') && this.chainId) {
-      context.setChainId(this.chainId)
-      isDirty = true
-    }
     if (changedProperties.has('srcToken') || changedProperties.has('dstToken')) {
       context.setPair({
         srcToken: this.srcToken ?? undefined,
         dstToken: this.dstToken ?? undefined,
       })
-      isDirty = true
-    }
-    if (changedProperties.has('connectedWalletAddress')) {
-      context.setConnectedWalletAddress(this.connectedWalletAddress as Address | undefined)
-      isDirty = true
-    }
-    if (isDirty) {
       this.requestUpdate()
     }
   }
 
   protected override render() {
-    if (!this.context.value) return
-
-    const isConnectWallet = !!this.connectedWalletAddress
+    if (!this.context.value) {
+      this.getContext()
+    }
 
     return html`
       <div class="swap-form-container">
@@ -87,24 +79,28 @@ export class SwapFromElement extends LitElement {
           <inch-swap-form-input disabled tokenType="destination"></inch-swap-form-input>
         </div>
         
-        ${when(isConnectWallet, () => html`<inch-fusion-swap-info></inch-fusion-swap-info>`)}
+        ${observe(this.fusionView$)}
 
         <inch-swap-button></inch-swap-button>
       </div>
     `
   }
 
+  private getWalletController() {
+    if (!this.walletController) throw new Error('')
+    return this.walletController
+  }
+
   private getContext() {
     if (!this.context.value) {
-      const context = new SwapContext()
-      this.chainId && context.setChainId(this.chainId)
+      const context = new SwapContext(
+        this.getWalletController()
+      )
       context.setPair({
         srcToken: this.srcToken ?? undefined,
         dstToken: this.dstToken ?? undefined,
       })
-      this.connectedWalletAddress && context.setConnectedWalletAddress(this.connectedWalletAddress as Address | undefined)
       this.context.setValue(context);
-      context.init()
     }
     return this.context.value
   }
