@@ -153,17 +153,8 @@ export class SceneController<T extends string, U extends T> {
 }
 
 function buildSceneContainer() {
-  const sceneContainer = document.createElement(SceneLayout.tagName) as SceneLayout;
+  const sceneContainer: HTMLDivElement = document.createElement('div');
   sceneContainer.id = 'scene-container';
   sceneContainer.classList.add('scene-container');
   return sceneContainer;
-}
-
-@customElement(SceneLayout.tagName)
-class SceneLayout extends LitElement {
-  static tagName = 'inch-scene-layout' as const;
-
-  protected override render(): unknown {
-    return html`<slot></slot>`
-  }
 }
