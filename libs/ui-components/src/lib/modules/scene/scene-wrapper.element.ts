@@ -26,8 +26,8 @@ export class SceneWrapperElement extends LitElement {
           const parent = this.parentElement
           if (!parent) return
           appendStyle(parent, {
-            width: `${entry.contentRect.width}px`,
-            height: `${entry.contentRect.height}px`
+            width: `${entry.contentRect.width + 2}px`,
+            height: `${entry.contentRect.height + 2}px`
           })
         })
       ),

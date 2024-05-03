@@ -1,10 +1,11 @@
-import { ChainId, ITokenDto } from '@one-inch-community/models';
+import { ChainId, ITokenDto, FusionQuoteReceiveDto } from '@one-inch-community/models';
 import type { Address } from 'viem';
 import { getEnvironmentValue } from '../environment';
 import { TimeCache } from '../cache';
 import { CacheActivePromise } from './decorators';
 
 const tokenPriceCache = new TimeCache<ChainId, Record<Address, string>>(10000)
+const fusionQuoteReceiveCache = new TimeCache<string, FusionQuoteReceiveDto>(5000)
 
 export class OneInchDevPortalAdapter {
 
@@ -32,6 +33,41 @@ export class OneInchDevPortalAdapter {
     const response = await fetch(`${this.host}/price/v1.1/${chainId}?${queryParams}`);
     const result = await response.json();
     tokenPriceCache.set(chainId, result)
+    return result
+  }
+
+  /**
+   * doc link https://portal.1inch.dev/documentation/fusion/swagger/quoter?method=get&path=%2Fv1.0%2F1%2Fquote%2Freceive
+   * */
+  @CacheActivePromise((...args: unknown[]) => args.slice(1).join(':'))
+  async getFusionQuoteReceive(
+    chainId: ChainId,
+    fromTokenAddress: Address,
+    toTokenAddress: Address,
+    amount: bigint,
+    walletAddress: Address,
+    enableEstimate = false,
+    isLedgerLive = false
+  ): Promise<FusionQuoteReceiveDto> {
+    const id = [
+      chainId, fromTokenAddress, toTokenAddress, amount, walletAddress, enableEstimate, isLedgerLive
+    ].join(':')
+
+    if (fusionQuoteReceiveCache.has(id)) {
+      return fusionQuoteReceiveCache.get(id)!
+    }
+
+    const queryParams = new URLSearchParams({
+      fromTokenAddress,
+      toTokenAddress,
+      walletAddress,
+      amount: amount.toString(),
+      enableEstimate: enableEstimate.toString(),
+      isLedgerLive: isLedgerLive.toString(),
+    });
+    const response = await fetch(`${this.host}/fusion/quoter/v1.0/${chainId}/quote/receive?${queryParams}`);
+    const result = await response.json();
+    fusionQuoteReceiveCache.set(id, result)
     return result
   }
 }

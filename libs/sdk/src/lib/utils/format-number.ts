@@ -27,3 +27,23 @@ export function formatDecimals(value: string, decimalPlaces: number): string {
   }
   return value.substring(0, dotIndex);
 }
+
+export function formatSmartNumber(value: string, charsAfterZero: number, defaultDecimalPlaces: number = charsAfterZero): string {
+  const dotIndex = value.indexOf('.');
+  if (dotIndex === -1) {
+    return formatNumber(value, defaultDecimalPlaces)
+  }
+  if (value.slice(0, dotIndex).length > 1) {
+    return formatNumber(value, defaultDecimalPlaces)
+  }
+  let decimals = 0
+  for (let i = dotIndex + 1; i < value.length; i++) {
+    const char = value[i]
+    if (char === '0') {
+      decimals++
+    } else {
+      return formatNumber(value, decimals + charsAfterZero)
+    }
+  }
+  return formatNumber(value, defaultDecimalPlaces)
+}
