@@ -64,34 +64,6 @@ export const walletViewStyle = css`
         margin-left: auto;
     }
     
-    .loader {
-        position: absolute;
-        display: flex;
-        align-items: center;
-        flex-direction: row-reverse;
-        width: 0;
-        z-index: 9;
-        height: 100%;
-        top: 0;
-        left: 0;
-        border-radius: 16px;
-    }
-    
-    .loader:before {
-        content: " ";
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        top: 0;
-        left: 0;
-        border-radius: 16px;
-        background: linear-gradient(90deg,
-        rgba(131,58,180,1),
-        rgba(255,0,0,1),
-        rgba(252,176,69,1)
-        );
-    }
-    
     .address-list {
         display: flex;
         flex-direction: column;
@@ -102,9 +74,19 @@ export const walletViewStyle = css`
         transition: transform .2s;
         will-change: transform;
     }
+    
+    .add-connection {
+        transition: transform .2s;
+        transform: scale(0);
+    }
 
     .address-container__active inch-wallet-view-address-balance {
         transform: translate3d(0, 0, 0);
+    }
+    
+    .wallet-view-container__wc.wallet-view-container__connected:not(.wallet-view-container__loading) .right-data {
+        transform: translate3d(36px, 0, 0);
+        transition: transform .2s;
     }
     
     @media (hover: hover) {
@@ -115,6 +97,12 @@ export const walletViewStyle = css`
             transform: scale(1);
         }
         .wallet-view-container:hover inch-wallet-view-address-balance {
+            transform: translate3d(0, 0, 0);
+        }
+        .wallet-view-container:hover .add-connection {
+            transform: scale(1);
+        }
+        .wallet-view-container:hover.wallet-view-container__wc.wallet-view-container__connected .right-data {
             transform: translate3d(0, 0, 0);
         }
     }

@@ -1,7 +1,5 @@
 import { TemplateResult } from 'lit';
 import { IconContext } from './icon-context';
-import { avalanche24Svg } from './chain/avalanche_24.svg';
-import { zkSyncEra24Svg } from './chain/zksyncera_24.svg';
 
 export type IconsRecord = {
   loader: () => Promise<TemplateResult | ((context: IconContext) => TemplateResult)>
@@ -18,6 +16,7 @@ export const icons: Record<string, IconsRecord> = {
   chevronDown16: { width: '16px', height: '16px', loader: () => import('./chevron-down_16.svg').then(m => m.chevronDown16Svg) },
   arrowDown16: { width: '16px', height: '16px', loader: () => import('./arrow-down_16.svg').then(m => m.arrowDown16Svg) },
   link16: { width: '16px', height: '16px', loader: () => import('./link_16.svg').then(m => m.link16Svg) },
+  plusCircle16: { width: '16px', height: '16px', loader: () => import('./plus-circle_16.svg').then(m => m.plusCircle16Svg) },
   circle24: { width: '24px', height: '24px', loader: () => import('./circle_24.svg').then(m => m.circle24Svg) },
   arrowDown24: { width: '24px', height: '24px', loader: () => import('./arrow-down_24.svg').then(m => m.arrowDown24Svg) },
   arrowLeft24: { width: '24px', height: '24px', loader: () => import('./arrow-left_24.svg').then(m => m.arrowLeft24Svg) },

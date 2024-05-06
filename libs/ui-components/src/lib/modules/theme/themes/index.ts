@@ -17,7 +17,9 @@ export const brandColorMap: Record<BrandColors, () => Promise<CSSResult>> = {
 
 function getSystemTheme() {
   if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    if ((window as any)?.ethereum?.isOneInchIOSWallet) return mainColorMap[MainColors.darkBlue]();
     return mainColorMap[MainColors.dark]();
   }
+  if ((window as any)?.ethereum?.isOneInchIOSWallet) return mainColorMap[MainColors.lightBlue]();
   return mainColorMap[MainColors.light]();
 }

@@ -13,6 +13,7 @@ import {
 } from './storage';
 import { adapterId } from './adapter-id';
 import { getInjectedProviderDetail, getInjectedProviderSupported } from './injected-provider-detail';
+import { WalletConnectV2Adapter, getWalletConnectProviderDetail } from "./adapters/wallet-connect-v2-adapter";
 
 export class WalletControllerImpl implements IConnectWalletController, IConnectWalletControllerInternal {
 
@@ -164,7 +165,7 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
     return connectState
   }
 
-  private async restoreConnectInner(walletId: string): Promise<boolean> {
+  private async restoreConnectInner(chainId: ChainId, walletId: string, force?: boolean): Promise<boolean> {
     const adapter: IWalletAdapter | undefined = this.adapters.get(walletId)
     if (!adapter) {
       throw new Error(`Invalid wallet id`)
@@ -172,7 +173,7 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
     let connectState: boolean
     if (!this.activeAdapters.has(walletId)) {
       try {
-        connectState = await adapter.restoreConnect();
+        connectState = await adapter.restoreConnect(chainId, force);
       } catch (error) {
         connectState = false
       }
@@ -198,11 +199,11 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
     for (const id of connectedWallet) {
       if (id === activeWalletId) continue
       if (!this.adapters.has(id)) continue
-      const connectState = await this.restoreConnectInner(id).catch(() => false)
+      const connectState = await this.restoreConnectInner(chainId, id).catch(() => false)
       this.afterConnectWallet(connectState, id)
     }
     if (!activeWalletId || !this.adapters.has(activeWalletId)) return
-    const connectState = await this.connectInner(chainId, activeWalletId)
+    const connectState = await this.restoreConnectInner(chainId, activeWalletId, true)
     this.afterConnectWallet(connectState, activeWalletId)
     if (!connectState) return
     const activeAddressFromStore = getActiveAddress()
@@ -235,6 +236,9 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
               this.adapters.set(id, new UniversalBrowserExtensionAdapter(injectedProviderDetail))
             }
           }
+          const wc = await getWalletConnectProviderDetail()
+          const wcId = adapterId(wc.info)
+          this.adapters.set(wcId, new WalletConnectV2Adapter(wc))
           resolve()
         }),
       ).subscribe()

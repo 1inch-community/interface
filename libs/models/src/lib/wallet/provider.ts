@@ -25,9 +25,14 @@ export type EventMap = {
     message: ProviderMessage
 };
 
+export interface RequestArguments {
+    method: string;
+    params?: unknown[] | Record<string, unknown> | object | undefined;
+}
+
 export type EthereumProvider = {
-    request(...args: any): Promise<any>
-    enable(): Promise<unknown>
+    request(args: RequestArguments): Promise<unknown>
+    enable(): Promise<Address[]>
     chainId?: number | string
     isOneInchIOSWallet?: true
     isOneInchWallet?: true
@@ -52,15 +57,6 @@ export interface EIP6963ProviderInfo {
     rdns?: string
     uuid?: string
 }
-
-// interface EIP1193Provider {
-//     isStatus?: boolean
-//     host?: string
-//     path?: string
-//     sendAsync?: (request: { method: string, params?: Array<unknown> }, callback: (error: Error | null, response: unknown) => void) => void
-//     send?: (request: { method: string, params?: Array<unknown> }, callback: (error: Error | null, response: unknown) => void) => void
-//     request: (request: { method: string, params?: Array<unknown> }) => Promise<unknown>
-// }
 
 export interface EIP6963ProviderDetail {
     info: EIP6963ProviderInfo

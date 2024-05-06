@@ -8,6 +8,7 @@ import { when } from 'lit/directives/when.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { map as litMap } from 'lit/directives/map.js';
 import '@one-inch-community/ui-components/icon';
+import '@one-inch-community/ui-components/button';
 import { appendStyle, async, subscribe } from '@one-inch-community/ui-components/lit';
 import { tap } from 'rxjs';
 import { Address } from 'viem';
@@ -66,8 +67,17 @@ export class WalletViewElement extends LitElement {
       height: `${height}px`
     });
 
+    const isWalletConnect = this.info.uuid === 'walletConnect'
+
+    const classes = {
+      'wallet-view-container': true,
+      'wallet-view-container__wc': isWalletConnect,
+      'wallet-view-container__connected': this.isWalletConnected,
+      'wallet-view-container__loading': this.showLoader,
+    }
+
     return html`
-      <div class="wallet-view-container" @click="${() => this.onClick()}">
+      <div class="${classMap(classes)}" @click="${() => this.onClick()}">
         <div class="data-container left-data">
           <img class="wallet-icon" alt="${this.info.name}" src="${this.info.icon}">
           <span class="wallet-name">${this.info.name}</span>
@@ -86,7 +96,13 @@ export class WalletViewElement extends LitElement {
                 'connect-icon__active': this.isActiveWallet
               };
               return html`
-                <inch-icon class="${classMap(classes)}" icon="connect16"></inch-icon>`;
+                <inch-icon class="${classMap(classes)}" icon="connect16"></inch-icon>
+                ${when(isWalletConnect && this.activeAddress, () => html`
+                  <inch-button @click="${() => this.onConnect()}" class="add-connection" size="l" type="tertiary">
+                    <inch-icon icon="plusCircle16"></inch-icon>
+                  </inch-button>
+                `)}
+              `;
             }
           )}
         </div>
@@ -125,6 +141,10 @@ export class WalletViewElement extends LitElement {
       this.showAddresses = !this.showAddresses;
       return;
     }
+    await this.onConnect()
+  }
+
+  private async onConnect() {
     if (!this.info) return;
     this.showLoader = true;
     this.showAddresses = await this.getController().connect(this.info);
