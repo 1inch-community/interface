@@ -7,7 +7,7 @@ export interface IWalletAdapter {
   readonly client: WalletClient | null
   isConnected(): Promise<boolean>
   connect(chainId: ChainId): Promise<boolean>
-  restoreConnect(): Promise<boolean>
+  restoreConnect(chainId: ChainId, force?: boolean): Promise<boolean>
   disconnect(): Promise<boolean>
   changeChain(chainId: ChainId): Promise<boolean>
   setActiveAddress(address: Address | null): void

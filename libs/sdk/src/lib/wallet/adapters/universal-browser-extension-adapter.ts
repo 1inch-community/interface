@@ -19,15 +19,17 @@ export class UniversalBrowserExtensionAdapter implements IWalletAdapter {
     return true;
   }
 
-  async restoreConnect(): Promise<boolean> {
+  async restoreConnect(chainId: ChainId, force: boolean): Promise<boolean> {
     this.data.setProvider(this.providerDetail.provider)
     const addresses = await this.data.getAddresses()
-    const chainId = await this.data.getChainId()
     const state = addresses.length > 0 && chainId !== null
     if (!state) {
       this.data.setProvider(null)
     } else {
       this.client = createClient(chainId, this.providerDetail.provider)
+    }
+    if (!state && force) {
+      return this.connect(chainId)
     }
     return state
   }

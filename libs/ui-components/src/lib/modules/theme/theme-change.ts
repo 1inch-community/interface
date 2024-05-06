@@ -2,6 +2,7 @@ import { brandColorMap, mainColorMap } from './themes';
 import { mainColorStyleElement, brandColorStyleElement } from './theme-elements';
 import { MainColors, BrandColors } from './themes/themes';
 import { applyStyle, setThemeColor } from '../lit/dom.utils';
+import { Observable, Subject } from 'rxjs';
 
 let currentMainColor: MainColors
 let currentBrandColor: BrandColors
@@ -14,12 +15,14 @@ const themeColors: Record<MainColors, (() => string)> = {
   [MainColors.darkBlue]: () => '#0e0e0e',
 }
 
+const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+const change$ = new Subject<MediaQueryList>()
+
 function getThemeColorsSystem() {
-  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    if ((window as any)?.ethereum?.isOneInchIOSWallet) return themeColors[MainColors.darkBlue]();
+  if (mediaQuery.matches) {
     return themeColors[MainColors.dark]();
   }
-  if ((window as any)?.ethereum?.isOneInchIOSWallet) return themeColors[MainColors.lightBlue]();
   return themeColors[MainColors.light]();
 }
 
@@ -31,9 +34,14 @@ export async function themeChangeBrandColor(brandColorName: BrandColors, event?:
   return await themeChange(currentMainColor, brandColorName, event)
 }
 
-window.matchMedia('(prefers-color-scheme: dark)').onchange = () => {
+export function getThemeChange(): Observable<MediaQueryList> {
+  return change$
+}
+
+mediaQuery.onchange = async () => {
   if (currentMainColor !== MainColors.systemSync) return
-  return themeChange(MainColors.systemSync, currentBrandColor)
+  await themeChange(MainColors.systemSync, currentBrandColor)
+  change$.next(mediaQuery)
 }
 
 
@@ -82,4 +90,8 @@ export async function themeChange(
   }
 
   await changeTheme()
+}
+
+export function isDarkTheme() {
+  return themeColors[currentMainColor]() === themeColors[MainColors.dark]()
 }

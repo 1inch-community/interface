@@ -7,6 +7,14 @@ export default defineConfig({
   root: __dirname,
   cacheDir: '../../temp/cache/dapp',
 
+  optimizeDeps: {
+    include: ['tslib']
+  },
+
+  define: {
+    global: {},
+  },
+
   server: {
     port: 4200,
     host: '0.0.0.0',

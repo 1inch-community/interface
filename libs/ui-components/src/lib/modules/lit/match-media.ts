@@ -17,7 +17,7 @@ export function mobileMediaCSS(style: CSSResult) {
   `
 }
 
-const emitter$ = defer(() => fromEvent(getMobileMatchMedia(), 'change')).pipe(
+const emitter$ = defer(() => fromEvent<MediaQueryListEvent>(getMobileMatchMedia(), 'change')).pipe(
   shareReplay({ bufferSize: 0, refCount: true }),
 )
 
@@ -25,7 +25,7 @@ export function changeMobileMatchMedia(context: ReactiveControllerHost) {
   subscribe(context, [emitter$])
 }
 
-export function getMobileMatchMediaEmitter(): Observable<Event> {
+export function getMobileMatchMediaEmitter(): Observable<MediaQueryListEvent> {
   return emitter$
 }
 

@@ -5,7 +5,20 @@ import {
   IDataAdapter,
   IProviderDataAdapterInternal
 } from '@one-inch-community/models';
-import { BehaviorSubject, filter, from, map, Observable, of, shareReplay, startWith, switchMap, combineLatest } from 'rxjs';
+import {
+  BehaviorSubject,
+  filter,
+  from,
+  map,
+  Observable,
+  of,
+  shareReplay,
+  startWith,
+  switchMap,
+  combineLatest,
+  defer,
+  merge
+} from 'rxjs';
 import { Address, ProviderRpcError } from 'viem';
 import { fromEIP1193Event } from './from-eip1193-event';
 
@@ -14,9 +27,14 @@ export class ProviderDataAdapter implements IDataAdapter, IProviderDataAdapterIn
   private readonly provider$ = new BehaviorSubject<EIP1193Provider | null>(null)
   private readonly activeAddressInner$ = new BehaviorSubject<Address | null>(null)
 
+  private readonly providerOrDisconnect$ = merge(
+    this.provider$,
+    defer(() => this.disconnect$).pipe(map(() => null))
+  )
+
   readonly info$: Observable<EIP6963ProviderInfo>
 
-  readonly addresses$: Observable<Address[]> = this.provider$.pipe(
+  readonly addresses$: Observable<Address[]> = this.providerOrDisconnect$.pipe(
     switchMap(provider => {
       if (!provider) return of([]);
       return from(this.getAddresses()).pipe(
@@ -39,7 +57,7 @@ export class ProviderDataAdapter implements IDataAdapter, IProviderDataAdapterIn
     shareReplay({ bufferSize: 1, refCount: true })
   );
 
-  readonly chainId$: Observable<ChainId | null> = this.provider$.pipe(
+  readonly chainId$: Observable<ChainId | null> = this.providerOrDisconnect$.pipe(
     switchMap(provider => {
       if (!provider) return of(null);
       return from(this.getChainId()).pipe(
@@ -76,7 +94,7 @@ export class ProviderDataAdapter implements IDataAdapter, IProviderDataAdapterIn
   async getAddresses(): Promise<Address[]> {
     const provider = this.provider$.value
     if (!provider) return []
-    return await provider.request({ method: 'eth_accounts' })
+    return await provider.request({ method: 'eth_accounts' }) as Address[]
   }
 
   async getActiveAddress(): Promise<Address | null> {
@@ -91,7 +109,7 @@ export class ProviderDataAdapter implements IDataAdapter, IProviderDataAdapterIn
   async getChainId(): Promise<ChainId | null> {
     const provider = this.provider$.value
     if (!provider) return null
-    const chainStr = await provider.request({ method: 'eth_chainId' }).catch(() => null);
+    const chainStr = await provider.request({ method: 'eth_chainId' }).catch(() => null) as string;
     if (!chainStr) return null
     return parseInt(chainStr, 16);
   }

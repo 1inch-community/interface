@@ -5,6 +5,10 @@
     "@one-inch-community/models": "0.0.1",
     "dexie": "3.2.x",
     "tslib": "2.3.0",
-    "viem": "2.9.x"
+    "viem": "2.9.x",
+    "@walletconnect/ethereum-provider": "2.12.x",
+    "@walletconnect/universal-provider": "2.12.x",
+    "@walletconnect/modal": "2.6.x",
+    "eventemitter3": "5.0.x"
   }
 }
