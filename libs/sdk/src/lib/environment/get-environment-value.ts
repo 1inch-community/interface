@@ -1,5 +1,6 @@
 export interface Environment {
   oneInchDevPortalHost: string
+  walletConnectProjectId: string
 }
 
 declare const __environment__: Environment
