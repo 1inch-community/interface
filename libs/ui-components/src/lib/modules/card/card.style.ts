@@ -2,7 +2,6 @@ import { css } from 'lit';
 
 export const cardStyle = css`
     
-    
     :host {
         background-color: var(--color-background-bg-primary);
         border-radius: 24px;
@@ -14,7 +13,7 @@ export const cardStyle = css`
     :host(.mobile) {
         border-bottom-left-radius: 0;
         border-bottom-right-radius: 0;
-        width: 100%;
+        width: 100vw;
         height: fit-content;
     }
     
