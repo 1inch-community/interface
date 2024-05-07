@@ -73,8 +73,32 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
     if (!this.adapters.has(id)) {
       throw new Error(`Invalid wallet info ${info.name} not exist`)
     }
-    const connectState = await this.connectInner(chainId, id)
+    const connectState = await this.connectSafe(chainId, id)
     this.afterConnectWallet(connectState, id)
+    this.update$.next()
+    return connectState
+  }
+
+  async addConnection(info: EIP6963ProviderInfo): Promise<boolean> {
+    const chainId = await this.data.getChainId()
+    const id = adapterId(info)
+    if (!this.adapters.has(id)) {
+      throw new Error(`Invalid wallet info ${info.name} not exist`)
+    }
+    const adapter: IWalletAdapter | undefined = this.adapters.get(id)
+    if (!adapter) {
+      throw new Error(`Invalid wallet id`)
+    }
+    if (!this.activeAdapters.has(id)) {
+      throw new Error(`Wallet adapter ${info.name} not connected`)
+    }
+    let connectState: boolean
+    try {
+      connectState = await adapter.connect(chainId);
+    } catch (error) {
+      connectState = false
+    }
+
     this.update$.next()
     return connectState
   }
@@ -130,7 +154,7 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
       if (!this.adapters.has(id)) {
         throw new Error(`Invalid wallet not exist`)
       }
-      state = await this.connectInner(chainId, id)
+      state = await this.connectSafe(chainId, id)
       this.afterConnectWallet(state, id)
     }
     if (state) {
@@ -139,7 +163,7 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
     this.update$.next()
   }
 
-  private async connectInner(chainId: ChainId, walletId: string, retry = false): Promise<boolean> {
+  private async connectSafe(chainId: ChainId, walletId: string, retry = false): Promise<boolean> {
     const adapter: IWalletAdapter | undefined = this.adapters.get(walletId)
     if (!adapter) {
       throw new Error(`Invalid wallet id`)
@@ -155,13 +179,13 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
     } else {
       connectState = await adapter.isConnected()
       if (!retry) {
-        connectState = await this.connectInner(chainId, walletId, true)
+        connectState = await this.connectSafe(chainId, walletId, true)
       }
     }
     return connectState
   }
 
-  private async restoreConnectInner(chainId: ChainId, walletId: string, force?: boolean): Promise<boolean> {
+  private async restoreConnectSafe(chainId: ChainId, walletId: string, force?: boolean): Promise<boolean> {
     const adapter: IWalletAdapter | undefined = this.adapters.get(walletId)
     if (!adapter) {
       throw new Error(`Invalid wallet id`)
@@ -195,11 +219,11 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
     for (const id of connectedWallet) {
       if (id === activeWalletId) continue
       if (!this.adapters.has(id)) continue
-      const connectState = await this.restoreConnectInner(chainId, id).catch(() => false)
+      const connectState = await this.restoreConnectSafe(chainId, id).catch(() => false)
       this.afterConnectWallet(connectState, id)
     }
     if (!activeWalletId || !this.adapters.has(activeWalletId)) return
-    const connectState = await this.restoreConnectInner(chainId, activeWalletId, true)
+    const connectState = await this.restoreConnectSafe(chainId, activeWalletId, true)
     this.afterConnectWallet(connectState, activeWalletId)
     if (!connectState) return
     const activeAddressFromStore = getActiveAddress()

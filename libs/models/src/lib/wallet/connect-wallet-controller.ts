@@ -11,6 +11,7 @@ export interface IConnectWalletController {
   init(): Promise<void>
   getSupportedWallets(): Promise<EIP6963ProviderInfo[]>
   connect(info: EIP6963ProviderInfo): Promise<boolean>
+  addConnection(info: EIP6963ProviderInfo): Promise<boolean>
   disconnect(): Promise<boolean>
   changeChain(chainId: ChainId): Promise<boolean>
   getDataAdapter(info: EIP6963ProviderInfo): IDataAdapter

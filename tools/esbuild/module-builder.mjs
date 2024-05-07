@@ -192,6 +192,7 @@ export class ModuleBuilder {
       define: {
         '__environment__': JSON.stringify({
           oneInchDevPortalHost: process.env.ONE_INCH_DEV_PORTAL_HOST,
+          walletConnectProjectId: process.env.WALLET_CONNECT_PROJECT_ID,
         })
       },
       loader: { '.ts': 'ts' }

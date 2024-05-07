@@ -153,10 +153,13 @@ export class MultiConnectProvider implements EIP1193Provider {
   }
 
   private updatePersist() {
+    const persistStorePrefixSet = new Set<string>()
     const data: { uri: string, topic: string, address: string, persistStorePrefix: string, isActive: boolean  }[] = []
     this.storage.forEach(({ uri, topic, address, persistStorePrefix }) => {
+      persistStorePrefixSet.add(persistStorePrefix)
       data.push({ uri, topic, address, persistStorePrefix, isActive: !!this.activeAddress && isAddressEqual(this.activeAddress, address) })
     })
+    this.cleanOldStorage().catch()
     storage.set('wc2_persist', data)
   }
 
@@ -196,6 +199,17 @@ export class MultiConnectProvider implements EIP1193Provider {
         })
       )
     ).subscribe()
+  }
+
+  private async cleanOldStorage() {
+    const databasesList = await indexedDB.databases()
+    const dbNameSet = new Set<string>()
+    this.storage.forEach(store => dbNameSet.add(WalletConnectStorage.getDatabaseName(store.persistStorePrefix)))
+    for (const db of databasesList) {
+      if (db.name && db.name.startsWith('wallet-connect') && !dbNameSet.has(db.name)) {
+        await WalletConnectStorage.dropStorageByName(db.name)
+      }
+    }
   }
 
 }
