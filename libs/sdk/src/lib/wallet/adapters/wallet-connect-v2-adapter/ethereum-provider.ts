@@ -26,7 +26,7 @@ export class EthereumProvider extends WcEthereumProvider {
       disableProviderPing: opts.disableProviderPing,
       relayUrl: opts.relayUrl,
       storageOptions: opts.storageOptions,
-      storage: new WalletConnectStorage(this.persistStorePrefix)
+      storage: WalletConnectStorage.init(this.persistStorePrefix)
     });
     this.registerEventListeners();
     await this.loadPersistedSession();
@@ -66,14 +66,27 @@ export class EthereumProvider extends WcEthereumProvider {
 export class WalletConnectStorage extends Dexie {
 
   static async dropStorage(persistStorePrefix: string) {
-    const storage = new WalletConnectStorage(persistStorePrefix)
+    const storage = WalletConnectStorage.init(persistStorePrefix)
     await storage.dropStorage()
+  }
+
+  static async dropStorageByName(name: string) {
+    const storage = new WalletConnectStorage(name)
+    await storage.dropStorage()
+  }
+
+  static getDatabaseName(persistStorePrefix: string) {
+    return `wallet-connect-connection-storage-${persistStorePrefix}`
+  }
+
+  static init(persistStorePrefix: string) {
+    return new WalletConnectStorage(WalletConnectStorage.getDatabaseName(persistStorePrefix))
   }
 
   private data!: Table<{key: string, value: unknown}, string>;
 
-  constructor(persistStorePrefix: string) {
-    super(`wallet-connect-connection-storage-${persistStorePrefix}`)
+  constructor(name: string) {
+    super(name)
     this.version(1).stores({
       data: [
         'key',

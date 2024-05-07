@@ -98,7 +98,7 @@ export class WalletViewElement extends LitElement {
               return html`
                 <inch-icon class="${classMap(classes)}" icon="connect16"></inch-icon>
                 ${when(isWalletConnect && this.activeAddress, () => html`
-                  <inch-button @click="${() => this.onConnect()}" class="add-connection" size="l" type="tertiary">
+                  <inch-button @click="${(event: MouseEvent) => this.onConnect(event)}" class="add-connection" size="l" type="tertiary">
                     <inch-icon icon="plusCircle16"></inch-icon>
                   </inch-button>
                 `)}
@@ -144,10 +144,17 @@ export class WalletViewElement extends LitElement {
     await this.onConnect()
   }
 
-  private async onConnect() {
-    if (!this.info) return;
+  private async onConnect(event?: MouseEvent) {
+    if (!this.info || this.showLoader) return;
+    event?.preventDefault()
+    event?.stopPropagation()
     this.showLoader = true;
-    this.showAddresses = await this.getController().connect(this.info);
+    const isWalletConnect = this.info.uuid === 'walletConnect'
+    if (this.isWalletConnected && isWalletConnect) {
+      this.showAddresses = await this.getController().addConnection(this.info);
+    } else {
+      this.showAddresses = await this.getController().connect(this.info);
+    }
     this.showLoader = false;
   }
 
