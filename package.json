@@ -2,7 +2,9 @@
   "name": "one-inch-community",
   "version": "0.1.0-preview",
   "license": "MIT",
-  "scripts": {},
+  "scripts": {
+    "start": "nx run one-inch-community:start"
+  },
   "private": true,
   "dependencies": {
     "@lit-labs/virtualizer": "^2.0.12",

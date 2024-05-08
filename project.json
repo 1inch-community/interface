@@ -2,12 +2,17 @@
   "name": "one-inch-community",
   "$schema": "node_modules/nx/schemas/project-schema.json",
   "targets": {
-    "local-registry": {
-      "executor": "@nx/js:verdaccio",
+    "start": {
+      "executor": "nx:run-commands",
       "options": {
-        "port": 4873,
-        "config": ".verdaccio/config.yml",
-        "storage": "tmp/local-registry/storage"
+        "parallel": false,
+        "commands": [
+          "nx run models:build",
+          "nx run ui-components:build",
+          "nx run sdk:build",
+          "nx run widgets:build",
+          "nx run dapp:serve"
+        ]
       }
     }
   }

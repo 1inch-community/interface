@@ -70,9 +70,13 @@ export class ModuleBuilder {
   }
 
   async start() {
-    await this.build()
-    if (this.isWatch) {
-      await this.watch()
+    try {
+      await this.build()
+      if (this.isWatch) {
+        await this.watch()
+      }
+    } catch (error) {
+      debugger
     }
   }
 
@@ -128,18 +132,27 @@ export class ModuleBuilder {
     }
   }
 
-  buildTypes() {
+  async buildTypes() {
     this.setStatus('build types', true);
-    return new Promise( resolve => {
-      dtsBundle(
-        this.moduleName,
-        this.logger,
-        this.distPath,
-        { index: this.modulePublicApiPath },
-        this.tsconfigPath
-      )
-      resolve()
-    });
+    await dtsBundle(
+      this.moduleName,
+      this.logger,
+      this.distPath,
+      { index: this.modulePublicApiPath },
+      this.tsconfigPath
+    ).catch(() => new Promise(resolve => {
+      this.setStatus('build types', true);
+      setTimeout(async () => {
+        await dtsBundle(
+          this.moduleName,
+          this.logger,
+          this.distPath,
+          { index: this.modulePublicApiPath },
+          this.tsconfigPath
+        )
+        resolve()
+      }, 2000)
+    }))
   }
 
   async buildPackage() {

@@ -36,7 +36,7 @@ export class Logger {
     this.modules.set(moduleName, statusContext)
     this.show()
     if (!this.isWatch && error !== null) {
-      process.exit(-1)
+      // process.exit(-1)
     }
   }
 

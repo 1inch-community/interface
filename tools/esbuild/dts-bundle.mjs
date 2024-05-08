@@ -33,59 +33,65 @@ function buildEntryPoints(entryPoints) {
  * @param {string} outDir - The entry points for which the declaration bundle is generated.
  * @param {string[] | Record<string, string> | { in: string, out: string }[]} entryPoints - The entry points for which the declaration bundle is generated.
  * @param {string} tsconfigPath
- * @return {void}
+ * @return {Promise<void>}
  */
-export async function dtsBundle(moduleName, logger, outDir, entryPoints, tsconfigPath) {
-  const entryPointsRecord = buildEntryPoints(entryPoints);
-  for (const fileName in entryPointsRecord) {
-    const filePath = entryPointsRecord[fileName];
-    logger.setStatus(moduleName, 'build types', true)
-    let data
-    try {
-      const error = console.error
-      console.error = (...args) => {
-        logger.setError(moduleName, 'build types', {
-          message: 'Build types error',
-          stack: args.join('\n')
-        })
-      };
-      data = generateDtsBundle(
-        [
-          {
-            filePath,
-            libraries: {
-              inlinedLibraries: [
-                '@one-inch-community/models'
-              ]
-            },
-            output: {
-              noBanner: true,
-              exportReferencedTypes: false,
-              inlineDeclareGlobals: true
+export function dtsBundle(moduleName, logger, outDir, entryPoints, tsconfigPath) {
+  return new Promise(async (resolve, reject) => {
+    const entryPointsRecord = buildEntryPoints(entryPoints);
+    for (const fileName in entryPointsRecord) {
+      const filePath = entryPointsRecord[fileName];
+      logger.setStatus(moduleName, 'build types', true)
+      let data
+      try {
+        const error = console.error
+        console.error = (...args) => {
+          logger.setError(moduleName, 'build types', {
+            message: 'Build types error',
+            stack: args.join('\n')
+          })
+          reject()
+        };
+        data = generateDtsBundle(
+          [
+            {
+              filePath,
+              libraries: {
+                inlinedLibraries: [
+                  '@one-inch-community/models'
+                ]
+              },
+              output: {
+                noBanner: true,
+                exportReferencedTypes: false,
+                inlineDeclareGlobals: true
+              }
             }
-          }
-        ],
-        {
-          preferredConfigPath: tsconfigPath,
-          followSymlinks: true
-        });
-      console.error = error
-      logger.setError(moduleName, 'build types', null)
-      logger.setError(moduleName, 'dts error', null)
-    } catch (error) {
-      logger.setError(moduleName, 'dts error', error)
-    }
-    try {
-      if (!data) {
-        return
+          ],
+          {
+            preferredConfigPath: tsconfigPath,
+            followSymlinks: true
+          });
+        console.error = error
+        logger.setError(moduleName, 'build types', null)
+        logger.setError(moduleName, 'dts error', null)
+      } catch (error) {
+        logger.setError(moduleName, 'dts error', error)
+        reject()
       }
-      const fileNameAnd = restoreFileName(fileName)
-      await fs.writeFile(path.join(outDir, fileNameAnd), data[0])
-      logger.setError(moduleName, 'save types', null)
-    } catch (error) {
-      logger.setError(moduleName, 'save types', error)
+      try {
+        if (!data) {
+          return reject()
+        }
+        const fileNameAnd = restoreFileName(fileName)
+        await fs.writeFile(path.join(outDir, fileNameAnd), data[0])
+        logger.setError(moduleName, 'save types', null)
+      } catch (error) {
+        logger.setError(moduleName, 'save types', error)
+        reject()
+      }
     }
-  }
+    resolve()
+  })
 }
 
 function restoreFileName(fileName) {
