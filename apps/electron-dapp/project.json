@@ -1,0 +1,27 @@
+{
+  "name": "electron-dapp",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/electron-dapp",
+  "tags": [],
+  "targets": {
+    "serve": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/electron-dapp",
+        "command": "electron-vite dev"
+      }
+    },
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/electron-dapp",
+        "parallel": false,
+        "commands": [
+          "electron-vite build --entry ./out/main/index.js",
+          "electron-builder -c ./electron-builder.yml build"
+        ]
+      }
+    }
+  }
+}

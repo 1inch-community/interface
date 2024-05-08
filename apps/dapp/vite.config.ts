@@ -5,7 +5,7 @@ import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 
 export default defineConfig({
   root: __dirname,
-  cacheDir: '../../temp/cache/dapp',
+  cacheDir: '../../node_modules/.vite/apps/dapp',
 
   optimizeDeps: {
     include: ['tslib']
@@ -35,7 +35,7 @@ export default defineConfig({
   // },
 
   build: {
-    outDir: '../../dist/apps/dapp',
+    outDir: process.env['OUT_DIR'] ?? '../../dist/apps/dapp',
     reportCompressedSize: true,
     sourcemap: true,
     terserOptions: {

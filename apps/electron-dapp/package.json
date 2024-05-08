@@ -1,0 +1,20 @@
+{
+  "name": "electron-dapp",
+  "version": "0.0.1",
+  "description": "",
+  "main": "./out/main/index.js",
+  "author": "",
+  "homepage": "",
+  "scripts": {
+  },
+  "devDependencies": {
+    "@electron-toolkit/preload": "^3.0.1",
+    "@electron-toolkit/utils": "^3.0.0",
+    "@electron-toolkit/tsconfig": "^1.0.1",
+    "electron": "^30.0.2",
+    "electron-store": "9.0.0",
+    "electron-updater": "^6.1.8",
+    "electron-builder": "^24.13.3",
+    "electron-vite": "^2.2.0"
+  }
+}

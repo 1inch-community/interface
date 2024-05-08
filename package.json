@@ -65,5 +65,12 @@
   },
   "nx": {
     "includedScripts": []
+  },
+  "main": "apps/electron-dapp/out/main/index.js",
+  "publish": {
+    "provider": "github",
+    "owner": "${env.GIT_HUB_RELEASES_USER_NAME}",
+    "repo": "${env.GIT_HUB_RELEASES_REPO_NAME}",
+    "token": "${env.GIT_HUB_RELEASES_TOKEN}"
   }
 }

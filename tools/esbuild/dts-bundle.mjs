@@ -1,6 +1,9 @@
 import {generateDtsBundle} from 'dts-bundle-generator'
 import * as fsModule from 'fs'
 import * as path from 'path'
+import { ThreadController } from './thread-controller.mjs';
+import { fileURLToPath } from 'url';
+import { ThreadLogger } from './logger.mjs';
 
 const fs = fsModule.promises
 
@@ -92,4 +95,16 @@ function restoreFileName(fileName) {
   const extname = path.extname(fileName)
   if (extname.toLowerCase().includes('d.ts')) return fileName
   return fileName + '.d.ts';
+}
+
+const __filename = fileURLToPath(import.meta.url);
+
+const threadController = new ThreadController(__filename,{ dtsBundle })
+
+export function dtsBundleAsync(moduleName, logger, outDir, entryPoints, tsconfigPath) {
+  return threadController.execute('dtsBundle', [ moduleName, null, outDir, entryPoints, tsconfigPath ])
+}
+
+export function dtsBundleThreadWrapper(moduleName, logger, outDir, entryPoints, tsconfigPath) {
+  return dtsBundle(moduleName, logger, outDir, entryPoints, tsconfigPath)
 }
