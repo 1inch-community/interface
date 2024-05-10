@@ -8,7 +8,7 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "node tools/esbuild/build.mjs --lib-name sdk"
+          "ts-node --project ./tsconfig.build.json tools/packagr/main.ts --lib-name sdk"
         ]
       }
     },

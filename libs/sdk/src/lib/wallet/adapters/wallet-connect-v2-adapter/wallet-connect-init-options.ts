@@ -1,8 +1,13 @@
 import { ChainId } from '@one-inch-community/models';
-import { isDarkTheme } from '@one-inch-community/ui-components/theme';
-import { getMobileMatchMedia } from '@one-inch-community/ui-components/lit';
 import type { EthereumProviderOptions } from '@walletconnect/ethereum-provider';
 import { getEnvironmentValue } from '../../../environment';
+
+const mobileMediaString = 'screen and (max-width: 600px)' as const
+const mobileMatchMedia = matchMedia(mobileMediaString)
+
+export function getMobileMatchMedia() {
+  return mobileMatchMedia
+}
 
 const optionalChains = Object.keys(ChainId)
   .filter(value => Number(value) && value !== `${ChainId.eth}`)
@@ -10,7 +15,7 @@ const optionalChains = Object.keys(ChainId)
 
 export const options = async (): Promise<EthereumProviderOptions> => {
   const mobileMedia = getMobileMatchMedia()
-  const themeMode = isDarkTheme() ? 'dark' : 'light'
+  const themeMode = 'dark'
   return {
     projectId: getEnvironmentValue('walletConnectProjectId'),
     showQrModal: true,
