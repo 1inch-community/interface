@@ -21,6 +21,8 @@ export class EsbuildController {
   }
 
   async build() {
+    this.logger.log('build bundle in progress')
+    this.logger.removeError('build bundle error')
     const config = await this.getBuildConfig();
     try {
       await esbuild.build(config)
@@ -30,10 +32,13 @@ export class EsbuildController {
       this.lastBuildIsError = false
     } catch (error) {
       this.lastBuildIsError = true
+      this.logger.error('build bundle error', error)
     }
+    this.logger.log('build bundle complete')
   }
 
   async rebuild() {
+    this.logger.log('rebuild bundle in progress')
     if (this.lastBuildIsError) {
       return await this.build()
     }
@@ -42,6 +47,7 @@ export class EsbuildController {
     } catch (error) {
       this.lastBuildIsError = true
     }
+    this.logger.log('rebuild bundle complete')
   }
 
   async terminate() {

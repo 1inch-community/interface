@@ -3,7 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { ChainId, IConnectWalletController } from '@one-inch-community/models';
 import '@one-inch-community/ui-components/button';
 import '@one-inch-community/ui-components/icon';
-import { observe, getMobileMatchMediaAndSubscribe } from '@one-inch-community/ui-components/lit';
+import { observe, getMobileMatchMediaAndSubscribe } from '@one-inch-community/lit';
 import { chainSelectorStyle } from './chain-selector.style';
 import { defer, filter, map } from 'rxjs';
 import { when } from 'lit/directives/when.js';

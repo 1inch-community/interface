@@ -1,12 +1,23 @@
 export interface ILogger {
-  error(message: string, error: Error): void;
+  readonly globalContextName: string
+  error(message: string, error: unknown): void;
   removeError(message: string): void;
   log(message: string): void;
   setLoadingState(state: boolean): void
+  fork(globalContextName: string): ILogger
 }
 
-export interface ILibraryLogger extends ILogger {
-  fork(moduleName: string): ILogger
-  openContext(moduleName: string): void
+export interface ILoggerInternal extends ILogger {
+  openContext(localContextName: string): void
   closeContext(): void
+  render(context?: IContext[]): void
 }
+
+export interface IContext {
+  name: string
+  message: string
+  parentContextName: string
+  isLoading: boolean
+  error: Map<string, unknown>
+}
+

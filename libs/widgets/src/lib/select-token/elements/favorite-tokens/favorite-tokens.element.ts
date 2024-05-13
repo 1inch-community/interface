@@ -9,7 +9,7 @@ import '@one-inch-community/widgets/token-icon';
 import '@one-inch-community/ui-components/icon';
 import { favoriteTokensStyles } from './favorite-tokens.styles';
 import { BehaviorSubject, combineLatest, defer, map, shareReplay, startWith, switchMap, tap } from 'rxjs';
-import { observe, animationMap, subscribe } from '@one-inch-community/ui-components/lit';
+import { observe, animationMap, subscribe } from '@one-inch-community/lit';
 import { TokenController } from '@one-inch-community/sdk';
 import { scrollbarStyle } from '@one-inch-community/ui-components/theme';
 import { emitSelectTokenEvent } from '../../events';

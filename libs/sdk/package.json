@@ -2,10 +2,11 @@
   "name": "sdk",
   "version": "0.0.1",
   "peerDependencies": {
-    "@one-inch-community/models": "0.0.1",
+    "@one-inch-community/models": "0.1.x",
     "dexie": "3.2.x",
     "tslib": "2.3.0",
     "viem": "2.9.x",
+    "rxjs": "7.x.x",
     "@walletconnect/ethereum-provider": "2.12.x",
     "@walletconnect/universal-provider": "2.12.x",
     "@walletconnect/modal": "2.6.x",

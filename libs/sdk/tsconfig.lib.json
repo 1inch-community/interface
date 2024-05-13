@@ -2,7 +2,6 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "declaration": true,
-    "skipLibCheck": true,
     "useDefineForClassFields": false,
     "experimentalDecorators": true,
     "types": ["node"],
@@ -16,6 +15,6 @@
     "sourceMap": true,
     "declarationMap": true
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*.ts"],
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
 }

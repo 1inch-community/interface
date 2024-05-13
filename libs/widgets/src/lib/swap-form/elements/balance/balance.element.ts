@@ -7,7 +7,7 @@ import { balanceStyles } from './balance.styles';
 import { catchError, combineLatest, defer, filter, map, switchMap } from 'rxjs';
 import { formatUnits } from 'viem';
 import { formatNumber, getBalance } from '@one-inch-community/sdk';
-import { observe } from '@one-inch-community/ui-components/lit';
+import { observe } from '@one-inch-community/lit';
 
 @customElement(BalanceElement.tagName)
 export class BalanceElement extends LitElement {

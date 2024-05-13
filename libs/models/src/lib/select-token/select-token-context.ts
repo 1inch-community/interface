@@ -1,6 +1,6 @@
 import { type Observable } from 'rxjs';
 import { type Address } from 'viem';
-import { ChainId } from '../chain/chain-id';
+import { ChainId } from '../chain';
 
 export interface ISelectTokenContext {
   readonly chainId$: Observable<ChainId>

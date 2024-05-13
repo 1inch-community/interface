@@ -7,16 +7,23 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
+        "env": {
+          "libName": "ui-components"
+        },
         "commands": [
-          "node tools/esbuild/build.mjs --lib-name ui-components"
+          "ts-node --project ./tools/packagr/tsconfig.json tools/packagr/main.ts"
         ]
       }
     },
     "watch": {
       "executor": "nx:run-commands",
       "options": {
+        "env": {
+          "libName": "ui-components",
+          "isWatch": true
+        },
         "commands": [
-          "node tools/esbuild/build.mjs --lib-name ui-components --watch"
+          "ts-node --project ./tools/packagr/tsconfig.json tools/packagr/main.ts"
         ]
       }
     },

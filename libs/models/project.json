@@ -7,8 +7,12 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
+        "env": {
+          "libName": "models",
+          "oneModuleLibrary": true
+        },
         "commands": [
-          "node tools/esbuild/build.mjs --lib-name models"
+          "ts-node --project ./tools/packagr/tsconfig.json tools/packagr/main.ts"
         ]
       }
     },

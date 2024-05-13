@@ -9,7 +9,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { map as litMap } from 'lit/directives/map.js';
 import '@one-inch-community/ui-components/icon';
 import '@one-inch-community/ui-components/button';
-import { appendStyle, async, subscribe } from '@one-inch-community/ui-components/lit';
+import { appendStyle, async, subscribe } from '@one-inch-community/lit';
 import { tap } from 'rxjs';
 import { Address } from 'viem';
 import { consume } from '@lit/context';

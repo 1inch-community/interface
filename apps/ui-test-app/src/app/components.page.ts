@@ -4,7 +4,6 @@ import '@one-inch-community/ui-components/button'
 import '@one-inch-community/ui-components/card'
 import '@one-inch-community/ui-components/icon'
 import '@one-inch-community/ui-components/segmented-control'
-import '../../../../libs/ui-components/src/lib/modules/token-icon/public-api'
 import type { SegmentedControlItem } from '@one-inch-community/ui-components/segmented-control'
 import {
   MainColors,

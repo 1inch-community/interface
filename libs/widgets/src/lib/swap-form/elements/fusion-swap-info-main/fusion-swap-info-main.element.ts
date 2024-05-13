@@ -2,7 +2,7 @@ import { html, LitElement } from 'lit';
 import { fusionSwapInfoMainStyle } from './fusion-swap-info-main.style';
 import { customElement, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { observe } from '@one-inch-community/ui-components/lit';
+import { observe } from '@one-inch-community/lit';
 import { consume } from '@lit/context';
 import { swapContext } from '../../context';
 import { combineLatest, debounceTime, defer, distinctUntilChanged, shareReplay, startWith, switchMap } from 'rxjs';

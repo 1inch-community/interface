@@ -12,7 +12,7 @@ import { consume } from '@lit/context';
 import { ChainId, ISelectTokenContext } from '@one-inch-community/models';
 import { selectTokenContext } from '../../context';
 import { combineLatest, debounceTime, defer, map, startWith } from 'rxjs';
-import { observe, resizeObserver } from '@one-inch-community/ui-components/lit';
+import { observe, resizeObserver } from '@one-inch-community/lit';
 import { scrollbarStyle } from '@one-inch-community/ui-components/theme';
 import { Address } from 'viem';
 import { ifDefined } from 'lit/directives/if-defined.js';

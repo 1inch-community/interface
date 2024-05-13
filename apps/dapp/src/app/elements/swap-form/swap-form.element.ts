@@ -6,7 +6,7 @@ import '@one-inch-community/ui-components/card';
 import '@one-inch-community/widgets/swap-form';
 import "@one-inch-community/widgets/wallet-manage"
 import { isTokensEqual, storage, TokenController, getChainById } from '@one-inch-community/sdk';
-import { getMobileMatchMediaAndSubscribe, observe, subscribe } from '@one-inch-community/ui-components/lit';
+import { getMobileMatchMediaAndSubscribe, observe, subscribe } from '@one-inch-community/lit';
 import { OverlayMobileController, OverlayController } from '@one-inch-community/ui-components/overlay';
 import { SceneController, sceneLazyValue } from '@one-inch-community/ui-components/scene';
 import { ChainId, IToken } from '@one-inch-community/models';

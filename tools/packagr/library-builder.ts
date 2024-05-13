@@ -1,9 +1,9 @@
-import { ILibraryLogger } from './logger';
+import { ILogger } from './logger';
 import { ModuleBuilder } from './module-builder';
 import { getLibraryDistPath, getLibraryRootPath } from './paths';
 import { moduleFinder } from './module-finder';
 import { generatePackageJson } from './generate-package-json';
-import { getLibFullName } from './names';
+import { getLibraryFullName } from './names';
 import { getLibraryPackageJson, getProjectPackageJson } from './files';
 import { ModuleBuildStatusController } from './module-build-status-controller';
 import * as fsSync from 'fs';
@@ -14,7 +14,7 @@ export class LibraryBuilder {
   private moduleBuilders: ModuleBuilder[] = []
 
   constructor(
-    private readonly logger: ILibraryLogger,
+    private readonly logger: ILogger,
     private readonly libName: string,
     private readonly isWatch: boolean,
     private readonly isProduction: boolean,
@@ -26,9 +26,14 @@ export class LibraryBuilder {
   async build() {
     this.logger.log('build in progress')
     await this.removeDist()
-    await Promise.all(this.moduleBuilders.map(builder => builder.terminate()))
+    await this.terminate()
     const module = await moduleFinder(getLibraryRootPath(this.libName));
-    const statusController = new ModuleBuildStatusController(module.map(info => info.moduleName))
+    const packageJson = await getProjectPackageJson()
+    const statusController = new ModuleBuildStatusController(
+      module.map(info => info.moduleName),
+      packageJson.name,
+      this.libName
+    )
     this.moduleBuilders = module.map(info => new ModuleBuilder(
       this.logger.fork(info.moduleName),
       statusController,
@@ -41,6 +46,12 @@ export class LibraryBuilder {
     ))
     await Promise.all(this.moduleBuilders.map(builder => builder.build()))
     await this.generatePackageJson()
+    this.logger.log('build complete')
+  }
+
+  async terminate() {
+    await Promise.all(this.moduleBuilders.map(builder => builder.terminate()))
+    this.moduleBuilders = []
   }
 
   async generatePackageJson() {
@@ -57,7 +68,7 @@ export class LibraryBuilder {
     const projectName = packageJson.name
     const version = packageJson.version
     await generatePackageJson({
-      name: getLibFullName(projectName, this.libName),
+      name: getLibraryFullName(projectName, this.libName),
       version: version,
       type: "module",
       peerDependencies: libPackageJson?.peerDependencies ?? {},
