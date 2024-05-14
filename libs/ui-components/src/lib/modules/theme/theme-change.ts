@@ -1,7 +1,7 @@
 import { brandColorMap, mainColorMap } from './themes';
 import { mainColorStyleElement, brandColorStyleElement } from './theme-elements';
 import { MainColors, BrandColors } from './themes/themes';
-import { applyStyle, setThemeColor } from '../lit/dom.utils';
+import { applyStyle, setThemeColor } from '@one-inch-community/lit';
 import { Observable, Subject } from 'rxjs';
 
 let currentMainColor: MainColors

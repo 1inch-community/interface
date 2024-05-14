@@ -1,5 +1,5 @@
 import { css } from 'lit';
-import { mobileMediaCSS } from '../lit/match-media';
+import { mobileMediaCSS } from '@one-inch-community/lit';
 
 export const cardHeaderStyle = css`
 

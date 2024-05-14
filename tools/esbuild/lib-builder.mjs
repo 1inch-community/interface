@@ -88,9 +88,6 @@ export class LibBuilder {
     if (this.oneModuleLibrary) return
     const pkg = this.getPackageJson();
     const pkgGlobal = this.getProjectPackageJson();
-    const module = `./index.esm.js`
-    const main = `./index.cjs.js`
-    const types = `./index.d.ts`
     const exports = {}
 
     this.modules.forEach(({ moduleName, modulePublicApiPath }) => {

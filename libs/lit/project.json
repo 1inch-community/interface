@@ -1,0 +1,36 @@
+{
+  "name": "lit",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/lit/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "env": {
+          "libName": "lit",
+          "oneModuleLibrary": true
+        },
+        "commands": [
+          "ts-node --project ./tools/packagr/tsconfig.json tools/packagr/main.ts"
+        ]
+      }
+    },
+    "watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "node tools/esbuild/build.mjs --lib-name lit --watch"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["{options.reportsDirectory}"],
+      "options": {
+        "reportsDirectory": "../../coverage/temp/ui-components"
+      }
+    }
+  },
+  "tags": []
+}

@@ -5,11 +5,5 @@
   "sourceRoot": "apps/ui-test-app/src",
   "tags": [],
   "targets": {
-    "run:app-and-deps": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "concurrently --kill-others \"nx run ui-test-app:serve\" \"nx run ui-components:watch\""
-      }
-    }
   }
 }

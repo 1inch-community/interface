@@ -2,7 +2,7 @@ import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { buttonSizeStyle, buttonStyle, buttonTypeStyle } from './button.style';
-import { vibrate } from '../lit/dom.utils';
+import { vibrate } from '@one-inch-community/lit';
 
 type ButtonSize = 'm' | 'l' | 'xl' | 'xxl'
 type ButtonType =

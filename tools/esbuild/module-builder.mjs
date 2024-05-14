@@ -199,8 +199,9 @@ export class ModuleBuilder {
       sourcemap: true,
       platform: 'browser',
       legalComments: 'none',
+      target: ['esnext'],
       tsconfig: this.tsconfigPath,
-      external: ['@one-inch-community', 'lit', ...Object.keys(pkg?.peerDependencies ?? {})],
+      // external: ['@one-inch-community', 'lit', ...Object.keys(pkg?.peerDependencies ?? {})],
       entryNames: `[dir]/[name].esm`,
       define: {
         '__environment__': JSON.stringify({

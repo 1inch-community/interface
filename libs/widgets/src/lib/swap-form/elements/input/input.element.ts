@@ -14,7 +14,7 @@ import { formatNumber } from '@one-inch-community/sdk';
 import '../balance/balance.element'
 import { inputStyle } from './input.style';
 import { swapContext } from '../../context';
-import { observe, subscribe, dispatchEvent } from '@one-inch-community/ui-components/lit';
+import { observe, subscribe, dispatchEvent } from '@one-inch-community/lit';
 import { formatUnits, parseUnits } from 'viem';
 
 @customElement(InputElement.tagName)

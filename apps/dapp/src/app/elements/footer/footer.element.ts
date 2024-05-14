@@ -2,7 +2,7 @@ import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { footerStyle } from './footer.style';
-import { getMobileMatchMedia, changeMobileMatchMedia } from '@one-inch-community/ui-components/lit';
+import { getMobileMatchMedia, changeMobileMatchMedia } from '@one-inch-community/lit';
 import '@one-inch-community/widgets/wallet-manage';
 import { getFooterHeight } from '../../platform/sizes';
 import { connectWalletController } from '../../controllers/connect-wallet-controller';

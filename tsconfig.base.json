@@ -20,6 +20,7 @@
     "typeRoots": [
       "./dist/libs/models",
       "./dist/libs/sdk",
+      "./dist/libs/lit",
       "./dist/libs/ui-components/async",
       "./dist/libs/ui-components/button",
       "./dist/libs/ui-components/card",
@@ -41,6 +42,10 @@
       "@one-inch-community/models": [
         "dist/libs/models/index",
         "dist/libs/models/*"
+      ],
+      "@one-inch-community/lit": [
+        "dist/libs/lit/index",
+        "dist/libs/lit/*"
       ],
       "@one-inch-community/sdk": [
         "dist/libs/sdk/index",

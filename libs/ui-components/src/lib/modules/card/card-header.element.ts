@@ -4,7 +4,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { cardHeaderStyle } from './card-header.style';
 import '@one-inch-community/ui-components/icon'
 import '@one-inch-community/ui-components/button'
-import { dispatchEvent } from '../lit/dom.utils';
+import { dispatchEvent } from '@one-inch-community/lit';
 
 @customElement(CardHeaderElement.tahName)
 export class CardHeaderElement extends LitElement {

@@ -10,7 +10,7 @@ import '@one-inch-community/widgets/token-icon';
 import '@one-inch-community/ui-components/icon';
 import '../token-list-stub-item';
 import { asyncTimeout } from '@one-inch-community/ui-components/async';
-import { subscribe } from '@one-inch-community/ui-components/lit';
+import { subscribe } from '@one-inch-community/lit';
 import { filter, merge, Observable, switchMap } from 'rxjs';
 import { consume } from '@lit/context';
 import { selectTokenContext } from '../../context';

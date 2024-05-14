@@ -1,4 +1,4 @@
-import { getMobileMatchMedia } from '@one-inch-community/ui-components/lit';
+import { getMobileMatchMedia } from '@one-inch-community/lit';
 
 export function getHeaderHeight() {
   const mobileMedia = getMobileMatchMedia()

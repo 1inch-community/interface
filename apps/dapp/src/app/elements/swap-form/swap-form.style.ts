@@ -1,5 +1,5 @@
 import { css } from 'lit';
-import { mobileMediaCSS } from '@one-inch-community/ui-components/lit';
+import { mobileMediaCSS } from '@one-inch-community/lit';
 
 export const swapFormStyle = css`
     

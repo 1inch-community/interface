@@ -5,7 +5,7 @@ import { consume } from '@lit/context';
 import { swapContext } from '../../context';
 import { ISwapContext, IToken } from '@one-inch-community/models';
 import { combineLatest, defer, firstValueFrom, map, Observable, of, startWith, switchMap, tap } from 'rxjs';
-import { observe, dispatchEvent, getMobileMatchMediaAndSubscribe, getMobileMatchMediaEmitter } from '@one-inch-community/ui-components/lit';
+import { observe, dispatchEvent, getMobileMatchMediaAndSubscribe, getMobileMatchMediaEmitter } from '@one-inch-community/lit';
 import { Address } from 'viem';
 import { TokenController } from '@one-inch-community/sdk';
 

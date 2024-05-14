@@ -5,13 +5,29 @@
     "start": {
       "executor": "nx:run-commands",
       "options": {
-        "parallel": false,
+        "parallel": true,
         "commands": [
-          "nx run models:build",
-          "nx run ui-components:build",
-          "nx run sdk:build",
-          "nx run widgets:build",
+          "nx run one-inch-community:watch-all-libs",
           "nx run dapp:serve"
+        ]
+      }
+    },
+    "build-all-libs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "ts-node --project ./tools/packagr/tsconfig.json tools/packagr/main.ts"
+        ]
+      }
+    },
+    "watch-all-libs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "env": {
+          "isWatch": true
+        },
+        "commands": [
+          "ts-node --project ./tools/packagr/tsconfig.json tools/packagr/main.ts"
         ]
       }
     }
