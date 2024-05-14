@@ -2,7 +2,7 @@ import { html, LitElement } from 'lit';
 import { connectWalletViewStyle } from './connect-wallet-view.style';
 import { customElement, property } from 'lit/decorators.js';
 import { IConnectWalletController } from '@one-inch-community/models';
-import { getMobileMatchMedia, observe, changeMobileMatchMedia } from '@one-inch-community/ui-components/lit';
+import { getMobileMatchMedia, observe, changeMobileMatchMedia } from '@one-inch-community/lit';
 import { OverlayController } from '@one-inch-community/ui-components/overlay';
 import '@one-inch-community/ui-components/button';
 import { defer, map } from 'rxjs';

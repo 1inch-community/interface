@@ -38,7 +38,7 @@ export class Logger {
     this.modules.set(moduleName, statusContext)
     this.show()
     if (!this.isWatch && error !== null) {
-      process.exit(-1)
+      // process.exit(-1)
     }
   }
 
@@ -59,6 +59,7 @@ export class Logger {
         ...(error ?? [])
       ].filter(Boolean).join(' '))
     }
+    return
 
     process.stdout.write('\x1Bc')
     process.stdout.write(`${this.isWatch ? 'Watch' : 'Build'} library ${this.libName}\n\n`);

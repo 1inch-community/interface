@@ -1,5 +1,5 @@
 import { AnimationType } from './animation-type';
-import { appendStyle } from '../../lit/append-style';
+import { appendStyle } from '@one-inch-community/lit';
 
 export function slideAnimation(): AnimationType {
   const initStyle = {

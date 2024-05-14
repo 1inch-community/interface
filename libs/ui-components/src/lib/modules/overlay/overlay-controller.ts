@@ -2,7 +2,7 @@ import { IOverlayController } from './overlay-controller.interface';
 import { TemplateResult } from 'lit';
 import { OverlayMobileController } from './overlay-mobile-controller';
 import { OverlayDesktopController } from './overlay-desktop-controller';
-import { getMobileMatchMedia } from '../lit/match-media';
+import { getMobileMatchMedia } from '@one-inch-community/lit';
 
 export class OverlayController implements IOverlayController {
 

@@ -7,16 +7,25 @@
     "build": {
       "executor": "nx:run-commands",
       "options": {
+        "env": {
+          "libName": "sdk",
+          "oneModuleLibrary": true
+        },
         "commands": [
-          "node tools/esbuild/build.mjs --lib-name sdk"
+          "ts-node --project ./tools/packagr/tsconfig.json tools/packagr/main.ts"
         ]
       }
     },
     "watch": {
       "executor": "nx:run-commands",
       "options": {
+        "env": {
+          "libName": "sdk",
+          "oneModuleLibrary": true,
+          "isWatch": true
+        },
         "commands": [
-          "node tools/esbuild/build.mjs --lib-name sdk --watch"
+          "ts-node --project ./tools/packagr/tsconfig.json tools/packagr/main.ts"
         ]
       }
     },

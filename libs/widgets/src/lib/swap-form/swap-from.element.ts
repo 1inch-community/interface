@@ -8,7 +8,7 @@ import "@one-inch-community/ui-components/button"
 import { IConnectWalletController, IToken } from '@one-inch-community/models';
 import { SwapContext } from '@one-inch-community/sdk';
 import { defer, distinctUntilChanged, map } from 'rxjs';
-import { observe } from '@one-inch-community/ui-components/lit';
+import { observe } from '@one-inch-community/lit';
 import { swapFromStyle } from './swap-from.style';
 import { swapContext } from './context';
 import './elements'

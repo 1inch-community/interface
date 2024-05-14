@@ -1,10 +1,9 @@
-import { html, LitElement, render, TemplateResult } from 'lit';
+import { html, render, TemplateResult } from 'lit';
 import { sceneStyle } from './scene.style';
 import { SceneWrapperElement } from './scene-wrapper.element';
 import { AnimationType } from './animations/animation-type';
 import { slideAnimation } from './animations/slide.animation';
-import { appendStyle } from '../lit/append-style';
-import { customElement } from 'lit/decorators.js';
+import { appendStyle } from '@one-inch-community/lit';
 
 type RenderConfig<T extends string> = Record<T, () => TemplateResult>
 

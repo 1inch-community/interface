@@ -2,12 +2,33 @@
   "name": "one-inch-community",
   "$schema": "node_modules/nx/schemas/project-schema.json",
   "targets": {
-    "local-registry": {
-      "executor": "@nx/js:verdaccio",
+    "start": {
+      "executor": "nx:run-commands",
       "options": {
-        "port": 4873,
-        "config": ".verdaccio/config.yml",
-        "storage": "tmp/local-registry/storage"
+        "parallel": true,
+        "commands": [
+          "nx run one-inch-community:watch-all-libs",
+          "nx run dapp:serve"
+        ]
+      }
+    },
+    "build-all-libs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "ts-node --project ./tools/packagr/tsconfig.json tools/packagr/main.ts"
+        ]
+      }
+    },
+    "watch-all-libs": {
+      "executor": "nx:run-commands",
+      "options": {
+        "env": {
+          "isWatch": true
+        },
+        "commands": [
+          "ts-node --project ./tools/packagr/tsconfig.json tools/packagr/main.ts"
+        ]
       }
     }
   }

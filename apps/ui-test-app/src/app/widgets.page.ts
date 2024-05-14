@@ -14,7 +14,7 @@ import {
 } from '@one-inch-community/ui-components/theme';
 import { SceneController } from '@one-inch-community/ui-components/scene';
 import { connectWalletController } from './connect-wallet-controller';
-import { observe } from '@one-inch-community/ui-components/lit';
+import { observe } from '@one-inch-community/lit';
 
 @customElement('app-widgets')
 export class WidgetsPage extends LitElement {

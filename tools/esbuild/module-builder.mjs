@@ -2,8 +2,7 @@ import * as path from 'path';
 import * as esbuild from 'esbuild';
 import * as fs from 'fs';
 import { generatePackageJson } from './generate-package-json.mjs';
-import { dtsBundleAsync } from './dts-bundle.mjs';
-import { findCrossDepsAsync } from './find-imports.mjs';
+import { dtsBundle } from './dts-bundle.mjs';
 
 export class ModuleBuilder {
 
@@ -13,16 +12,10 @@ export class ModuleBuilder {
 
   buildError = false;
 
-  get libFullName() {
-    return [
-      `@${this.projectName}`,
-      this.libName,
-    ].filter(Boolean).join('/');
-  }
-
   get moduleFullName() {
     return [
-      this.libFullName,
+      `@${this.libName}`,
+      this.libName,
       this.oneModuleLibrary ? null : this.moduleName
     ].filter(Boolean).join('/');
   }
@@ -56,7 +49,6 @@ export class ModuleBuilder {
   }
 
   constructor(
-    projectName,
     projectRoot,
     libName,
     moduleName,
@@ -67,8 +59,6 @@ export class ModuleBuilder {
     logger
   ) {
     this.projectRoot = projectRoot;
-    this.projectName = projectName;
-    this.oneModuleLibrary = oneModuleLibrary
     this.libName = libName;
     this.moduleName = oneModuleLibrary ? libName : moduleName;
     this.modulePublicApiPath = modulePublicApiPath;
@@ -80,9 +70,13 @@ export class ModuleBuilder {
   }
 
   async start() {
-    await this.build()
-    if (this.isWatch) {
-      await this.watch()
+    try {
+      await this.build()
+      if (this.isWatch) {
+        await this.watch()
+      }
+    } catch (error) {
+      debugger
     }
   }
 
@@ -105,7 +99,6 @@ export class ModuleBuilder {
   async build() {
     const config = this.getBuildConfig();
     try {
-      const crossModules = await this.findCrossDeps(config)
       this.setStatus('build module', true);
       await esbuild.build(config);
       await this.buildTypes()
@@ -123,7 +116,6 @@ export class ModuleBuilder {
     if (!this.context) {
       const config = this.getBuildConfig();
       this.context = await esbuild.context(config);
-      debugger
     }
 
     try {
@@ -140,15 +132,27 @@ export class ModuleBuilder {
     }
   }
 
-  buildTypes() {
+  async buildTypes() {
     this.setStatus('build types', true);
-    return dtsBundleAsync(
+    await dtsBundle(
       this.moduleName,
       this.logger,
       this.distPath,
       { index: this.modulePublicApiPath },
       this.tsconfigPath
-    )
+    ).catch(() => new Promise(resolve => {
+      this.setStatus('build types', true);
+      setTimeout(async () => {
+        await dtsBundle(
+          this.moduleName,
+          this.logger,
+          this.distPath,
+          { index: this.modulePublicApiPath },
+          this.tsconfigPath
+        )
+        resolve()
+      }, 2000)
+    }))
   }
 
   async buildPackage() {
@@ -195,8 +199,9 @@ export class ModuleBuilder {
       sourcemap: true,
       platform: 'browser',
       legalComments: 'none',
+      target: ['esnext'],
       tsconfig: this.tsconfigPath,
-      external: ['@one-inch-community', 'lit', ...Object.keys(pkg?.peerDependencies ?? {})],
+      // external: ['@one-inch-community', 'lit', ...Object.keys(pkg?.peerDependencies ?? {})],
       entryNames: `[dir]/[name].esm`,
       define: {
         '__environment__': JSON.stringify({
@@ -206,14 +211,6 @@ export class ModuleBuilder {
       },
       loader: { '.ts': 'ts' }
     };
-  }
-
-  async findCrossDeps(config) {
-    this.setStatus('find dependencies', true);
-    if (this.oneModuleLibrary) {
-      return new Set()
-    }
-    return await findCrossDepsAsync(this.libFullName, config.entryPoints.index, this.tsconfigPath)
   }
 
   getPackageJson() {

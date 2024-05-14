@@ -1,4 +1,4 @@
-import { mobileMediaCSS } from '@one-inch-community/ui-components/lit';
+import { mobileMediaCSS } from '@one-inch-community/lit';
 import { css } from 'lit';
 
 export const tokenListStubItemStyle = css`

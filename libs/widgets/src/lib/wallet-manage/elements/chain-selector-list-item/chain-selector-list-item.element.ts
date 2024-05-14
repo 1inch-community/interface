@@ -5,7 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import '@one-inch-community/ui-components/icon';
 import { ChainId, IConnectWalletController } from '@one-inch-community/models';
 import { isL2Chain } from '@one-inch-community/sdk';
-import { dispatchEvent, getMobileMatchMediaAndSubscribe } from '@one-inch-community/ui-components/lit';
+import { dispatchEvent, getMobileMatchMediaAndSubscribe } from '@one-inch-community/lit';
 import { when } from 'lit/directives/when.js';
 
 type ChainViewInfo = {

@@ -3,8 +3,8 @@ import { customElement } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 import { sceneContext } from './scene-context.token';
 import { SceneContext } from './scene-context';
-import { appendStyle } from '../lit/append-style';
-import { subscribe, resizeObserver } from '@one-inch-community/ui-components/lit';
+import { appendStyle } from '@one-inch-community/lit';
+import { subscribe, resizeObserver } from '@one-inch-community/lit';
 import { animationFrameScheduler, observeOn, of, tap } from 'rxjs';
 
 @customElement(SceneWrapperElement.tagName)

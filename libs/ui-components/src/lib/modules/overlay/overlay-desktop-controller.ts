@@ -1,6 +1,6 @@
 import { IOverlayController } from './overlay-controller.interface';
 import { html, render, TemplateResult } from 'lit';
-import { appendStyle } from '../lit/append-style';
+import { appendStyle } from '@one-inch-community/lit';
 import { getContainer } from './overlay-container';
 import { getOverlayId } from './overlay-id-generator';
 import { fromEvent, Subscription } from 'rxjs';
