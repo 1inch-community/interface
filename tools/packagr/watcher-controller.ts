@@ -1,5 +1,6 @@
 import { ILogger } from './logger';
 import * as fs from 'fs';
+import { debounce } from './debounce';
 
 export class WatcherController {
 
@@ -7,6 +8,8 @@ export class WatcherController {
   private watchers: fs.FSWatcher[] = []
   private isWork = false
   private rebuildInProgress = false
+
+  private readonly rebuildDebounce = debounce(() => this.rebuild(), 100)
 
   constructor(
     private readonly logger: ILogger,
@@ -19,13 +22,18 @@ export class WatcherController {
     this.update()
   }
 
+  addPaths(watchPaths: string[]) {
+    watchPaths.forEach(path => this.paths.add(path))
+    this.update()
+  }
+
   start() {
     if (this.isWork) {
       return
     }
     this.stop()
     this.paths.forEach(path => {
-      this.watchers.push(fs.watch(path, { recursive: true }, () => this.rebuild()))
+      this.watchers.push(fs.watch(path, { recursive: true }, () => this.rebuildDebounce()))
     })
     this.isWork = true
   }

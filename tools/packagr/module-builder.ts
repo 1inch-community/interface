@@ -1,6 +1,6 @@
 import { ILogger } from './logger';
 import { dirname } from 'path';
-import { ModuleBuildStatusController } from './module-build-status-controller';
+import { BuildStatusController } from './build-status-controller';
 import { EsbuildController } from './esbuild-controller';
 import { DtsBuildController } from './dtsbuild-controller';
 import { DependenciesFinder } from './dependencies-finder';
@@ -20,7 +20,7 @@ export class ModuleBuilder {
 
   constructor(
     private readonly logger: ILogger,
-    private readonly statusController: ModuleBuildStatusController,
+    private readonly statusController: BuildStatusController,
     private readonly libName: string,
     moduleName: string,
     public readonly modulePath: string,
@@ -56,9 +56,6 @@ export class ModuleBuilder {
     this.dependenciesFinder = new DependenciesFinder(
       this.logger,
       this.libName,
-      this.moduleName,
-      this.modulePath,
-      this.oneModuleLibrary
     )
   }
 
@@ -78,6 +75,10 @@ export class ModuleBuilder {
     if (this.isWatch) {
       this.logger.log('wait changes')
       this.watcher.addPath(dirname(this.modulePath))
+      const paths = await this.dependenciesFinder.findAllDependenciesPath(this.modulePath)
+      if (paths.length) {
+        this.watcher.addPaths(paths)
+      }
       this.watcher.start()
     }
   }
@@ -86,6 +87,11 @@ export class ModuleBuilder {
     this.logger.log('start module rebuilding')
     this.logger.setLoadingState(true)
     this.statusController.changeStatus(this.moduleName, 'building')
+
+    const paths = await this.dependenciesFinder.findAllDependenciesPath(this.modulePath)
+    if (paths.length) {
+      this.watcher.addPaths(paths)
+    }
 
     await this.waitBuildCrossDeps()
     await this.esbuildController.rebuild()
@@ -127,7 +133,7 @@ export class ModuleBuilder {
   }
 
   private async waitBuildCrossDeps() {
-    const crossDepsSet = await this.dependenciesFinder.findModuleCrossDependencies()
+    const crossDepsSet = await this.dependenciesFinder.findModuleCrossDependencies(this.modulePath, this.oneModuleLibrary)
     const crossDeps = [ ...crossDepsSet ]
     this.logger.log('wait build cross dependencies')
     await Promise.all(crossDeps.map(deps => this.statusController.waitReady(deps)))

@@ -11,12 +11,13 @@ const oneModuleLibrary = Boolean(process.env['oneModuleLibrary']);
 
 
 (async () => {
+  const packageJson = await getProjectPackageJson()
+  Reflect.set(globalThis.process, 'title', [packageJson.name, libName ?? '', 'builder'].filter(Boolean).join('-'))
   if (libName) {
     const logger = Logger.now(libName)
     const builder = new LibraryBuilder(logger, libName, isWatch, isProduction, oneModuleLibrary)
     await builder.build()
   } else {
-    const packageJson = await getProjectPackageJson()
     const logger = Logger.now(packageJson.name)
     const builder = new ProjectBuilder(logger, isWatch, isProduction)
     await builder.build()

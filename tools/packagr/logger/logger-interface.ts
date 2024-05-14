@@ -6,18 +6,3 @@ export interface ILogger {
   setLoadingState(state: boolean): void
   fork(globalContextName: string): ILogger
 }
-
-export interface ILoggerInternal extends ILogger {
-  openContext(localContextName: string): void
-  closeContext(): void
-  render(context?: IContext[]): void
-}
-
-export interface IContext {
-  name: string
-  message: string
-  parentContextName: string
-  isLoading: boolean
-  error: Map<string, unknown>
-}
-

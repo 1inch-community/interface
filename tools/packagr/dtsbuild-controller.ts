@@ -8,15 +8,8 @@ import { ILogger } from './logger';
 import * as path from 'path';
 import * as fsSync from 'fs'
 import { findFilesByName } from './files';
-import { inIgnoreList } from './types-ignore-list';
 
 const fs = fsSync.promises
-
-const formatHost: ts.FormatDiagnosticsHost = {
-  getCanonicalFileName: path => path,
-  getCurrentDirectory: ts.sys.getCurrentDirectory,
-  getNewLine: () => ts.sys.newLine
-};
 
 export class DtsBuildController {
 
@@ -43,8 +36,8 @@ export class DtsBuildController {
     this.logger.removeError('type emit skipped')
 
     try {
-      this.buildCompiler()
-      const result = this.compile()
+      // this.buildCompiler()
+      const result = this.compileMono()
       if (result) {
         await this.moveAllTypes()
         await this.createIndexDts()
@@ -62,7 +55,7 @@ export class DtsBuildController {
     this.logger.removeError('types build error')
     this.logger.removeError('type emit skipped')
     try {
-      const result = this.compile()
+      const result = this.compileMono()
       if (result) {
         await this.moveAllTypes()
       } else {
@@ -83,7 +76,7 @@ export class DtsBuildController {
     const configFile = ts.readConfigFile(getLibraryTsconfigPath(this.libName), ts.sys.readFile);
     const parsedCommandLine = ts.parseJsonConfigFileContent(configFile.config, ts.sys, libRootPath);
     this.files = parsedCommandLine.fileNames.filter(filePath => {
-      return filePath.includes(moduleRoot) && !inIgnoreList(filePath)
+      return filePath.includes(moduleRoot)
     })
     this.options = {
       ...parsedCommandLine.options,
@@ -121,6 +114,36 @@ export class DtsBuildController {
     return !emitResult.emitSkipped
   }
 
+  private compileMono() {
+    const moduleRoot = path.dirname(this.modulePath)
+    const libRootPath = getLibraryRootPath(this.libName)
+    const configFile = ts.readConfigFile(getLibraryTsconfigPath(this.libName), ts.sys.readFile);
+    const parsedCommandLine = ts.parseJsonConfigFileContent(configFile.config, ts.sys, libRootPath);
+    const fileNames = parsedCommandLine.fileNames.filter(filePath => {
+      return filePath.includes(moduleRoot)
+    })
+    const options = {
+      ...parsedCommandLine.options,
+      outDir: path.join(getModuleDistPath(this.libName, this.moduleName), '_types'),
+      declaration: true,
+      emitDeclarationOnly: true,
+      sourceMap: false,
+    }
+    const program = ts.createProgram(fileNames, options)
+    const emitResult = program.emit();
+    const allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
+    for (const diagnostic of allDiagnostics) {
+      if (diagnostic.file) {
+        const { line, character } = ts.getLineAndCharacterOfPosition(diagnostic.file, diagnostic.start ?? 0);
+        const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n');
+        this.logger.error('diagnostic types error', new Error(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`))
+      } else {
+        this.logger.error('diagnostic types error', new Error(ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')))
+      }
+    }
+    return !emitResult.emitSkipped
+  }
+
   private async moveAllTypes() {
     const dist = path.join(getModuleDistPath(this.libName, this.moduleName), '_types')
     const typesPaths = await findFilesByName(dist, 'public-api.d.ts')
@@ -139,11 +162,8 @@ export class DtsBuildController {
     await Promise.all(files.map(async (file: fsSync.Dirent) => {
       const sourceFile = path.join(typesRootPath, file.name);
       const targetFile = path.join(typesDist, file.name);
-      if (file.isDirectory()) {
-        return
-      }
       if (this.isWatch) {
-        await fs.copyFile(sourceFile, targetFile)
+        await copy(sourceFile, targetFile)
       } else {
         await fs.rename(sourceFile, targetFile)
       }
@@ -160,8 +180,24 @@ export class DtsBuildController {
 
 }
 
-function restoreFileName(fileName: string): string {
-  const extname = path.extname(fileName)
-  if (extname.toLowerCase().includes('d.ts')) return fileName
-  return fileName + '.d.ts';
+async function copy(src: string, dest: string): Promise<void> {
+  const stat = await fs.stat(src);
+
+  if (stat.isDirectory()) {
+    await fs.mkdir(dest, { recursive: true });
+    const entries = await fs.readdir(src, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const srcPath = path.join(src, entry.name);
+      const destPath = path.join(dest, entry.name);
+
+      if (entry.isDirectory()) {
+        await copy(srcPath, destPath);
+      } else {
+        await fs.copyFile(srcPath, destPath);
+      }
+    }
+  } else {
+    await fs.copyFile(src, dest);
+  }
 }

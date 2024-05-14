@@ -1,10 +1,11 @@
 import ts from 'typescript';
-import * as fsSync from 'fs'
+import * as fsSync from 'fs';
 import * as path from 'node:path';
 import { getLibraryTsconfigPath } from './paths';
 import { getLibraryFullName } from './names';
 import { findFilesByName, getProjectPackageJson } from './files';
 import { ILogger } from './logger';
+
 const fs = fsSync.promises
 
 export class DependenciesFinder {
@@ -12,14 +13,11 @@ export class DependenciesFinder {
   constructor(
     private readonly logger: ILogger,
     private readonly libName: string,
-    private readonly moduleName: string,
-    private readonly moduleEntry: string,
-    private readonly oneModuleLibrary: boolean
   ) {
   }
 
-  async findModuleCrossDependencies() {
-    if (this.oneModuleLibrary) {
+  async findModuleCrossDependencies(moduleEntry: string, oneModuleLibrary: boolean): Promise<Set<string>> {
+    if (oneModuleLibrary) {
       return new Set<string>()
     }
     this.logger.log('find cross dependencies in progress')
@@ -28,8 +26,43 @@ export class DependenciesFinder {
     if (!options) {
       return new Set<string>()
     }
+    const packageJson = await getProjectPackageJson()
+    const libName = getLibraryFullName(packageJson.name, this.libName)
+    const result = await this.findAllDependencies(moduleEntry, options, libName)
     this.logger.log('find cross dependencies ready')
-    return await this.findAllDependencies(this.moduleEntry, options)
+    return result
+  }
+
+  async findAllDependenciesPath(moduleEntry: string): Promise<string[]> {
+    const tsconfigPath = getLibraryTsconfigPath(this.libName)
+    const options = await this.readConfigFile(tsconfigPath)
+    if (!options) {
+      return []
+    }
+    const packageJson = await getProjectPackageJson()
+    const resultSer = await this.findAllDependencies(moduleEntry, options, `@${packageJson.name}/`)
+    const result: string[] = []
+    resultSer.forEach(dep => {
+      const depPath = getDependencyPath(dep, options)
+      depPath && result.push(path.dirname(depPath))
+    })
+    return result
+  }
+
+  async findLibraryCrossDependencies(moduleEntries: string[]): Promise<Set<string>> {
+    this.logger.log('find cross dependencies in progress')
+    const tsconfigPath = getLibraryTsconfigPath(this.libName)
+    const options = await this.readConfigFile(tsconfigPath)
+    if (!options) {
+      return new Set<string>()
+    }
+    const packageJson = await getProjectPackageJson()
+    const resultList: string[] = []
+    for (const moduleEntry of moduleEntries) {
+      const result = await this.findAllDependencies(moduleEntry, options, name => name.startsWith(`@${packageJson.name}/`) && ((name.split('/').length - 1) < 2))
+      resultList.push(...result.values())
+    }
+    return new Set(resultList)
   }
 
   private async readConfigFile(filePath: string) {
@@ -50,9 +83,7 @@ export class DependenciesFinder {
     return configParseResult.options;
   }
 
-  private async findAllDependencies(filePath: string, options: ts.CompilerOptions) {
-    const packageJson = await getProjectPackageJson()
-    const libName = getLibraryFullName(packageJson.name, this.libName)
+  private async findAllDependencies(filePath: string, options: ts.CompilerOptions, target: string | ((name: string) => boolean)) {
     const imports = new Set<string>()
     const moduleFiles = await findFilesByName(path.dirname(filePath), file => file.includes('.ts'))
 
@@ -68,7 +99,7 @@ export class DependenciesFinder {
           const specifier = node.moduleSpecifier;
           if (ts.isStringLiteral(specifier)) {
             const moduleName = specifier.text;
-            if (moduleName.includes(libName)) {
+            if (typeof target === 'function' ? target(moduleName) : moduleName.startsWith(target)) {
               imports.add(moduleName);
             }
           }
@@ -80,3 +111,14 @@ export class DependenciesFinder {
   }
 
 }
+
+function getDependencyPath(dependency: string, options: ts.CompilerOptions): string | null {
+  if (options.paths && options.baseUrl) {
+    const paths = options.paths[dependency] || [];
+    if (paths.length > 0) {
+      return path.resolve(options.baseUrl, paths[0]);
+    }
+  }
+  return null;
+}
+
