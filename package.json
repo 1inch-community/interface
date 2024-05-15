@@ -59,26 +59,5 @@
     "vite-plugin-dts": "~2.3.0",
     "vite-plugin-html": "^3.2.2",
     "vitest": "^1.5.3"
-  },
-  "nx": {
-    "includedScripts": []
-  },
-  "release": {
-    "branches": ["desktop-dapp"],
-    "plugins": [
-      "@semantic-release/commit-analyzer",
-      "@semantic-release/release-notes-generator",
-      "@semantic-release/changelog",
-      "@semantic-release/github",
-      [
-        "@semantic-release/git",
-        {
-          "assets": [
-            "package.json"
-          ],
-          "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
-        }
-      ]
-    ]
   }
 }
