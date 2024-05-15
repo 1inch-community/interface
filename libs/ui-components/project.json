@@ -11,7 +11,7 @@
           "libName": "ui-components"
         },
         "commands": [
-          "ts-node --project ./tools/packagr/tsconfig.json tools/packagr/main.ts"
+          "pnpm run build:lib"
         ]
       }
     },
@@ -23,7 +23,7 @@
           "isWatch": true
         },
         "commands": [
-          "ts-node --project ./tools/packagr/tsconfig.json tools/packagr/main.ts"
+          "pnpm run build:lib"
         ]
       }
     },

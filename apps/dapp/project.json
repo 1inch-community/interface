@@ -17,10 +17,7 @@
     "build:electron": {
       "executor": "nx:run-commands",
       "options": {
-        "command": "nx run dapp:build",
-        "env": {
-          "OUT_DIR": "../../apps/electron-dapp/src/renderer"
-        }
+        "command": "nx run dapp:build --mode electron"
       }
     }
   }

@@ -1,20 +1,46 @@
 {
   "name": "electron-dapp",
   "version": "0.0.1",
-  "description": "",
   "main": "./out/main/index.js",
-  "author": "",
-  "homepage": "",
   "scripts": {
+    "start": "electron-vite dev"
+  },
+  "build": {
+    "appId": "io.1inch.dapp",
+    "mac": {
+      "publish": ["github"],
+      "category": "public.app-category.finance"
+    },
+    "win": {
+      "publish": ["github"],
+      "target": "nsis"
+    },
+    "linux": {
+      "publish": ["github"],
+      "target": "AppImage"
+    }
+  },
+  "publish": [
+    {
+      "provider": "github",
+      "owner": "DKotsyuba",
+      "repo": "1inch-community/interface",
+      "protocol": "ssh"
+    }
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/1inch-community/interface.git"
   },
   "devDependencies": {
     "@electron-toolkit/preload": "^3.0.1",
-    "@electron-toolkit/utils": "^3.0.0",
     "@electron-toolkit/tsconfig": "^1.0.1",
-    "electron": "^30.0.2",
+    "@electron-toolkit/utils": "^3.0.0",
+    "dotenv": "^16.4.5",
+    "electron": "^30.0.4",
+    "electron-builder": "^24.13.3",
     "electron-store": "9.0.0",
     "electron-updater": "^6.1.8",
-    "electron-builder": "^24.13.3",
     "electron-vite": "^2.2.0"
   }
 }

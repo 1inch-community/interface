@@ -1,4 +1,6 @@
-import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
+import { defineConfig, externalizeDepsPlugin } from 'electron-vite';
+import { dirname, join } from 'path'
+
 
 export default defineConfig({
   main: {
@@ -8,6 +10,12 @@ export default defineConfig({
     plugins: [externalizeDepsPlugin()]
   },
   renderer: {
-    publicDir
+    base: './',
+    root: join(dirname(dirname(__dirname)), 'dist', 'apps', 'dapp'),
+    build: {
+      rollupOptions: {
+        input: join(dirname(dirname(__dirname)), 'dist', 'apps', 'dapp', 'index.html'),
+      }
+    }
   }
 })

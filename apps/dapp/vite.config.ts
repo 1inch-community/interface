@@ -2,51 +2,69 @@
 import { defineConfig } from 'vite';
 
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
+import { createHtmlPlugin } from 'vite-plugin-html';
 
-export default defineConfig({
-  root: __dirname,
-  cacheDir: '../../node_modules/.vite/apps/dapp',
+export default defineConfig(({ mode }) => {
+  const isElectron = mode === 'electron';
+  const isProduction = mode === 'production';
 
-  optimizeDeps: {
-    include: ['tslib']
-  },
+  const _isProduction = isElectron || isProduction
 
-  define: {
-    global: {},
-  },
+  return {
+    root: __dirname,
+    cacheDir: '../../node_modules/.vite/apps/dapp',
 
-  server: {
-    port: 4200,
-    host: '0.0.0.0',
-  },
+    optimizeDeps: {
+      include: ['tslib']
+    },
 
-  preview: {
-    port: 4300,
-    host: '0.0.0.0',
-  },
+    define: {
+      global: {},
+    },
 
-  plugins: [
-    nxViteTsPaths(),
-  ],
+    server: {
+      port: 4200,
+      host: '0.0.0.0',
+    },
 
-  // Uncomment this if you are using workers.
-  // worker: {
-  //  plugins: [ nxViteTsPaths() ],
-  // },
+    preview: {
+      port: 4300,
+      host: '0.0.0.0',
+    },
 
-  build: {
-    outDir: process.env['OUT_DIR'] ?? '../../dist/apps/dapp',
-    reportCompressedSize: true,
-    sourcemap: true,
-    terserOptions: {
-      format: {
-        comments: false
+    plugins: [
+      nxViteTsPaths(),
+      createHtmlPlugin({
+        inject: {
+          data: {
+            baseHref: isElectron ? './' : '/'
+          },
+        },
+      }),
+    ],
+
+    // Uncomment this if you are using workers.
+    // worker: {
+    //  plugins: [ nxViteTsPaths() ],
+    // },
+
+    build: {
+      outDir: '../../dist/apps/dapp',
+      reportCompressedSize: true,
+      minify: _isProduction,
+      sourcemap: true,
+      terserOptions: {
+        format: {
+          comments: false
+        },
+        compress: _isProduction,
       },
-      compress: true,
+      commonjsOptions: {
+        transformMixedEsModules: true,
+      },
     },
-    commonjsOptions: {
-      transformMixedEsModules: true,
+    esbuild: {
+      legalComments: 'none'
     },
-  },
-  esbuild: { legalComments: 'none' },
+  }
 });
