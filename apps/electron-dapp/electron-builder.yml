@@ -1,5 +1,5 @@
-appId: com.electron.app
-productName: electron-app
+appId: io.1inch.dapp
+productName: 1inch-dApp
 directories:
   buildResources: build
 files:
@@ -12,32 +12,34 @@ files:
 asarUnpack:
   - resources/**
 win:
-  executableName: electron-app
+  executableName: 1inch-dApp
+  target:
+    - nsis
+    - zip
 nsis:
-  artifactName: ${name}-${version}-setup.${ext}
+  artifactName: ${name}-${version}-${arch}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
 mac:
+  category: public.app-category.finance
   entitlementsInherit: build/entitlements.mac.plist
-  extendInfo:
-    - NSCameraUsageDescription: Application requests access to the device's camera.
-    - NSMicrophoneUsageDescription: Application requests access to the device's microphone.
-    - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
-    - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
+  target:
+    - dmg
+    - zip
 dmg:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: ${name}-${version}-${arch}.${ext}
 linux:
   target:
     - AppImage
-    - snap
-    - deb
-  maintainer: electronjs.org
-  category: Utility
+  maintainer: 1inch.io
+  category: Finance
 appImage:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: ${name}-${version}-${arch}.${ext}
 npmRebuild: false
 publish:
-  provider: generic
-  url: https://example.com/auto-updates
+  provider: github
+  owner: DKotsyuba
+  repo: 1inch-community/interface
+  releaseType: draft

@@ -21,18 +21,9 @@
           "killClone": "true"
         },
         "commands": [
-          "nx run one-inch-community:build-all-libs",
-          "nx run dapp:build:electron",
           "electron-vite build --entry ./out/main/index.js",
-          "electron-builder -c ./electron-builder.yml build"
+          "electron-builder -c ./electron-builder.yml build -mwl"
         ]
-      }
-    },
-    "publish": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/electron-dapp",
-        "command": "electron-builder --publish always"
       }
     }
   }
