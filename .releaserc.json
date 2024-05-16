@@ -7,7 +7,11 @@
     [
       "@semantic-release/git",
       {
-        "assets": ["CHANGELOG.md", "package.json"],
+        "assets": [
+          "CHANGELOG.md",
+          "package.json",
+          "apps/electron-dapp/package.json"
+        ],
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ],
@@ -20,7 +24,7 @@
     [
       "@semantic-release/exec",
         {
-          "prepareCmd": "node tools/scripts/update-versions.js ${nextRelease.version}"
+          "prepareCmd": "sh tools/scripts/publish.sh ${nextRelease.version}"
         }
     ],
     [
@@ -30,7 +34,10 @@
           {"path": "apps/electron-dapp/dist/*.dmg"},
           {"path": "apps/electron-dapp/dist/*.zip"},
           {"path": "apps/electron-dapp/dist/*.exe"},
-          {"path": "apps/electron-dapp/dist/*.AppImage"}
+          {"path": "apps/electron-dapp/dist/*.AppImage"},
+          {"path": "apps/electron-dapp/dist/latest.yml"},
+          {"path": "apps/electron-dapp/dist/latest-mac.yml"},
+          {"path": "apps/electron-dapp/dist/latest-linux.yml"}
         ]
       }
     ]
