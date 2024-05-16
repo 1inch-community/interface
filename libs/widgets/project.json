@@ -26,10 +26,6 @@
           "pnpm run build:lib"
         ]
       }
-    },
-    "publish": {
-      "command": "node tools/scripts/publish.mjs widgets {args.ver} {args.tag}",
-      "dependsOn": ["build"]
     }
   },
   "tags": []

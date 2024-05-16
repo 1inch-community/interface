@@ -3,9 +3,12 @@ import { subscribe } from './subscribe-reactive-controller';
 import { Observable, defer, fromEvent, shareReplay } from 'rxjs';
 
 const mobileMediaString = 'screen and (max-width: 610px)' as const
-const mobileMatchMedia = matchMedia(mobileMediaString)
+let mobileMatchMedia: MediaQueryList;
 
 export function getMobileMatchMedia() {
+  if (!mobileMatchMedia) {
+    mobileMatchMedia = matchMedia(mobileMediaString)
+  }
   return mobileMatchMedia
 }
 
