@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/1inch-community/interface/compare/v1.1.0...v1.2.0) (2024-05-16)
+
+
+### Features
+
+* added app icons for electron dapp ([5c70b9b](https://github.com/1inch-community/interface/commit/5c70b9bb9e0f293ff104b1332774bc9a20801316))
+
 # [1.1.0](https://github.com/1inch-community/interface/compare/v1.0.0...v1.1.0) (2024-05-15)
 
 
