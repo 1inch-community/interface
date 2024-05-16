@@ -17,7 +17,7 @@ win:
     - nsis
     - zip
 nsis:
-  artifactName: ${name}-${version}-${arch}-setup.${ext}
+  artifactName: ${productName}-${arch}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
   createDesktopShortcut: always
@@ -29,14 +29,14 @@ mac:
     - dmg
     - zip
 dmg:
-  artifactName: ${name}-${version}-${arch}.${ext}
+  artifactName: ${productName}-${arch}.${ext}
 linux:
   target:
     - AppImage
   maintainer: 1inch.io
   category: Finance
 appImage:
-  artifactName: ${name}-${version}-${arch}.${ext}
+  artifactName: ${productName}-${arch}.${ext}
 npmRebuild: false
 publish:
   provider: github

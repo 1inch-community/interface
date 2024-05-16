@@ -1,5 +1,9 @@
 {
-  "branches": ["main", "desktop-dapp"],
+  "branches": [
+    "main",
+    "dev",
+    "desktop-dapp"
+  ],
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
@@ -24,6 +28,7 @@
           {"path": "apps/electron-dapp/dist/*.zip"},
           {"path": "apps/electron-dapp/dist/*.exe"},
           {"path": "apps/electron-dapp/dist/*.AppImage"},
+          {"path": "apps/electron-dapp/dist/latest*.yml"},
           {"path": "apps/electron-dapp/dist/latest.yml"},
           {"path": "apps/electron-dapp/dist/latest-mac.yml"},
           {"path": "apps/electron-dapp/dist/latest-linux.yml"}
