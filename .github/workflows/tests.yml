@@ -25,4 +25,4 @@ jobs:
         run: pnpm install
 
       - name: Run tests
-        run: nx run-many --target=test --all
+        run: npx nx run-many --target=test --all
