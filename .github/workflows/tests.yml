@@ -3,11 +3,12 @@ name: Tests
 on:
   push:
     branches:
-      - desktop-dapp
+      - dev
+      - main
 
 jobs:
   call-common-jobs:
-    uses: ./.github/workflows/common-jobs.yml
+    uses: .github/jobs/common-jobs.yml
 
   run-tests:
     runs-on: ubuntu-latest
