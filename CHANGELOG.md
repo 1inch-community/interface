@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/1inch-community/interface/compare/v1.3.0...v1.3.1) (2024-05-16)
+
+
+### Bug Fixes
+
+* update release flow ([e799408](https://github.com/1inch-community/interface/commit/e79940848f9b9492db03d5007bbd5f359e853f54))
+
 # [1.3.0](https://github.com/1inch-community/interface/compare/v1.2.0...v1.3.0) (2024-05-16)
 
 
