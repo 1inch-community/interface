@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/1inch-community/interface/compare/v1.2.0...v1.3.0) (2024-05-16)
+
+
+### Features
+
+* added electron-updater ([2c32a16](https://github.com/1inch-community/interface/commit/2c32a16c95807be71c6a77e140f255723893b760))
+
 # [1.2.0](https://github.com/1inch-community/interface/compare/v1.1.0...v1.2.0) (2024-05-16)
 
 
