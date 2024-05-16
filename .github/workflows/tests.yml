@@ -1,0 +1,20 @@
+name: Tests
+
+on:
+  push:
+    branches:
+      - desktop-dapp
+
+jobs:
+  call-common-jobs:
+    uses: ./.github/workflows/common-jobs.yml
+
+  run-tests:
+    runs-on: ubuntu-latest
+    needs: call-common-jobs
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Run tests for all projects
+        run: npx nx run-many --target=test --all

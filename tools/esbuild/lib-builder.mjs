@@ -6,6 +6,7 @@ import { Logger } from './logger.mjs';
 import { config } from 'dotenv';
 import { ModuleBuilder } from './module-builder.mjs';
 import { generatePackageJson } from './generate-package-json.mjs';
+import { ModuleBuildStatusController } from './module-build-status-controller.mjs';
 
 export class LibBuilder {
 
@@ -13,7 +14,7 @@ export class LibBuilder {
 
   get libFullName() {
     return [
-      `@${this.libName}`,
+      `@${this.projectName}`,
       this.libName,
     ].filter(Boolean).join('/');
   }
@@ -47,6 +48,7 @@ export class LibBuilder {
     const version = pkgGlobal.version
     this.modules = fundModules(libRoot);
 
+    this.projectName = pkgGlobal.name
     this.projectRoot = projectRoot
     this.libName = libName
     this.isWatch = isWatch
@@ -63,15 +65,12 @@ export class LibBuilder {
     await this.buildPackage()
   }
 
-  // restart() {
-  //   this.initModuleBuilders()
-  //   this.moduleBuilder.forEach(builder => builder.start())
-  // }
-
   initModuleBuilders() {
+    const statusController = new ModuleBuildStatusController()
     this.moduleBuilder.forEach(builder => builder.stop())
     this.moduleBuilder = this.modules.map(({ moduleName, modulePublicApiPath }) => {
       return new ModuleBuilder(
+        this.projectName,
         this.projectRoot,
         this.libName,
         moduleName,
@@ -79,7 +78,8 @@ export class LibBuilder {
         this.isWatch,
         this.production,
         this.oneModuleLibrary,
-        this.logger
+        this.logger,
+        statusController
       )
     })
   }

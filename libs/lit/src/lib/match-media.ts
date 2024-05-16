@@ -2,10 +2,13 @@ import { css as LitCss, CSSResult, type ReactiveControllerHost, unsafeCSS } from
 import { subscribe } from './subscribe-reactive-controller';
 import { Observable, defer, fromEvent, shareReplay } from 'rxjs';
 
-const mobileMediaString = 'screen and (max-width: 600px)' as const
-const mobileMatchMedia = matchMedia(mobileMediaString)
+const mobileMediaString = 'screen and (max-width: 610px)' as const
+let mobileMatchMedia: MediaQueryList;
 
 export function getMobileMatchMedia() {
+  if (!mobileMatchMedia) {
+    mobileMatchMedia = matchMedia(mobileMediaString)
+  }
   return mobileMatchMedia
 }
 

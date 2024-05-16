@@ -11,7 +11,7 @@
           "libName": "ui-components"
         },
         "commands": [
-          "ts-node --project ./tools/packagr/tsconfig.json tools/packagr/main.ts"
+          "pnpm run build:lib"
         ]
       }
     },
@@ -23,7 +23,7 @@
           "isWatch": true
         },
         "commands": [
-          "ts-node --project ./tools/packagr/tsconfig.json tools/packagr/main.ts"
+          "pnpm run build:lib"
         ]
       }
     },
@@ -32,7 +32,11 @@
       "outputs": ["{options.reportsDirectory}"],
       "options": {
         "reportsDirectory": "../../coverage/temp/ui-components"
-      }
+      },
+      "dependsOn": [
+        { "projects": "models", "target": "build" },
+        { "projects": "lit", "target": "build" }
+      ]
     }
   },
   "tags": []

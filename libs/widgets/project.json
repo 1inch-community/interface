@@ -11,21 +11,21 @@
           "libName": "widgets"
         },
         "commands": [
-          "ts-node --project ./tools/packagr/tsconfig.json tools/packagr/main.ts"
+          "pnpm run build:lib"
         ]
       }
     },
     "watch": {
       "executor": "nx:run-commands",
       "options": {
+        "env": {
+          "libName": "widgets",
+          "isWatch": true
+        },
         "commands": [
-          "node tools/esbuild/build.mjs --lib-name widgets --watch"
+          "pnpm run build:lib"
         ]
       }
-    },
-    "publish": {
-      "command": "node tools/scripts/publish.mjs widgets {args.ver} {args.tag}",
-      "dependsOn": ["build"]
     }
   },
   "tags": []

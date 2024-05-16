@@ -106,6 +106,16 @@ export const walletViewStyle = css`
             transform: translate3d(0, 0, 0);
         }
     }
+    
+    @media (hover: none) {
+        .wallet-view-container__wc.wallet-view-container__connected:not(.wallet-view-container__loading) .right-data {
+            transform: translate3d(0, 0, 0);
+        }
+
+        .add-connection {
+            transform: scale(1);
+        }
+    }
 
     @keyframes rainbow {
         0% {

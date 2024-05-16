@@ -1,3 +1,5 @@
+import { parentPort } from 'worker_threads';
+
 export class Logger {
 
   modules = new Map()
@@ -102,3 +104,16 @@ function getStatusIcon(status) {
   return '✅'
 }
 
+export class ThreadLogger {
+  setStatus(moduleName, statusName, isLoading) {
+    parentPort.postMessage([ 'logger', [ 'setStatus', [moduleName, statusName, isLoading] ] ]);
+  }
+
+  setError(moduleName, errorName, error) {
+    parentPort.postMessage([ 'logger', [ 'setError', [moduleName, errorName, error] ] ]);
+  }
+
+  addModule(moduleName) {
+    parentPort.postMessage([ 'logger', [ 'setStatus', [ moduleName ] ] ]);
+  }
+}

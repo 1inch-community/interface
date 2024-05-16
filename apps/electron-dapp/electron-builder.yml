@@ -1,0 +1,49 @@
+appId: io.1inch.dapp
+productName: 1inch-dApp
+afterSign: ./build/notarize.js
+directories:
+  buildResources: build
+files:
+  - '!**/.vscode/*'
+  - '!src/*'
+  - '!electron.vite.config.{js,ts,mjs,cjs}'
+  - '!{.eslintignore,.eslintrc.js,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
+  - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
+  - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
+asarUnpack:
+  - resources/**
+win:
+  executableName: 1inch-dApp
+  target:
+    - nsis
+    - zip
+nsis:
+  oneClick: false
+  artifactName: ${productName}-${arch}-setup.${ext}
+  shortcutName: ${productName}
+  uninstallDisplayName: ${productName}
+  createDesktopShortcut: always
+mac:
+  category: public.app-category.finance
+  entitlementsInherit: build/entitlements.mac.plist
+  entitlements: build/entitlements.mac.plist
+  hardenedRuntime: true
+  notarize: false
+  target:
+    - dmg
+    - zip
+dmg:
+  artifactName: ${productName}-${arch}.${ext}
+linux:
+  target:
+    - AppImage
+  maintainer: 1inch.io
+  category: Finance
+appImage:
+  artifactName: ${productName}-${arch}.${ext}
+npmRebuild: false
+publish:
+  provider: github
+  owner: DKotsyuba
+  repo: 1inch-community/interface
+  releaseType: draft
