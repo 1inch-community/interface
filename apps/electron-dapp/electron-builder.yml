@@ -1,5 +1,6 @@
 appId: io.1inch.dapp
 productName: 1inch-dApp
+afterSign: ./build/notarize.js
 directories:
   buildResources: build
 files:
@@ -17,6 +18,7 @@ win:
     - nsis
     - zip
 nsis:
+  oneClick: false
   artifactName: ${productName}-${arch}-setup.${ext}
   shortcutName: ${productName}
   uninstallDisplayName: ${productName}
@@ -24,6 +26,8 @@ nsis:
 mac:
   category: public.app-category.finance
   entitlementsInherit: build/entitlements.mac.plist
+  entitlements: build/entitlements.mac.plist
+  hardenedRuntime: true
   notarize: false
   target:
     - dmg
