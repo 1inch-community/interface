@@ -29,7 +29,7 @@ runs:
         cache: pnpm
 
     - name: Install dependencies
-      run: pnpm install --ignore-scripts
+      run: pnpm install --ignore-scripts --frozen-lockfile
       shell: bash
 
     - name: Install NX globally

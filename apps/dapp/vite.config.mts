@@ -51,17 +51,13 @@ export default defineConfig(({ mode }) => {
     build: {
       outDir: '../../dist/apps/dapp',
       reportCompressedSize: true,
-      minify: _isProduction,
       sourcemap: true,
       terserOptions: {
         format: {
           comments: false
         },
         compress: _isProduction,
-      },
-      commonjsOptions: {
-        transformMixedEsModules: true,
-      },
+      }
     },
     esbuild: {
       legalComments: 'none'

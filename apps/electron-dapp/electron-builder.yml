@@ -1,6 +1,6 @@
 appId: io.1inch.dapp
 productName: 1inch-dApp
-afterSign: ./build/notarize.js
+#afterSign: ./build/notarize.js
 directories:
   buildResources: build
 files:
@@ -42,8 +42,4 @@ linux:
 appImage:
   artifactName: ${productName}-${arch}.${ext}
 npmRebuild: false
-publish:
-  provider: github
-  owner: DKotsyuba
-  repo: 1inch-community/interface
-  releaseType: draft
+publish: null

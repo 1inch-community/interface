@@ -21,10 +21,23 @@
           "killClone": "true"
         },
         "commands": [
+          "npx nx run one-inch-community:build-all-libs",
+          "npx nx run dapp:build:electron",
+          "npx electron-vite build --entry ./out/main/index.js",
+          "npx electron-builder -c ./electron-builder.yml build -mwl"
+        ]
+      }
+    },
+    "build:ci": {
+      "executor": "nx:run-commands",
+      "options": {
+        "cwd": "apps/electron-dapp",
+        "parallel": false,
+        "commands": [
           "nx run one-inch-community:build-all-libs",
           "nx run dapp:build:electron",
           "electron-vite build --entry ./out/main/index.js",
-          "electron-builder -c ./electron-builder.yml build -mwl"
+          "electron-builder -c ./electron-builder.yml build $PLATFORM"
         ]
       }
     }
