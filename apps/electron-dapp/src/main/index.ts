@@ -8,7 +8,7 @@ dotenv.config()
 import Store from 'electron-store'
 import { initUpdater } from './updater';
 
-const store = new Store() as unknown as Map<string, any>
+const store = new Store()
 
 async function createWindow() {
   const { width, height, x, y } = store.get('windowBounds') ?? {}

@@ -28,6 +28,14 @@
           "pnpm run build:lib"
         ]
       }
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "tsc --project libs/lit/tsconfig.json --noEmit --skipLibCheck"
+        ]
+      }
     }
   },
   "tags": []

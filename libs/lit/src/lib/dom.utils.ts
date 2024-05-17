@@ -46,5 +46,6 @@ export function vibrate(pattern: VibratePattern = 40) {
   try {
     navigator.vibrate(pattern);
   } catch (error) {
+    //
   }
 }

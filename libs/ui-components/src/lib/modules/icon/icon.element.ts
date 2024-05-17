@@ -61,7 +61,6 @@ export class IconElement extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    // @ts-ignore: TS2717
     'inch-icon': IconElement
   }
 }

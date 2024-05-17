@@ -158,7 +158,6 @@ async function loadIconFromMultiChain(data: RepositoryPayload): Promise<HTMLImag
 
 declare global {
   interface HTMLElementTagNameMap {
-    // @ts-ignore: TS2717
     'inch-token-icon': TokenIconElement
   }
 }

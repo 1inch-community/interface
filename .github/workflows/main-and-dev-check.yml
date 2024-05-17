@@ -1,4 +1,4 @@
-name: Tests
+name: Main check
 
 on:
   push:
@@ -18,8 +18,11 @@ jobs:
         with:
           node-version: ${{ vars.NODE_VERSION }}
 
-      - name: Pnpm version
-        run: pnpm -v
+      - name: Run link check
+        run: npx nx run-many --target=lint --all
+
+      - name: Run building all libs
+        run: nx run one-inch-community:build-all-libs
 
       - name: Run tests for all projects
         run: npx nx run-many --target=test --all
