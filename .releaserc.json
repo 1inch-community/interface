@@ -1,8 +1,11 @@
 {
   "branches": [
     "main",
-    "dev",
-    "desktop-dapp"
+    {
+      "name": "dev",
+      "prerelease": true,
+      "channel": "dev"
+    }
   ],
   "plugins": [
     "@semantic-release/commit-analyzer",

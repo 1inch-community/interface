@@ -12,7 +12,7 @@ export async function createClientAndSyncChain(
     provider,
     address
   )
-  const addresses = await client.requestAddresses()
+  await client.requestAddresses()
     .catch((error) => {
       if (
         error.core === 4001

@@ -2,13 +2,12 @@ import { app, shell, BrowserWindow } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import Store from 'electron-store'
+import { initUpdater } from './updater';
 import * as dotenv from 'dotenv'
 dotenv.config()
 
-import Store from 'electron-store'
-import { initUpdater } from './updater';
-
-const store = new Store()
+const store: Store<Record<string, unknown>> = new Store()
 
 async function createWindow() {
   const { width, height, x, y } = store.get('windowBounds') ?? {}
