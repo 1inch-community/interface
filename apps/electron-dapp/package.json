@@ -9,6 +9,7 @@
     "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/tsconfig": "^1.0.1",
     "@electron-toolkit/utils": "^3.0.0",
+    "dmg-license": "^1.0.11",
     "dotenv": "^16.4.5",
     "electron": "^30.0.4",
     "electron-builder": "^24.13.3",
