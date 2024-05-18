@@ -1,3 +1,19 @@
+# 1.0.0-dev.1 (2024-05-18)
+
+
+### Bug Fixes
+
+* added license.txt for build dmg ([d0054c0](https://github.com/1inch-community/interface/commit/d0054c0f4ac154680f6dbae8069cc5c220aa7a0e))
+* fix common jobs path ([e167c2b](https://github.com/1inch-community/interface/commit/e167c2bb7c26c0c094f273b57879fa90e4d7facf))
+* fix common jobs path ([3c07b7a](https://github.com/1inch-community/interface/commit/3c07b7ae2ad2635004d824235987357071692397))
+* fix lint ([cf33243](https://github.com/1inch-community/interface/commit/cf33243d5e21b6bd03162edda81826260c9e9d39))
+
+
+### Features
+
+* added new pipelines ([1aabf61](https://github.com/1inch-community/interface/commit/1aabf618d31c04bed27f11b1f8633133aa8381dc))
+* added release pipeline for dev branch ([b75a575](https://github.com/1inch-community/interface/commit/b75a5753f26845c60ea40da98f1310e1e4b8b081))
+
 ## [1.3.2](https://github.com/1inch-community/interface/compare/v1.3.1...v1.3.2) (2024-05-16)
 
 
