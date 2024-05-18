@@ -1,2 +1,0 @@
-import{aa as a,af as s}from"./index-Bgau2dAd.js";var i={[a.eth]:"eth",[a.bnb]:"",[a.matic]:"",[a.op]:"",[a.arbitrum]:"",[a.gnosis]:"",[a.avalanche]:"",[a.fantom]:"",[a.aurora]:"",[a.klaytn]:"",[a.zkSyncEra]:""},p=({address:r,chainId:e})=>new Promise((t,o)=>{if(!r||!e)return o();const n=new Image;n.onload=()=>t(n),n.onerror=o,n.src=`https://tokens.pancakeswap.finance/images/${i[e]}/${s(r.toLowerCase())}.png`});export{p as pancakeSwapRepository};
-//# sourceMappingURL=pancakeswap.repository-CXOF5NNQ-hOeX3gAg.js.map

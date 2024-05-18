@@ -1,0 +1,12 @@
+import{i as r}from"./index-nML9Z3oK.js";var a=r`
+
+  :root {
+      --primary: #00a0b5;
+      --primary-50: rgb(0 160 181 / 50%);
+      --primary-hover: #007e8f;
+      --secondary: #00a0b51f;
+      --secondary-hover: #00a0b53d;
+  }
+  
+`;export{a as communityStyle};
+//# sourceMappingURL=community.style-M4KRHXZD-CECtnkmW.js.map
