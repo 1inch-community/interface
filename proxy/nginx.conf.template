@@ -1,0 +1,39 @@
+user  nginx;
+worker_processes  auto;
+
+error_log  /var/log/nginx/error.log notice;
+pid        /var/run/nginx.pid;
+
+events {
+}
+
+http {
+    limit_req_zone $binary_remote_addr zone=mylimit:100m rate=40r/m;
+
+    include /etc/nginx/mime.types;
+    default_type application/octet-stream;
+
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log;
+
+    server {
+        listen 80;
+        server_name 127.0.0.1;
+
+        location / {
+            limit_req zone=mylimit burst=1000;
+            proxy_pass https://api.1inch.dev/;
+            proxy_set_header X-Forwarded-Proto https;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_ssl_server_name on;
+            proxy_set_header Authorization "Bearer $TOKEN";
+            proxy_pass_header Authorization;
+        }
+
+        location /health {
+            add_header Content-Type text/plain;
+            return 200 'ok';
+        }
+    }
+}
