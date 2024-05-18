@@ -1,3 +1,11 @@
+# [1.0.0-dev.5](https://github.com/1inch-community/interface/compare/v1.0.0-dev.4...v1.0.0-dev.5) (2024-05-18)
+
+
+### Bug Fixes
+
+* fix env for build pages ([578f05f](https://github.com/1inch-community/interface/commit/578f05fba7d5b6d2830b065300bb59c7bd6275f6))
+* fix env for build pages ([ea57c38](https://github.com/1inch-community/interface/commit/ea57c38768e36b569f729c55b4036e8e5916c2e0))
+
 # [1.0.0-dev.4](https://github.com/1inch-community/interface/compare/v1.0.0-dev.3...v1.0.0-dev.4) (2024-05-18)
 
 
