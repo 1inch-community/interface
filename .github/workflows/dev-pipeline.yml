@@ -7,6 +7,8 @@ on:
 
 env:
   GH_TOKEN: ${{ secrets.GH_TOKEN }}
+  WALLET_CONNECT_PROJECT_ID: ${{ secrets.WALLET_CONNECT_PROJECT_ID }}
+  ONE_INCH_DEV_PORTAL_HOST: ${{ vars.ONE_INCH_DEV_PORTAL_HOST }}
   DAPP_IS_PRODUCTION: true
 
 jobs:
@@ -72,6 +74,7 @@ jobs:
         run: nx run dapp:build
         env:
           BASE_VITE: "/interface/"
+          BASE_HREF: "/interface/"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
