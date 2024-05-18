@@ -1,3 +1,10 @@
+# [1.0.0-dev.3](https://github.com/1inch-community/interface/compare/v1.0.0-dev.2...v1.0.0-dev.3) (2024-05-18)
+
+
+### Features
+
+* added pipeline for deploy project on github pages ([395304d](https://github.com/1inch-community/interface/commit/395304d011b482ac8347866d0a21008893be5e15))
+
 # [1.0.0-dev.2](https://github.com/1inch-community/interface/compare/v1.0.0-dev.1...v1.0.0-dev.2) (2024-05-18)
 
 
