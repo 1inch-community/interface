@@ -5,10 +5,9 @@ import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { createHtmlPlugin } from 'vite-plugin-html';
 
 export default defineConfig(({ mode }) => {
-  const isElectron = mode === 'electron';
-  const isProduction = mode === 'production';
+  const isProduction = Boolean(process.env['DAPP_IS_PRODUCTION'] ?? mode === 'production');
+  const baseHref = process.env['BASE_HREF']
 
-  const _isProduction = isElectron || isProduction
 
   return {
     root: __dirname,
@@ -37,7 +36,7 @@ export default defineConfig(({ mode }) => {
       createHtmlPlugin({
         inject: {
           data: {
-            baseHref: isElectron ? './' : '/'
+            baseHref: baseHref ?? '/'
           },
         },
       }),
@@ -57,7 +56,7 @@ export default defineConfig(({ mode }) => {
         format: {
           comments: false
         },
-        compress: _isProduction,
+        compress: isProduction,
       }
     },
     esbuild: {

@@ -13,12 +13,6 @@
       "dependsOn": [
         "^build"
       ]
-    },
-    "build:electron": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "nx run dapp:build --mode electron"
-      }
     }
   }
 }

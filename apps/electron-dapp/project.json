@@ -18,7 +18,8 @@
         "cwd": "apps/electron-dapp",
         "parallel": false,
         "env": {
-          "killClone": "true"
+          "killClone": "true",
+          "BASE_HREF": "./"
         },
         "commands": [
           "nx run one-inch-community:build-all-libs",
