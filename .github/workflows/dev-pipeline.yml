@@ -5,6 +5,9 @@ on:
     branches:
       - dev
 
+env:
+  GH_TOKEN: ${{ secrets.GH_TOKEN }}
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -29,6 +32,9 @@ jobs:
   release:
     runs-on: macos-latest
 
+    permissions:
+      contents: write
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -45,5 +51,3 @@ jobs:
 
       - name: Release
         run: npx semantic-release
-        env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}

@@ -42,4 +42,8 @@ linux:
 appImage:
   artifactName: ${productName}-${arch}.${ext}
 npmRebuild: false
-publish: null
+publish:
+  provider: github
+  owner: DKotsyuba
+  repo: 1inch-community/interface
+  releaseType: draft
