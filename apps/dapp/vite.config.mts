@@ -50,6 +50,7 @@ export default defineConfig(({ mode }) => {
 
     build: {
       outDir: '../../dist/apps/dapp',
+      chunkSizeWarningLimit: 600,
       reportCompressedSize: true,
       sourcemap: true,
       terserOptions: {
