@@ -1,3 +1,10 @@
+# [1.0.0-dev.4](https://github.com/1inch-community/interface/compare/v1.0.0-dev.3...v1.0.0-dev.4) (2024-05-18)
+
+
+### Bug Fixes
+
+* fix base href for github pages ([19fee30](https://github.com/1inch-community/interface/commit/19fee303e7514a517f6971ab1de87644c5f9ecb0))
+
 # [1.0.0-dev.3](https://github.com/1inch-community/interface/compare/v1.0.0-dev.2...v1.0.0-dev.3) (2024-05-18)
 
 
