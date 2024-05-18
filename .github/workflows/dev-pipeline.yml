@@ -71,7 +71,7 @@ jobs:
       - name: Build dApp
         run: nx run dapp:build
         env:
-          BASE_HREF: "/interface/"
+          BASE_VITE: "/interface/"
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3

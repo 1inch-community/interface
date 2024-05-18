@@ -5,11 +5,13 @@ import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { createHtmlPlugin } from 'vite-plugin-html';
 
 export default defineConfig(({ mode }) => {
-  const isProduction = Boolean(process.env['DAPP_IS_PRODUCTION'] ?? mode === 'production');
+  const isProduction  = process.env['DAPP_IS_PRODUCTION'] ? Boolean(process.env['DAPP_IS_PRODUCTION']) : mode === 'production';
   const baseHref = process.env['BASE_HREF']
+  const baseVite = process.env['BASE_VITE']
 
 
   return {
+    base: baseVite,
     root: __dirname,
     cacheDir: '../../node_modules/.vite/apps/dapp',
 
