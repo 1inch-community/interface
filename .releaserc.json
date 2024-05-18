@@ -31,10 +31,8 @@
           {"path": "apps/electron-dapp/dist/*.zip"},
           {"path": "apps/electron-dapp/dist/*.exe"},
           {"path": "apps/electron-dapp/dist/*.AppImage"},
-          {"path": "apps/electron-dapp/dist/latest*.yml"},
-          {"path": "apps/electron-dapp/dist/latest.yml"},
-          {"path": "apps/electron-dapp/dist/latest-mac.yml"},
-          {"path": "apps/electron-dapp/dist/latest-linux.yml"}
+          {"path": "apps/electron-dapp/dist/*.blockmap"},
+          {"path": "apps/electron-dapp/dist/latest*.yml"}
         ]
       }
     ],

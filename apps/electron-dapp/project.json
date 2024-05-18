@@ -24,20 +24,11 @@
           "nx run one-inch-community:build-all-libs",
           "nx run dapp:build:electron",
           "electron-vite build --entry ./out/main/index.js",
-          "electron-builder -c ./electron-builder.yml build -mwl -p never"
-        ]
-      }
-    },
-    "build:ci": {
-      "executor": "nx:run-commands",
-      "options": {
-        "cwd": "apps/electron-dapp",
-        "parallel": false,
-        "commands": [
-          "nx run one-inch-community:build-all-libs",
-          "nx run dapp:build:electron",
-          "electron-vite build --entry ./out/main/index.js",
-          "electron-builder -c ./electron-builder.yml build $PLATFORM"
+          "electron-builder -c ./electron-builder.yml build --mac --arm64 -p never",
+          "electron-builder -c ./electron-builder.yml build --linux --arm64 -p never",
+          "electron-builder -c ./electron-builder.yml build --linux --x64 -p never",
+          "electron-builder -c ./electron-builder.yml build --win --arm64 -p never",
+          "electron-builder -c ./electron-builder.yml build --win --x64 -p never"
         ]
       }
     }

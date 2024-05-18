@@ -51,3 +51,27 @@ jobs:
 
       - name: Release
         run: npx semantic-release
+
+  public-on-pages:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Setup environment
+        uses: ./.github/actions/setup-environment
+        with:
+          node-version: ${{ vars.NODE_VERSION }}
+
+      - name: Build Libs
+        run: nx run one-inch-community:build-all-libs
+
+      - name: Build dApp
+        run: nx run dapp:build
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          publish_dir: ./dist/apps/dapp
