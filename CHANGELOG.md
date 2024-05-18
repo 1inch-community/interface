@@ -1,3 +1,11 @@
+# [1.0.0-dev.2](https://github.com/1inch-community/interface/compare/v1.0.0-dev.1...v1.0.0-dev.2) (2024-05-18)
+
+
+### Bug Fixes
+
+* fix electron building ([5814fbd](https://github.com/1inch-community/interface/commit/5814fbd2a0e0ae8f24afd565961d8199da67262b))
+* fix vite build ([a8647c2](https://github.com/1inch-community/interface/commit/a8647c2444080e3e2828f99966c1ea8e511cd925))
+
 # 1.0.0-dev.1 (2024-05-18)
 
 
