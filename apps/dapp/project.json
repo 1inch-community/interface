@@ -5,14 +5,5 @@
   "sourceRoot": "apps/dapp/src",
   "tags": [],
   "targets": {
-    "build-and-deploy": {
-      "executor": "nx:run-commands",
-      "options": {
-        "command": "nx run dapp:build && firebase deploy"
-      },
-      "dependsOn": [
-        "^build"
-      ]
-    }
   }
 }
