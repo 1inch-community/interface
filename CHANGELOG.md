@@ -1,3 +1,10 @@
+# [1.0.0-dev.6](https://github.com/1inch-community/interface/compare/v1.0.0-dev.5...v1.0.0-dev.6) (2024-05-19)
+
+
+### Bug Fixes
+
+* optimize electron building script ([d5f9f4d](https://github.com/1inch-community/interface/commit/d5f9f4d55daa95066a1fef30d58eeb859cea3172))
+
 # [1.0.0-dev.5](https://github.com/1inch-community/interface/compare/v1.0.0-dev.4...v1.0.0-dev.5) (2024-05-18)
 
 
