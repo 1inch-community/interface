@@ -1,3 +1,10 @@
+# [1.0.0-dev.7](https://github.com/1inch-community/interface/compare/v1.0.0-dev.6...v1.0.0-dev.7) (2024-05-19)
+
+
+### Bug Fixes
+
+* remove firebase deps ([cfbc8c8](https://github.com/1inch-community/interface/commit/cfbc8c873e30b7a82b80b9116ba9c7c55298ac06))
+
 # [1.0.0-dev.6](https://github.com/1inch-community/interface/compare/v1.0.0-dev.5...v1.0.0-dev.6) (2024-05-19)
 
 
