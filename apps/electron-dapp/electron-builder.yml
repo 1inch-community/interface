@@ -15,8 +15,14 @@ asarUnpack:
 win:
   executableName: 1inch-dApp
   target:
-    - nsis
-    - zip
+    - target: nsis
+      arch:
+        - x64
+        - arm64
+    - target: zip
+      arch:
+        - x64
+        - arm64
 nsis:
   oneClick: false
   artifactName: ${productName}-${arch}-setup.${ext}
@@ -30,13 +36,22 @@ mac:
   hardenedRuntime: true
   notarize: false
   target:
-    - dmg
-    - zip
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+    - target: zip
+      arch:
+        - x64
+        - arm64
 dmg:
   artifactName: ${productName}-${arch}.${ext}
 linux:
   target:
-    - AppImage
+    - target: AppImage
+      arch:
+        - x64
+        - arm64
   maintainer: 1inch.io
   category: Finance
 appImage:
