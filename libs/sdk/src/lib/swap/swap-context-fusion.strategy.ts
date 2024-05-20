@@ -81,13 +81,14 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy {
       const destinationToken = destinationTokenSnapshot.token
       if (!quoteReceive || !sourceToken || !destinationToken) return null
       const sourceTokenAmount = BigInt(quoteReceive.fromTokenAmount)
-      return BigMath.dev(
+      return BigMath.div(
         averageDestinationTokenAmount,
         sourceTokenAmount,
         destinationToken.decimals,
         sourceToken.decimals,
       )
     }, null),
+    distinctUntilChanged(),
     switchMap(rate => {
       if (!rate) return this.fallback.rate$
       return [rate]

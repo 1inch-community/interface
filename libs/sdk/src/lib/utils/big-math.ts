@@ -1,10 +1,10 @@
 export class BigMath {
 
   private constructor() {
-    throw new Error('BigMath not support instance creating use static methods: dev, mul, add, sub');
+    throw new Error('BigMath not support instance creating use static methods: div, mul, add, sub');
   }
 
-  static dev(
+  static div(
     numerator: bigint,
     denominator: bigint,
     numeratorDecimals: number,
@@ -90,5 +90,42 @@ export class BigMath {
     const scaledNumbers = numbers.map(num => num * scale / (BigInt(10) ** BigInt(numbersDecimals)));
     const sum = scaledNumbers.reduce((acc, curr) => acc + curr, BigInt(0));
     return sum / BigInt(numbers.length)
+  }
+
+  static pow(
+    base: bigint,
+    exponent: number,
+    baseDecimals: number,
+    resultDecimals: number = baseDecimals
+  ): bigint {
+    if (exponent < 0) {
+      throw new Error('Negative exponents are not supported.');
+    }
+    if (exponent === 0) {
+      return BigInt(10) ** BigInt(resultDecimals);
+    }
+
+    const factor = BigInt(10) ** BigInt(baseDecimals);
+    const adjustedBase = base * factor;
+    let result = adjustedBase ** BigInt(exponent);
+
+    const resultScale = BigInt(10) ** BigInt(exponent * baseDecimals);
+    result = result / resultScale;
+
+    if (resultDecimals !== baseDecimals) {
+      const scale = BigInt(10) ** BigInt(resultDecimals - baseDecimals);
+      result = result * scale;
+    }
+
+    return result;
+  }
+
+  static reduceDecimals(value: bigint, currentDecimals: number, targetDecimals: number) {
+    if (targetDecimals > currentDecimals) {
+      throw new Error('Target decimals must be less than or equal to current decimals.');
+    }
+
+    const factor = BigInt(10) ** BigInt(currentDecimals - targetDecimals);
+    return value / factor;
   }
 }

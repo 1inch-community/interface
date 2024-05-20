@@ -4,7 +4,7 @@ import { BigMath } from './big-math';
 describe('BigMath', () => {
 
   it('dev', () => {
-    expect(BigMath.dev(
+    expect(BigMath.div(
       2368452n,
       23651n,
       11,
@@ -12,7 +12,7 @@ describe('BigMath', () => {
       3
     )).toBe(0n)
 
-    expect(BigMath.dev(
+    expect(BigMath.div(
       2368452n,
       23651n,
       11,
@@ -20,7 +20,7 @@ describe('BigMath', () => {
       8
     )).toBe(10014n)
 
-    expect(BigMath.dev(
+    expect(BigMath.div(
       123456n,
       7899999n,
       8,
@@ -28,7 +28,7 @@ describe('BigMath', () => {
       2
     )).toBe(15627343750n)
 
-    expect(() => BigMath.dev(
+    expect(() => BigMath.div(
       20n,
       0n,
       2,
@@ -183,6 +183,22 @@ describe('BigMath', () => {
       100n,
       100n,
     ], 0)).toBe(100n)
+  })
+
+  it('pow', () => {
+    expect(BigMath.pow(
+      123456n,
+      0,
+      8,
+      18
+    )).toBe(1000000000000000000n)
+
+    expect(BigMath.pow(
+      123456n,
+      2,
+      8,
+      18,
+    )).toBe(152413839360000000000n)
   })
 
 })

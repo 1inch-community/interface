@@ -60,9 +60,6 @@ export default defineConfig(({ mode }) => {
         },
         compress: isProduction,
       }
-    },
-    esbuild: {
-      legalComments: 'none'
-    },
+    }
   }
 });

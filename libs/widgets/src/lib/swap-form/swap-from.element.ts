@@ -1,12 +1,11 @@
 import { html, LitElement, PropertyValues } from 'lit';
 import { ContextProvider } from '@lit/context';
 import { customElement, property } from 'lit/decorators.js';
-import { isAddressEqual } from 'viem';
 import '@one-inch-community/ui-components/card'
 import "@one-inch-community/ui-components/icon"
 import "@one-inch-community/ui-components/button"
 import { IConnectWalletController, IToken } from '@one-inch-community/models';
-import { SwapContext } from '@one-inch-community/sdk';
+import { isTokensEqual, SwapContext } from '@one-inch-community/sdk';
 import { combineLatest, defer, distinctUntilChanged, map } from 'rxjs';
 import { observe } from '@one-inch-community/lit';
 import { swapFromStyle } from './swap-from.style';
@@ -15,10 +14,8 @@ import './elements'
 
 function hasChangedToken(value: IToken, oldValue: IToken): boolean {
   if (!oldValue) return true
-  return value.symbol !== oldValue.symbol
-    || value.chainId !== oldValue.chainId
-    || !isAddressEqual(value.address, oldValue.address)
-    || value.decimals !== oldValue.decimals
+  if (!value) return true
+  return isTokensEqual(value, oldValue)
 }
 
 @customElement(SwapFromElement.tagName)

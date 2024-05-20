@@ -1,7 +1,7 @@
 import { IConnectWalletController } from '@one-inch-community/models';
 import { ISwapContextStrategy } from './models/swap-context-strategy.interface';
 import { PairHolder } from './pair-holder';
-import { combineLatest, defer, map, Observable, shareReplay, switchMap } from 'rxjs';
+import { combineLatest, debounceTime, defer, map, Observable, shareReplay, switchMap } from 'rxjs';
 import { buildDefaultTokenRageProvider } from '../tokens';
 
 export class SwapContextOnChainStrategy implements ISwapContextStrategy {
@@ -11,6 +11,7 @@ export class SwapContextOnChainStrategy implements ISwapContextStrategy {
     this.pairHolder.streamSnapshot('source'),
     this.pairHolder.streamSnapshot('destination')
   ])).pipe(
+    debounceTime(0),
     switchMap(([chainId, sourceTokenSnapshot, destinationTokenSnapshot]) => {
       const sourceToken = sourceTokenSnapshot.token
       const destinationToken = destinationTokenSnapshot.token

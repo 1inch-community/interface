@@ -51,7 +51,7 @@ export class UniswapV2BaseRateAdapter implements ITokenRateAdapter {
       }
       const reserves = await this.getReserves(chainId, pool)
       const isRevertRate = !isAddressEqual(sourceToken.address, token0)
-      const rate = BigMath.dev(
+      const rate = BigMath.div(
         isRevertRate ? reserves[1] : reserves[0],
         isRevertRate ? reserves[0] : reserves[1],
         sourceToken.decimals,
@@ -78,12 +78,20 @@ export class UniswapV2BaseRateAdapter implements ITokenRateAdapter {
       return this.pools.get(id2)!
     }
     const client = getClient(chainId)
-    const pool: Address = await client.readContract({
+    let pool: Address = await client.readContract({
       address: getAddress(this.factoryContractGetter(chainId)),
       functionName: 'getPair',
       args: [srcTokenAddress, dstTokenAddress],
       abi: FactoryContractABI
     })
+    if (pool !== zeroAddress) {
+      pool = await client.readContract({
+        address: getAddress(this.factoryContractGetter(chainId)),
+        functionName: 'getPair',
+        args: [dstTokenAddress, srcTokenAddress],
+        abi: FactoryContractABI
+      })
+    }
     let token0 = zeroAddress
     if (pool !== zeroAddress) {
       token0 = await client.readContract({

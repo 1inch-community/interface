@@ -4,7 +4,7 @@ import '@one-inch-community/ui-components/button'
 import { consume } from '@lit/context';
 import { swapContext } from '../../context';
 import { ISwapContext, IToken } from '@one-inch-community/models';
-import { combineLatest, defer, firstValueFrom, map, Observable, of, startWith, switchMap } from 'rxjs';
+import { combineLatest, debounceTime, defer, firstValueFrom, map, Observable, of, startWith, switchMap } from 'rxjs';
 import { observe, dispatchEvent, getMobileMatchMediaAndSubscribe, getMobileMatchMediaEmitter } from '@one-inch-community/lit';
 import { Address } from 'viem';
 import { TokenController } from '@one-inch-community/sdk';
@@ -63,6 +63,7 @@ export class SwapButton extends LitElement {
     this.chainId$,
     getMobileMatchMediaEmitter().pipe(startWith(null))
   ]).pipe(
+    debounceTime(0),
     map(([walletAddress, srcToken, dstToken, exceedingMaximumAmount, amount]) => this.getSwapButtonView(
       walletAddress,
       srcToken,

@@ -9,6 +9,10 @@ import {
   isNativeToken,
 } from '../../chain';
 import { startWith, switchMap } from 'rxjs';
+import { uniswapV3Adapter } from './adapters/uniswap-v3-adapter';
+import { pancakeswapV3Adapter } from './adapters/pancakeswap-v3-adapter';
+import { sushiswapV3Adapter } from './adapters/sushiswap-v3-adapter';
+import { spookyswapV3Adapter } from './adapters/spookyswap-v3-adapter';
 
 export class TokenRateProvider implements ITokenRateProvider {
 
@@ -31,6 +35,7 @@ export class TokenRateProvider implements ITokenRateProvider {
     const sources = this.adapters.filter(source => source.isSupportedChain(chainId))
     const rateList: bigint[] = await Promise.all(sources.map(source => source.getRate(chainId, _srcToken, _dstToken)))
       .then(results => results.filter(v => v !== null) as bigint[])
+    if (rateList.length === 0) return null
     return BigMath.avr(rateList, destinationToken.decimals)
   }
 
@@ -45,9 +50,14 @@ export class TokenRateProvider implements ITokenRateProvider {
 
 export function buildDefaultTokenRageProvider() {
   return new TokenRateProvider([
+    // v3
+    uniswapV3Adapter,
+    pancakeswapV3Adapter,
+    sushiswapV3Adapter,
+    spookyswapV3Adapter,
+    // v2
     uniswapV2Adapter,
-    // TODO viem tell invalid contract factory address
-    // sushiswapV2Adapter,
-    // pancakeswapV2Adapter
+    sushiswapV2Adapter,
+    pancakeswapV2Adapter
   ])
 }

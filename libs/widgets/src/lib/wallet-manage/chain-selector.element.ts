@@ -8,7 +8,7 @@ import { chainSelectorStyle } from './chain-selector.style';
 import { defer, filter, map } from 'rxjs';
 import { when } from 'lit/directives/when.js';
 import { OverlayController } from '@one-inch-community/ui-components/overlay';
-import { isL2Chain } from '@one-inch-community/sdk';
+import { isL2Chain, isSupportFusion } from '@one-inch-community/sdk';
 
 type ChainViewInfo = {
   name: string
@@ -35,6 +35,7 @@ const chainViewConfig: Record<ChainId, ChainViewInfo> = {
 };
 
 const chainList: ChainViewFull[] = Object.keys(chainViewConfig)
+  .filter(chainId => isSupportFusion(+chainId))
   .map((chainId) => ({ ...(chainViewConfig as any)[chainId], chainId: Number(chainId) }))
   .sort((info1: ChainViewFull, info2: ChainViewFull) => {
     if (info1.chainId == ChainId.eth) return -1;
