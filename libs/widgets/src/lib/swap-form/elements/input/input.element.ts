@@ -68,8 +68,10 @@ export class InputElement extends LitElement {
       this.amount$,
       this.token$
     ]).pipe(
-      filter(([, token]) => !!token),
-      map(([amount, token]) => formatUnits(amount, token!.decimals)),
+      map(([amount, token]) => {
+        if (!amount || !token) return '0'
+        return formatUnits(amount, token.decimals)
+      }),
       filter(amount => amount !== this.input.value),
       tap(amount => this.input.value = formatNumber(amount, 6))
     )

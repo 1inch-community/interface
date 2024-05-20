@@ -21,7 +21,7 @@ export class WalletViewAddressBalanceElement extends LitElement {
     async ([chainId, address]) => {
       if (!chainId || !address) throw new Error('')
       const balanceRecord = await TokenController.getTokenBalance(chainId, '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', address);
-      const balance = formatNumber(formatUnits(BigInt(balanceRecord.amount), 18), 6)
+      const balance = formatNumber(formatUnits(BigInt(balanceRecord?.amount ?? 0), 18), 6)
       storage.set([this.chainId, this.address].join(':'), balance)
       return balance
     },

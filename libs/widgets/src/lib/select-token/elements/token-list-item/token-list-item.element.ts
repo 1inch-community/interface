@@ -48,10 +48,10 @@ export class TokenListItemElement extends LitElement {
       const token = await TokenController.getToken(chainId, tokenAddress);
       let balance = null;
       let balanceUsd = null;
-      if (walletAddress) {
+      if (walletAddress && token) {
         balance = await TokenController.getTokenBalance(chainId, tokenAddress, walletAddress);
         const tokenPrice = await TokenController.getTokenUSDPrice(chainId, tokenAddress);
-        const balanceFormatted = formatUnits(BigInt(balance.amount), token.decimals);
+        const balanceFormatted = formatUnits(BigInt(balance?.amount ?? 0), token.decimals);
         balanceUsd = Number(balanceFormatted) * Number(tokenPrice);
       }
       return [token, balance, balanceUsd] as const;
@@ -90,7 +90,7 @@ export class TokenListItemElement extends LitElement {
     `;
   }
 
-  private getTokenView(token: ITokenRecord | undefined, balance: IBalancesTokenRecord | null, balanceUsd: number | null) {
+  private getTokenView(token: ITokenRecord | null, balance: IBalancesTokenRecord | null, balanceUsd: number | null) {
     if (!token) {
       return html``
     }

@@ -48,17 +48,10 @@ export class SwapButton extends LitElement {
     switchMap(([wallet, sourceToken, amount]) => {
       if (!wallet || !sourceToken || amount === 0n) return of(false)
       return TokenController.getTokenBalance(sourceToken.chainId, sourceToken.address, wallet).then(balance => {
-        return amount > BigInt(balance.amount)
+        if (!balance) return false
+        return !amount || amount > BigInt(balance.amount)
       })
     })
-  )
-
-  private readonly buttonType$ = this.connectedWalletAddress$.pipe(
-    map(address => address ? 'primary' : 'secondary'),
-  )
-
-  private readonly buttonText$ = this.connectedWalletAddress$.pipe(
-    map(address => address ? 'Swap' : 'Connect wallet'),
   )
 
   private readonly view$: Observable<TemplateResult> = combineLatest([
@@ -134,7 +127,7 @@ export class SwapButton extends LitElement {
     const connectedWalletAddress = await firstValueFrom(this.connectedWalletAddress$)
     if (!sourceToken || !connectedWalletAddress) return
     const balance = await TokenController.getTokenBalance(sourceToken.chainId, sourceToken.address, connectedWalletAddress)
-    this.context?.setTokenAmountByType('source', BigInt(balance.amount), true)
+    this.context?.setTokenAmountByType('source', BigInt(balance?.amount ?? 0), true)
   }
 
   private async onClick() {

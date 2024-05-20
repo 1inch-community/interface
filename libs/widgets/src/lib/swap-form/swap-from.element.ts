@@ -27,9 +27,9 @@ export class SwapFromElement extends LitElement {
 
   static override styles = swapFromStyle
 
-  @property({ type: Object, hasChanged: hasChangedToken }) srcToken: IToken | null = null
+  @property({ type: Object, hasChanged: hasChangedToken, attribute: false }) srcToken: IToken | null = null
 
-  @property({ type: Object, hasChanged: hasChangedToken }) dstToken: IToken | null = null
+  @property({ type: Object, hasChanged: hasChangedToken, attribute: false }) dstToken: IToken | null = null
 
   @property({ type: Object, attribute: false }) walletController?: IConnectWalletController
 
