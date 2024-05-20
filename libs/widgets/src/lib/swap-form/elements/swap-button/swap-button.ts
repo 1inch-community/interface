@@ -59,14 +59,16 @@ export class SwapButton extends LitElement {
     this.sourceToken$,
     this.destinationToken$,
     this.exceedingMaximumAmount$,
+    this.sourceTokenAmount$.pipe(startWith(0n)),
     this.chainId$,
     getMobileMatchMediaEmitter().pipe(startWith(null))
   ]).pipe(
-    map(([walletAddress, srcToken, dstToken, exceedingMaximumAmount]) => this.getSwapButtonView(
+    map(([walletAddress, srcToken, dstToken, exceedingMaximumAmount, amount]) => this.getSwapButtonView(
       walletAddress,
       srcToken,
       dstToken,
-      exceedingMaximumAmount
+      exceedingMaximumAmount,
+      amount
     ))
   )
 
@@ -78,7 +80,8 @@ export class SwapButton extends LitElement {
     walletAddress: Address | null,
     srcToken: IToken | null,
     dstToken: IToken | null,
-    exceedingMaximumAmount: boolean
+    exceedingMaximumAmount: boolean,
+    amount: bigint | null
   ): TemplateResult {
     const size = this.mobileMedia.matches ? 'xl' : 'xxl'
 
@@ -102,6 +105,14 @@ export class SwapButton extends LitElement {
       return html`
         <inch-button @click="${(event: MouseEvent) => dispatchEvent(this, 'openTokenSelector', 'destination', event)}" type="secondary" size="${size}" fullSize>
           Select destination token
+        </inch-button>
+      `
+    }
+
+    if (!amount || amount === 0n) {
+      return html`
+        <inch-button type="secondary" size="${size}" fullSize disabled>
+          Enter amount to swap
         </inch-button>
       `
     }
