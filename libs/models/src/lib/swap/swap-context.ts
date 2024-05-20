@@ -11,8 +11,8 @@ export interface ISwapContext {
   setPair(pair: Partial<Pair>): void
   switchPair(): void
   getTokenByType(type: 'source' | 'destination'): Observable<IToken | null>
-  getTokenAmountByType(type: 'source' | 'destination'): Observable<bigint>
-  getTokenRawAmountByType(type: 'source' | 'destination'): Observable<bigint>
+  getTokenAmountByType(type: 'source' | 'destination'): Observable<bigint | null>
+  getTokenRawAmountByType(type: 'source' | 'destination'): Observable<bigint | null>
   setTokenAmountByType(type: 'source' | 'destination', value: bigint, markDirty?: boolean): void
 }
 
