@@ -62,7 +62,9 @@ export class ProviderDataAdapter implements IDataAdapter, IProviderDataAdapterIn
       if (!provider) return of(null);
       return from(this.getChainId()).pipe(
         switchMap(chainId => fromEIP1193Event(provider, 'chainChanged').pipe(
-          map(chainStr => parseInt(chainStr, 16)),
+          map(chainStr => {
+            return parseChainId(chainStr)
+          }),
           startWith(chainId),
         ))
       )
@@ -111,7 +113,7 @@ export class ProviderDataAdapter implements IDataAdapter, IProviderDataAdapterIn
     if (!provider) return null
     const chainStr = await provider.request({ method: 'eth_chainId' }).catch(() => null) as string;
     if (!chainStr) return null
-    return parseInt(chainStr, 16);
+    return parseChainId(chainStr);
   }
 
   async isConnected() {
@@ -123,4 +125,11 @@ export class ProviderDataAdapter implements IDataAdapter, IProviderDataAdapterIn
     this.activeAddressInner$.next(address)
   }
 
+}
+
+function parseChainId(chainId: string | number): number {
+  if (typeof chainId === 'number') {
+    return chainId
+  }
+  return parseInt(chainId, 16);
 }
