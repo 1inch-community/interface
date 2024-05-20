@@ -23,7 +23,7 @@ export class WalletConnectV2Adapter implements IWalletAdapter {
   }
 
   async isConnected(): Promise<boolean> {
-    return false;
+    return this.provider?.isConnected() ?? false
   }
 
   async connect(chainId: ChainId): Promise<boolean> {

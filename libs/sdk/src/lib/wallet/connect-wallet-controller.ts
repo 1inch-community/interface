@@ -178,7 +178,7 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
       connectState && this.activeAdapters.set(walletId, adapter)
     } else {
       connectState = await adapter.isConnected()
-      if (!retry) {
+      if (!retry && !connectState) {
         connectState = await this.connectSafe(chainId, walletId, true)
       }
     }

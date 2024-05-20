@@ -124,6 +124,10 @@ export class MultiConnectProvider implements EIP1193Provider {
     //
   }
 
+  isConnected() {
+    return this.activeAddress !== null
+  }
+
   async request(args: RequestArguments): Promise<unknown> {
     const method = args.method
     if (method === 'eth_requestAccounts' || method === 'eth_accounts') {
