@@ -25,7 +25,6 @@ export class FusionSwapInfoElement extends LitElement {
     return this.scene.render({
       main: () => html`
         <inch-fusion-swap-info-main
-          
         ></inch-fusion-swap-info-main>
       `,
       slippage: () => html`

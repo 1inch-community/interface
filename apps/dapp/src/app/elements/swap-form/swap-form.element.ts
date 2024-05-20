@@ -128,6 +128,7 @@ export class SwapFormElement extends LitElement {
                 .srcToken="${sceneLazyValue(this, () => this.srcToken)}"
                 .dstToken="${sceneLazyValue(this, () => this.dstToken)}"
                 .walletController="${connectWalletController}"
+                @switchPair="${() => this.onSwitchPair()}"
                 @openTokenSelector="${(event: CustomEvent) => this.onOpenSelectToken(event)}"
                 @connectWallet="${() => this.onOpenConnectWalletView()}"
               ></inch-swap-form>
@@ -153,27 +154,39 @@ export class SwapFormElement extends LitElement {
     this.targetSelectToken = event.detail.value
   }
 
+  private onSwitchPair() {
+    const srcToken = this.srcToken
+    this.setSrcToken(this.dstToken)
+    this.setDstToken(srcToken)
+  }
+
   private onSelectToken(event: CustomEvent) {
     const token: IToken = event.detail.value
     if (this.targetSelectToken === 'source') {
       if (this.dstToken && isTokensEqual(token, this.dstToken)) {
-        this.dstToken = this.srcToken
-        storage.set('dst-token-symbol', this.dstToken?.symbol)
+        this.setDstToken(this.srcToken)
       }
-      this.srcToken = token
-      storage.set('src-token-symbol', this.srcToken?.symbol)
+      this.setSrcToken(token)
     }
     if (this.targetSelectToken === 'destination') {
       if (!this.dstToken && this.srcToken && isTokensEqual(token, this.srcToken)) {
         return
       }
       if (this.srcToken && isTokensEqual(token, this.srcToken)) {
-        this.srcToken = this.dstToken
-        storage.set('src-token-symbol', this.srcToken?.symbol)
+        this.setSrcToken(this.dstToken)
       }
-      this.dstToken = token
-      storage.set('dst-token-symbol', this.dstToken?.symbol)
+      this.setDstToken(token)
     }
+  }
+
+  private setSrcToken(token: IToken | null): void {
+    this.srcToken = this.dstToken
+    storage.set('src-token-symbol', token?.symbol)
+  }
+
+  private setDstToken(token: IToken| null): void {
+    this.dstToken = token
+    storage.set('dst-token-symbol', token?.symbol)
   }
 
   private async onOpenConnectWalletView() {
