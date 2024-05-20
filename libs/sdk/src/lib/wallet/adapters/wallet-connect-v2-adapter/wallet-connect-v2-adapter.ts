@@ -51,11 +51,12 @@ export class WalletConnectV2Adapter implements IWalletAdapter {
   }
 
   async disconnect(): Promise<boolean> {
-    return false;
+    this.provider?.disconnect()
+    return true;
   }
 
   async changeChain(chainId: ChainId): Promise<boolean> {
-    this.client?.switchChain({ id: chainId })
+    await this.client?.switchChain({ id: chainId })
     return true;
   }
 

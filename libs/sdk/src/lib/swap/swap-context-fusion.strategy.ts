@@ -13,22 +13,35 @@ import {
 } from 'rxjs';
 import { BigMath, OneInchDevPortalAdapter } from '../utils';
 import { SwapContextOnChainStrategy } from './swap-context-onchain.strategy';
+import { TokenController } from '../tokens';
 
 export class SwapContextFusionStrategy implements ISwapContextStrategy {
 
+  private readonly sourceTokenAmount$ = combineLatest([
+    this.walletController.data.chainId$,
+    this.walletController.data.activeAddress$,
+    this.pairHolder.streamSnapshot('source')
+  ]).pipe(
+    switchMap(([chainId, activeAddress, snapshot ]) => {
+      const token = snapshot.token
+      if (!chainId || !activeAddress || !token) return [0n]
+      return TokenController.liveQuery(() => TokenController.getTokenBalance(chainId, token.address, activeAddress).then(record => BigInt(record?.amount ?? '0')))
+    })
+  )
 
   private readonly quoteReceive$ = defer(() => combineLatest([
     this.walletController.data.chainId$,
     this.walletController.data.activeAddress$,
     this.pairHolder.streamSnapshot('source'),
-    this.pairHolder.streamSnapshot('destination')
+    this.pairHolder.streamSnapshot('destination'),
+    this.sourceTokenAmount$
   ])).pipe(
     debounceTime(0),
-    switchMap(([ chainId, activeAddress, sourceTokenSnapshot, destinationTokenSnapshot ]) => {
+    switchMap(([ chainId, activeAddress, sourceTokenSnapshot, destinationTokenSnapshot, sourceTokenBalance ]) => {
       const sourceToken = sourceTokenSnapshot.token
       const destinationToken = destinationTokenSnapshot.token
       const amount = sourceTokenSnapshot.amountRaw
-      if (!chainId || !activeAddress || !sourceToken || !destinationToken || amount === 0n) return [null]
+      if (!amount || !chainId || !activeAddress || !sourceToken || !destinationToken || amount === 0n || sourceTokenBalance === 0n || amount > sourceTokenBalance) return [null]
       return this.devPortalAdapter.getFusionQuoteReceive(
         chainId,
         sourceToken.address,
@@ -87,7 +100,6 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy {
     private readonly devPortalAdapter = new OneInchDevPortalAdapter(),
     private readonly fallback = new SwapContextOnChainStrategy(pairHolder, walletController)
   ) {
-    this.rate$.subscribe()
   }
 
   destroy() {

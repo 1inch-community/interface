@@ -54,7 +54,7 @@ export class TokenSchema extends Dexie {
     });
   }
 
-  async getToken(chainId: ChainId, address: Address): Promise<ITokenRecord> {
+  async getToken(chainId: ChainId, address: Address): Promise<ITokenRecord | null> {
     const recordId = getId(chainId, address);
     if (this.tokenCache.has(recordId)) {
       return this.tokenCache.get(recordId)!
@@ -64,7 +64,7 @@ export class TokenSchema extends Dexie {
       .equals(recordId)
       .toArray();
     this.tokenCache.set(recordId, records[0])
-    return records[0];
+    return records[0] ?? null;
   }
 
   async getNativeToken(chainId: ChainId) {
@@ -130,13 +130,13 @@ export class TokenSchema extends Dexie {
     return result
   }
 
-  async getTokenBalance(chainId: ChainId, tokenAddress: Address, walletAddress: Address): Promise<IBalancesTokenRecord> {
+  async getTokenBalance(chainId: ChainId, tokenAddress: Address, walletAddress: Address): Promise<IBalancesTokenRecord | null> {
     const recordId = getId(chainId, walletAddress, tokenAddress);
     const records = await this.balances
       .where('id')
       .equals(recordId)
       .toArray();
-    return records[0];
+    return records[0] ?? null;
   }
 
   async setTokens(chainId: ChainId, tokens: ITokenDto[]) {

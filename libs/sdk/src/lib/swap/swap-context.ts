@@ -1,19 +1,29 @@
 import { IConnectWalletController, ISwapContext, IToken, Pair } from '@one-inch-community/models';
 import {
+  combineLatest,
   defer,
   distinctUntilChanged,
-  map, merge,
-  Observable, scan, shareReplay, Subscription, switchMap
+  map,
+  merge,
+  Observable,
+  scan,
+  shareReplay,
+  Subscription,
+  switchMap,
+  tap
 } from 'rxjs';
 import { PairHolder, TokenType } from './pair-holder';
 import { SwapContextOnChainStrategy } from './swap-context-onchain.strategy';
 import { SwapContextFusionStrategy } from './swap-context-fusion.strategy';
 import { ISwapContextStrategy } from './models/swap-context-strategy.interface';
+import { BigMath } from '../utils';
 
 export class SwapContext implements ISwapContext {
 
   private readonly pairHolder = new PairHolder()
   private readonly subscription = new Subscription()
+
+  private lastSwapContextStrategy: ISwapContextStrategy | null = null;
 
   readonly chainId$ = defer(() => this.walletController.data.chainId$);
   readonly connectedWalletAddress$ = defer(() => this.walletController.data.activeAddress$);
@@ -29,6 +39,7 @@ export class SwapContext implements ISwapContext {
         ? new SwapContextOnChainStrategy(this.pairHolder, this.walletController)
         : new SwapContextFusionStrategy(this.pairHolder, this.walletController)
     }, null),
+    tap(strategy => this.lastSwapContextStrategy = strategy),
     shareReplay({ bufferSize: 1, refCount: true })
   )
 
@@ -39,15 +50,35 @@ export class SwapContext implements ISwapContext {
   constructor(
     private readonly walletController: IConnectWalletController
   ) {
+    const distinctionTokenAmountSync$ = combineLatest([
+      this.rate$.pipe(distinctUntilChanged()),
+      this.getTokenRawAmountByType('source').pipe(distinctUntilChanged()),
+      this.getTokenByType('source'),
+      this.getTokenByType('destination')
+    ]).pipe(
+      map(([rate, sourceTokenAmount, sourceToken, destinationToken]) => {
+        if (!sourceTokenAmount || sourceTokenAmount === 0n || rate === 0n || !sourceToken || !destinationToken) return 0n
+        return BigMath.mul(
+          sourceTokenAmount,
+          rate,
+          sourceToken.decimals,
+          sourceToken.decimals,
+          destinationToken.decimals
+        )
+      }),
+      tap(amount => this.setTokenAmountByType('destination', amount, true))
+    )
+
     this.subscription.add(
       merge(
-        this.strategy$
+        distinctionTokenAmountSync$
       ).subscribe()
     )
   }
 
   destroy() {
     this.subscription.unsubscribe()
+    this.lastSwapContextStrategy?.destroy()
   }
 
   setPair(pair: Partial<Pair>): void {
@@ -65,14 +96,16 @@ export class SwapContext implements ISwapContext {
     )
   }
 
-  getTokenAmountByType(type: TokenType): Observable<bigint> {
+  getTokenAmountByType(type: TokenType): Observable<bigint | null> {
     return this.pairHolder.streamSnapshot(type).pipe(
-      map(snapshot => snapshot.amountView),
+      map(snapshot => {
+        return snapshot.amountView
+      }),
       distinctUntilChanged(),
     )
   }
 
-  getTokenRawAmountByType(type: TokenType): Observable<bigint> {
+  getTokenRawAmountByType(type: TokenType): Observable<bigint | null> {
     return this.pairHolder.streamSnapshot(type).pipe(
       map(snapshot => snapshot.amountRaw),
       distinctUntilChanged(),

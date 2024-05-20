@@ -1,52 +1,51 @@
-import { filter, BehaviorSubject, tap, combineLatest, map, Observable, shareReplay } from 'rxjs';
+import { map, Observable, startWith, Subject } from 'rxjs';
 import { IToken } from '@one-inch-community/models';
+import { isTokensEqual } from '../tokens';
 
 type TokenAndAmount = {
-  amountRaw: bigint,
-  amountView: bigint,
+  amountRaw: bigint | null,
+  amountView: bigint | null,
   token: IToken | null
 }
 
 export class TokenContext {
 
-  private isDirtyAmount = false
-  private amountForView = 0n
-
-  readonly token$ = new BehaviorSubject<IToken | null>(null)
-  readonly amount$ = new BehaviorSubject<bigint>(0n)
-  readonly amountForView$ = this.amount$.pipe(
-    filter(() => this.isDirtyAmount),
-    tap((value) => {
-      this.amountForView = value
-      this.isDirtyAmount = false
-    }),
-    shareReplay({ bufferSize: 1, refCount: true })
-  )
+  private amountForView: bigint | null = null
+  private amount: bigint | null = null
+  private token: IToken | null = null
+  private readonly signalChange$ = new Subject<void>()
 
   setToken(token?: IToken) {
-    if (!token) return
-    this.token$.next(token)
+    if (this.token && token && isTokensEqual(this.token, token)) {
+      return
+    }
+    this.token = token ?? null
+    this.signalChange$.next()
   }
 
   setAmount(amount: bigint, markDirty = false) {
-    this.isDirtyAmount = markDirty
-    this.amount$.next(amount)
+    if (this.amount === amount && !markDirty) {
+      return
+    }
+    this.amount = amount
+    if (markDirty) {
+      this.amountForView = amount
+    }
+    this.signalChange$.next()
   }
 
   getSnapshot(): TokenAndAmount {
     return {
-      token: this.token$.value,
-      amountRaw: this.amount$.value,
+      token: this.token,
+      amountRaw: this.amount,
       amountView: this.amountForView,
     }
   }
 
   streamSnapshot(): Observable<TokenAndAmount> {
-    return combineLatest([
-      this.token$,
-      this.amount$
-    ]).pipe(
+    return this.signalChange$.pipe(
       map(() => this.getSnapshot()),
+      startWith(this.getSnapshot())
     )
   }
 
