@@ -1,3 +1,10 @@
+# [1.0.0-dev.8](https://github.com/1inch-community/interface/compare/v1.0.0-dev.7...v1.0.0-dev.8) (2024-05-20)
+
+
+### Features
+
+* **sdk:** added closing the walletconnect modal window if user changes theme ([a0b3885](https://github.com/1inch-community/interface/commit/a0b3885ffcc96138446a467f1b1fd1f9908c98da))
+
 # [1.0.0-dev.7](https://github.com/1inch-community/interface/compare/v1.0.0-dev.6...v1.0.0-dev.7) (2024-05-19)
 
 
