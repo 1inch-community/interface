@@ -7,7 +7,7 @@ import "@one-inch-community/ui-components/icon"
 import "@one-inch-community/ui-components/button"
 import { IConnectWalletController, IToken } from '@one-inch-community/models';
 import { SwapContext } from '@one-inch-community/sdk';
-import { defer, distinctUntilChanged, map } from 'rxjs';
+import { combineLatest, defer, distinctUntilChanged, map } from 'rxjs';
 import { observe } from '@one-inch-community/lit';
 import { swapFromStyle } from './swap-from.style';
 import { swapContext } from './context';
@@ -35,10 +35,14 @@ export class SwapFromElement extends LitElement {
 
   readonly context = new ContextProvider(this, { context: swapContext })
 
-  private readonly fusionView$ = defer(() => this.getWalletController().data.activeAddress$).pipe(
+  private readonly fusionView$ = combineLatest([
+    defer(() => this.getWalletController().data.activeAddress$),
+    defer(() => this.getContext().getTokenByType('source')),
+    defer(() => this.getContext().getTokenByType('destination'))
+  ]).pipe(
     distinctUntilChanged(),
-    map(address => {
-      if (!address) return html``
+    map(([address, sourceToken, destinationToken ]) => {
+      if (!address || !sourceToken || !destinationToken) return html``
 
       return html`<inch-fusion-swap-info></inch-fusion-swap-info>`
     })
