@@ -75,15 +75,15 @@ export class SwapFormElement extends LitElement {
     if (srcTokenSymbol) {
       const tokenList = await TokenController.getTokenBySymbol(chainId, srcTokenSymbol)
       if (!tokenList.length) {
-        this.srcToken = await TokenController.getNativeToken(chainId)
+        this.setSrcToken(await TokenController.getNativeToken(chainId))
       } else {
-        this.srcToken = tokenList[0]
+        this.setSrcToken(tokenList[0])
       }
 
     }
     if (dstTokenSymbol) {
       const tokenList = await TokenController.getTokenBySymbol(chainId, dstTokenSymbol)
-      this.dstToken = tokenList[0]
+      this.setDstToken(tokenList[0])
     }
   }
 
@@ -96,11 +96,11 @@ export class SwapFormElement extends LitElement {
     if (!srcTokenSymbol && !dstTokenSymbol) return
     if (srcTokenSymbol) {
       const tokenList = await TokenController.getTokenBySymbol(chainId, srcTokenSymbol)
-      this.srcToken = tokenList[0]
+      this.setSrcToken(tokenList[0])
     }
     if (dstTokenSymbol) {
       const tokenList = await TokenController.getTokenBySymbol(chainId, dstTokenSymbol)
-      this.dstToken = tokenList[0]
+      this.setDstToken(tokenList[0])
     }
   }
 
@@ -180,7 +180,7 @@ export class SwapFormElement extends LitElement {
   }
 
   private setSrcToken(token: IToken | null): void {
-    this.srcToken = this.dstToken
+    this.srcToken = token
     storage.set('src-token-symbol', token?.symbol)
   }
 
