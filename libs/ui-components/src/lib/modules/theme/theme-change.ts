@@ -44,6 +44,10 @@ mediaQuery.onchange = async () => {
   change$.next(mediaQuery)
 }
 
+function isDarkTheme(theme: MainColors) {
+  if (theme === MainColors.systemSync) return mediaQuery.matches
+  return theme === MainColors.dark || theme === MainColors.darkBlue
+}
 
 export async function themeChange(
   mainColorName: MainColors,
@@ -58,6 +62,8 @@ export async function themeChange(
     setThemeColor(themeColors[mainColorName]())
     currentMainColor = mainColorName
     currentBrandColor = brandColorName
+    const htmlElement = document.querySelector('html')
+    htmlElement?.setAttribute('theme', isDarkTheme(mainColorName) ? 'dark' : 'light')
   }
   if (event && ('startViewTransition' in document)) {
     const x = event.clientX;
@@ -90,8 +96,4 @@ export async function themeChange(
   }
 
   await changeTheme()
-}
-
-export function isDarkTheme() {
-  return themeColors[currentMainColor]() === themeColors[MainColors.dark]()
 }

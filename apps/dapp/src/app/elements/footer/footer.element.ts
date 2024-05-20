@@ -3,6 +3,7 @@ import { customElement } from 'lit/decorators.js';
 import { styleMap } from 'lit/directives/style-map.js';
 import { footerStyle } from './footer.style';
 import { getMobileMatchMedia, changeMobileMatchMedia } from '@one-inch-community/lit';
+import { getEnvironmentValue } from '@one-inch-community/sdk';
 import '@one-inch-community/widgets/wallet-manage';
 import { getFooterHeight } from '../../platform/sizes';
 import { connectWalletController } from '../../controllers/connect-wallet-controller';
@@ -35,6 +36,7 @@ export class FooterElement extends LitElement {
     return html`
       <div class="footer-container" style="${styleMap(styles)}">
         <span class="power-by">© ${new Date().getFullYear()} Powered by 1inch</span>
+        <span class="version">version: ${getEnvironmentValue('appVersion')}</span>
       </div>
     `
   }

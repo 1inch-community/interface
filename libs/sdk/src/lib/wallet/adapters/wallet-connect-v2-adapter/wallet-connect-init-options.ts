@@ -15,7 +15,8 @@ const optionalChains = Object.keys(ChainId)
 
 export const options = async (): Promise<EthereumProviderOptions> => {
   const mobileMedia = getMobileMatchMedia()
-  const themeMode = 'dark'
+  const htmlElement = document.querySelector('html')
+  const themeMode = htmlElement?.getAttribute('theme') ?? 'dark'
   return {
     projectId: getEnvironmentValue('walletConnectProjectId'),
     showQrModal: true,
@@ -50,8 +51,7 @@ export const options = async (): Promise<EthereumProviderOptions> => {
         '--wcm-background-color': 'var(--primary)',
         '--wcm-accent-color': 'var(--primary)',
         '--wcm-color-bg-2': 'none',
-        '--wcm-color-bg-1': 'var(--color-background-bg-primary)',
-        '--wcm-color-fg-1': 'var(--color-content-content-primary)'
+        '--wcm-color-fg-1': 'var(--color-content-content-primary)',
       }
     }
   } as EthereumProviderOptions

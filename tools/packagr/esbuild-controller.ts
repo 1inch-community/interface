@@ -74,7 +74,7 @@ export class EsbuildController {
       external: ['@one-inch-community', 'lit', ...Object.keys(pkg?.peerDependencies ?? {})],
       entryNames: `[dir]/[name].esm`,
       define: {
-        '__environment__': JSON.stringify(getEnv())
+        '__environment__': JSON.stringify(await getEnv())
       },
       loader: { '.ts': 'ts' }
     };

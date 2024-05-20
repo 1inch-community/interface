@@ -211,7 +211,6 @@ export class MultiConnectProvider implements EIP1193Provider {
       }
     }
   }
-
 }
 
 async function makeProvider(persistStorePrefix: string): Promise<EthereumProvider> {

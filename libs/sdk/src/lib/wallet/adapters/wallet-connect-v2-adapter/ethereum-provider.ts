@@ -1,18 +1,35 @@
 import { default as WcEthereumProvider, EthereumProviderOptions } from '@walletconnect/ethereum-provider';
 import { UniversalProvider } from '@walletconnect/universal-provider';
 import Dexie, { Table } from 'dexie';
+import { ConnectOps } from '@walletconnect/ethereum-provider/dist/types/EthereumProvider';
 
 
 export class EthereumProvider extends WcEthereumProvider {
 
   static async initProvider(opts: EthereumProviderOptions, persistStorePrefix: string): Promise<EthereumProvider> {
     const provider = new EthereumProvider(persistStorePrefix);
-    await provider.initialize(opts, );
+    await provider.initialize(opts);
     return provider;
   }
 
   constructor(private readonly persistStorePrefix: string) {
     super();
+  }
+
+  override async connect(opts?: ConnectOps): Promise<void> {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.type !== "attributes" || mutation.attributeName !== 'theme') return
+        this.modal.closeModal()
+      });
+    });
+    try {
+      const htmlElement = document.querySelector('html')!
+      observer.observe(htmlElement, { attributes: true })
+      return await super.connect(opts);
+    } finally {
+      observer.disconnect();
+    }
   }
 
   protected override async initialize(opts: EthereumProviderOptions) {
