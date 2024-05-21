@@ -50,9 +50,11 @@ export class UniswapV3BaseRateAdapter implements ITokenRateAdapter {
       if (pool === zeroAddress) {
         return null;
       }
-      const sqrtPriceX96 = await this.getSqrtPriceX96(chainId, pool);
       const isRevertRate = !isAddressEqual(sourceToken.address, token0);
-      const liquidity = await this.getLiquidity(chainId, pool)
+      const [ sqrtPriceX96, liquidity ] = await Promise.all([
+        this.getSqrtPriceX96(chainId, pool),
+        this.getLiquidity(chainId, pool)
+      ])
       const rate = this.calculatePrice(sqrtPriceX96, sourceToken, destinationToken, liquidity, isRevertRate);
       this.rateCache.set(chainId, id, rate);
 
