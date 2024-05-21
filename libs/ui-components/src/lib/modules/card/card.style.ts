@@ -16,6 +16,10 @@ export const cardStyle = css`
         width: 100vw;
         height: fit-content;
     }
+
+    :host(.shadow) {
+        box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12), 0 4px 12px 0 rgba(0, 0, 0, 0.12);
+    }
     
     .card-content {
         padding: 8px;

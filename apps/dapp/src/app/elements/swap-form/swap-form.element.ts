@@ -192,6 +192,7 @@ export class SwapFormElement extends LitElement {
   private async onOpenConnectWalletView() {
     const id = await this.connectWalletOverlay.open(html`
       <inch-wallet-manage
+        showShadow
         @closeCard="${() => this.connectWalletOverlay.close(id)}"
         .controller="${connectWalletController}"
       ></inch-wallet-manage>

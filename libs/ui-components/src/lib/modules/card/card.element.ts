@@ -10,6 +10,8 @@ export class CardElement extends LitElement {
 
   @property({ type: Boolean }) forMobileView = false
 
+  @property({ type: Boolean }) showShadow = false
+
   protected override render() {
     return html`
       <slot name="header"></slot>
@@ -20,8 +22,11 @@ export class CardElement extends LitElement {
   }
 
   protected override firstUpdated() {
-    if (this.forMobileView) {
+    if (this.forMobileView && !this.classList.contains('mobile')) {
       this.classList.add('mobile')
+    }
+    if (this.showShadow && !this.classList.contains('shadow')) {
+      this.classList.add('shadow')
     }
   }
 

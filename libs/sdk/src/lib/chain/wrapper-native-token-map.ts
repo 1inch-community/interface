@@ -16,6 +16,10 @@ export const wrapperNativeTokenMap: Readonly<Record<ChainId, Address>> = {
   [ChainId.zkSyncEra]: '0x5aea5775959fbc2557cc8789bc1bf90a239d9a91',
 }
 
+export function getWrapperNativeTokenAddress(chainId: ChainId): Address {
+  return wrapperNativeTokenMap[chainId]
+}
+
 export function getWrapperNativeToken(chainId: ChainId): IToken {
   const chain = getChainById(chainId)
   return {
