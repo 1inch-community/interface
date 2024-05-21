@@ -1,8 +1,8 @@
-import { singletonField } from '../utils/singleton-field';
+import { singletonField } from '../utils';
 import { ChainId } from '@one-inch-community/models';
 import { Block } from 'viem';
 import { getWSClient } from './chain-client';
-import { Observable, shareReplay } from 'rxjs';
+import { fromEvent, map, merge, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
 
 const blockEmitterMap: Record<ChainId, Observable<Block> | null> = singletonField('__block_emitter_map', () => ({
   [ChainId.eth]: null,
@@ -27,9 +27,39 @@ function blockListener(chainId: ChainId): Observable<Block> {
   )
 }
 
+function isWindowVisibleAndFocused(): boolean {
+  const isFocused = document.hasFocus();
+  const isVisible = document.visibilityState === 'visible';
+  return isFocused && isVisible;
+}
+
+function isWindowVisibleAndFocused$(): Observable<boolean> {
+  let isFirst = true
+  return merge(
+    fromEvent(window, 'focus'),
+    fromEvent(window, 'blur'),
+    fromEvent(document, 'visibilitychange')
+  ).pipe(
+    startWith(null),
+    map(() => {
+      if (isFirst) {
+        isFirst = false
+        return true
+      }
+      return isWindowVisibleAndFocused()
+    })
+  );
+}
+
 export function getBlockEmitter(chainId: ChainId): Observable<Block> {
   if (blockEmitterMap[chainId] === null) {
-    blockEmitterMap[chainId] = blockListener(chainId)
+    blockEmitterMap[chainId] = isWindowVisibleAndFocused$().pipe(
+      switchMap(state => {
+        if (state) return blockListener(chainId)
+        return of()
+      }),
+      shareReplay({ bufferSize: 1, refCount: true })
+    )
   }
   return blockEmitterMap[chainId]!
 }
