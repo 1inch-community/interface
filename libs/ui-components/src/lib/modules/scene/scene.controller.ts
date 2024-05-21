@@ -36,6 +36,9 @@ export class SceneController<T extends string, U extends T> {
   }
 
   render(config: RenderConfig<T>): TemplateResult {
+    if (this.transitionInProgress) {
+      return html`${this.sceneContainer}`;
+    }
     const isFirstRender = !this.currentScenes;
     this.currentScenes = config;
     const sceneName = this.getCurrentSceneName();
@@ -85,6 +88,7 @@ export class SceneController<T extends string, U extends T> {
   }
 
   private async transition(sceneName: T, isBack?: boolean) {
+    debugger
     this.transitionInProgress = true;
     try {
       const currentScene = this.getCurrentSceneName();

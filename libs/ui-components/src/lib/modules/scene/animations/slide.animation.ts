@@ -1,5 +1,5 @@
 import { Animation } from './animation';
-import { appendStyle } from '@one-inch-community/lit';
+import { appendStyle, isSafari } from '@one-inch-community/lit';
 
 export function slideAnimation(): Animation {
   const initStyle = {
@@ -10,7 +10,7 @@ export function slideAnimation(): Animation {
     right: '0',
     zIndex: '9',
     backfaceVisibility: 'hidden',
-    height: '100%'
+    height: isSafari() ? '100%' : ''
   }
   const resetStyle = {
     position: '',
