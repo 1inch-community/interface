@@ -14,7 +14,7 @@ function buildFallbackTransport(rpcList: string[]) {
     })),
     {
     rank: {
-      interval: 30_000,
+      interval: 60_000 * 5,
       sampleCount: rpcList.length,
       timeout: 500,
       weights: {
@@ -22,8 +22,8 @@ function buildFallbackTransport(rpcList: string[]) {
         stability: 0.7
       }
     },
-    retryCount: Math.round(rpcList.length / 2),
-    retryDelay: 100
+    retryCount: 10,
+    retryDelay: 30_000
   })
 }
 
@@ -48,6 +48,12 @@ export const transportMap: Record<ChainId, Transport> = singletonField('__transp
     'https://ethereum.publicnode.com',
     'https://rpc.mevblocker.io',
     'https://eth.merkle.io',
+    'https://1rpc.io/eth',
+    'https://rpc.flashbots.net',
+    'https://eth-pokt.nodies.app',
+    'https://eth.meowrpc.com',
+    'https://eth.drpc.org',
+    'https://endpoints.omniatech.io/v1/eth/mainnet/public',
     'https://ethereum-mainnet-rpc.allthatnode.com', // global
     'https://ethereum-mainnet-archive.allthatnode.com', // archive global
     'https://ethereum-mainnet-rpc-germany.allthatnode.com', // germany

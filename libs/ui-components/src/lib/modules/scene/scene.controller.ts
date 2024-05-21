@@ -88,7 +88,6 @@ export class SceneController<T extends string, U extends T> {
   }
 
   private async transition(sceneName: T, isBack?: boolean) {
-    debugger
     this.transitionInProgress = true;
     try {
       const currentScene = this.getCurrentSceneName();
