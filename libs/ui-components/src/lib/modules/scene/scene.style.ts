@@ -1,12 +1,10 @@
 import { css, unsafeCSS } from 'lit';
 
 type StyleConfig = {
-  animationContainerSizeChangeTime: string
   sceneBackgroundColor: string
 }
 
 const defaultConfig: StyleConfig = {
-  animationContainerSizeChangeTime: '.6s',
   sceneBackgroundColor: 'var(--color-background-bg-primary)',
 }
 
@@ -17,8 +15,7 @@ export const sceneStyle = (config?: Partial<StyleConfig>) => {
   return css`
 
       :host {
-          --animation-time: ${unsafeCSS(_config.animationContainerSizeChangeTime)};
-          --animation-time-container: .2s;
+          --scene-background-color: ${unsafeCSS(_config.sceneBackgroundColor)};
       }
 
       .scene-container {
@@ -27,15 +24,7 @@ export const sceneStyle = (config?: Partial<StyleConfig>) => {
           position: relative;
           overflow: hidden;
           border-radius: 16px;
-      }
-
-      .scene-wrapper {
-          background-color: ${unsafeCSS(_config.sceneBackgroundColor)};
-          padding: 1px;
-          box-sizing: border-box;
-          display: block;
-          height: fit-content;
-          will-change: transform
+          will-change: width, height;
       }
   `
 }

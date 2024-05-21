@@ -5,7 +5,7 @@ import { consume } from '@lit/context';
 import { swapContext } from '../../context';
 import { ISwapContext, IToken } from '@one-inch-community/models';
 import { combineLatest, debounceTime, defer, firstValueFrom, map, Observable, of, startWith, switchMap } from 'rxjs';
-import { observe, dispatchEvent, getMobileMatchMediaAndSubscribe, getMobileMatchMediaEmitter } from '@one-inch-community/lit';
+import { observe, dispatchEvent, getMobileMatchMediaAndSubscribe, getMobileMatchMediaEmitter, mobileMediaCSS } from '@one-inch-community/lit';
 import { Address } from 'viem';
 import { TokenController } from '@one-inch-community/sdk';
 
@@ -14,10 +14,17 @@ export class SwapButton extends LitElement {
   static tagName = 'inch-swap-button' as const
 
   static override styles = css`
+      :host {
+          height: 57px;
+      }
+      ${mobileMediaCSS(css`
+          :host {
+              height: 44px;
+          }
+      `)}
       .on-hover {
           display: none;
       }
-      
       @media (hover: hover) {
           .smart-hover:hover .on-hover {
               display: block;

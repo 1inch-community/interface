@@ -6,7 +6,7 @@ import "@one-inch-community/ui-components/icon"
 import "@one-inch-community/ui-components/button"
 import { IConnectWalletController, IToken } from '@one-inch-community/models';
 import { isTokensEqual, SwapContext } from '@one-inch-community/sdk';
-import { combineLatest, defer, distinctUntilChanged, map } from 'rxjs';
+import { combineLatest, defer, distinctUntilChanged, map, startWith } from 'rxjs';
 import { observe } from '@one-inch-community/lit';
 import { swapFromStyle } from './swap-from.style';
 import { swapContext } from './context';
@@ -24,6 +24,8 @@ export class SwapFromElement extends LitElement {
 
   static override styles = swapFromStyle
 
+  static lastFusionRenderIsEmptyState = true
+
   @property({ type: Object, hasChanged: hasChangedToken, attribute: false }) srcToken: IToken | null = null
 
   @property({ type: Object, hasChanged: hasChangedToken, attribute: false }) dstToken: IToken | null = null
@@ -37,11 +39,12 @@ export class SwapFromElement extends LitElement {
     defer(() => this.getContext().getTokenByType('source')),
     defer(() => this.getContext().getTokenByType('destination'))
   ]).pipe(
+    map(([address, sourceToken, destinationToken ]) => !address || !sourceToken || !destinationToken),
+    startWith(SwapFromElement.lastFusionRenderIsEmptyState),
     distinctUntilChanged(),
-    map(([address, sourceToken, destinationToken ]) => {
-      if (!address || !sourceToken || !destinationToken) return html``
-
-      return html`<inch-fusion-swap-info></inch-fusion-swap-info>`
+    map((isEmpty) => {
+      SwapFromElement.lastFusionRenderIsEmptyState = isEmpty
+      return this.getFusionInfoView(isEmpty)
     })
   )
 
@@ -80,11 +83,16 @@ export class SwapFromElement extends LitElement {
           <inch-swap-form-input disabled tokenType="destination"></inch-swap-form-input>
         </div>
         
-        ${observe(this.fusionView$)}
+        ${observe(this.fusionView$, this.getFusionInfoView(SwapFromElement.lastFusionRenderIsEmptyState))}
 
         <inch-swap-button></inch-swap-button>
       </div>
     `
+  }
+
+  private getFusionInfoView(isEmpty: boolean) {
+    if (isEmpty) return html``
+    return html`<inch-fusion-swap-info></inch-fusion-swap-info>`
   }
 
   private getWalletController() {
