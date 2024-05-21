@@ -2,110 +2,132 @@ import { ICache } from '@one-inch-community/models';
 import { storage, JsonParser } from '../utils';
 
 /**
- * Implements a long-term cache system using key-value storage mechanism with storage.
- * The cache entries have a specified time-to-live (TTL) in days and are stored
- * using a unique storage key in the storage, allowing data persistence across browser sessions.
- *
- * It is important to remember that checking the validity of the cache over time occurs only
- *  once at the time the constructor is called, and then only the storage is updated without
- *  checking the data on time-to-live
- *
- * @template Key The type of the keys used for the cache entries, which should be compatible with string since storage keys are strings.
- * @template Value The type of the values stored in the cache. Since storage stores data as strings,
- * the values must be serializable to a string format, typically using JSON serialization.
+ * Type representing the cached data with a timestamp.
+ * @template Value
+ */
+type LongTimeCacheData<Value> = {
+  timestamp: number;
+  value: Value;
+}
+
+/**
+ * Class representing a long-term cache with TTL (Time To Live) functionality.
+ * @template Key
+ * @template Value
+ * @implements {ICache<Key, Value>}
  */
 export class LongTimeCache<Key, Value> implements ICache<Key, Value> {
 
-  private readonly cache: Map<Key, Value> = new Map<Key, Value>();
+  /** @private @readonly @type {Map<Key, LongTimeCacheData<Value>>} */
+  private readonly cache: Map<Key, LongTimeCacheData<Value>> = new Map();
+
+  private get storageKeyAndVersion() {
+    return [this.storageKey, 'v2'].join(':')
+  }
 
   /**
    * Creates an instance of LongTimeCache.
-   * Initializes the cache from the storage if data exists, and sets up the TTL mechanism.
-   *
-   * @param {string} storageKey The key under which the cache's data and metadata are stored in storage.
-   * This key is used to differentiate this cache instance's data from other data in storage.
-   * @param {number} ttlDays The time-to-live for the cache data, in days. After this period, the cache is considered expired
-   * and its data is removed from storage.
+   * @param {string} storageKey - The key used to store the cache in localStorage.
+   * @param {number} ttlDays - The TTL (Time To Live) for cache items in days.
    */
-  constructor(private readonly storageKey: string, ttlDays: number) {
-    let createTime = storage.get(`${storageKey}_create-time`, Number)
-    if (createTime === null) {
-      createTime = Date.now()
-      storage.set(`${storageKey}_create-time`, createTime)
-    }
-    if ((Date.now() - createTime) < (ttlDays * 8.64e+7)) {
-      const data = storage.get<[Key, Value][]>(storageKey, JsonParser)
-      this.cache = new Map(data)
-    } else {
-      storage.remove(storageKey)
-      storage.remove(`${storageKey}_create-time`)
-    }
+  constructor(private readonly storageKey: string, private readonly ttlDays: number) {
+    const data = storage.get<[Key, LongTimeCacheData<Value>][]>(this.storageKeyAndVersion, JsonParser);
+    this.cache = new Map(data);
   }
 
   /**
-   * Stores a value in the cache under the specified key and updates storage accordingly.
-   * If the cache already contains a value for this key, it will be overwritten both in the in-memory cache
-   * and in storage.
-   *
-   * Values stored in storage are serialized to a string, typically using JSON serialization.
-   *
-   * @param {Key} key The key under which the value should be stored. Since storage uses strings as keys,
-   * the provided key is converted to a string.
-   * @param {Value} value The value to store in the cache. This value is serialized to a string for storage.
+   * Sets a value in the cache.
+   * @param {Key} key - The key under which the value is stored.
+   * @param {Value} value - The value to be cached.
    */
   set(key: Key, value: Value): void {
-    this.cache.set(key, value)
-    storage.set(this.storageKey, Array.from(this.cache.entries()))
+    this.cache.set(key, { value, timestamp: Date.now() });
+    this.updatePersistence();
   }
 
   /**
-   * Retrieves a value from the cache for the specified key.
-   * This does not check if the data for the key has expired.
-   *
-   * @param {Key} key The key of the value to retrieve.
-   * @returns {Value | null} The value associated with the key, or `null` if the key is not found or expired.
+   * Gets a value from the cache.
+   * @param {Key} key - The key of the value to retrieve.
+   * @returns {Value | null} - The cached value, or null if not found or expired.
    */
   get(key: Key): Value | null {
-    return this.cache.get(key) ?? null
+    this.checkCacheData(key);
+    return this.cache.get(key)?.value ?? null;
   }
 
   /**
-   * Checks if the cache (and implicitly the storage) contains a given key.
-   * This does not check if the data for the key has expired; it only checks for existence.
-   *
-   * @param {Key} key The key to check in the cache.
-   * @returns {boolean} `true` if the cache contains the key, otherwise `false`.
+   * Checks if a key exists in the cache.
+   * @param {Key} key - The key to check.
+   * @returns {boolean} - True if the key exists and is not expired, otherwise false.
    */
   has(key: Key): boolean {
-    return this.cache.has(key)
+    this.checkCacheData(key);
+    return this.cache.has(key);
   }
 
   /**
-   * Deletes a value from the cache and storage for the specified key.
-   * If the key does not exist in the cache, this method does nothing.
-   *
-   * @param {Key} key The key of the value to delete.
+   * Deletes a value from the cache.
+   * @param {Key} key - The key of the value to delete.
+   * @returns {boolean} - True if the value existed and was deleted, otherwise false.
    */
-  delete(key: Key) {
-    const state = this.cache.has(key)
-    storage.set(this.storageKey, Array.from(this.cache.entries()))
-    return state
+  delete(key: Key): boolean {
+    const state = this.cache.delete(key);
+    this.updatePersistence();
+    return state;
   }
 
   /**
-   * Clears all data from the cache and removes the associated data from storage.
-   * This is useful for scenarios where the cache needs to be completely refreshed or invalidated.
+   * Clears the cache.
    */
   clear(): void {
-    this.cache.clear()
-    storage.set(this.storageKey, Array.from(this.cache.entries()))
+    this.cache.clear();
+    this.updatePersistence();
   }
 
   /**
-   * @returns {number} returns cache size.
-   * */
+   * Gets the size of the cache.
+   * @returns {number} - The number of items in the cache.
+   */
   size(): number {
-    return this.cache.size
+    let isDirty = false;
+    this.cache.forEach((_, key) => {
+      const state = this.checkCacheData(key, true);
+      if (state && !isDirty) {
+        isDirty = true;
+      }
+    });
+    if (isDirty) {
+      this.updatePersistence();
+    }
+    return this.cache.size;
   }
 
+  /**
+   * Checks if a cached item is expired.
+   * @private
+   * @param {Key} key - The key of the item to check.
+   * @param {boolean} [skipUpdatePersistence=false] - Whether to skip updating persistence.
+   * @returns {boolean} - True if the item was expired and deleted, otherwise false.
+   */
+  private checkCacheData(key: Key, skipUpdatePersistence?: boolean): boolean {
+    const data = this.cache.get(key);
+    if (!data) return false;
+    let isDirty = false;
+    if ((Date.now() - data.timestamp) > (this.ttlDays * 8.64e+7)) {
+      this.cache.delete(key);
+      isDirty = true;
+      if (!(skipUpdatePersistence ?? false)) {
+        this.updatePersistence();
+      }
+    }
+    return isDirty;
+  }
+
+  /**
+   * Updates the persistent storage with the current cache state.
+   * @private
+   */
+  private updatePersistence(): void {
+    storage.set(this.storageKeyAndVersion, Array.from(this.cache.entries()));
+  }
 }
