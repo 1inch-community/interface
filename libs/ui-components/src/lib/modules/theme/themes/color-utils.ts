@@ -12,7 +12,7 @@ export function hexToRGBA(hex: string, alfa = 100): CSSResult {
   const g = (bigint >> 8) & 255;
   const b = bigint & 255;
 
-  return unsafeCSS(`rgb(${r}, ${g}, ${b} / ${alfa}%)`);
+  return unsafeCSS(`rgba(${r}, ${g}, ${b}, ${alfa}%)`);
 }
 
 export function transformColor(hex: string): CSSResult {
@@ -36,6 +36,53 @@ export function transformColor(hex: string): CSSResult {
   const toHex = (value: number) => value.toString(16).padStart(2, '0');
 
   return unsafeCSS(`#${toHex(r)}${toHex(g)}${toHex(b)}`)
+}
+
+export function getRandomBrightColor() {
+  const max = 200;
+  const min = 32;
+
+  const colors = [
+    Math.floor(Math.random() * (max - min) + min),
+    Math.floor(Math.random() * (max - min) + min),
+    max
+  ];
+
+  colors.sort(() => Math.random() - 0.5);
+
+  const toHex = (value: number) => value.toString(16).padStart(2, '0');
+  return `#${toHex(colors[0])}${toHex(colors[1])}${toHex(colors[2])}`;
+}
+
+export function getColorFromString(str: string): string {
+  function hashString(str: string) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    return hash;
+  }
+
+  function intToRgb(hash: number) {
+    const max = 200;
+    const min = 32;
+
+    const r = (hash & 0xFF) % (max - min) + min;
+    const g = ((hash >> 8) & 0xFF) % (max - min) + min;
+    const b = ((hash >> 16) & 0xFF) % (max - min) + min;
+
+    return { r, g, b };
+  }
+
+  function rgbToHex(r: number, g: number, b: number) {
+    const toHex = (value: number) => value.toString(16).padStart(2, '0');
+    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+  }
+
+  const hash = hashString(str);
+  const { r, g, b } = intToRgb(hash);
+
+  return rgbToHex(r, g, b);
 }
 
 export function makeColorSchema(primaryColor: string) {
