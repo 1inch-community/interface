@@ -8,10 +8,18 @@ function shuffleArray<T>(array: T[]): T[] {
   return array;
 }
 
-export const rainbowColors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#8B00FF']
-export const rainbowColorsInterpolate = interpolateColorArray(rainbowColors, rainbowColors.length)
-export const rainbowRandomColors = shuffleArray(['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#8B00FF'])
-export const rainbowRandomColorsInterpolate = interpolateColorArray(rainbowRandomColors, rainbowColors.length)
+export const rainbowColors = [
+  '#FF0000',
+  '#FF7F00',
+  '#ffd500',
+  '#40ff00',
+  '#0000FF',
+  '#37009e',
+  '#8B00FF'
+]
+export const rainbowRandomColors = shuffleArray(rainbowColors)
+const _rainbowRandomColorsInterpolate = interpolateColorArray(rainbowColors, rainbowColors.length / 2)
+export const rainbowRandomColorsInterpolate = [..._rainbowRandomColorsInterpolate, ..._rainbowRandomColorsInterpolate.reverse()]
 
 function hexToRgb(hex: string) {
   let r = 0, g = 0, b = 0;
@@ -136,6 +144,7 @@ export function makeColorSchema(primaryColor: string) {
       :root {
           --primary: ${unsafeCSS(primaryColor)};
           --primary-50: ${hexToRGBA(primaryColor, 50)};
+          --primary-12: ${hexToRGBA(primaryColor, 12)};
           --primary-hover: ${transformColor(primaryColor)};
           --secondary: ${unsafeCSS(primaryColor)}1f;
           --secondary-hover: ${unsafeCSS(primaryColor)}3d;

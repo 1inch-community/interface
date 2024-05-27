@@ -1,13 +1,26 @@
 import { css, html, LitElement, TemplateResult } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, state } from 'lit/decorators.js';
+import { classMap } from 'lit/directives/class-map.js';
 import '@one-inch-community/ui-components/button'
 import { consume } from '@lit/context';
 import { swapContext } from '../../context';
 import { ISwapContext, IToken } from '@one-inch-community/models';
-import { combineLatest, debounceTime, defer, firstValueFrom, map, Observable, of, startWith, switchMap } from 'rxjs';
-import { observe, dispatchEvent, getMobileMatchMediaAndSubscribe, getMobileMatchMediaEmitter, mobileMediaCSS } from '@one-inch-community/lit';
+import {
+  combineLatest,
+  debounceTime,
+  defer,
+  distinctUntilChanged,
+  firstValueFrom,
+  map,
+  Observable,
+  of,
+  startWith,
+  switchMap, tap
+} from 'rxjs';
+import { observe, dispatchEvent, getMobileMatchMediaAndSubscribe, getMobileMatchMediaEmitter, mobileMediaCSS, subscribe } from '@one-inch-community/lit';
 import { Address } from 'viem';
 import { TokenController } from '@one-inch-community/sdk';
+import { BrandColors, getThemeChange, getRainbowGradient } from '@one-inch-community/ui-components/theme';
 
 @customElement(SwapButton.tagName)
 export class SwapButton extends LitElement {
@@ -25,6 +38,40 @@ export class SwapButton extends LitElement {
       .on-hover {
           display: none;
       }
+      .rainbow {
+          --button-text-color-ext: #ffffff;
+          --button-text-color-ext-hover: #ffffff;
+          position: relative;
+      }
+      .rainbow:after, .rainbow:before {
+          content: '';
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+          bottom: 0;
+          right: 0;
+          background: ${getRainbowGradient()};
+          background-size: 1000%;
+          animation: bg-rainbow 300s cubic-bezier(0.4, 0, 1, 1) infinite;
+          z-index: -1;
+      }
+      @keyframes bg-rainbow {
+          0% {
+              border-radius: 24px;
+              background-position: 0 0;
+          }
+          50% {
+              border-radius: 24px;
+              background-size: 800%;
+              background-position: 400% 0;
+          }
+          100% {
+              border-radius: 24px;
+              background-position: 0 0;
+          }
+      }
       @media (hover: hover) {
           .smart-hover:hover .on-hover {
               display: block;
@@ -38,6 +85,8 @@ export class SwapButton extends LitElement {
 
   @consume({ context: swapContext, subscribe: true })
   context?: ISwapContext
+
+  @state() private isRainbowTheme = false
 
   private readonly mobileMedia = getMobileMatchMediaAndSubscribe(this)
 
@@ -80,6 +129,17 @@ export class SwapButton extends LitElement {
     ))
   )
 
+  override connectedCallback() {
+    super.connectedCallback();
+    subscribe(this, [
+      getThemeChange().pipe(
+        map(({ brandColor }) => brandColor),
+        distinctUntilChanged(),
+        tap(color => this.isRainbowTheme = color === BrandColors.rainbow),
+      )
+    ])
+  }
+
   protected override render() {
     return html`${observe(this.view$)}`
   }
@@ -93,9 +153,13 @@ export class SwapButton extends LitElement {
   ): TemplateResult {
     const size = this.mobileMedia.matches ? 'xl' : 'xxl'
 
+    const classes = {
+      // 'rainbow': this.isRainbowTheme
+    }
+
     if (!walletAddress) {
       return html`
-        <inch-button @click="${() => dispatchEvent(this, 'connectWallet', null)}" type="secondary" size="${size}" fullSize>
+        <inch-button class="${classMap(classes)}" @click="${() => dispatchEvent(this, 'connectWallet', null)}" type="secondary" size="${size}" fullSize>
           Connect wallet
         </inch-button>
       `

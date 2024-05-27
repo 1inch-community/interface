@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Task } from '@lit/task';
-import { formatNumber, getChainById, LongTimeCache, TokenController } from '@one-inch-community/sdk';
+import { formatNumber, getChainById, LongTimeCache, nativeTokenAddress, TokenController } from '@one-inch-community/sdk';
 import { ChainId } from '@one-inch-community/models';
 import { Address, formatUnits } from 'viem';
 import { walletViewAddressBalanceStyle } from './wallet-view-address-balance.style';
@@ -20,7 +20,7 @@ export class WalletViewAddressBalanceElement extends LitElement {
   private readonly task = new Task(this,
     async ([chainId, address]) => {
       if (!chainId || !address) throw new Error('')
-      const balanceRecord = await TokenController.getTokenBalance(chainId, '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee', address);
+      const balanceRecord = await TokenController.getTokenBalance(chainId, nativeTokenAddress, address);
       const balance = formatNumber(formatUnits(BigInt(balanceRecord?.amount ?? 0), 18), 6)
       storage.set([this.chainId, this.address].join(':'), balance)
       return balance

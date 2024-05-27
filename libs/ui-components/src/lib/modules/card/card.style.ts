@@ -18,7 +18,7 @@ export const cardStyle = css`
     }
 
     :host(.shadow) {
-        box-shadow: 0 1px 4px 0 rgba(0, 0, 0, 0.12), 0 4px 12px 0 rgba(0, 0, 0, 0.12);
+        box-shadow: 0 1px 4px 0 var(--primary-12), 0 4px 12px 0 var(--primary-12);
     }
     
     .card-content {

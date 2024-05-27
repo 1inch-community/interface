@@ -68,7 +68,6 @@ export class SwapFormElement extends LitElement {
         map(({ brandColor }) => brandColor),
         distinctUntilChanged(),
         tap(color => this.isRainbowTheme = color === BrandColors.rainbow),
-        tap(() => this.isRainbowTheme ? this.classList.add('rainbow') : this.classList.remove('rainbow')),
       )
     ])
 

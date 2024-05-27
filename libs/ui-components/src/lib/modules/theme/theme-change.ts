@@ -1,4 +1,4 @@
-import { brandColorMap, mainColorMap } from './themes';
+import { brandColorMap, mainColorMap, primaryColorMap } from './themes';
 import { mainColorStyleElement, brandColorStyleElement } from './theme-elements';
 import { MainColors, BrandColors } from './themes/themes';
 import { applyStyle, setThemeColor } from '@one-inch-community/lit';

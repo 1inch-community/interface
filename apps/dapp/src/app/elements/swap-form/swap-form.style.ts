@@ -1,8 +1,6 @@
-import { css, unsafeCSS } from 'lit';
+import { css } from 'lit';
 import { mobileMediaCSS } from '@one-inch-community/lit';
-import { rainbowRandomColorsInterpolate } from '@one-inch-community/ui-components/theme';
-
-const rainbowColors = () => rainbowRandomColorsInterpolate
+import { getRainbowGradient } from '@one-inch-community/ui-components/theme';
 
 export const swapFormStyle = css`
 
@@ -15,7 +13,7 @@ export const swapFormStyle = css`
     .shadow-container {
         will-change: box-shadow;
         transform: translate3d(0, 0, 0); /*for enabled hardware rendering in Safari*/
-        box-shadow: 0 12px 24px var(--primary-50);
+        box-shadow: 0 5px 24px var(--primary-50);
         border-radius: 24px;
     }
 
@@ -32,10 +30,11 @@ export const swapFormStyle = css`
         left: -1px;
         top: -1px;
         border-radius: 24px;
-        background: linear-gradient(90deg, ${unsafeCSS(rainbowColors())});
-        background-size: 1000%;
-        animation: bg-rainbow 300s cubic-bezier(0.4, 0, 1, 1) infinite;
+        background: ${getRainbowGradient()};
+        background-size: 2000%;
+        animation: bg-rainbow 90s cubic-bezier(0.4, 0, 1, 1) infinite;
         z-index: -1;
+        will-change: background, width, height, left, top, background-position;
     }
 
     .shadow-container-rainbow:after {
@@ -44,16 +43,25 @@ export const swapFormStyle = css`
 
     @keyframes bg-rainbow {
         0% {
-            border-radius: 24px;
+            width: calc(100% + 2px);
+            height: calc(100% + 2px);
+            left: -1px;
+            top: -1px;
             background-position: 0 0;
         }
         50% {
-            border-radius: 24px;
+            width: 100%;
+            height: 100%;
+            left: 0;
+            top: 0;
             background-size: 800%;
             background-position: 400% 0;
         }
         100% {
-            border-radius: 24px;
+            width: calc(100% + 2px);
+            height: calc(100% + 2px);
+            left: -1px;
+            top: -1px;
             background-position: 0 0;
         }
     }
