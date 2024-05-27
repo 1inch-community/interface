@@ -9,6 +9,7 @@ export enum MainColors {
 export enum BrandColors {
   community,
   random,
+  rainbow,
   orange,
   violet
 }

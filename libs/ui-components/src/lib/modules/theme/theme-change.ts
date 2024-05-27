@@ -2,7 +2,7 @@ import { brandColorMap, mainColorMap } from './themes';
 import { mainColorStyleElement, brandColorStyleElement } from './theme-elements';
 import { MainColors, BrandColors } from './themes/themes';
 import { applyStyle, setThemeColor } from '@one-inch-community/lit';
-import { Observable, Subject } from 'rxjs';
+import { Observable, ReplaySubject } from 'rxjs';
 
 let currentMainColor: MainColors
 let currentBrandColor: BrandColors
@@ -17,7 +17,7 @@ const themeColors: Record<MainColors, (() => string)> = {
 
 const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
-const change$ = new Subject<MediaQueryList>()
+const changeAppTheme$ = new ReplaySubject<{mainColor: MainColors, brandColor: BrandColors}>(1)
 
 function getThemeColorsSystem() {
   if (mediaQuery.matches) {
@@ -34,14 +34,13 @@ export async function themeChangeBrandColor(brandColorName: BrandColors, event?:
   return await themeChange(currentMainColor, brandColorName, event)
 }
 
-export function getThemeChange(): Observable<MediaQueryList> {
-  return change$
+export function getThemeChange(): Observable<{mainColor: MainColors, brandColor: BrandColors}> {
+  return changeAppTheme$
 }
 
 mediaQuery.onchange = async () => {
   if (currentMainColor !== MainColors.systemSync) return
   await themeChange(MainColors.systemSync, currentBrandColor)
-  change$.next(mediaQuery)
 }
 
 function isDarkTheme(theme: MainColors) {
@@ -62,8 +61,9 @@ export async function themeChange(
     setThemeColor(themeColors[mainColorName]())
     currentMainColor = mainColorName
     currentBrandColor = brandColorName
-    const htmlElement = document.querySelector('html')
-    htmlElement?.setAttribute('theme', isDarkTheme(mainColorName) ? 'dark' : 'light')
+    document.documentElement.setAttribute('theme', isDarkTheme(mainColorName) ? 'dark' : 'light')
+    document.documentElement.setAttribute('brand-color', BrandColors[brandColorName])
+    changeAppTheme$.next({ mainColor: mainColorName, brandColor: brandColorName })
   }
   if (event && ('startViewTransition' in document)) {
     const x = event.clientX;

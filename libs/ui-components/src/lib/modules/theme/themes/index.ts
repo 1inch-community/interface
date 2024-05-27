@@ -1,5 +1,6 @@
 import type { CSSResult } from 'lit';
 import { MainColors, BrandColors } from './themes';
+import { makeColorSchema, rainbowRandomColors } from './color-utils';
 
 export const mainColorMap: Record<MainColors, () => Promise<CSSResult>> = {
   [MainColors.systemSync]: () => getSystemTheme(),
@@ -10,6 +11,7 @@ export const mainColorMap: Record<MainColors, () => Promise<CSSResult>> = {
 }
 
 export const brandColorMap: Record<BrandColors, () => Promise<CSSResult>> = {
+  [BrandColors.rainbow]: () => Promise.resolve(makeColorSchema(rainbowRandomColors[0])),
   [BrandColors.community]: () => import('./brand-color-schemes/community.style').then(m => m.communityStyle),
   [BrandColors.random]: () => import('./brand-color-schemes/random.style').then(m => m.randomStyle),
   [BrandColors.orange]: () => import('./brand-color-schemes/orange.style').then(m => m.orangeStyle),

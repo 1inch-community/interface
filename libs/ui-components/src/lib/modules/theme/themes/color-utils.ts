@@ -1,17 +1,71 @@
 import { css, CSSResult, unsafeCSS } from 'lit';
 
-export function hexToRGBA(hex: string, alfa = 100): CSSResult {
-  hex = hex.replace(/^#/, '');
+function shuffleArray<T>(array: T[]): T[] {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
 
-  if (hex.length === 3) {
-    hex = hex.split('').map(char => char + char).join('');
+export const rainbowColors = ['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#8B00FF']
+export const rainbowColorsInterpolate = interpolateColorArray(rainbowColors, rainbowColors.length)
+export const rainbowRandomColors = shuffleArray(['#FF0000', '#FF7F00', '#FFFF00', '#00FF00', '#0000FF', '#4B0082', '#8B00FF'])
+export const rainbowRandomColorsInterpolate = interpolateColorArray(rainbowRandomColors, rainbowColors.length)
+
+function hexToRgb(hex: string) {
+  let r = 0, g = 0, b = 0;
+  if (hex.length === 4) {
+    r = parseInt(hex[1] + hex[1], 16);
+    g = parseInt(hex[2] + hex[2], 16);
+    b = parseInt(hex[3] + hex[3], 16);
+  } else if (hex.length === 7) {
+    r = parseInt(hex[1] + hex[2], 16);
+    g = parseInt(hex[3] + hex[4], 16);
+    b = parseInt(hex[5] + hex[6], 16);
+  }
+  return [r, g, b];
+}
+
+function rgbToHex(r: number, g: number, b: number) {
+  const toHex = (value: number) => value.toString(16).padStart(2, '0');
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}
+
+function interpolate(start: number, end: number, fraction: number) {
+  return Math.round(start + (end - start) * fraction);
+}
+
+function interpolateColors(color1: string, color2: string, steps: number) {
+  const [r1, g1, b1] = hexToRgb(color1);
+  const [r2, g2, b2] = hexToRgb(color2);
+  const colors = [];
+
+  for (let i = 0; i <= steps; i++) {
+    const fraction = i / steps;
+    const r = interpolate(r1, r2, fraction);
+    const g = interpolate(g1, g2, fraction);
+    const b = interpolate(b1, b2, fraction);
+    colors.push(rgbToHex(r, g, b));
   }
 
-  const bigint = parseInt(hex, 16);
-  const r = (bigint >> 16) & 255;
-  const g = (bigint >> 8) & 255;
-  const b = bigint & 255;
+  return colors;
+}
 
+function interpolateColorArray(colors: string[], steps: number) {
+  const result = [];
+
+  for (let i = 0; i < colors.length - 1; i++) {
+    const interpolatedColors = interpolateColors(colors[i], colors[i + 1], steps);
+    result.push(...interpolatedColors.slice(0, -1));
+  }
+  result.push(colors[colors.length - 1]);
+
+  return result;
+}
+
+export function hexToRGBA(hex: string, alfa = 100): CSSResult {
+  const [ r, g, b ] = hexToRgb(hex)
   return unsafeCSS(`rgba(${r}, ${g}, ${b}, ${alfa}%)`);
 }
 
@@ -33,9 +87,7 @@ export function transformColor(hex: string): CSSResult {
   g = clamp(g + deltaG);
   b = clamp(b + deltaB);
 
-  const toHex = (value: number) => value.toString(16).padStart(2, '0');
-
-  return unsafeCSS(`#${toHex(r)}${toHex(g)}${toHex(b)}`)
+  return unsafeCSS(rgbToHex(r, g ,b))
 }
 
 export function getRandomBrightColor() {
@@ -50,8 +102,7 @@ export function getRandomBrightColor() {
 
   colors.sort(() => Math.random() - 0.5);
 
-  const toHex = (value: number) => value.toString(16).padStart(2, '0');
-  return `#${toHex(colors[0])}${toHex(colors[1])}${toHex(colors[2])}`;
+  return rgbToHex(colors[0], colors[1], colors[2]);
 }
 
 export function getColorFromString(str: string): string {
@@ -72,11 +123,6 @@ export function getColorFromString(str: string): string {
     const b = ((hash >> 16) & 0xFF) % (max - min) + min;
 
     return { r, g, b };
-  }
-
-  function rgbToHex(r: number, g: number, b: number) {
-    const toHex = (value: number) => value.toString(16).padStart(2, '0');
-    return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
   }
 
   const hash = hashString(str);

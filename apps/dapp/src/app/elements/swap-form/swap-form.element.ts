@@ -1,7 +1,8 @@
 import { html, LitElement } from 'lit';
-import { filter, tap } from 'rxjs';
+import { distinctUntilChanged, filter, map, tap } from 'rxjs';
 import { customElement, state } from 'lit/decorators.js';
 import { createRef, ref } from 'lit/directives/ref.js';
+import { classMap } from 'lit/directives/class-map.js';
 import '@one-inch-community/ui-components/card';
 import '@one-inch-community/widgets/swap-form';
 import "@one-inch-community/widgets/wallet-manage"
@@ -9,6 +10,7 @@ import { isTokensEqual, storage, TokenController, getChainById } from '@one-inch
 import { getMobileMatchMediaAndSubscribe, observe, subscribe } from '@one-inch-community/lit';
 import { OverlayMobileController, OverlayController } from '@one-inch-community/ui-components/overlay';
 import { SceneController, sceneLazyValue } from '@one-inch-community/ui-components/scene';
+import { getThemeChange, BrandColors } from '@one-inch-community/ui-components/theme';
 import { ChainId, IToken } from '@one-inch-community/models';
 import { swapFormStyle } from './swap-form.style';
 import { connectWalletController } from '../../controllers/connect-wallet-controller';
@@ -29,6 +31,8 @@ export class SwapFormElement extends LitElement {
   @state() private srcToken: IToken | null = null
 
   @state() private dstToken: IToken | null = null
+
+  @state() private isRainbowTheme = false
 
   private readonly chainId$ = connectWalletController.data.chainId$
   private readonly activeAddress$ = connectWalletController.data.activeAddress$
@@ -58,6 +62,15 @@ export class SwapFormElement extends LitElement {
         tap((chainId) => this.syncTokens(chainId))
       )
     ], { requestUpdate: false })
+
+    subscribe(this, [
+      getThemeChange().pipe(
+        map(({ brandColor }) => brandColor),
+        distinctUntilChanged(),
+        tap(color => this.isRainbowTheme = color === BrandColors.rainbow),
+        tap(() => this.isRainbowTheme ? this.classList.add('rainbow') : this.classList.remove('rainbow')),
+      )
+    ])
 
     await import('@one-inch-community/widgets/select-token')
   }
@@ -105,24 +118,35 @@ export class SwapFormElement extends LitElement {
   }
 
   private getMobileSwapForm() {
+    const classes = {
+      'shadow-container': true,
+      'shadow-container-rainbow': this.isRainbowTheme
+    }
     return html`
-      <inch-card class="shadow-swap-form-card">
-        <inch-swap-form
-          .srcToken="${this.srcToken}"
-          .dstToken="${this.dstToken}"
-          .walletController="${connectWalletController}"
-          @openTokenSelector="${(event: CustomEvent) => this.onOpenMobileSelectToken(event)}"
-          @connectWallet="${() => this.onOpenConnectWalletView()}"
-        ></inch-swap-form>
-      </inch-card>
+      <div class="${classMap(classes)}">
+        <inch-card>
+          <inch-swap-form
+            .srcToken="${this.srcToken}"
+            .dstToken="${this.dstToken}"
+            .walletController="${connectWalletController}"
+            @openTokenSelector="${(event: CustomEvent) => this.onOpenMobileSelectToken(event)}"
+            @connectWallet="${() => this.onOpenConnectWalletView()}"
+          ></inch-swap-form>
+        </inch-card>
+      </div>
     `;
   }
 
   private getDesktopSwapForm() {
+    const classes = {
+      'shadow-container': true,
+      'shadow-container-rainbow': this.isRainbowTheme
+    }
     return html`
-      <inch-card class="shadow-swap-form-card">
-        ${this.desktopScene.render({
-          swapForm: () => html`
+      <div class="${classMap(classes)}">
+        <inch-card>
+          ${this.desktopScene.render({
+            swapForm: () => html`
               <inch-swap-form
                 ${ref(this.swapFormRef)}
                 .srcToken="${sceneLazyValue(this, () => this.srcToken)}"
@@ -133,19 +157,20 @@ export class SwapFormElement extends LitElement {
                 @connectWallet="${() => this.onOpenConnectWalletView()}"
               ></inch-swap-form>
             `,
-          selectToken: () => html`
+            selectToken: () => html`
             <inch-select-token
               chainId="${observe(this.chainId$)}"
               connectedWalletAddress="${observe(this.activeAddress$)}"
               @backCard="${() => this.desktopScene.back()}"
               @selectToken="${async (event: CustomEvent) => {
-                this.onSelectToken(event);
-                await this.desktopScene.back()
-              }}"
+              this.onSelectToken(event);
+              await this.desktopScene.back()
+            }}"
             ></inch-select-token>
           `
-        })}
-      </inch-card>
+          })}
+        </inch-card>
+      </div>
     `;
   }
 
