@@ -1,5 +1,5 @@
 import { html, LitElement } from 'lit';
-import { distinctUntilChanged, filter, map, tap } from 'rxjs';
+import { distinctUntilChanged, filter, map, skip, tap } from 'rxjs';
 import { customElement, state } from 'lit/decorators.js';
 import { createRef, ref } from 'lit/directives/ref.js';
 import { classMap } from 'lit/directives/class-map.js';
@@ -52,15 +52,16 @@ export class SwapFormElement extends LitElement {
 
   constructor() {
     super();
-    this.initTokens().catch()
   }
 
   async connectedCallback() {
+    await this.initTokens()
     super.connectedCallback();
-
     subscribe(this, [
       this.chainId$.pipe(
         filter(Boolean),
+        distinctUntilChanged(),
+        skip(1),
         tap((chainId) => this.syncTokens(chainId))
       )
     ], { requestUpdate: false })
@@ -91,17 +92,13 @@ export class SwapFormElement extends LitElement {
   private async initTokens() {
     const chainId = await connectWalletController.data.getChainId()
     if (!chainId) return
-    const chain = getChainById(chainId)
-    const srcTokenSymbol: string | null = storage.get('src-token-symbol', JSON.parse) ?? chain.nativeCurrency.symbol
-    const dstTokenSymbol: string | null = storage.get('dst-token-symbol', JSON.parse)
-    if (!srcTokenSymbol && !dstTokenSymbol) return
-    if (srcTokenSymbol) {
-      const tokenList = await TokenController.getTokenBySymbol(chainId, srcTokenSymbol)
-      this.setSrcToken(tokenList[0])
+    const srcToken: IToken | null = storage.get('src-token-symbol', JSON.parse)
+    const dstToken: IToken | null = storage.get('dst-token-symbol', JSON.parse)
+    if (srcToken) {
+      this.setSrcToken(srcToken)
     }
-    if (dstTokenSymbol) {
-      const tokenList = await TokenController.getTokenBySymbol(chainId, dstTokenSymbol)
-      this.setDstToken(tokenList[0])
+    if (dstToken) {
+      this.setDstToken(dstToken)
     }
   }
 
@@ -194,12 +191,12 @@ export class SwapFormElement extends LitElement {
 
   private setSrcToken(token: IToken | null): void {
     this.srcToken = token
-    storage.set('src-token-symbol', token?.symbol)
+    storage.set('src-token-symbol', token)
   }
 
   private setDstToken(token: IToken| null): void {
     this.dstToken = token
-    storage.set('dst-token-symbol', token?.symbol)
+    storage.set('dst-token-symbol', token)
   }
 
   private async onOpenConnectWalletView() {
