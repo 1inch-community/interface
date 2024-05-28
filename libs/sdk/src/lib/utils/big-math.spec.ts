@@ -201,4 +201,16 @@ describe('BigMath', () => {
     )).toBe(152413839360000000000n)
   })
 
+  it('min', () => {
+    expect(BigMath.min(
+      1n, 2n, 3n, 4n,
+    )).toBe(1n)
+  })
+
+  it('max', () => {
+    expect(BigMath.max(
+      1n, 2n, 3n, 4n,
+    )).toBe(4n)
+  })
+
 })

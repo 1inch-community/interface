@@ -27,7 +27,7 @@ export class TokenUsdOnChainPriceProvider {
     if (isAddressEqual(token.address, USDTAddress)) {
       return '1'
     }
-    const rate = await this.rateProvider.getRate(
+    const rate = await this.rateProvider.getOnChainRate(
       chainId,
       { address: USDTAddress, chainId, decimals, name: 'USDT', symbol: 'USDT' },
       token,

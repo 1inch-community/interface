@@ -5,7 +5,7 @@ import { createRef, ref } from 'lit/directives/ref.js';
 import { classMap } from 'lit/directives/class-map.js';
 import '@one-inch-community/ui-components/card';
 import '@one-inch-community/widgets/swap-form';
-import { isTokensEqual, storage, TokenController, getChainById } from '@one-inch-community/sdk';
+import { isTokensEqual, storage, TokenController } from '@one-inch-community/sdk';
 import { getMobileMatchMediaAndSubscribe, observe, subscribe } from '@one-inch-community/lit';
 import { OverlayMobileController, OverlayController } from '@one-inch-community/ui-components/overlay';
 import { SceneController, sceneLazyValue } from '@one-inch-community/ui-components/scene';
@@ -55,8 +55,8 @@ export class SwapFormElement extends LitElement {
   }
 
   async connectedCallback() {
-    await this.initTokens()
     super.connectedCallback();
+    await this.initTokens()
     subscribe(this, [
       this.chainId$.pipe(
         filter(Boolean),

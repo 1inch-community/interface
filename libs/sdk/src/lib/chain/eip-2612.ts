@@ -1,9 +1,8 @@
-import { AbiFunction, Address, Hex, parseAbi, toFunctionSelector } from 'viem';
+import { AbiFunction, Address, Hex, parseAbi, toFunctionSelector, maxUint256 } from 'viem';
 import { getClient } from './chain-client';
 import { ChainId } from '@one-inch-community/models';
 import { QueueCache } from '../cache';
 import { getImplementationAddress } from './proxy-contract';
-import { uint256Max } from './constants';
 
 type EIP712Parameter = {
   name: string
@@ -180,7 +179,7 @@ function getPermitDataAndType(isDaiLike: boolean, owner: Address, spender: Addre
   } else {
     data['owner'] = owner
     data['spender'] = spender
-    data['value'] = uint256Max
+    data['value'] = maxUint256
     data['nonce'] = nonce
     data['deadline'] = Math.round(Date.now() / 1000) + 300 // 5 min
   }

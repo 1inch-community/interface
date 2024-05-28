@@ -5,7 +5,7 @@ import { TimeCache } from '../cache';
 import { CacheActivePromise } from './decorators';
 
 const tokenPriceCache = new TimeCache<ChainId, Record<Address, string>>(10000)
-const fusionQuoteReceiveCache = new TimeCache<string, FusionQuoteReceiveDto>(5000)
+const fusionQuoteReceiveCache = new TimeCache<string, FusionQuoteReceiveDto | null>(5000)
 
 export class OneInchDevPortalAdapter {
 
@@ -23,7 +23,7 @@ export class OneInchDevPortalAdapter {
   }
 
 
-  @CacheActivePromise()
+  // @CacheActivePromise()
   async getTokenPrices(chainId: ChainId): Promise<Record<Address, string>> {
     const cacheValue = tokenPriceCache.get(chainId)
     if (cacheValue) {
@@ -39,7 +39,7 @@ export class OneInchDevPortalAdapter {
   /**
    * doc link https://portal.1inch.dev/documentation/fusion/swagger/quoter?method=get&path=%2Fv1.0%2F1%2Fquote%2Freceive
    * */
-  @CacheActivePromise((...args: unknown[]) => args.slice(1).join(':'))
+  // @CacheActivePromise((...args: unknown[]) => args.slice(1).join(':'))
   async getFusionQuoteReceive(
     chainId: ChainId,
     fromTokenAddress: Address,
@@ -48,13 +48,13 @@ export class OneInchDevPortalAdapter {
     walletAddress: Address,
     enableEstimate = false,
     isLedgerLive = false
-  ): Promise<FusionQuoteReceiveDto> {
+  ): Promise<FusionQuoteReceiveDto | null> {
     const id = [
       chainId, fromTokenAddress, toTokenAddress, amount, walletAddress, enableEstimate, isLedgerLive
     ].join(':')
 
     if (fusionQuoteReceiveCache.has(id)) {
-      return fusionQuoteReceiveCache.get(id)!
+      return fusionQuoteReceiveCache.get(id)
     }
 
     const queryParams = new URLSearchParams({
@@ -66,6 +66,10 @@ export class OneInchDevPortalAdapter {
       isLedgerLive: isLedgerLive.toString(),
     });
     const response = await fetch(`${this.host}/fusion/quoter/v1.0/${chainId}/quote/receive?${queryParams}`);
+    if (!response.ok) {
+      fusionQuoteReceiveCache.set(id, null)
+      return null
+    }
     const result = await response.json();
     fusionQuoteReceiveCache.set(id, result)
     return result

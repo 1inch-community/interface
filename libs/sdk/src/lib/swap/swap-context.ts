@@ -16,7 +16,7 @@ import { PairHolder, TokenType } from './pair-holder';
 import { SwapContextOnChainStrategy } from './swap-context-onchain.strategy';
 import { SwapContextFusionStrategy } from './swap-context-fusion.strategy';
 import { ISwapContextStrategy } from './models/swap-context-strategy.interface';
-import { BigMath } from '../utils';
+
 
 export class SwapContext implements ISwapContext {
 
@@ -47,31 +47,25 @@ export class SwapContext implements ISwapContext {
     switchMap(strategy => strategy.rate$)
   )
 
+  readonly revertedRate$ = this.strategy$.pipe(
+    switchMap(strategy => strategy.revertedRate$)
+  )
+
+  readonly destinationTokenAmount$ = this.strategy$.pipe(
+    switchMap(strategy => strategy.destinationTokenAmount$)
+  )
+
   constructor(
     private readonly walletController: IConnectWalletController
   ) {
-    const distinctionTokenAmountSync$ = combineLatest([
-      this.rate$.pipe(distinctUntilChanged()),
-      this.getTokenRawAmountByType('source').pipe(distinctUntilChanged()),
-      this.getTokenByType('source'),
-      this.getTokenByType('destination')
-    ]).pipe(
-      map(([rate, sourceTokenAmount, sourceToken, destinationToken]) => {
-        if (!sourceTokenAmount || sourceTokenAmount === 0n || rate === 0n || !sourceToken || !destinationToken) return 0n
-        return BigMath.mul(
-          sourceTokenAmount,
-          rate,
-          sourceToken.decimals,
-          sourceToken.decimals,
-          destinationToken.decimals
-        )
-      }),
-      tap(amount => this.setTokenAmountByType('destination', amount, true))
-    )
-
     this.subscription.add(
       merge(
-        distinctionTokenAmountSync$
+        this.destinationTokenAmount$.pipe(
+          distinctUntilChanged(),
+          tap(amount => {
+            this.setTokenAmountByType('destination', amount, true)
+          })
+        )
       ).subscribe()
     )
   }

@@ -36,7 +36,7 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy {
     this.pairHolder.streamSnapshot('destination'),
     this.sourceTokenAmount$
   ])).pipe(
-    debounceTime(0),
+    debounceTime(100),
     switchMap(([ chainId, activeAddress, sourceTokenSnapshot, destinationTokenSnapshot, sourceTokenBalance ]) => {
       const sourceToken = sourceTokenSnapshot.token
       const destinationToken = destinationTokenSnapshot.token
@@ -50,6 +50,7 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy {
         activeAddress
       )
     }),
+    distinctUntilChanged(),
     shareReplay({ bufferSize: 1, refCount: true })
   )
 
@@ -76,7 +77,7 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy {
   ]).pipe(
     debounceTime(0),
     withLatestFrom(this.pairHolder.streamSnapshot('source'), this.pairHolder.streamSnapshot('destination')),
-    scan((previousValue: null | bigint, [ [ quoteReceive, averageDestinationTokenAmount ], sourceTokenSnapshot, destinationTokenSnapshot ]) => {
+    map(([ [ quoteReceive, averageDestinationTokenAmount ], sourceTokenSnapshot, destinationTokenSnapshot ]) => {
       const sourceToken = sourceTokenSnapshot.token
       const destinationToken = destinationTokenSnapshot.token
       if (!quoteReceive || !sourceToken || !destinationToken) return null
@@ -87,11 +88,43 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy {
         destinationToken.decimals,
         sourceToken.decimals,
       )
-    }, null),
+    }),
     distinctUntilChanged(),
     switchMap(rate => {
       if (!rate) return this.fallback.rate$
       return [rate]
+    })
+  )
+
+  readonly revertedRate$ = combineLatest([
+    this.quoteReceive$,
+    this.averageDestinationTokenAmount$
+  ]).pipe(
+    debounceTime(0),
+    withLatestFrom(this.pairHolder.streamSnapshot('source'), this.pairHolder.streamSnapshot('destination')),
+    map(([ [ quoteReceive, averageDestinationTokenAmount ], sourceTokenSnapshot, destinationTokenSnapshot ]) => {
+      const sourceToken = sourceTokenSnapshot.token
+      const destinationToken = destinationTokenSnapshot.token
+      if (!quoteReceive || !sourceToken || !destinationToken) return null
+      const sourceTokenAmount = BigInt(quoteReceive.fromTokenAmount)
+      return BigMath.div(
+        sourceTokenAmount,
+        averageDestinationTokenAmount,
+        sourceToken.decimals,
+        destinationToken.decimals,
+      )
+    }),
+    distinctUntilChanged(),
+    switchMap(rate => {
+      if (!rate) return this.fallback.revertedRate$
+      return [rate]
+    })
+  )
+
+  readonly destinationTokenAmount$ = this.quoteReceive$.pipe(
+    switchMap(data => {
+      if (!data) return this.fallback.destinationTokenAmount$
+      return [BigInt(data.toTokenAmount)]
     })
   )
 

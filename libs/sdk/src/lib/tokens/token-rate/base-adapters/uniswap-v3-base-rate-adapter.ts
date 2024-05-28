@@ -1,8 +1,8 @@
-import { ChainId, IToken, ITokenRateAdapter } from '@one-inch-community/models';
-import { Address, getAddress, isAddressEqual, parseAbi } from 'viem';
+import { ChainId, IToken, ITokenRateSourceAdapter, Rate } from '@one-inch-community/models';
+import { Address, getAddress, isAddressEqual, parseAbi, zeroAddress } from 'viem';
 import { getClient } from '../../../chain';
 import { BlockTimeCache, LongTimeCache } from '../../../cache';
-import { BigMath, CacheActivePromise } from '../../../utils';
+import { BigMath } from '../../../utils';
 
 const FactoryContractABI = parseAbi([
   'function getPool(address tokenA, address tokenB, uint24 fee) external view returns (address pool)'
@@ -15,12 +15,9 @@ const PoolContractABI = parseAbi([
   'function token1() external view returns (address)'
 ]);
 
-const zeroAddress: Address = '0x0000000000000000000000000000000000000000';
-
-export class UniswapV3BaseRateAdapter implements ITokenRateAdapter {
+export class UniswapV3BaseRateAdapter implements ITokenRateSourceAdapter {
 
   private readonly pools = new LongTimeCache<string, [Address, Address]>(`${this.name}_pools`, 7);
-  private readonly rateCache = new BlockTimeCache<string, bigint>();
   private readonly liquidityCache = new BlockTimeCache<string, bigint>();
 
   constructor(
@@ -34,16 +31,8 @@ export class UniswapV3BaseRateAdapter implements ITokenRateAdapter {
     return this.supportedChain.includes(chainId);
   }
 
-  @CacheActivePromise((_, chainId: ChainId, sourceToken: IToken, destinationToken: IToken) => [chainId, sourceToken.address, destinationToken.address].join(':'))
-  async getRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken): Promise<bigint | null> {
-    const id = [sourceToken.address, destinationToken.address].join(':');
+  async getRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken): Promise<Rate | null> {
     try {
-
-      const rateFromCache = this.rateCache.get(chainId, id) ?? null;
-      if (rateFromCache !== null) {
-        return rateFromCache;
-      }
-
       const srcTokenAddress = getAddress(sourceToken.address);
       const dstTokenAddress = getAddress(destinationToken.address);
       const [pool, token0] = await this.getPool(chainId, srcTokenAddress, dstTokenAddress);
@@ -55,13 +44,15 @@ export class UniswapV3BaseRateAdapter implements ITokenRateAdapter {
         this.getSqrtPriceX96(chainId, pool),
         this.getLiquidity(chainId, pool)
       ])
-      const rate = this.calculatePrice(sqrtPriceX96, sourceToken, destinationToken, liquidity, isRevertRate);
-      this.rateCache.set(chainId, id, rate);
-
-      return rate;
+      const [ rate, revertedRate ] = this.calculatePrice(sqrtPriceX96, sourceToken, destinationToken, liquidity, isRevertRate);
+      return {
+        rate,
+        revertedRate,
+        isReverted: isRevertRate,
+      };
     } catch (error) {
       console.error(`Error in UniswapV3BaseRateAdapter adapter name ${this.name}`, error);
-      return this.rateCache.get(chainId, id);
+      return null
     }
   }
 
@@ -132,16 +123,25 @@ export class UniswapV3BaseRateAdapter implements ITokenRateAdapter {
     return liquidity
   }
 
-  private calculatePrice(sqrtPriceX96: bigint, sourceToken: IToken, destinationToken: IToken, liquidity: bigint, isRevertRate: boolean): bigint {
+  private calculatePrice(sqrtPriceX96: bigint, sourceToken: IToken, destinationToken: IToken, liquidity: bigint, isRevertRate: boolean): [bigint, bigint] {
     const Q96 = 2n ** 96n
     const sourceTokenAmount = liquidity * Q96 / sqrtPriceX96
     const destinationTokenAmount = liquidity * sqrtPriceX96 / Q96;
-    return BigMath.div(
-      isRevertRate ? destinationTokenAmount : sourceTokenAmount,
-      isRevertRate ? sourceTokenAmount : destinationTokenAmount,
-      sourceToken.decimals,
-      destinationToken.decimals,
-      destinationToken.decimals
-    )
+    return [
+      BigMath.div(
+        isRevertRate ? destinationTokenAmount : sourceTokenAmount,
+        isRevertRate ? sourceTokenAmount : destinationTokenAmount,
+        sourceToken.decimals,
+        destinationToken.decimals,
+        destinationToken.decimals
+      ),
+      BigMath.div(
+        isRevertRate ? sourceTokenAmount : destinationTokenAmount,
+        isRevertRate ? destinationTokenAmount : sourceTokenAmount,
+        destinationToken.decimals,
+        sourceToken.decimals,
+        sourceToken.decimals,
+      )
+    ]
   }
 }

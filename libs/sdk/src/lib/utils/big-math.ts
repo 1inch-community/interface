@@ -1,3 +1,5 @@
+import { maxUint256 } from 'viem';
+
 export class BigMath {
 
   private constructor() {
@@ -120,12 +122,23 @@ export class BigMath {
     return result;
   }
 
-  static reduceDecimals(value: bigint, currentDecimals: number, targetDecimals: number) {
-    if (targetDecimals > currentDecimals) {
-      throw new Error('Target decimals must be less than or equal to current decimals.');
+  static min(...values: bigint[]): bigint {
+    let result: bigint = maxUint256
+    for (const value of values) {
+      if (value < result) {
+        result = value
+      }
     }
+    return result
+  }
 
-    const factor = BigInt(10) ** BigInt(currentDecimals - targetDecimals);
-    return value / factor;
+  static max(...values: bigint[]): bigint {
+    let result = 0n
+    for (const value of values) {
+      if (value > result) {
+        result = value
+      }
+    }
+    return result
   }
 }

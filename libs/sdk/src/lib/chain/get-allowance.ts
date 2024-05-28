@@ -1,9 +1,8 @@
 import { ChainId } from "@one-inch-community/models";
-import { Address, parseAbi } from 'viem';
+import { Address, parseAbi, maxUint256 } from 'viem';
 import { BlockTimeCache } from '../cache';
 import { getClient } from './chain-client';
 import { isNativeToken } from './is-native-token';
-import { uint256Max } from './constants';
 import { Observable, switchMap } from 'rxjs';
 import { getBlockEmitter } from './block-emitter-map';
 
@@ -23,7 +22,7 @@ export async function getAllowance(chainId: ChainId, contract: Address, owner: A
 
   const client = getClient(chainId);
   if (isNativeToken(contract)) {
-    return uint256Max;
+    return maxUint256;
   }
   const result = await client.readContract({
     abi,
