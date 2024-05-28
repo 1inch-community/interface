@@ -5,7 +5,6 @@ import { createRef, ref } from 'lit/directives/ref.js';
 import { classMap } from 'lit/directives/class-map.js';
 import '@one-inch-community/ui-components/card';
 import '@one-inch-community/widgets/swap-form';
-import "@one-inch-community/widgets/wallet-manage"
 import { isTokensEqual, storage, TokenController, getChainById } from '@one-inch-community/sdk';
 import { getMobileMatchMediaAndSubscribe, observe, subscribe } from '@one-inch-community/lit';
 import { OverlayMobileController, OverlayController } from '@one-inch-community/ui-components/overlay';
@@ -14,6 +13,9 @@ import { getThemeChange, BrandColors } from '@one-inch-community/ui-components/t
 import { ChainId, IToken } from '@one-inch-community/models';
 import { swapFormStyle } from './swap-form.style';
 import { connectWalletController } from '../../controllers/connect-wallet-controller';
+
+import('@one-inch-community/widgets/wallet-manage')
+import('@one-inch-community/widgets/select-token')
 
 @customElement(SwapFormElement.tagName)
 export class SwapFormElement extends LitElement {
@@ -70,8 +72,6 @@ export class SwapFormElement extends LitElement {
         tap(color => this.isRainbowTheme = color === BrandColors.rainbow),
       )
     ])
-
-    await import('@one-inch-community/widgets/select-token')
   }
 
   protected render() {
