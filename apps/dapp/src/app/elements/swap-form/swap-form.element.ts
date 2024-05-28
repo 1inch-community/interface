@@ -82,21 +82,10 @@ export class SwapFormElement extends LitElement {
   }
 
   private async syncTokens(chainId: ChainId) {
-    const srcTokenSymbol = this.srcToken?.symbol
-    const dstTokenSymbol = this.dstToken?.symbol
-    if (srcTokenSymbol) {
-      const tokenList = await TokenController.getTokenBySymbol(chainId, srcTokenSymbol)
-      if (!tokenList.length) {
-        this.setSrcToken(await TokenController.getNativeToken(chainId))
-      } else {
-        this.setSrcToken(tokenList[0])
-      }
-
-    }
-    if (dstTokenSymbol) {
-      const tokenList = await TokenController.getTokenBySymbol(chainId, dstTokenSymbol)
-      this.setDstToken(tokenList[0])
-    }
+    const token = await TokenController.getNativeToken(chainId)
+    this.setSrcToken(token)
+    this.setDstToken(null)
+    this.requestUpdate()
   }
 
   private async initTokens() {

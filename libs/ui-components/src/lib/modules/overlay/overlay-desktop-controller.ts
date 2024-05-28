@@ -42,7 +42,7 @@ export class OverlayDesktopController implements IOverlayController {
         top: `${position[1]}px`,
         left: `${position[0]}px`,
         borderRadius: '24px',
-        boxShadow: `0px 1px 4px 0px var(--primary-12), 0px 4px 12px 0px var(--primary-12)`
+        boxShadow: `0 -3px 4px 0 var(--primary-12), 0 6px 12px 0 var(--primary-12)`
       })
     }
 

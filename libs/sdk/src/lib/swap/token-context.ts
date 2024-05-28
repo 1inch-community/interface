@@ -15,7 +15,7 @@ export class TokenContext {
   private token: IToken | null = null
   private readonly signalChange$ = new Subject<void>()
 
-  setToken(token?: IToken) {
+  setToken(token: IToken | null) {
     if (this.token && token && isTokensEqual(this.token, token)) {
       return
     }

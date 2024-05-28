@@ -5,18 +5,12 @@ import '@one-inch-community/ui-components/card'
 import "@one-inch-community/ui-components/icon"
 import "@one-inch-community/ui-components/button"
 import { IConnectWalletController, IToken } from '@one-inch-community/models';
-import { isTokensEqual, SwapContext } from '@one-inch-community/sdk';
+import { SwapContext } from '@one-inch-community/sdk';
 import { combineLatest, defer, distinctUntilChanged, map, startWith } from 'rxjs';
 import { observe } from '@one-inch-community/lit';
 import { swapFromStyle } from './swap-from.style';
 import { swapContext } from './context';
 import './elements'
-
-function hasChangedToken(value: IToken, oldValue: IToken): boolean {
-  if (!oldValue) return true
-  if (!value) return true
-  return isTokensEqual(value, oldValue)
-}
 
 @customElement(SwapFromElement.tagName)
 export class SwapFromElement extends LitElement {
@@ -26,9 +20,9 @@ export class SwapFromElement extends LitElement {
 
   static lastFusionRenderIsEmptyState = true
 
-  @property({ type: Object, hasChanged: hasChangedToken, attribute: false }) srcToken: IToken | null = null
+  @property({ type: Object, attribute: false }) srcToken: IToken | null = null
 
-  @property({ type: Object, hasChanged: hasChangedToken, attribute: false }) dstToken: IToken | null = null
+  @property({ type: Object, attribute: false }) dstToken: IToken | null = null
 
   @property({ type: Object, attribute: false }) walletController?: IConnectWalletController
 
@@ -54,11 +48,11 @@ export class SwapFromElement extends LitElement {
   }
 
   protected override updated(changedProperties: PropertyValues) {
-    const context =   this.getContext()
+    const context = this.getContext()
     if (changedProperties.has('srcToken') || changedProperties.has('dstToken')) {
       context.setPair({
-        srcToken: this.srcToken ?? undefined,
-        dstToken: this.dstToken ?? undefined,
+        srcToken: this.srcToken,
+        dstToken: this.dstToken,
       })
       this.requestUpdate()
     }
@@ -106,8 +100,8 @@ export class SwapFromElement extends LitElement {
         this.getWalletController()
       )
       context.setPair({
-        srcToken: this.srcToken ?? undefined,
-        dstToken: this.dstToken ?? undefined,
+        srcToken: this.srcToken,
+        dstToken: this.dstToken,
       })
       this.context.setValue(context);
     }

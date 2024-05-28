@@ -1,4 +1,4 @@
-import { IConnectWalletController, ISwapContext, IToken, Pair } from '@one-inch-community/models';
+import { IConnectWalletController, ISwapContext, IToken, Pair, NullableValue } from '@one-inch-community/models';
 import {
   combineLatest,
   defer,
@@ -81,7 +81,7 @@ export class SwapContext implements ISwapContext {
     this.lastSwapContextStrategy?.destroy()
   }
 
-  setPair(pair: Partial<Pair>): void {
+  setPair(pair: NullableValue<Pair>): void {
     this.pairHolder.setPair(pair);
   }
 

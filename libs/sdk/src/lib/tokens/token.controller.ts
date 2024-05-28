@@ -4,9 +4,9 @@ import { ChainId } from '@one-inch-community/models';
 import { Address, formatUnits } from 'viem';
 import { averageBlockTime } from '../chain/average-block-time';
 import { TokenUsdOnChainPriceProvider } from './token-usd-on-chain-price.provider';
-import { TokenOnChainBalances } from './token-balances/token-on-chain-balances';
 import { liveQuery } from 'dexie';
 import { CacheActivePromise } from '../utils/decorators';
+import { getBalances } from '../chain';
 
 const lastUpdateTokenDatabaseTimestampStorageKey = `last-update-token-database-timestamp-v${TokenSchema.databaseVersion}`
 const lastUpdateTokenBalanceDatabaseTimestampStorageKey = `last-update-token-balance-database-timestamp-v${TokenSchema.databaseVersion}`
@@ -18,7 +18,6 @@ class TokenControllerImpl {
 
   private readonly schema = new TokenSchema()
   private readonly tokenUsdPriceProvider = new TokenUsdOnChainPriceProvider()
-  private readonly tokenOnChainBalances = new TokenOnChainBalances()
   private readonly oneInchApiAdapter = new OneInchDevPortalAdapter()
   private lastUpdateTokenDatabaseTimestampStorage = storage.get<Record<ChainId, number>>(lastUpdateTokenDatabaseTimestampStorageKey, JsonParser)
   private lastUpdateTokenBalanceDatabaseTimestampStorage = storage.get<Record<string, number>>(lastUpdateTokenBalanceDatabaseTimestampStorageKey, JsonParser)
@@ -186,7 +185,7 @@ class TokenControllerImpl {
 
   private async getBalancesOnChain(chainId: ChainId, walletAddress: Address): Promise<Record<Address, string>> {
     const tokens = await this.schema.getAllTokenAddresses(chainId)
-    return this.tokenOnChainBalances.getBalances(chainId, walletAddress, tokens)
+    return getBalances(chainId, walletAddress, tokens)
   }
 }
 
