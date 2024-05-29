@@ -1,4 +1,5 @@
 import { css } from 'lit';
+import { IosCss } from '@one-inch-community/lit';
 
 export const appStyle = css`
     
@@ -10,6 +11,16 @@ export const appStyle = css`
         flex-direction: column;
         justify-content: space-between;
     }
+    
+    ${IosCss(css`
+        :host {
+            padding-right: 30px;
+        }
+
+        :host::-webkit-scrollbar {
+            display: none;
+        }
+    `)}
 
     .content {
         display: flex;

@@ -1,12 +1,24 @@
 import { html, LitElement } from 'lit';
-import { distinctUntilChanged, filter, map, skip, tap } from 'rxjs';
+import {
+  animationFrameScheduler,
+  defer,
+  distinctUntilChanged,
+  filter,
+  fromEvent,
+  map, of,
+  skip,
+  subscribeOn,
+  switchMap,
+  takeUntil,
+  tap, timer
+} from 'rxjs';
 import { customElement, state } from 'lit/decorators.js';
 import { createRef, ref } from 'lit/directives/ref.js';
 import { classMap } from 'lit/directives/class-map.js';
 import '@one-inch-community/ui-components/card';
 import '@one-inch-community/widgets/swap-form';
 import { isTokensEqual, storage, TokenController } from '@one-inch-community/sdk';
-import { getMobileMatchMediaAndSubscribe, observe, subscribe } from '@one-inch-community/lit';
+import { appendStyle, getMobileMatchMediaAndSubscribe, observe, subscribe } from '@one-inch-community/lit';
 import { OverlayMobileController, OverlayController } from '@one-inch-community/ui-components/overlay';
 import { SceneController, sceneLazyValue } from '@one-inch-community/ui-components/scene';
 import { getThemeChange, BrandColors } from '@one-inch-community/ui-components/theme';
@@ -16,6 +28,7 @@ import { connectWalletController } from '../../controllers/connect-wallet-contro
 
 import('@one-inch-community/widgets/wallet-manage')
 import('@one-inch-community/widgets/select-token')
+import('@one-inch-community/ui-components/icon')
 
 @customElement(SwapFormElement.tagName)
 export class SwapFormElement extends LitElement {
@@ -36,10 +49,14 @@ export class SwapFormElement extends LitElement {
 
   @state() private isRainbowTheme = false
 
+
+
   private readonly chainId$ = connectWalletController.data.chainId$
   private readonly activeAddress$ = connectWalletController.data.activeAddress$
 
   private readonly swapFormRef = createRef<HTMLElement>()
+  private readonly swapFormContainerRef  = createRef<HTMLElement>()
+  private readonly unicornLoaderRef  = createRef<HTMLElement>()
 
   private readonly desktopScene = new SceneController('swapForm', {
     swapForm: { minWidth: 556, minHeight: 376.5, lazyRender: true },
@@ -59,16 +76,14 @@ export class SwapFormElement extends LitElement {
         distinctUntilChanged(),
         skip(1),
         tap((chainId) => this.syncTokens(chainId))
-      )
-    ], { requestUpdate: false })
-
-    subscribe(this, [
+      ),
       getThemeChange().pipe(
         map(({ brandColor }) => brandColor),
         distinctUntilChanged(),
         tap(color => this.isRainbowTheme = color === BrandColors.rainbow),
-      )
-    ])
+      ),
+      this.mobileUpdate()
+    ], { requestUpdate: false })
   }
 
   protected render() {
@@ -104,7 +119,8 @@ export class SwapFormElement extends LitElement {
       'shadow-container-rainbow': this.isRainbowTheme
     }
     return html`
-      <div class="${classMap(classes)}">
+      <inch-icon ${ref(this.unicornLoaderRef)} class="unicorn-loader" icon="unicornRun"></inch-icon>
+      <div ${ref(this.swapFormContainerRef)} class="${classMap(classes)}">
         <inch-card>
           <inch-swap-form
             .srcToken="${this.srcToken}"
@@ -124,7 +140,8 @@ export class SwapFormElement extends LitElement {
       'shadow-container-rainbow': this.isRainbowTheme
     }
     return html`
-      <div class="${classMap(classes)}">
+      <inch-icon ${ref(this.unicornLoaderRef)} class="unicorn-loader" icon="unicornRun"></inch-icon>
+      <div ${ref(this.swapFormContainerRef)} class="${classMap(classes)}">
         <inch-card>
           ${this.desktopScene.render({
             swapForm: () => html`
@@ -220,6 +237,59 @@ export class SwapFormElement extends LitElement {
       </inch-card>
     `)
     this.targetSelectToken = event.detail.value
+  }
+
+  private mobileUpdate() {
+    let lastPosition = 0
+    let full = false
+    let resetInProgress = false
+    const max = 60
+    const root = (): HTMLElement | null => document.querySelector('#app-root')
+    const target = (): HTMLElement => this.swapFormContainerRef.value!
+    const loader = (): HTMLElement => this.unicornLoaderRef.value!
+    const set = (position: number) => {
+      if (position < 0) return
+      if (position > max) {
+        full = true
+      }
+      const adjustedPosition = position > max ? max + (position - max) / 4 : position;
+      const loaderPosition = (position > max ? max : position) / max;
+      appendStyle(loader(), { transform: `scale(${loaderPosition})` })
+      appendStyle(target(), { transform: `translate3d(0, ${adjustedPosition}px, 0)` })
+      lastPosition = adjustedPosition
+    }
+    const reset = async () => {
+      resetInProgress = true
+      await target().animate([
+        { transform: `translate3d(0, ${lastPosition}px, 0)` },
+        { transform: `translate3d(0, 0, 0)` }
+      ], {
+        duration: 800,
+        easing: 'cubic-bezier(.2, .8, .2, 1)'
+      }).finished
+      set(0)
+      full = false
+      resetInProgress = false
+    }
+    return defer(() => {
+      const targetEl = target()
+      return fromEvent<TouchEvent>(targetEl, 'touchstart').pipe(
+        filter(() => {
+          return !resetInProgress && (root()?.scrollTop ?? 0) === 0
+        }),
+        switchMap((startEvent: TouchEvent) => {
+          const startPoint = startEvent.touches[0].clientY
+          return fromEvent<TouchEvent>(targetEl, 'touchmove').pipe(
+            map(event => event.touches[0].clientY - startPoint),
+            tap(position => set(position)),
+            takeUntil(fromEvent<TouchEvent>(targetEl, 'touchend').pipe(
+              switchMap(() => full ? timer(300) : of(null)),
+              tap(() => reset())
+            ))
+          )
+        })
+      )
+    }).pipe(subscribeOn(animationFrameScheduler))
   }
 }
 

@@ -1,3 +1,4 @@
+import { mobileMediaCSS } from '@one-inch-community/lit';
 import { css } from 'lit';
 
 export const footerStyle = css`
@@ -17,9 +18,11 @@ export const footerStyle = css`
     
     .mobile-footer {
         height: 72px;
+        width: 100vw;
         position: fixed;
         padding: 16px 8px;
         bottom: 0;
+        z-index: 9;
         justify-content: space-between;
     }
     
@@ -48,5 +51,11 @@ export const footerStyle = css`
             opacity: 1;
         }
     }
+    
+    ${mobileMediaCSS(css`
+        :host {
+            padding-bottom: 90px;
+        }
+    `)}
 
 `

@@ -5,6 +5,7 @@ import './elements/header'
 import './elements/footer'
 import './elements/swap-form'
 import { scrollbarStyle } from '@one-inch-community/ui-components/theme';
+import { preventIosScrollTopOverflow } from '@one-inch-community/lit';
 
 @customElement('app-root')
 export class AppElement extends LitElement {
@@ -21,8 +22,13 @@ export class AppElement extends LitElement {
 
   static override styles = [
     appStyle,
-    scrollbarStyle
+    scrollbarStyle,
   ]
+
+  connectedCallback() {
+    super.connectedCallback();
+    preventIosScrollTopOverflow(this)
+  }
 
   protected render() {
     return html`

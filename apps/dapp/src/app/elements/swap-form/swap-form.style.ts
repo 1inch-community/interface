@@ -8,13 +8,26 @@ export const swapFormStyle = css`
         display: flex;
         padding-top: 48px;
         justify-content: center;
+        position: relative;
+        z-index: 1;
+    }
+    
+    .unicorn-loader {
+        position: absolute;
+        z-index: 1;
+        top: 40px;
+        transform: scale(0);
+        will-change: transform;
+        height: auto;
     }
 
     .shadow-container {
-        will-change: box-shadow;
+        will-change: box-shadow, transform;
         transform: translate3d(0, 0, 0); /*for enabled hardware rendering in Safari*/
         box-shadow: 0 5px 24px var(--primary-50);
         border-radius: 24px;
+        position: relative;
+        z-index: 2;
     }
 
     .shadow-container-rainbow {

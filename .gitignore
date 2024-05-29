@@ -2,6 +2,7 @@
 
 # compiled output
 dist
+dev-cert
 tmp
 /out-tsc
 

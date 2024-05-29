@@ -1,7 +1,7 @@
 import { IOverlayController } from './overlay-controller.interface';
 import { html, render, TemplateResult } from 'lit';
 import { getContainer } from './overlay-container';
-import { appendStyle } from '@one-inch-community/lit';
+import { appendStyle, isSafariIOS } from '@one-inch-community/lit';
 import { getOverlayId } from './overlay-id-generator';
 import { fromEvent, Subscription, tap } from 'rxjs';
 
@@ -51,7 +51,7 @@ export class OverlayMobileController implements IOverlayController {
     appendStyle(rootNode, {
       filter: 'blur(3px)',
       transform: 'scale(.9) translate3d(0, -6%, 0)',
-      willChange: 'filter, transform',
+      // willChange: isSafariIOS() ? '' : 'filter, transform',
     })
     const id = getOverlayId()
     this.subscribeOnResize(id)

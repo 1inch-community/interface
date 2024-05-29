@@ -5,6 +5,7 @@ import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import minifyHTML from 'rollup-plugin-minify-html-literals'
 import { defaultShouldMinify } from 'minify-html-literals'
+import basicSsl from '@vitejs/plugin-basic-ssl'
 
 function isCSS(text: string): boolean {
   return (text.includes(':host') || text.includes(':root') || text.includes('@keyframes') || text.includes('@media') || text.includes('@font-face') || text.includes('var(--'));
@@ -57,6 +58,14 @@ export default defineConfig(({ mode }) => {
 
     plugins: [
       nxViteTsPaths(),
+      basicSsl({
+        certDir: './dev-cert',
+        name: 'one-inch-community-dev',
+        domains: [
+          'localhost',
+          '1inch.local'
+        ]
+      }),
       isProduction ? (minifyHTML as any).default({ options: { shouldMinify } }) : null,
       createHtmlPlugin({
         inject: {

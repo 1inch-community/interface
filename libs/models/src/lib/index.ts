@@ -1,6 +1,6 @@
 export * from './base'
 export * from './chain'
-export * from './swap/swap-context'
+export * from './swap'
 export * from './select-token/select-token-context'
 export * from './token/token'
 export * from './token-price'
