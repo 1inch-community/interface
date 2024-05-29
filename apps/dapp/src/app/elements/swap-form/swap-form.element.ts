@@ -50,13 +50,9 @@ export class SwapFormElement extends LitElement {
 
   private readonly connectWalletOverlay = new OverlayController('app-root', 'center')
 
-  constructor() {
-    super();
-  }
-
   async connectedCallback() {
-    super.connectedCallback();
     await this.initTokens()
+    super.connectedCallback();
     subscribe(this, [
       this.chainId$.pipe(
         filter(Boolean),
