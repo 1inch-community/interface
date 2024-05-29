@@ -1,10 +1,9 @@
 import { ChainId } from '@one-inch-community/models';
 import { createPublicClient, PublicClient } from 'viem';
-import { singletonField } from '../utils/singleton-field';
 import { batchConfig, transportMap, transportWSMap } from './transport-map';
 import { getChainById } from './viem-chain-map';
 
-const viemClients: Record<ChainId, PublicClient | null> = singletonField('__chain_client', () => ({
+const viemClients: Record<ChainId, PublicClient | null> = {
   [ChainId.eth]: null,
   [ChainId.bnb]: null,
   [ChainId.matic]: null,
@@ -16,9 +15,9 @@ const viemClients: Record<ChainId, PublicClient | null> = singletonField('__chai
   [ChainId.aurora]: null,
   [ChainId.klaytn]: null,
   [ChainId.zkSyncEra]: null,
-}));
+}
 
-const viemWSClients: Record<ChainId, PublicClient | null> = singletonField('__chain_ws_client', () => ({
+const viemWSClients: Record<ChainId, PublicClient | null> = {
   [ChainId.eth]: null,
   [ChainId.bnb]: null,
   [ChainId.matic]: null,
@@ -30,7 +29,7 @@ const viemWSClients: Record<ChainId, PublicClient | null> = singletonField('__ch
   [ChainId.aurora]: null,
   [ChainId.klaytn]: null,
   [ChainId.zkSyncEra]: null,
-}))
+}
 
 function buildViemDefaultClient(chainId: ChainId) {
   const chain = getChainById(chainId);

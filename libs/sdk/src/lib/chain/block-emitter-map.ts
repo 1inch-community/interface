@@ -1,10 +1,9 @@
-import { singletonField } from '../utils';
 import { ChainId } from '@one-inch-community/models';
 import { Block } from 'viem';
 import { getWSClient } from './chain-client';
 import { fromEvent, map, merge, Observable, of, shareReplay, startWith, switchMap } from 'rxjs';
 
-const blockEmitterMap: Record<ChainId, Observable<Block> | null> = singletonField('__block_emitter_map', () => ({
+const blockEmitterMap: Record<ChainId, Observable<Block> | null> = {
   [ChainId.eth]: null,
   [ChainId.bnb]: null,
   [ChainId.matic]: null,
@@ -16,7 +15,7 @@ const blockEmitterMap: Record<ChainId, Observable<Block> | null> = singletonFiel
   [ChainId.aurora]: null,
   [ChainId.klaytn]: null,
   [ChainId.zkSyncEra]: null,
-}))
+}
 
 function blockListener(chainId: ChainId): Observable<Block> {
   return new Observable<Block>(subscriber => {

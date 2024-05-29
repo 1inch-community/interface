@@ -1,5 +1,3 @@
-import { singletonField } from './singleton-field';
-
 type StorageConfig = {
   storagePrefix?: string
   storageSeparator?: string
@@ -102,7 +100,7 @@ export function JsonParser<T>(value: string): T {
   return JSON.parse(value)
 }
 
-export const storage = singletonField('__storage_controller', () => new Storage({
+export const storage = new Storage({
   storagePrefix: 'one-inch',
   storageSeparator: ':'
-}))
+})
