@@ -1,5 +1,5 @@
 import { css } from 'lit';
-import { IosCss } from '@one-inch-community/lit';
+import { mobileMediaCSS } from '@one-inch-community/lit';
 
 export const appStyle = css`
     
@@ -12,11 +12,7 @@ export const appStyle = css`
         justify-content: space-between;
     }
     
-    ${IosCss(css`
-        :host {
-            padding-right: 30px;
-        }
-
+    ${mobileMediaCSS(css`
         :host::-webkit-scrollbar {
             display: none;
         }

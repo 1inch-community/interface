@@ -31,14 +31,4 @@ export const scrollbarStyle = css`
             height: 2px;
         }
     `)}
-
-    :host {
-        width: 100%;
-        padding-right: 30px;
-    }
-
-    :host::-webkit-scrollbar {
-        display: none;
-    }
-  
 `
