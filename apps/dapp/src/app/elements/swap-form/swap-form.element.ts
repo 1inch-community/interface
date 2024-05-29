@@ -268,6 +268,7 @@ export class SwapFormElement extends LitElement {
         easing: 'cubic-bezier(.2, .8, .2, 1)'
       }).finished
       set(0)
+      appendStyle(target(), { transform: '' })
       full = false
       resetInProgress = false
     }

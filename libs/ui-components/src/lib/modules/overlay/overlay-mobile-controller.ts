@@ -51,7 +51,7 @@ export class OverlayMobileController implements IOverlayController {
     appendStyle(rootNode, {
       filter: 'blur(3px)',
       transform: 'scale(.9) translate3d(0, -6%, 0)',
-      // willChange: isSafariIOS() ? '' : 'filter, transform',
+      willChange: 'filter, transform',
     })
     const id = getOverlayId()
     this.subscribeOnResize(id)
