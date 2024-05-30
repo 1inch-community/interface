@@ -57,8 +57,8 @@ export class SwapFormElement extends LitElement {
   private readonly unicornLoaderRef  = createRef<HTMLElement>()
 
   private readonly desktopScene = new SceneController('swapForm', {
-    swapForm: { minWidth: 556, minHeight: 376.5, lazyRender: true },
-    selectToken: { minWidth: 556, minHeight: 376.5, maxHeight: 680 }
+    swapForm: { minWidth: 556, maxHeight: 581, lazyRender: true },
+    selectToken: { minWidth: 556, maxHeight: 680 }
   })
 
   private readonly selectTokenMobileOverlay = new OverlayMobileController('app-root')

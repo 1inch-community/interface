@@ -3,9 +3,6 @@ import { customElement } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 import { sceneContext } from './scene-context.token';
 import { SceneContext } from './scene-context';
-import { appendStyle } from '@one-inch-community/lit';
-import { subscribe, resizeObserver } from '@one-inch-community/lit';
-import { tap } from 'rxjs';
 
 @customElement(SceneWrapperElement.tagName)
 export class SceneWrapperElement extends LitElement {
@@ -29,22 +26,6 @@ export class SceneWrapperElement extends LitElement {
   constructor() {
     super();
     this.context.setValue(new SceneContext())
-  }
-
-  override connectedCallback() {
-    super.connectedCallback();
-    subscribe(this, [
-      resizeObserver(this).pipe(
-        tap(entry => {
-          const parent = this.parentElement
-          if (!parent) return
-          appendStyle(parent, {
-            width: `${entry.contentRect.width + 2}px`,
-            height: `${entry.contentRect.height + 2}px`
-          })
-        })
-      )
-    ])
   }
 
   animationInStart() {

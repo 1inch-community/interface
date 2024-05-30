@@ -5,6 +5,7 @@ import { Animation } from './animations/animation';
 import { slideAnimation } from './animations/slide.animation';
 import { appendStyle } from '@one-inch-community/lit';
 import { asyncFrame } from '../async/async-frame';
+import { ScrollViewProviderElement } from '@one-inch-community/ui-components/scroll';
 
 type RenderConfig<T extends string> = Record<T, () => TemplateResult>
 
@@ -113,6 +114,10 @@ export class SceneController<T extends string, U extends T> {
         this.resizeContainer(nextSceneWrapperRect, currentSceneWrapperRect)
       ]);
 
+      appendStyle(this.sceneContainer, {
+        width: '',
+        height: ''
+      });
       this.sceneContainer.firstChild && this.sceneContainer.removeChild(this.sceneContainer.firstChild);
 
       isBack ? upScene.animationOutEnd() : upScene.animationInEnd();
@@ -153,9 +158,10 @@ export class SceneController<T extends string, U extends T> {
       if (!value) return '';
       return (typeof value === 'number') ? `${value}px` : value;
     };
+    if (config.maxHeight) {
+      this.sceneContainer.maxHeight = parseInt(config.maxHeight.toString())
+    }
     appendStyle(this.sceneContainer, {
-      minHeight: formatValue(config.minHeight),
-      maxHeight: formatValue(config.maxHeight),
       minWidth: formatValue(config.minWidth),
       maxWidth: formatValue(config.maxWidth)
     });
@@ -178,7 +184,7 @@ export class SceneController<T extends string, U extends T> {
 }
 
 function buildSceneContainer() {
-  const sceneContainer: HTMLDivElement = document.createElement('div');
+  const sceneContainer = document.createElement(ScrollViewProviderElement.tagName);
   sceneContainer.id = 'scene-container';
   sceneContainer.classList.add('scene-container');
   return sceneContainer;

@@ -67,7 +67,6 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
     const virtualizerRect = this.virtualizer.getBoundingClientRect()
     this.globalOffsetY = virtualizerRect.top - contextRect.top + 8
     this.virtualizer.style.minHeight = `${(this.context.maxHeight ?? 0) - this.globalOffsetY}px`
-    this.context.style.height = `${(this.context.maxHeight ?? 0)}px`
   }
 }
 

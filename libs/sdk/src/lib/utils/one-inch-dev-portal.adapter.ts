@@ -23,7 +23,7 @@ export class OneInchDevPortalAdapter {
   }
 
 
-  // @CacheActivePromise()
+  @CacheActivePromise((_, chainId: ChainId) => chainId.toString())
   async getTokenPrices(chainId: ChainId): Promise<Record<Address, string>> {
     const cacheValue = tokenPriceCache.get(chainId)
     if (cacheValue) {
@@ -39,7 +39,7 @@ export class OneInchDevPortalAdapter {
   /**
    * doc link https://portal.1inch.dev/documentation/fusion/swagger/quoter?method=get&path=%2Fv1.0%2F1%2Fquote%2Freceive
    * */
-  // @CacheActivePromise((...args: unknown[]) => args.slice(1).join(':'))
+  @CacheActivePromise((...args: unknown[]) => args.slice(1).join(':'))
   async getFusionQuoteReceive(
     chainId: ChainId,
     fromTokenAddress: Address,
