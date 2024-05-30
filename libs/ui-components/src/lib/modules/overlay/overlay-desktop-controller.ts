@@ -4,6 +4,7 @@ import { appendStyle } from '@one-inch-community/lit';
 import { getContainer } from './overlay-container';
 import { getOverlayId } from './overlay-id-generator';
 import { fromEvent, Subscription } from 'rxjs';
+import { ScrollViewProviderElement } from '@one-inch-community/ui-components/scroll'
 
 export class OverlayDesktopController implements IOverlayController {
 
@@ -27,6 +28,7 @@ export class OverlayDesktopController implements IOverlayController {
   async open(openTarget: TemplateResult | HTMLElement): Promise<number> {
     const position = await this.getPosition(openTarget)
     const overlayContainer = this.createOverlayContainer(openTarget)
+    overlayContainer.maxHeight = position[2]
     if (this.target === 'center') {
       appendStyle(overlayContainer, {
         top: `0px`,
@@ -67,16 +69,17 @@ export class OverlayDesktopController implements IOverlayController {
     this.activeOverlayMap.delete(overlayId)
   }
 
-  private async getPosition(openTarget: TemplateResult | HTMLElement) {
+  private async getPosition(openTarget: TemplateResult | HTMLElement): Promise<[number, number, number]> {
+    const offset = 8
     if (this.target === 'center') {
-      return [0, 0]
+      return [0, 0, window.innerHeight - (offset * 2)]
     }
     const rect = this.target.getBoundingClientRect()
     const rectContent = await this.getRect(openTarget)
-    return [
-      rect.right - (rectContent.width),
-      rect.top + rect.height + 8
-    ]
+    const left = rect.right - (rectContent.width)
+    const top = rect.top + rect.height + offset
+    const maxHeight = window.innerHeight - top - offset
+    return [left, top, maxHeight]
   }
 
   private async getRect(openTarget: TemplateResult | HTMLElement) {
@@ -92,14 +95,15 @@ export class OverlayDesktopController implements IOverlayController {
   }
 
   private createOverlayContainer(openTarget: TemplateResult | HTMLElement) {
-    const overlayContainer = document.createElement('div')
+    const overlayContainer = document.createElement(ScrollViewProviderElement.tagName)
     appendStyle(overlayContainer, {
       position: 'absolute',
       display: 'flex',
       overflow: 'hidden',
       alignItems: 'flex-end',
       width: 'fit-content',
-      height: 'fit-content'
+      height: 'fit-content',
+      zIndex: '1000'
     })
     render(html`${openTarget}`, overlayContainer)
     this.container.appendChild(overlayContainer)

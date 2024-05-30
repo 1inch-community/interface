@@ -49,8 +49,6 @@ export class SwapFormElement extends LitElement {
 
   @state() private isRainbowTheme = false
 
-
-
   private readonly chainId$ = connectWalletController.data.chainId$
   private readonly activeAddress$ = connectWalletController.data.activeAddress$
 

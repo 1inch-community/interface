@@ -6,6 +6,7 @@ import '@one-inch-community/ui-components/card';
 import { ChainId, IConnectWalletController } from '@one-inch-community/models';
 import { getMobileMatchMediaAndSubscribe } from '@one-inch-community/lit';
 import { scrollbarStyle } from '@one-inch-community/ui-components/theme';
+import '@one-inch-community/ui-components/scroll';
 import '../chain-selector-list-item';
 
 type ChainViewInfo = {
@@ -51,11 +52,9 @@ export class ChainSelectorListElement extends LitElement {
     return html`
       <inch-card class="card" forMobileView>
         <inch-card-header closeButton headerText="Select chain"></inch-card-header>
-        <div class="scroll-container">
-          <div class="scroll-overlay">
-            ${this.getList()}
-          </div>
-        </div>
+        <inch-scroll-view-consumer >
+          ${this.getList()}
+        </inch-scroll-view-consumer>
       </inch-card>
     `
   }

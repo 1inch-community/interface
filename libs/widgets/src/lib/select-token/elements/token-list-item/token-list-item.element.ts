@@ -5,13 +5,12 @@ import { tokenListItemStyle } from './token-list-item.style';
 import { Address, formatUnits, isAddressEqual } from 'viem';
 import { ChainId, IBalancesTokenRecord, ISelectTokenContext, ITokenRecord } from '@one-inch-community/models';
 import { Task } from '@lit/task';
-import { formatNumber, getBlockEmitter, TokenController } from '@one-inch-community/sdk';
+import { formatNumber, TokenController } from '@one-inch-community/sdk';
 import '@one-inch-community/widgets/token-icon';
 import '@one-inch-community/ui-components/icon';
 import '../token-list-stub-item';
-import { asyncTimeout } from '@one-inch-community/ui-components/async';
 import { subscribe } from '@one-inch-community/lit';
-import { filter, merge, Observable, switchMap } from 'rxjs';
+import { filter, merge, Observable, switchMap, timer } from 'rxjs';
 import { consume } from '@lit/context';
 import { selectTokenContext } from '../../context';
 import { emitSelectTokenEvent } from '../../events';
@@ -39,11 +38,10 @@ export class TokenListItemElement extends LitElement {
   private task = new Task(this,
     async ([chainId, tokenAddress, walletAddress, fastUpdate]) => {
       if (fastUpdate) {
-        const result = this.task.value as unknown
+        const result = this.task.value as unknown;
         if (result) return result as [ITokenRecord, IBalancesTokenRecord | null, number | null];
       }
       if (!chainId || !tokenAddress) return [];
-      await asyncTimeout(200);
       if (this.isDestroy) throw new Error('');
       const token = await TokenController.getToken(chainId, tokenAddress);
       let balance = null;
@@ -65,9 +63,8 @@ export class TokenListItemElement extends LitElement {
   }
 
   protected override firstUpdated() {
-    if (!this.chainId) throw new Error('');
     subscribe(this, merge(
-      getBlockEmitter(this.chainId),
+      timer(12_000),
       this.getTokenUpdateEmitter()
     ).pipe(
       switchMap(() => this.task.run([this.chainId, this.tokenAddress, this.walletAddress, false]))
@@ -92,7 +89,7 @@ export class TokenListItemElement extends LitElement {
 
   private getTokenView(token: ITokenRecord | null, balance: IBalancesTokenRecord | null, balanceUsd: number | null) {
     if (!token) {
-      return html``
+      return this.getStub();
     }
     this.isFavorite = token.isFavorite ?? false;
     let balanceFormat = '0';

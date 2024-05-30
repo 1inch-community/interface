@@ -1,5 +1,4 @@
 import { html, LitElement } from 'lit';
-import { walletListStyle } from './wallet-list.style';
 import { customElement } from 'lit/decorators.js';
 import { map } from 'lit/directives/map.js';
 import { Task } from '@lit/task';
@@ -8,12 +7,11 @@ import { consume } from '@lit/context';
 import { controllerContext } from '../../context';
 import { IConnectWalletController } from '@one-inch-community/models';
 import '@one-inch-community/ui-components/icon';
+import '@one-inch-community/ui-components/scroll';
 
 @customElement(WalletListElement.tagName)
 export class WalletListElement extends LitElement {
   static tagName = 'inch-wallet-list' as const
-
-  static override styles = walletListStyle
 
   @consume({ context: controllerContext })
   private controller?: IConnectWalletController
@@ -27,9 +25,9 @@ export class WalletListElement extends LitElement {
     return this.task.render({
       pending: () => html`<inch-icon icon="unicornRun"></inch-icon>`,
       complete: (infoList) => html`
-        <div class="scroll-container">
+        <inch-scroll-view-consumer>
           ${map(infoList, info => html`<inch-wallet-view .info="${info}"></inch-wallet-view>`)}
-        </div>
+        </inch-scroll-view-consumer>
       `
     })
   }

@@ -62,8 +62,7 @@ export const tokenListStubItemStyle = css`
 
     ${mobileMediaCSS(css`
         .item-container {
-            padding: 8px 0;
-            gap: 4px;
+            padding: 8px 8px;
         }
     `)}
 

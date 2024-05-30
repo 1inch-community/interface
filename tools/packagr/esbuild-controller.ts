@@ -51,7 +51,7 @@ export class EsbuildController {
   }
 
   async terminate() {
-
+    await this.esbuildContext?.cancel()
   }
 
   private async getBuildConfig(): Promise<esbuild.BuildOptions> {
