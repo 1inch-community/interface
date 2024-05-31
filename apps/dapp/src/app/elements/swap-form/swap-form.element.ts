@@ -3,22 +3,22 @@ import {
   animationFrameScheduler,
   defer,
   distinctUntilChanged,
-  filter,
+  filter, firstValueFrom,
   fromEvent,
-  map, of,
+  map,
   skip,
   subscribeOn,
   switchMap,
   takeUntil,
-  tap, timer
+  tap
 } from 'rxjs';
 import { customElement, state } from 'lit/decorators.js';
 import { createRef, ref } from 'lit/directives/ref.js';
 import { classMap } from 'lit/directives/class-map.js';
 import '@one-inch-community/ui-components/card';
 import '@one-inch-community/widgets/swap-form';
-import { isTokensEqual, storage, TokenController } from '@one-inch-community/sdk';
-import { appendStyle, getMobileMatchMediaAndSubscribe, observe, subscribe } from '@one-inch-community/lit';
+import { isTokensEqual, storage, TokenController, CacheActivePromise } from '@one-inch-community/sdk';
+import { appendStyle, getMobileMatchMediaAndSubscribe, observe, subscribe, vibrate } from '@one-inch-community/lit';
 import { OverlayMobileController, OverlayController } from '@one-inch-community/ui-components/overlay';
 import { SceneController, sceneLazyValue } from '@one-inch-community/ui-components/scene';
 import { getThemeChange, BrandColors } from '@one-inch-community/ui-components/theme';
@@ -241,16 +241,33 @@ export class SwapFormElement extends LitElement {
     let lastPosition = 0
     let full = false
     let resetInProgress = false
+    const audio = new AudionController()
     const max = 60
+    const initialResistance = 500000
+    const resistanceThreshold = 3
+    const resistance = 4
     const root = (): HTMLElement | null => document.querySelector('#app-root')
     const target = (): HTMLElement => this.swapFormContainerRef.value!
     const loader = (): HTMLElement => this.unicornLoaderRef.value!
     const set = (position: number) => {
       if (position < 0) return
+      let adjustedPosition;
+
       if (position > max) {
-        full = true
+        if (!full) {
+          vibrate(50)
+          audio.play().then()
+        }
+        full = true;
+        if (position <= max + resistanceThreshold) {
+          adjustedPosition = max + (position - max) / initialResistance;
+        } else {
+          adjustedPosition = max + (resistanceThreshold / initialResistance) + ((position - max - resistanceThreshold) / resistance);
+        }
+      } else {
+        full = false;
+        adjustedPosition = position;
       }
-      const adjustedPosition = position > max ? max + (position - max) / 4 : position;
       const loaderPosition = (position > max ? max : position) / max;
       appendStyle(loader(), { transform: `scale(${loaderPosition})` })
       appendStyle(target(), { transform: `translate3d(0, ${adjustedPosition}px, 0)` })
@@ -258,8 +275,21 @@ export class SwapFormElement extends LitElement {
     }
     const reset = async () => {
       resetInProgress = true
+      let _lastPosition = lastPosition
+      if (_lastPosition > max && audio.isPlaying) {
+        await target().animate([
+          { transform: `translate3d(0, ${_lastPosition}px, 0)` },
+          { transform: `translate3d(0, ${max}px, 0)` }
+        ], {
+          duration: 200,
+          easing: 'cubic-bezier(.2, .8, .2, 1)'
+        }).finished
+        _lastPosition = max
+        appendStyle(target(), { transform: `translate3d(0, ${_lastPosition}px, 0)` })
+        await audio.onEnded()
+      }
       await target().animate([
-        { transform: `translate3d(0, ${lastPosition}px, 0)` },
+        { transform: `translate3d(0, ${_lastPosition}px, 0)` },
         { transform: `translate3d(0, 0, 0)` }
       ], {
         duration: 800,
@@ -277,12 +307,12 @@ export class SwapFormElement extends LitElement {
           return !resetInProgress && (root()?.scrollTop ?? 0) === 0
         }),
         switchMap((startEvent: TouchEvent) => {
+          audio.load()
           const startPoint = startEvent.touches[0].clientY
           return fromEvent<TouchEvent>(targetEl, 'touchmove').pipe(
             map(event => event.touches[0].clientY - startPoint),
             tap(position => set(position)),
             takeUntil(fromEvent<TouchEvent>(targetEl, 'touchend').pipe(
-              switchMap(() => full ? timer(300) : of(null)),
               tap(() => reset())
             ))
           )
@@ -290,6 +320,38 @@ export class SwapFormElement extends LitElement {
       )
     }).pipe(subscribeOn(animationFrameScheduler))
   }
+}
+
+class AudionController {
+
+  get isPlaying(): boolean {
+    return !this.audio.paused
+  }
+
+  private readonly audio: HTMLAudioElement
+  constructor() {
+    this.audio = new Audio('/audio/unicorn-run.mp3')
+    this.audio.preload = 'none'
+    this.audio.volume = 0.4
+  }
+
+  load() {
+    this.audio.load()
+  }
+
+  @CacheActivePromise()
+  async play() {
+    try {
+      await this.audio.play()
+    } catch (e) {
+      console.error('AudionController Error', e)
+    }
+  }
+
+  onEnded() {
+    return firstValueFrom(fromEvent(this.audio, 'ended'))
+  }
+
 }
 
 declare global {

@@ -15,7 +15,7 @@ export const swapFormStyle = css`
     .unicorn-loader {
         position: absolute;
         z-index: 1;
-        top: 40px;
+        top: 50px;
         transform: scale(0);
         will-change: transform;
         height: auto;
