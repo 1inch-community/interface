@@ -5,7 +5,7 @@ import '@one-inch-community/ui-components/icon';
 import '@one-inch-community/ui-components/button';
 import '../fusion-swap-info-slippage';
 import '../fusion-swap-info-main';
-import { SceneController } from '@one-inch-community/ui-components/scene';
+import { SceneController, shiftAnimation } from '@one-inch-community/ui-components/scene';
 
 @customElement(FusionSwapInfoElement.tagName)
 export class FusionSwapInfoElement extends LitElement {
@@ -16,19 +16,28 @@ export class FusionSwapInfoElement extends LitElement {
     SceneController.styles()
   ];
 
+  private isOpenFusionInfo = false
+
   private readonly scene = new SceneController('main', {
-    main: { lazyRender: true },
-    slippage: {}
-  });
+    main: { lazyRender: true, minHeight: 178 },
+    slippage: { minHeight: 79.5 }
+  }, shiftAnimation());
 
   protected override render() {
     return this.scene.render({
       main: () => html`
         <inch-fusion-swap-info-main
+          .isOpen="${this.isOpenFusionInfo}"
+          @openSlippageSettings="${() => this.scene.nextTo('slippage')}"
         ></inch-fusion-swap-info-main>
       `,
       slippage: () => html`
-        <inch-fusion-swap-info-slippage></inch-fusion-swap-info-slippage>
+        <inch-fusion-swap-info-slippage
+          @backFromSlippageSettings="${() => {
+            this.isOpenFusionInfo = true
+            this.scene.back()
+          }}"
+        ></inch-fusion-swap-info-slippage>
       `
     });
   }

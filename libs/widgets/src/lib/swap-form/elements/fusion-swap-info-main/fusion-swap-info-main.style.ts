@@ -4,7 +4,7 @@ import { css } from 'lit';
 export const fusionSwapInfoMainStyle = css`
     
     :host {
-        --font-size: 16px
+        --font-size: 16px;
     }
     
     .container {
@@ -18,12 +18,14 @@ export const fusionSwapInfoMainStyle = css`
         justify-content: space-between;
         border-radius: 16px;
         color: var(--color-content-content-primary);
+        cursor: pointer;
     }
 
     .open {
         height: 176px;
         grid-template-rows: min-content 1fr;
         grid-row-gap: 16px;
+        cursor: auto;
     }
 
     .icon {
@@ -135,6 +137,7 @@ export const fusionSwapInfoMainStyle = css`
         font-style: normal;
         font-weight: 500;
         line-height: 24px;
+        cursor: pointer;
     }
     
     .row-title {

@@ -2,7 +2,7 @@ import { html, render, TemplateResult } from 'lit';
 import { sceneStyle } from './scene.style';
 import { SceneWrapperElement } from './scene-wrapper.element';
 import { Animation } from './animations/animation';
-import { slideAnimation } from './animations/slide.animation';
+import { slideAnimation } from './animations';
 import { appendStyle } from '@one-inch-community/lit';
 import { asyncFrame } from '../async/async-frame';
 import { ScrollViewProviderElement } from '@one-inch-community/ui-components/scroll';

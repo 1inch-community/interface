@@ -15,6 +15,7 @@ export const sceneStyle = (config?: Partial<StyleConfig>) => {
   return css`
 
       :host {
+          display: flex;
           --scene-background-color: ${unsafeCSS(_config.sceneBackgroundColor)};
       }
 

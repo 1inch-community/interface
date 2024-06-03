@@ -15,7 +15,7 @@ export interface SegmentedControlItem {
 
 @customElement(SegmentedControlElement.tagName)
 export class SegmentedControlElement extends LitElement {
-  static tagName = 'inch-segmented-control'
+  static tagName = 'inch-segmented-control' as const
 
   static override styles = [
     segmentedControlContainerStyle,
@@ -24,9 +24,9 @@ export class SegmentedControlElement extends LitElement {
 
   @property({ type: String }) size: SegmentedControlSize = 'm'
 
-  @property({ type: Array, state: true }) items: SegmentedControlItem[] = []
+  @property({ type: Array, attribute: false }) items: SegmentedControlItem[] = []
 
-  @property({ type: Object, state: true }) select?: SegmentedControlItem
+  @property({ type: Object, attribute: false }) select?: SegmentedControlItem
 
   private itemRefList: HTMLElement[] = []
   private caretRef: HTMLElement | null = null

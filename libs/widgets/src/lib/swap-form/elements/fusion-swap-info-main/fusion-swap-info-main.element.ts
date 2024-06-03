@@ -1,6 +1,6 @@
 import { html, LitElement } from 'lit';
 import { fusionSwapInfoMainStyle } from './fusion-swap-info-main.style';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { observe } from '@one-inch-community/lit';
 import { consume } from '@lit/context';
@@ -15,6 +15,9 @@ import {
 import { ISwapContext, Rate } from '@one-inch-community/models';
 import { formatUnits, parseUnits } from 'viem';
 import { formatSmartNumber, isRateEqual, isTokensEqual, TokenController } from '@one-inch-community/sdk';
+import { dispatchEvent } from '@one-inch-community/lit';
+import "@one-inch-community/ui-components/button"
+import "@one-inch-community/ui-components/icon"
 
 @customElement(FusionSwapInfoMainElement.tagName)
 export class FusionSwapInfoMainElement extends LitElement {
@@ -22,7 +25,7 @@ export class FusionSwapInfoMainElement extends LitElement {
 
   static override styles = fusionSwapInfoMainStyle
 
-  @state() isOpen = false;
+  @property({ type: Boolean }) isOpen = false;
 
   @consume({ context: swapContext, subscribe: true })
   context?: ISwapContext;
@@ -85,7 +88,7 @@ export class FusionSwapInfoMainElement extends LitElement {
         <div class="content-container">
           <div class="content-row">
             <span class="row-title">Slippage tolerance</span>
-            <div class="row-content row-slippage">
+            <div @click="${() => dispatchEvent(this, 'openSlippageSettings', null)}" class="row-content row-slippage">
               0.4% · Auto
             </div>
           </div>

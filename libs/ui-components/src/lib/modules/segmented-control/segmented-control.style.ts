@@ -1,3 +1,4 @@
+import { mobileMediaCSS } from '@one-inch-community/lit';
 import { css } from 'lit';
 
 export const segmentedControlContainerStyle = css`
@@ -55,6 +56,7 @@ export const segmentedControlItemStyle = css`
         padding: 6px 16px;
         z-index: 1;
         width: 100%;
+        font-size: 16px;
         justify-content: center;
         text-wrap: nowrap;
         transition: color .2s, background-color .2s;
@@ -71,5 +73,11 @@ export const segmentedControlItemStyle = css`
         border: none;
         background-color: transparent;
     }
+
+    ${mobileMediaCSS(css`
+        .item {
+            font-size: 13px;
+        }
+    `)}
 
 `
