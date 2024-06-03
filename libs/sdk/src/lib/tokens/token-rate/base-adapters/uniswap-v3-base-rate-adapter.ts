@@ -132,19 +132,19 @@ export class UniswapV3BaseRateAdapter implements ITokenRateSourceAdapter {
     const destinationTokenAmount = liquidity * sqrtPriceX96 / Q96;
     return [
       BigMath.div(
+        isRevertRate ? sourceTokenAmount : destinationTokenAmount,
+        isRevertRate ? destinationTokenAmount : sourceTokenAmount,
+        destinationToken.decimals,
+        sourceToken.decimals,
+        sourceToken.decimals,
+      ),
+      BigMath.div(
         isRevertRate ? destinationTokenAmount : sourceTokenAmount,
         isRevertRate ? sourceTokenAmount : destinationTokenAmount,
         sourceToken.decimals,
         destinationToken.decimals,
         destinationToken.decimals
       ),
-      BigMath.div(
-        isRevertRate ? sourceTokenAmount : destinationTokenAmount,
-        isRevertRate ? destinationTokenAmount : sourceTokenAmount,
-        destinationToken.decimals,
-        sourceToken.decimals,
-        sourceToken.decimals,
-      )
     ]
   }
 }

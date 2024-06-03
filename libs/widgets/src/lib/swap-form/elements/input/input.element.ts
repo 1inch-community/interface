@@ -11,7 +11,8 @@ import "@one-inch-community/ui-components/icon"
 import "@one-inch-community/ui-components/button"
 import { ISwapContext, IToken } from '@one-inch-community/models';
 import { formatNumber } from '@one-inch-community/sdk';
-import '../balance/balance.element'
+import '../balance'
+import '../fiat-balance'
 import { inputStyle } from './input.style';
 import { swapContext } from '../../context';
 import { observe, subscribe, dispatchEvent } from '@one-inch-community/lit';
@@ -103,6 +104,7 @@ export class InputElement extends LitElement {
         <div class="flex-container">
           <inch-swap-balance tokenType="${ifDefined(this.tokenType)}"></inch-swap-balance>
           ${this.input}
+          <inch-fiat-balance tokenType="${ifDefined(this.tokenType)}"></inch-fiat-balance>
           <br>
         </div>
       </div>

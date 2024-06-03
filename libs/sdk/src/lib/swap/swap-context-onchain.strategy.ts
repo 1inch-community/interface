@@ -43,9 +43,18 @@ export class SwapContextOnChainStrategy implements ISwapContextStrategy {
       if (!rate || !sourceTokenAmount) return 0n
       const sourceToken = rate.sourceToken
       const destinationToken = rate.destinationToken
+      if (rate.isReverted) {
+        return BigMath.div(
+          sourceTokenAmount,
+          rate.revertedRate,
+          sourceToken.decimals,
+          sourceToken.decimals,
+          destinationToken.decimals
+        )
+      }
       return BigMath.mul(
         sourceTokenAmount,
-        rate.isReverted ? rate.revertedRate : rate.rate,
+        rate.rate,
         sourceToken.decimals,
         sourceToken.decimals,
         destinationToken.decimals

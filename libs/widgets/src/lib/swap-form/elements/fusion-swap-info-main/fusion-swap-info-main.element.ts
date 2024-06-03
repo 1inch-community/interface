@@ -43,7 +43,7 @@ export class FusionSwapInfoMainElement extends LitElement {
         destinationToken.address
       ])
       const secondaryToken = isTokensEqual(primaryToken, sourceToken) ? destinationToken : sourceToken
-      const isRevertedRate = isTokensEqual(primaryToken, destinationToken)
+      const isRevertedRate = isTokensEqual(primaryToken, sourceToken)
       const targetRate = isRevertedRate ? revertedRate : rate
       const rateFormated = formatSmartNumber(formatUnits(targetRate, secondaryToken.decimals), 2);
       const tokenPrice = await TokenController.getTokenUSDPrice(chainId, secondaryToken.address);

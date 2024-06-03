@@ -1,19 +1,19 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { consume } from '@lit/context';
-import { ISwapContext } from '@one-inch-community/models';
 import { swapContext } from '../../context';
-import { balanceStyles } from './balance.styles';
+import { ISwapContext } from '@one-inch-community/models';
+import { observe } from '@one-inch-community/lit';
 import { catchError, combineLatest, defer, filter, map, switchMap } from 'rxjs';
 import { formatUnits } from 'viem';
-import { formatNumber, TokenController } from '@one-inch-community/sdk';
-import { observe } from '@one-inch-community/lit';
+import { formatSmartNumber, TokenController } from '@one-inch-community/sdk';
+import { fiatBalanceStyles } from './fiat-balance.styles';
 
-@customElement(BalanceElement.tagName)
-export class BalanceElement extends LitElement {
-  static tagName = 'inch-swap-balance';
+@customElement(FiatBalanceElement.tagName)
+export class FiatBalanceElement extends LitElement {
+  static tagName = 'inch-fiat-balance';
 
-  static override styles = balanceStyles;
+  static override styles = fiatBalanceStyles
 
   @property({ type: String, attribute: true }) tokenType?: 'source' | 'destination';
 
@@ -32,12 +32,16 @@ export class BalanceElement extends LitElement {
     filter(([address]) => !!address),
     switchMap(([ walletAddress, token, chainId ]) => {
       if (!walletAddress || !token || !chainId) return [html`<br>`]
-      return defer(() => TokenController.liveQuery(() => TokenController.getTokenBalance(chainId, token.address, walletAddress))).pipe(
-        filter(Boolean),
-        map(balanceRecord => {
-          return formatNumber(formatUnits(BigInt(balanceRecord.amount), token.decimals), 6)
+      return combineLatest([
+        TokenController.liveQuery(() => TokenController.getTokenUSDPrice(chainId, token.address)),
+        this.context!.getTokenRawAmountByType(this.tokenType!)
+      ]).pipe(
+        map(([ tokenPrice, amount ]) => {
+          if (!amount) return html`<br>`
+          const balanceFormatted = formatUnits(BigInt(amount ?? 0), token.decimals);
+          const balanceUsd = Number(balanceFormatted) * Number(tokenPrice);
+          return this.getBalanceView(formatSmartNumber(balanceUsd.toString(), 1))
         }),
-        map(balance => this.getBalanceView(balance)),
         catchError(() => [html`<br>`])
       )
     }),
@@ -50,13 +54,13 @@ export class BalanceElement extends LitElement {
 
   private getBalanceView(balance: string) {
     return html`
-      <span>Balance: ${balance}</span>
+      <span>~$${balance}</span>
     `
   }
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'inch-swap-balance': BalanceElement;
+    'inch-fiat-balance': FiatBalanceElement
   }
 }
