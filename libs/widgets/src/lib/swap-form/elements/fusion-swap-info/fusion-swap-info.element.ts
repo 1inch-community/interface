@@ -17,7 +17,7 @@ export class FusionSwapInfoElement extends LitElement {
   ];
 
   private readonly scene = new SceneController('main', {
-    main: {},
+    main: { lazyRender: true },
     slippage: {}
   });
 

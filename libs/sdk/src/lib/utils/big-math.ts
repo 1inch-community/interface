@@ -1,9 +1,7 @@
-import { maxUint256 } from 'viem';
-
 export class BigMath {
 
   private constructor() {
-    throw new Error('BigMath not support instance creating use static methods: div, mul, add, sub');
+    throw new Error('BigMath does not support instance creation. Use static methods: div, mul, add, sub, avr, pow, min, max.');
   }
 
   static div(
@@ -38,10 +36,11 @@ export class BigMath {
     if (valueA === 0n || valueB === 0n) {
       return 0n;
     }
-
     const product = valueA * valueB;
-    const scale = (BigInt(10) ** BigInt(valueADecimals + valueBDecimals)) / (BigInt(10) ** BigInt(resultDecimals));
-    return product / scale;
+    const totalDecimals = BigInt(valueADecimals + valueBDecimals);
+    const scale = 10n ** totalDecimals;
+    const resultScale = 10n ** BigInt(resultDecimals);
+    return (product * resultScale) / scale;
   }
 
   static add(
@@ -123,22 +122,23 @@ export class BigMath {
   }
 
   static min(...values: bigint[]): bigint {
-    let result: bigint = maxUint256
+    let result: bigint = values[0];
     for (const value of values) {
       if (value < result) {
-        result = value
+        result = value;
       }
     }
-    return result
+    return result;
   }
 
   static max(...values: bigint[]): bigint {
-    let result = 0n
+    let result = values[0];
     for (const value of values) {
       if (value > result) {
-        result = value
+        result = value;
       }
     }
-    return result
+    return result;
   }
 }
+

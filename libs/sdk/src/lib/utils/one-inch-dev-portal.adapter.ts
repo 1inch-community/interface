@@ -72,6 +72,6 @@ export class OneInchDevPortalAdapter {
     }
     const result = await response.json();
     fusionQuoteReceiveCache.set(id, result)
-    return result
+    return { ...result, chainId }
   }
 }

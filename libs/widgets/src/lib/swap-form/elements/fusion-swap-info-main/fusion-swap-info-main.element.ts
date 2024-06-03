@@ -5,10 +5,16 @@ import { classMap } from 'lit/directives/class-map.js';
 import { observe } from '@one-inch-community/lit';
 import { consume } from '@lit/context';
 import { swapContext } from '../../context';
-import { combineLatest, debounceTime, defer, distinctUntilChanged, shareReplay, startWith, switchMap } from 'rxjs';
-import { ISwapContext } from '@one-inch-community/models';
+import {
+  debounceTime,
+  defer, distinctUntilChanged,
+  shareReplay,
+  startWith,
+  switchMap
+} from 'rxjs';
+import { ISwapContext, Rate } from '@one-inch-community/models';
 import { formatUnits, parseUnits } from 'viem';
-import { formatSmartNumber, isTokensEqual, TokenController } from '@one-inch-community/sdk';
+import { formatSmartNumber, isRateEqual, isTokensEqual, TokenController } from '@one-inch-community/sdk';
 
 @customElement(FusionSwapInfoMainElement.tagName)
 export class FusionSwapInfoMainElement extends LitElement {
@@ -22,37 +28,21 @@ export class FusionSwapInfoMainElement extends LitElement {
   context?: ISwapContext;
 
   readonly rate$ = defer(() => this.getContext().rate$);
-  readonly revertedRate$ = defer(() => this.getContext().revertedRate$);
-  readonly chainId$ = defer(() => this.getContext().chainId$);
-  readonly sourceToken$ = defer(() => this.getContext().getTokenByType('source'));
-  readonly destinationToken$ = defer(() => this.getContext().getTokenByType('destination'));
 
-  readonly rateView$ = combineLatest([
-    this.chainId$,
-    this.rate$,
-    this.revertedRate$,
-    this.sourceToken$,
-    this.destinationToken$
-  ]).pipe(
+  readonly rateView$ = this.rate$.pipe(
     debounceTime(0),
-    distinctUntilChanged(([chainId1, rate1, revertedRate1, sourceToken1, destinationToken1], [chainId2, rate2, revertedRate2, sourceToken2, destinationToken2]) => {
-      return chainId1 === chainId2
-        && rate1 === rate2
-        && revertedRate1 === revertedRate2
-        && (!(sourceToken1 && sourceToken2) || isTokensEqual(sourceToken1, sourceToken2))
-        && (!(destinationToken1 && destinationToken2) || isTokensEqual(destinationToken1, destinationToken2))
-        && sourceToken1 === sourceToken2
-        && destinationToken1 === destinationToken2;
-    }),
-    switchMap(async ([chainId, rate, revertedRate, sourceToken, destinationToken]) => {
-      if (!chainId || !sourceToken || !destinationToken || rate === 0n || revertedRate === 0n) return this.getLoadRateView();
-
+    distinctUntilChanged(rateViewDistinctUntilChangedHandler),
+    switchMap(async (rateData) => {
+      if (rateData === null) return this.getLoadRateView();
+      const { chainId, rate, revertedRate, sourceToken, destinationToken } = rateData
       const primaryToken = await TokenController.getPriorityToken(chainId, [
         sourceToken.address,
         destinationToken.address
       ])
       const secondaryToken = isTokensEqual(primaryToken, sourceToken) ? destinationToken : sourceToken
-      const rateFormated = formatSmartNumber(formatUnits(revertedRate, secondaryToken.decimals), 2);
+      const isRevertedRate = isTokensEqual(primaryToken, destinationToken)
+      const targetRate = isRevertedRate ? revertedRate : rate
+      const rateFormated = formatSmartNumber(formatUnits(targetRate, secondaryToken.decimals), 2);
       const tokenPrice = await TokenController.getTokenUSDPrice(chainId, secondaryToken.address);
       const rateUsd = parseUnits(tokenPrice, secondaryToken.decimals)
       const rateUsdFormated = formatSmartNumber(formatUnits(rateUsd, secondaryToken.decimals), 2);
@@ -129,6 +119,13 @@ export class FusionSwapInfoMainElement extends LitElement {
     return this.context;
   }
 
+}
+
+function rateViewDistinctUntilChangedHandler(rate1: Rate | null, rate2: Rate | null) {
+  if (rate1 === null || rate2 === null) {
+      return false;
+  }
+  return isRateEqual(rate1, rate2);
 }
 
 declare global {

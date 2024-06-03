@@ -44,11 +44,7 @@ export class SwapContext implements ISwapContext {
   )
 
   readonly rate$ = this.strategy$.pipe(
-    switchMap(strategy => strategy.rate$)
-  )
-
-  readonly revertedRate$ = this.strategy$.pipe(
-    switchMap(strategy => strategy.revertedRate$)
+    switchMap(strategy => strategy.rate$),
   )
 
   readonly destinationTokenAmount$ = this.strategy$.pipe(

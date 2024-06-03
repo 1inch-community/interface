@@ -76,6 +76,14 @@ describe('BigMath', () => {
       18,
       24
     )).toBe(0n)
+
+    expect(BigMath.mul(
+      1000000n,
+      261n,
+      6,
+      6,
+      18
+    )).toBe(261000000000000n)
   })
 
   it('add', () => {

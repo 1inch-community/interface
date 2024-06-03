@@ -6,11 +6,12 @@ import "@one-inch-community/ui-components/icon"
 import "@one-inch-community/ui-components/button"
 import { IConnectWalletController, IToken } from '@one-inch-community/models';
 import { SwapContext } from '@one-inch-community/sdk';
-import { combineLatest, defer, distinctUntilChanged, map, startWith } from 'rxjs';
-import { observe } from '@one-inch-community/lit';
+import { combineLatest, defer, distinctUntilChanged, map, startWith, tap } from 'rxjs';
+import { subscribe } from '@one-inch-community/lit';
 import { swapFromStyle } from './swap-from.style';
 import { swapContext } from './context';
 import './elements'
+import { when } from 'lit/directives/when.js';
 
 @customElement(SwapFromElement.tagName)
 export class SwapFromElement extends LitElement {
@@ -36,11 +37,17 @@ export class SwapFromElement extends LitElement {
     map(([address, sourceToken, destinationToken ]) => !address || !sourceToken || !destinationToken),
     startWith(SwapFromElement.lastFusionRenderIsEmptyState),
     distinctUntilChanged(),
-    map((isEmpty) => {
+    tap((isEmpty) => {
       SwapFromElement.lastFusionRenderIsEmptyState = isEmpty
-      return this.getFusionInfoView(isEmpty)
     })
   )
+
+  override connectedCallback() {
+    super.connectedCallback();
+    subscribe(this, [
+      this.fusionView$
+    ])
+  }
 
   override disconnectedCallback() {
     super.disconnectedCallback();
@@ -77,8 +84,8 @@ export class SwapFromElement extends LitElement {
           <inch-swap-form-input disabled tokenType="destination"></inch-swap-form-input>
         </div>
         
-        ${observe(this.fusionView$, this.getFusionInfoView(SwapFromElement.lastFusionRenderIsEmptyState))}
-
+        ${when(!SwapFromElement.lastFusionRenderIsEmptyState, () => html`<inch-fusion-swap-info></inch-fusion-swap-info>`)}
+        
         <inch-swap-button></inch-swap-button>
       </div>
     `

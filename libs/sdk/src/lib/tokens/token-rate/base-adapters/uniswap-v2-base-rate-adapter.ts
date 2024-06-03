@@ -58,9 +58,12 @@ export class UniswapV2BaseRateAdapter implements ITokenRateSourceAdapter {
         sourceToken.decimals,
       )
       return {
+        chainId,
         rate,
         revertedRate,
         isReverted: isRevertRate,
+        sourceToken,
+        destinationToken
       }
     } catch (error) {
       console.error(`Error in UniswapV2BaseAdapter adapter name ${this.name}`, error)

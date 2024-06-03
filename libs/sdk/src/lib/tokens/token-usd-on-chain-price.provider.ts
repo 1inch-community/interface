@@ -33,7 +33,7 @@ export class TokenUsdOnChainPriceProvider {
       token,
     )
     if (!rate) return '0'
-    return formatUnits(rate, token.decimals)
+    return formatUnits(rate.rate, token.decimals)
   }
 
 }

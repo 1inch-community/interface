@@ -1,10 +1,9 @@
 import { ChainId } from '../chain';
 import { IToken } from '../token/token';
 import { Observable } from 'rxjs';
+import { Rate } from './rate';
 
 export interface ITokenRateProvider {
-  getOnChainRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken): Promise<bigint | null>
-  getOnChainRevertedRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken): Promise<bigint | null>
-  listenOnChainRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken): Observable<bigint | null>
-  listenOnChainRevertedRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken): Observable<bigint | null>
+  getOnChainRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken): Promise<Rate | null>
+  listenOnChainRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken): Observable<Rate | null>
 }

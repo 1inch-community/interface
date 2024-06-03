@@ -1,4 +1,4 @@
-import { IConnectWalletController } from '@one-inch-community/models';
+import { IConnectWalletController, Rate } from '@one-inch-community/models';
 import { ISwapContextStrategy } from './models/swap-context-strategy.interface';
 import { PairHolder } from './pair-holder';
 import {
@@ -6,7 +6,7 @@ import {
   debounceTime,
   defer,
   distinctUntilChanged,
-  map, scan,
+  map, Observable,
   shareReplay,
   switchMap,
   withLatestFrom
@@ -36,7 +36,7 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy {
     this.pairHolder.streamSnapshot('destination'),
     this.sourceTokenAmount$
   ])).pipe(
-    debounceTime(100),
+    debounceTime(300),
     switchMap(([ chainId, activeAddress, sourceTokenSnapshot, destinationTokenSnapshot, sourceTokenBalance ]) => {
       const sourceToken = sourceTokenSnapshot.token
       const destinationToken = destinationTokenSnapshot.token
@@ -71,52 +71,45 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy {
     })
   )
 
-  readonly rate$ = combineLatest([
+  readonly rate$: Observable<Rate | null> = combineLatest([
     this.quoteReceive$,
     this.averageDestinationTokenAmount$
   ]).pipe(
     debounceTime(0),
-    withLatestFrom(this.pairHolder.streamSnapshot('source'), this.pairHolder.streamSnapshot('destination')),
-    map(([ [ quoteReceive, averageDestinationTokenAmount ], sourceTokenSnapshot, destinationTokenSnapshot ]) => {
+    withLatestFrom(
+      this.walletController.data.chainId$,
+      this.pairHolder.streamSnapshot('source'),
+      this.pairHolder.streamSnapshot('destination')
+    ),
+    map(([ [ quoteReceive, averageDestinationTokenAmount ], chainId, sourceTokenSnapshot, destinationTokenSnapshot ]) => {
       const sourceToken = sourceTokenSnapshot.token
       const destinationToken = destinationTokenSnapshot.token
-      if (!quoteReceive || !sourceToken || !destinationToken) return null
+      if (!quoteReceive || !sourceToken || !destinationToken || !chainId) return null
       const sourceTokenAmount = BigInt(quoteReceive.fromTokenAmount)
-      return BigMath.div(
+      const revertedRate = BigMath.div(
         averageDestinationTokenAmount,
         sourceTokenAmount,
         destinationToken.decimals,
         sourceToken.decimals,
       )
+      const rate = BigMath.div(
+        sourceTokenAmount,
+        averageDestinationTokenAmount,
+        sourceToken.decimals,
+        destinationToken.decimals,
+      )
+      return {
+        chainId,
+        rate,
+        revertedRate,
+        sourceToken,
+        destinationToken,
+        isReverted: false,
+      } as Rate
     }),
     distinctUntilChanged(),
     switchMap(rate => {
       if (!rate) return this.fallback.rate$
-      return [rate]
-    })
-  )
-
-  readonly revertedRate$ = combineLatest([
-    this.quoteReceive$,
-    this.averageDestinationTokenAmount$
-  ]).pipe(
-    debounceTime(0),
-    withLatestFrom(this.pairHolder.streamSnapshot('source'), this.pairHolder.streamSnapshot('destination')),
-    map(([ [ quoteReceive, averageDestinationTokenAmount ], sourceTokenSnapshot, destinationTokenSnapshot ]) => {
-      const sourceToken = sourceTokenSnapshot.token
-      const destinationToken = destinationTokenSnapshot.token
-      if (!quoteReceive || !sourceToken || !destinationToken) return null
-      const sourceTokenAmount = BigInt(quoteReceive.fromTokenAmount)
-      return BigMath.div(
-        sourceTokenAmount,
-        averageDestinationTokenAmount,
-        sourceToken.decimals,
-        destinationToken.decimals,
-      )
-    }),
-    distinctUntilChanged(),
-    switchMap(rate => {
-      if (!rate) return this.fallback.revertedRate$
       return [rate]
     })
   )

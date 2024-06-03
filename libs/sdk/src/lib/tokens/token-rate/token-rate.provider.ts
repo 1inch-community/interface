@@ -2,13 +2,13 @@ import { ChainId, IToken, ITokenRateSourceAdapter, ITokenRateProvider, Rate } fr
 import { uniswapV2Adapter } from './adapters/uniswap-v2-adapter';
 import { sushiswapV2Adapter } from './adapters/sushiswap-v2-adapter';
 import { pancakeswapV2Adapter } from './adapters/pancakeswap-v2-adapter';
-import { BigMath, CacheActivePromise } from '../../utils';
+import { CacheActivePromise } from '../../utils';
 import {
   getBlockEmitter,
   getWrapperNativeToken,
   isNativeToken,
 } from '../../chain';
-import { startWith, exhaustMap } from 'rxjs';
+import { startWith, exhaustMap, Observable } from 'rxjs';
 import { uniswapV3Adapter } from './adapters/uniswap-v3-adapter';
 import { pancakeswapV3Adapter } from './adapters/pancakeswap-v3-adapter';
 import { sushiswapV3Adapter } from './adapters/sushiswap-v3-adapter';
@@ -23,32 +23,23 @@ export class TokenRateProvider implements ITokenRateProvider {
   }
 
   @CacheActivePromise((_, chainId: ChainId, sourceToken: IToken, destinationToken: IToken) => [chainId, sourceToken.address, destinationToken.address].join(':'))
-  async getOnChainRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken): Promise<bigint | null> {
+  async getOnChainRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken): Promise<Rate | null> {
     const rate = await this.getOnChainRawRate(chainId, sourceToken, destinationToken)
     if (rate.length === 0) return null
-    const rateValues = rate.map(rate => rate.isReverted ? rate.revertedRate : rate.rate)
-    return BigMath.max(...rateValues)
+    const getRateVale = (rate: Rate) => rate.isReverted ? rate.revertedRate : rate.rate
+    let maxRate: Rate = rate[0]
+    for (const item of rate) {
+      if (getRateVale(item) > getRateVale(maxRate)) {
+        maxRate = item
+      }
+    }
+    return maxRate
   }
 
-  @CacheActivePromise((_, chainId: ChainId, sourceToken: IToken, destinationToken: IToken) => [chainId, sourceToken.address, destinationToken.address].join(':'))
-  async getOnChainRevertedRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken): Promise<bigint | null> {
-    const rate = await this.getOnChainRawRate(chainId, sourceToken, destinationToken)
-    if (rate.length === 0) return null
-    const rateValues = rate.map(rate => rate.isReverted ? rate.rate : rate.revertedRate)
-    return BigMath.max(...rateValues)
-  }
-
-  listenOnChainRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken) {
+  listenOnChainRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken): Observable<Rate | null> {
     return getBlockEmitter(chainId).pipe(
       startWith(null),
       exhaustMap(() => this.getOnChainRate(chainId, sourceToken, destinationToken))
-    )
-  }
-
-  listenOnChainRevertedRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken) {
-    return getBlockEmitter(chainId).pipe(
-      startWith(null),
-      exhaustMap(() => this.getOnChainRevertedRate(chainId, sourceToken, destinationToken))
     )
   }
 

@@ -1,4 +1,4 @@
-import { IConnectWalletController } from '@one-inch-community/models';
+import { IConnectWalletController, Rate } from '@one-inch-community/models';
 import { ISwapContextStrategy } from './models/swap-context-strategy.interface';
 import { PairHolder } from './pair-holder';
 import {
@@ -16,51 +16,36 @@ import { BigMath } from '../utils';
 
 export class SwapContextOnChainStrategy implements ISwapContextStrategy {
 
-  readonly rate$: Observable<bigint> = defer(() => combineLatest([
+  private readonly sourceTokenSnapshot$ = this.pairHolder.streamSnapshot('source')
+  private readonly destinationTokenSnapshot$ = this.pairHolder.streamSnapshot('destination')
+  private readonly sourceTokenAmount$ = this.sourceTokenSnapshot$.pipe(map(snapshot => snapshot.amountRaw), distinctUntilChanged())
+
+  readonly rate$: Observable<Rate | null> = defer(() => combineLatest([
     this.walletController.data.chainId$,
-    this.pairHolder.streamSnapshot('source'),
-    this.pairHolder.streamSnapshot('destination')
+    this.sourceTokenSnapshot$,
+    this.destinationTokenSnapshot$,
   ])).pipe(
     debounceTime(0),
     switchMap(([chainId, sourceTokenSnapshot, destinationTokenSnapshot]) => {
       const sourceToken = sourceTokenSnapshot.token
       const destinationToken = destinationTokenSnapshot.token
-      if (!sourceToken || !destinationToken || !chainId) return [0n]
+      if (!sourceToken || !destinationToken || !chainId) return [null]
       return this.rateProvider.listenOnChainRate(chainId, sourceToken, destinationToken)
     }),
-    map(rate => rate ?? 0n),
-    shareReplay({ refCount: true, bufferSize: 1 })
-  );
-
-  readonly revertedRate$: Observable<bigint> = defer(() => combineLatest([
-    this.walletController.data.chainId$,
-    this.pairHolder.streamSnapshot('source'),
-    this.pairHolder.streamSnapshot('destination')
-  ])).pipe(
-    debounceTime(0),
-    switchMap(([chainId, sourceTokenSnapshot, destinationTokenSnapshot]) => {
-      const sourceToken = sourceTokenSnapshot.token
-      const destinationToken = destinationTokenSnapshot.token
-      if (!sourceToken || !destinationToken || !chainId) return [0n]
-      return this.rateProvider.listenOnChainRevertedRate(chainId, sourceToken, destinationToken)
-    }),
-    map(rate => rate ?? 0n),
     shareReplay({ refCount: true, bufferSize: 1 })
   );
 
   readonly destinationTokenAmount$ = combineLatest([
-    this.rate$.pipe(distinctUntilChanged()),
-    this.pairHolder.streamSnapshot('source'),
-    this.pairHolder.streamSnapshot('destination')
+    this.rate$,
+    this.sourceTokenAmount$
   ]).pipe(
-    map(([rate, sourceTokenSnapshot, destinationTokenSnapshot]) => {
-      const sourceToken = sourceTokenSnapshot.token
-      const destinationToken = destinationTokenSnapshot.token
-      const sourceTokenAmount = sourceTokenSnapshot.amountRaw
-      if (!sourceTokenAmount || sourceTokenAmount === 0n || rate === 0n || !sourceToken || !destinationToken) return 0n
+    map(([rate, sourceTokenAmount]) => {
+      if (!rate || !sourceTokenAmount) return 0n
+      const sourceToken = rate.sourceToken
+      const destinationToken = rate.destinationToken
       return BigMath.mul(
         sourceTokenAmount,
-        rate,
+        rate.isReverted ? rate.revertedRate : rate.rate,
         sourceToken.decimals,
         sourceToken.decimals,
         destinationToken.decimals

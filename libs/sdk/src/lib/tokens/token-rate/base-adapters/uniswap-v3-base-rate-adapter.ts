@@ -46,8 +46,11 @@ export class UniswapV3BaseRateAdapter implements ITokenRateSourceAdapter {
       ])
       const [ rate, revertedRate ] = this.calculatePrice(sqrtPriceX96, sourceToken, destinationToken, liquidity, isRevertRate);
       return {
+        chainId,
         rate,
         revertedRate,
+        sourceToken,
+        destinationToken,
         isReverted: isRevertRate,
       };
     } catch (error) {
