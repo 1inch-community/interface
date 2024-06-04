@@ -1,3 +1,10 @@
+# [1.0.0-dev.14](https://github.com/1inch-community/interface/compare/v1.0.0-dev.13...v1.0.0-dev.14) (2024-06-04)
+
+
+### Features
+
+* **select-token-widget:** added blur header ([f229c5c](https://github.com/1inch-community/interface/commit/f229c5ceae1f0d446fa8a857da21fe681983b724))
+
 # [1.0.0-dev.13](https://github.com/1inch-community/interface/compare/v1.0.0-dev.12...v1.0.0-dev.13) (2024-06-04)
 
 
