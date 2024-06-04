@@ -1,6 +1,7 @@
 export interface Environment {
   oneInchDevPortalHost: string
   walletConnectProjectId: string
+  baseHref: string
   appVersion: string
 }
 

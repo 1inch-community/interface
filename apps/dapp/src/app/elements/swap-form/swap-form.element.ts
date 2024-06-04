@@ -343,7 +343,7 @@ class AudionController {
 
   private readonly audio: HTMLAudioElement
   constructor() {
-    this.audio = new Audio('/audio/unicorn-run.mp3')
+    this.audio = new Audio('audio/unicorn-run.mp3')
     this.audio.preload = 'none'
     this.audio.volume = 0.4
   }
