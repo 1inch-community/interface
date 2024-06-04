@@ -24,7 +24,7 @@ export const inputStyle = css`
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        height: 100%;
+        height: fit-content;
     }
     
     .input-title {
@@ -72,7 +72,7 @@ export const inputStyle = css`
     }
     
     .amount-input {
-        height: 40px;
+        height: 48px;
         color: var(--color-content-content-primary);
         box-sizing: border-box;
         font-size: 24px;
@@ -110,6 +110,9 @@ export const inputStyle = css`
     }
 
     ${mobileMediaCSS(css`
+        .amount-input {
+            height: 40px;
+        }
         .symbol, .amount-input {
             font-size: 20px;
         }
@@ -118,7 +121,6 @@ export const inputStyle = css`
         }
         .input-container {
             height: 116px;
-            //padding: 16px 8px;
         }
         .symbol-container {
             padding: 4px 8px;

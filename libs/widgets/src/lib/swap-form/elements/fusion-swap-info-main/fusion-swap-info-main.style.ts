@@ -111,13 +111,13 @@ export const fusionSwapInfoMainStyle = css`
         grid-column-start: 1;
         grid-column-end: 3;
         flex-direction: column;
-        opacity: 0;
+        visibility: hidden;
         transform: translate3d(0, -15px, 0);
         transition: transform .2s, opacity .2s;
     }
     
     .open .content-container {
-        opacity: 1;
+        visibility: visible;
         transform: translate3d(0, 0, 0);
     }
     
@@ -161,6 +161,10 @@ export const fusionSwapInfoMainStyle = css`
     ${mobileMediaCSS(css`
         :host {
             --font-size: 13px
+        }
+        
+        .open {
+            grid-row-gap: 0;
         }
     `)}
 `

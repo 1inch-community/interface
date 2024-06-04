@@ -105,7 +105,6 @@ export class InputElement extends LitElement {
           <inch-swap-balance tokenType="${ifDefined(this.tokenType)}"></inch-swap-balance>
           ${this.input}
           <inch-fiat-balance tokenType="${ifDefined(this.tokenType)}"></inch-fiat-balance>
-          <br>
         </div>
       </div>
     `

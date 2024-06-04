@@ -9,12 +9,7 @@ import './elements/search-token-input'
 import './elements/token-list'
 import './elements/favorite-tokens'
 import { ChainId } from '@one-inch-community/models';
-import { Address, isAddressEqual } from 'viem';
-
-function hasChangedAddress(value: Address, oldValue?: Address): boolean {
-  if (!oldValue) return true
-  return !isAddressEqual(value, oldValue)
-}
+import { Address } from 'viem';
 
 @customElement(SelectTokenElement.tagName)
 export class SelectTokenElement extends LitElement {
@@ -24,7 +19,7 @@ export class SelectTokenElement extends LitElement {
 
   @property({ type: Number }) chainId?: ChainId
 
-  @property({ type: String, hasChanged: hasChangedAddress }) connectedWalletAddress?: Address
+  @property({ type: String }) connectedWalletAddress?: Address
 
   readonly context = new ContextProvider(this, { context: selectTokenContext })
 

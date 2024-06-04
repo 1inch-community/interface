@@ -37,7 +37,7 @@ export class SwapContextOnChainStrategy implements ISwapContextStrategy {
 
   readonly destinationTokenAmount$ = combineLatest([
     this.rate$,
-    this.sourceTokenAmount$
+    this.sourceTokenAmount$.pipe(distinctUntilChanged())
   ]).pipe(
     map(([rate, sourceTokenAmount]) => {
       if (!rate || !sourceTokenAmount) return 0n
@@ -48,7 +48,7 @@ export class SwapContextOnChainStrategy implements ISwapContextStrategy {
           sourceTokenAmount,
           rate.revertedRate,
           sourceToken.decimals,
-          sourceToken.decimals,
+          destinationToken.decimals,
           destinationToken.decimals
         )
       }
