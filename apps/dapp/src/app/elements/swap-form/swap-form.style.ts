@@ -12,6 +12,10 @@ export const swapFormStyle = css`
         z-index: 1;
     }
     
+    :host(.padding-top-transition) {
+        transition: padding-top .2s;
+    }
+    
     .unicorn-loader {
         position: absolute;
         z-index: 1;
@@ -19,6 +23,7 @@ export const swapFormStyle = css`
         transform: scale(0);
         will-change: transform;
         height: auto;
+        transition: top .2s;
     }
 
     .shadow-container {
@@ -82,6 +87,12 @@ export const swapFormStyle = css`
     ${mobileMediaCSS(css`
         :host {
             padding-top: 24px;
+        }
+        :host(.is-enlarged-form) {
+            padding-top: 0;
+        }
+        :host(.is-enlarged-form) .unicorn-loader {
+            top: 20px;
         }
     `)}
 `

@@ -77,6 +77,7 @@ export const segmentedControlItemStyle = css`
     ${mobileMediaCSS(css`
         .item {
             font-size: 13px;
+            padding: 6px 12px;
         }
     `)}
 

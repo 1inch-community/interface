@@ -2,7 +2,7 @@ import { html, LitElement } from 'lit';
 import { fusionSwapInfoMainStyle } from './fusion-swap-info-main.style';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { observe } from '@one-inch-community/lit';
+import { observe, dispatchEvent } from '@one-inch-community/lit';
 import { consume } from '@lit/context';
 import { swapContext } from '../../context';
 import {
@@ -14,8 +14,7 @@ import {
 } from 'rxjs';
 import { ISwapContext, Rate } from '@one-inch-community/models';
 import { formatUnits, parseUnits } from 'viem';
-import { formatSmartNumber, isRateEqual, isTokensEqual, TokenController } from '@one-inch-community/sdk';
-import { dispatchEvent } from '@one-inch-community/lit';
+import { formatSmartNumber, getSymbolFromWrapToken, isRateEqual, isTokensEqual, TokenController } from '@one-inch-community/sdk';
 import "@one-inch-community/ui-components/button"
 import "@one-inch-community/ui-components/icon"
 
@@ -50,13 +49,23 @@ export class FusionSwapInfoMainElement extends LitElement {
       const rateUsd = parseUnits(tokenPrice, secondaryToken.decimals)
       const rateUsdFormated = formatSmartNumber(formatUnits(rateUsd, secondaryToken.decimals), 2);
       return html`
-        <span class="rate-view">1 ${secondaryToken.symbol} = ${rateFormated} ${primaryToken.symbol}  <span
+        <span class="rate-view">1 ${getSymbolFromWrapToken(secondaryToken)} = ${rateFormated} ${primaryToken.symbol}  <span
           class="dst-token-rate-usd-price">~$${rateUsdFormated}</span></span>
       `;
     }),
     startWith(this.getLoadRateView()),
     shareReplay({ bufferSize: 1, refCount: true })
   );
+
+  override connectedCallback() {
+    super.connectedCallback();
+    dispatchEvent(this, 'changeFusionInfoOpenState', this.isOpen)
+  }
+
+  override disconnectedCallback() {
+    super.disconnectedCallback();
+    dispatchEvent(this, 'changeFusionInfoOpenState', false)
+  }
 
   protected override render() {
     const classes = {
@@ -72,7 +81,10 @@ export class FusionSwapInfoMainElement extends LitElement {
       'fusion-icon-open': this.isOpen
     };
     return html`
-      <div class="${classMap(classes)}" @click="${() => this.isOpen = true}">
+      <div class="${classMap(classes)}" @click="${() => {
+        this.isOpen = true;
+        dispatchEvent(this, 'changeFusionInfoOpenState', this.isOpen)
+      }}">
         <div class="rate-container">
           ${observe(this.rateView$)}
         </div>
@@ -93,12 +105,21 @@ export class FusionSwapInfoMainElement extends LitElement {
             </div>
           </div>
           <div class="content-row">
+            <span class="row-title">Auction time</span>
+            <div @click="${() => dispatchEvent(this, 'openAuctionTimeSettings', null)}" class="row-content row-slippage">
+              180s · Auto
+            </div>
+          </div>
+          <div class="content-row">
             <span class="row-title">Minimum receive</span>
             <div class="row-content"></div>
           </div>
           <div class="content-row">
             <span class="row-title">Network Fee</span>
-            <div class="row-content"></div>
+            <div class="row-content">
+              <inch-icon icon="fusion16"></inch-icon>
+              <span>Free</span>
+            </div>
           </div>
         </div>
       </div>
@@ -115,6 +136,7 @@ export class FusionSwapInfoMainElement extends LitElement {
     event.preventDefault();
     event.stopPropagation();
     this.isOpen = !this.isOpen;
+    dispatchEvent(this, 'changeFusionInfoOpenState', this.isOpen)
   }
 
   private getContext() {

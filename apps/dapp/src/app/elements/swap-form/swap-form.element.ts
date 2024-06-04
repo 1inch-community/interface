@@ -57,7 +57,7 @@ export class SwapFormElement extends LitElement {
   private readonly unicornLoaderRef  = createRef<HTMLElement>()
 
   private readonly desktopScene = new SceneController('swapForm', {
-    swapForm: { minWidth: 556, maxHeight: 581, lazyRender: true },
+    swapForm: { minWidth: 556, maxHeight: 621, lazyRender: true },
     selectToken: { minWidth: 556, maxHeight: 680 }
   })
 
@@ -82,6 +82,10 @@ export class SwapFormElement extends LitElement {
       ),
       this.mobileUpdate()
     ], { requestUpdate: false })
+  }
+
+  protected firstUpdated() {
+    setTimeout(() => this.classList.add('padding-top-transition'), 100)
   }
 
   protected render() {
@@ -114,7 +118,7 @@ export class SwapFormElement extends LitElement {
   private getMobileSwapForm() {
     const classes = {
       'shadow-container': true,
-      'shadow-container-rainbow': this.isRainbowTheme
+      'shadow-container-rainbow': this.isRainbowTheme,
     }
     return html`
       <inch-icon ${ref(this.unicornLoaderRef)} class="unicorn-loader" icon="unicornRun"></inch-icon>
@@ -124,6 +128,7 @@ export class SwapFormElement extends LitElement {
             .srcToken="${this.srcToken}"
             .dstToken="${this.dstToken}"
             .walletController="${connectWalletController}"
+            @changeFusionInfoOpenState="${(event: CustomEvent) => this.onChangeFusionInfoOpenState(event)}"
             @openTokenSelector="${(event: CustomEvent) => this.onOpenMobileSelectToken(event)}"
             @connectWallet="${() => this.onOpenConnectWalletView()}"
           ></inch-swap-form>
@@ -179,6 +184,14 @@ export class SwapFormElement extends LitElement {
     const srcToken = this.srcToken
     this.setSrcToken(this.dstToken)
     this.setDstToken(srcToken)
+  }
+
+  private onChangeFusionInfoOpenState(event: CustomEvent) {
+    if (event.detail.value && !this.classList.contains('is-enlarged-form')) {
+      this.classList.add('is-enlarged-form')
+    } else {
+      this.classList.remove('is-enlarged-form')
+    }
   }
 
   private onSelectToken(event: CustomEvent) {

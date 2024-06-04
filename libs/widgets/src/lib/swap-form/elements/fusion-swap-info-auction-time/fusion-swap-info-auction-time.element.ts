@@ -1,5 +1,5 @@
 import { LitElement, html } from 'lit';
-import { fusionSwapInfoSlippageStyle } from './fusion-swap-info-slippage.style';
+import { fusionSwapInfoAuctionTimeStyle } from './fusion-swap-info-auction-time.style';
 import { customElement } from 'lit/decorators.js';
 import '@one-inch-community/ui-components/segmented-control'
 import '@one-inch-community/ui-components/icon'
@@ -9,31 +9,34 @@ import { Maskito } from '@maskito/core';
 import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import { fromEvent, tap } from 'rxjs';
 
-@customElement(FusionSwapInfoSlippageElement.tagName)
-export class FusionSwapInfoSlippageElement extends LitElement {
-  static tagName = 'inch-fusion-swap-info-slippage' as const;
+@customElement(FusionSwapInfoAuctionTimeElement.tagName)
+export class FusionSwapInfoAuctionTimeElement extends LitElement {
+  static tagName = 'inch-fusion-swap-info-auction-time' as const;
 
-  static override styles = fusionSwapInfoSlippageStyle
+  static override styles = fusionSwapInfoAuctionTimeStyle
 
   private readonly mobileMedia = getMobileMatchMediaAndSubscribe(this)
 
   private readonly segments: SegmentedControlItem[] = [
     { label: 'Auto', value: 'auto' },
-    { label: '0.1%', value: 0.1 },
-    { label: '0.5%', value: 0.5 },
-    { label: '1%', value: 1 },
-    { label: 'Custom', template: () => html`${this.customSlippageInput}` },
-  ]
+    { label: '3m', value: 60 * 3 },
+    { label: '5m', value: 60 * 5 },
+    { label: '10m', value: 60 * 10 },
+    { label: '30m', value: 60 * 30 },
+    this.mobileMedia.matches ? null : { label: '1H', value: 60 * 60 },
+    this.mobileMedia.matches ? null : { label: '2H', value: 60 * 60 * 2 },
+    { label: 'Custom', template: () => html`${this.customAuctionTimeInput}` },
+  ].filter(Boolean) as SegmentedControlItem[]
 
-  private readonly customSlippageInput = document.createElement('input')
+  private readonly customAuctionTimeInput = document.createElement('input')
 
   override connectedCallback() {
     super.connectedCallback();
     this.buildMask()
-    this.customSlippageInput.placeholder = 'Custom %'
-    this.customSlippageInput.inputMode = 'decimal'
-    this.customSlippageInput.autocomplete = 'off'
-    appendStyle(this.customSlippageInput, {
+    this.customAuctionTimeInput.placeholder = 'Custom s'
+    this.customAuctionTimeInput.inputMode = 'decimal'
+    this.customAuctionTimeInput.autocomplete = 'off'
+    appendStyle(this.customAuctionTimeInput, {
       backgroundColor: 'transparent',
       border: 'none',
       outline: 'none',
@@ -44,10 +47,10 @@ export class FusionSwapInfoSlippageElement extends LitElement {
       textAlign: 'center',
     })
     subscribe(this, [
-      fromEvent(this.customSlippageInput, 'input').pipe(
+      fromEvent(this.customAuctionTimeInput, 'input').pipe(
         tap(() => {
-          if (this.customSlippageInput.value.length === 1) {
-            this.customSlippageInput.value = '';
+          if (this.customAuctionTimeInput.value.length === 1) {
+            this.customAuctionTimeInput.value = '';
           }
         })
       )
@@ -55,13 +58,13 @@ export class FusionSwapInfoSlippageElement extends LitElement {
   }
 
   protected override render() {
-    appendStyle(this.customSlippageInput, {
+    appendStyle(this.customAuctionTimeInput, {
       fontSize: this.mobileMedia.matches ? '13px' : '16px',
     })
     return html`
       <div @click="${() => dispatchEvent(this, 'back', null)}" class="slippage-title">
         <inch-icon class="back-icon" icon="chevronDown16"></inch-icon>
-        <span>Slippage tolerance</span>
+        <span>Auction time</span>
       </div>
       <inch-segmented-control
         .items="${this.segments}"
@@ -71,10 +74,10 @@ export class FusionSwapInfoSlippageElement extends LitElement {
   }
 
   private buildMask() {
-    return new Maskito(this.customSlippageInput, maskitoNumberOptionsGenerator({
-      max: 99,
-      min: 1,
-      postfix: '%'
+    return new Maskito(this.customAuctionTimeInput, maskitoNumberOptionsGenerator({
+      max: 60 * 60 * 30,
+      min: 60 * 3,
+      postfix: 's'
     }));
   }
 
@@ -82,6 +85,6 @@ export class FusionSwapInfoSlippageElement extends LitElement {
 
 declare global {
   interface HTMLElementTagNameMap {
-    'inch-fusion-swap-info-slippage': FusionSwapInfoSlippageElement
+    'inch-fusion-swap-info-auction-time': FusionSwapInfoAuctionTimeElement
   }
 }

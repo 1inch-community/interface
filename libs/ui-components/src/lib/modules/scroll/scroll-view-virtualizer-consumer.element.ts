@@ -7,7 +7,8 @@ import { ScrollContext, scrollContext } from './scroll-context';
 import '@lit-labs/virtualizer'
 import type { LitVirtualizer } from '@lit-labs/virtualizer'
 import { resizeObserver, subscribe } from '@one-inch-community/lit';
-import { tap, merge } from 'rxjs';
+import { tap, merge, of } from 'rxjs';
+import { mainViewportContext } from './main-viewport-context';
 
 @customElement(ScrollViewVirtualizerConsumerElement.tagName)
 export class ScrollViewVirtualizerConsumerElement extends LitElement {
@@ -22,6 +23,9 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
   @consume({ context: scrollContext, subscribe: true })
   private context!: ScrollContext
 
+  @consume({ context: mainViewportContext, subscribe: false })
+  private mainViewportContext?: HTMLElement
+
   private globalOffsetY: number | null = null
 
   private readonly virtualizerRef = createRef<LitVirtualizer>()
@@ -31,17 +35,14 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
     return this.virtualizerRef.value
   }
 
-  override async connectedCallback() {
-    super.connectedCallback();
-  }
-
   protected override firstUpdated() {
     if (!this.context || !this.virtualizerRef.value) return
     this.updateView()
     subscribe(this, [
       merge(
         resizeObserver(this.context),
-        resizeObserver(this.virtualizer)
+        resizeObserver(this.virtualizer),
+        this.mainViewportContext ? resizeObserver(this.mainViewportContext) : of()
       ).pipe(
         tap(() => this.updateView())
       )
@@ -63,10 +64,17 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
 
   private updateView() {
     if (!this.context || !this.virtualizerRef.value) return
-    const contextRect = this.context.getBoundingClientRect()
+    const contextRect = this.getViewPortBoundingClientRect()
     const virtualizerRect = this.virtualizer.getBoundingClientRect()
     this.globalOffsetY = virtualizerRect.top - contextRect.top + 8
     this.virtualizer.style.minHeight = `${(this.context.maxHeight ?? 0) - this.globalOffsetY}px`
+  }
+
+  private getViewPortBoundingClientRect() {
+    if (this.mainViewportContext) {
+      return this.mainViewportContext.getBoundingClientRect()
+    }
+    return this.context.getBoundingClientRect()
   }
 }
 

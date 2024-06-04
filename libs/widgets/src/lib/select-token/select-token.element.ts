@@ -9,7 +9,9 @@ import './elements/search-token-input'
 import './elements/token-list'
 import './elements/favorite-tokens'
 import { ChainId } from '@one-inch-community/models';
+import { createMainViewportContext } from '@one-inch-community/ui-components/scroll';
 import { Address } from 'viem';
+
 
 @customElement(SelectTokenElement.tagName)
 export class SelectTokenElement extends LitElement {
@@ -22,6 +24,11 @@ export class SelectTokenElement extends LitElement {
   @property({ type: String }) connectedWalletAddress?: Address
 
   readonly context = new ContextProvider(this, { context: selectTokenContext })
+
+  override connectedCallback() {
+    super.connectedCallback();
+    createMainViewportContext(this)
+  }
 
   protected override render() {
     this.initContext()

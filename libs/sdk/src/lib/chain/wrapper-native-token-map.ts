@@ -27,6 +27,14 @@ export function getWrapperNativeToken(chainId: ChainId): IToken {
     symbol: `W${chain.nativeCurrency.symbol}`,
     name: `W${chain.nativeCurrency.symbol}`,
     decimals: chain?.nativeCurrency?.decimals ?? 18,
-    address: wrapperNativeTokenMap[chainId]
+    address: wrapperNativeTokenMap[chainId],
+    isInternalWrapToken: true
   }
+}
+
+export function getSymbolFromWrapToken(token: IToken) {
+  if (token.isInternalWrapToken) {
+    return token.symbol.slice(1)
+  }
+  return token.symbol
 }

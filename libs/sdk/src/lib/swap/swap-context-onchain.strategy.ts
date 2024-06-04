@@ -62,6 +62,12 @@ export class SwapContextOnChainStrategy implements ISwapContextStrategy {
     })
   )
 
+  readonly autoSlippage$ = combineLatest([
+
+  ]).pipe(
+
+  )
+
   constructor(
     private readonly pairHolder: PairHolder,
     private readonly walletController: IConnectWalletController,

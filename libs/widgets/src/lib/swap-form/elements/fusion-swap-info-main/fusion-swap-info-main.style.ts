@@ -22,7 +22,7 @@ export const fusionSwapInfoMainStyle = css`
     }
 
     .open {
-        height: 176px;
+        height: 236px;
         grid-template-rows: min-content 1fr;
         grid-row-gap: 16px;
         cursor: auto;
@@ -138,6 +138,7 @@ export const fusionSwapInfoMainStyle = css`
         font-weight: 500;
         line-height: 24px;
         cursor: pointer;
+        transition: color .2s;
     }
     
     .row-title {
@@ -147,6 +148,20 @@ export const fusionSwapInfoMainStyle = css`
         font-weight: 400;
         line-height: 24px;
     }
+    
+    .row-content {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: var(--primary);
+        text-align: right;
+        font-size: var(--font-size);
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px;
+        transition: opacity .2s, transform .2s;
+        will-change: opacity;
+    }
 
     @media (hover: hover) {
         .container:not(.open):hover {
@@ -155,6 +170,10 @@ export const fusionSwapInfoMainStyle = css`
 
         .container:not(.open):hover .rate-loader {
             background-color: var(--color-background-bg-positive-hover);
+        }
+        
+        .row-slippage:hover {
+            color: var(--primary-hover);
         }
     }
     
