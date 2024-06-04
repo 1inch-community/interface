@@ -33,10 +33,13 @@ export class SelectTokenElement extends LitElement {
   protected override render() {
     this.initContext()
     return html`
-      <inch-card-header backButton headerText="Select token"></inch-card-header>
-      <inch-search-token-input></inch-search-token-input>
-      <inch-favorite-tokens></inch-favorite-tokens>
-      <inch-token-list></inch-token-list>
+      <inch-token-list
+        .header="${() => html`
+          <inch-card-header backButton headerText="Select token"></inch-card-header>
+          <inch-search-token-input></inch-search-token-input>
+          <inch-favorite-tokens></inch-favorite-tokens>
+        `}"
+      ></inch-token-list>
     `
   }
 

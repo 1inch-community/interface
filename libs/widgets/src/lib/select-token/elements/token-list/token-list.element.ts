@@ -1,5 +1,5 @@
-import { html, LitElement } from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { html, LitElement, TemplateResult } from 'lit';
+import { customElement, state, property } from 'lit/decorators.js';
 import '../token-list-item'
 import '@one-inch-community/ui-components/icon'
 import { tokenListStyle } from './token-list.style';
@@ -25,6 +25,8 @@ export class TokenListElement extends LitElement {
     scrollbarStyle
   ]
 
+  @property({ type: Object }) header?: (() => TemplateResult<1>)
+
   @consume({ context: selectTokenContext })
   context?: ISelectTokenContext
 
@@ -40,6 +42,7 @@ export class TokenListElement extends LitElement {
   protected override render() {
     return html`
       <inch-scroll-view-virtualizer-consumer
+        .header="${this.header}"
         .items=${observe(this.addressList$, this.getStubAddresses())}
         .keyFunction="${((address: Address) => [this.chainId, this.walletAddress, address].join(':')) as any}"
         .renderItem=${((address: Address) => html`
