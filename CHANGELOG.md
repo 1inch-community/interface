@@ -1,3 +1,10 @@
+# [1.0.0-dev.13](https://github.com/1inch-community/interface/compare/v1.0.0-dev.12...v1.0.0-dev.13) (2024-06-04)
+
+
+### Bug Fixes
+
+* **select-token-widget:** fixed view ([76e635e](https://github.com/1inch-community/interface/commit/76e635e2ee0ae328721089a9ee9de8bb9c0edb50))
+
 # [1.0.0-dev.12](https://github.com/1inch-community/interface/compare/v1.0.0-dev.11...v1.0.0-dev.12) (2024-06-04)
 
 
