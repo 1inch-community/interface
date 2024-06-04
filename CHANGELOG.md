@@ -1,3 +1,10 @@
+# [1.0.0-dev.12](https://github.com/1inch-community/interface/compare/v1.0.0-dev.11...v1.0.0-dev.12) (2024-06-04)
+
+
+### Bug Fixes
+
+* **dapp:** fix audio path ([3337518](https://github.com/1inch-community/interface/commit/333751826f7d3ae463ec6a7fc2a3c80eb79f8d35))
+
 # [1.0.0-dev.11](https://github.com/1inch-community/interface/compare/v1.0.0-dev.10...v1.0.0-dev.11) (2024-06-04)
 
 
