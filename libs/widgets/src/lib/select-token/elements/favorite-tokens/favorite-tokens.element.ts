@@ -39,7 +39,8 @@ export class FavoriteTokensElement extends LitElement {
     tap(tokens => {
       if (tokens.length && this.classList.contains('empty')) {
         this.classList.remove('empty');
-      } else {
+      }
+      if (!tokens.length && !this.classList.contains('empty')) {
         this.classList.add('empty');
       }
     }),
