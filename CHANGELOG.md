@@ -1,3 +1,10 @@
+# [1.0.0-dev.10](https://github.com/1inch-community/interface/compare/v1.0.0-dev.9...v1.0.0-dev.10) (2024-06-04)
+
+
+### Bug Fixes
+
+* **sdk:** fixed types in sdk ([f1e5bca](https://github.com/1inch-community/interface/commit/f1e5bcac86bae7d304065b7e3c7b232ff4f7d47f))
+
 # [1.0.0-dev.9](https://github.com/1inch-community/interface/compare/v1.0.0-dev.8...v1.0.0-dev.9) (2024-06-04)
 
 
