@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 
 export interface ISwapContextStrategy {
   readonly rate$: Observable<Rate | null>
-  readonly autoSlippage$: Observable<bigint>
+  // readonly autoSlippage$: Observable<bigint>
   readonly destinationTokenAmount$: Observable<bigint>
   destroy(): void
 }
