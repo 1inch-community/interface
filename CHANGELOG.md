@@ -1,3 +1,10 @@
+# [1.0.0-dev.11](https://github.com/1inch-community/interface/compare/v1.0.0-dev.10...v1.0.0-dev.11) (2024-06-04)
+
+
+### Bug Fixes
+
+* **dapp:** added preload audio ([ba41592](https://github.com/1inch-community/interface/commit/ba4159282162beea0acc72e7f8bbbd560b2fb22f))
+
 # [1.0.0-dev.10](https://github.com/1inch-community/interface/compare/v1.0.0-dev.9...v1.0.0-dev.10) (2024-06-04)
 
 
