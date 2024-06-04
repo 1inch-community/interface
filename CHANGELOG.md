@@ -1,3 +1,53 @@
+# [1.0.0-dev.9](https://github.com/1inch-community/interface/compare/v1.0.0-dev.8...v1.0.0-dev.9) (2024-06-04)
+
+
+### Bug Fixes
+
+* **builder:** fixed automatic build order for dynamic imports ([41c9b63](https://github.com/1inch-community/interface/commit/41c9b63b8b39fd6e9feffce2095f040f927dbe00))
+* **dapp:** fixed scroll bar ([828ffc0](https://github.com/1inch-community/interface/commit/828ffc0df0f2215c3539e1bf1a538c6a3354d29f))
+* **dapp:** fixed the bar bottom position when scrolling ([53e9c70](https://github.com/1inch-community/interface/commit/53e9c706288d496568ea8f5754fd53425b224340))
+* **dapp:** optimization swap form render time ([26e4688](https://github.com/1inch-community/interface/commit/26e468829bf64b8a173b666a47422f68b72213fd))
+* **model:** change basic swap context model ([c04a5fb](https://github.com/1inch-community/interface/commit/c04a5fb47e861a915b8831df57e3515f3a544903))
+* optimization rendering scrollable overlays ([51f04fc](https://github.com/1inch-community/interface/commit/51f04fc69483c93df292ec6a822c4a7267f6dd6d))
+* optimization scene rendering ([51065b1](https://github.com/1inch-community/interface/commit/51065b1cbba9d545398947308587da5afab1fb67))
+* **packagr:** fix types diagnostic log ([baa4474](https://github.com/1inch-community/interface/commit/baa44749340177dca3ba4d595c8286cbf13cb859))
+* **sdk:** fix parsing chainId from wallet provider ([0204d96](https://github.com/1inch-community/interface/commit/0204d96baa4aba02caab33a5df7336f53bc711ef))
+* **sdk:** fixed change active connection in connect wallet module ([689a606](https://github.com/1inch-community/interface/commit/689a606fbf940ea0c8bcb6045e8bd6d6efc7650f))
+* **sdk:** optimize loading pool data in uniswap v3 rate adapter ([4be6a0a](https://github.com/1inch-community/interface/commit/4be6a0a24be6aa4e6beeb0a2b85f7efcab324ac0))
+* **sdk:** timings changed in chain clients ([63c0ddc](https://github.com/1inch-community/interface/commit/63c0ddc7ce7c33e8e37373aa97c87f5dc18d8c88))
+* **swap-form:** fixed rate calculation ([88f5f25](https://github.com/1inch-community/interface/commit/88f5f25617fa25274e3ae9a928af82a16b9f5ecc))
+* **swap-form:** fixed render artefacts in safari ([d603a1e](https://github.com/1inch-community/interface/commit/d603a1eb3b5e6dcda9d675aecb84fbce67198026))
+* **swap-form:** fixed render scene in safari ([84bc8aa](https://github.com/1inch-community/interface/commit/84bc8aa0acfaad0c46baa26f277ab038c1aa81b4))
+* **swap-form:** fixed shadow rendering in safari ([95b492b](https://github.com/1inch-community/interface/commit/95b492b1b9183ce5a9588723e84ae4f5a2873419))
+* **swap-from:** fixed form overflow ([6477a2b](https://github.com/1inch-community/interface/commit/6477a2b8507695120971f1b5043d6f02abf9c640))
+* **swap-from:** fixed rate calculation ([304ae0f](https://github.com/1inch-community/interface/commit/304ae0f59bc0f0af2add6fba9d32edec6651991c))
+* **swap-from:** fixed showing fusion info if user not select token ([de3e63c](https://github.com/1inch-community/interface/commit/de3e63cfbca69b1697b0ddd55309345c8d92b6b2))
+* **swap-from:** optimize saving tokens persist state ([45270c9](https://github.com/1inch-community/interface/commit/45270c91e29fb156869d8258b017f2e141c400ab))
+* **theme:** rainbow theme improvements ([b084882](https://github.com/1inch-community/interface/commit/b084882d8b8352d0073d118eb80ebf6cc652a449))
+* **wallet:** fixed reconnect wallet ([d2a4a23](https://github.com/1inch-community/interface/commit/d2a4a23463ee162f80a538c9cb81392b0f1ff266))
+* **widgets:** reworking the code for a new swap context model ([cba6986](https://github.com/1inch-community/interface/commit/cba6986e8ed55fe7d47e8c5917d5d4677fd01470))
+
+
+### Features
+
+* **dapp:** added css and html templates minification ([438cfad](https://github.com/1inch-community/interface/commit/438cfad849f815bba8b31c668ee8622f79c3dac5))
+* **dapp:** added mobile pull-to-refresh data update ([bd629d9](https://github.com/1inch-community/interface/commit/bd629d9b2f3601321daae98427bc5dfd9b3baafd))
+* **sdk:** added block listener sleep when the tab is not active ([bd5294c](https://github.com/1inch-community/interface/commit/bd5294cb92571e3c8fe4809105a052087f056916))
+* **sdk:** added linking source token amount and destination token amount ([eea7dd3](https://github.com/1inch-community/interface/commit/eea7dd34fde930ff600fbdc200f4180ef93700ef))
+* **sdk:** added uniswap v3 adapter ([d1795d2](https://github.com/1inch-community/interface/commit/d1795d23a57080f9b2b0636ce9907f0dd465cde1))
+* **sdk:** changed logic work long time cache ([fb2a459](https://github.com/1inch-community/interface/commit/fb2a459715e207c5784b8e0ed2057c42e3c82aad))
+* **swap-form:** added fiat amount view ([18be934](https://github.com/1inch-community/interface/commit/18be934873128ba205aec2853e38e1679730f8d3))
+* **swap-form:** added fusion swap auction time view ([4208626](https://github.com/1inch-community/interface/commit/42086267d177985e26c735ebcc24267e16b5d3f1))
+* **swap-form:** added slippage settings view ([4ab6be8](https://github.com/1inch-community/interface/commit/4ab6be839edd2a96380e25bd125fe2b02bcf7d78))
+* **swap-form:** added sound when update data in mobile ([14286bb](https://github.com/1inch-community/interface/commit/14286bb766f2376521ad0d3bdfa39485639b8a3e))
+* **swap-from:** added state saving in persist store if user switches pair ([2aabd21](https://github.com/1inch-community/interface/commit/2aabd213270374ab37c4b7de37d33eecc60c6518))
+* **theme:** added algorithm for automatically make color schema ([137bf9c](https://github.com/1inch-community/interface/commit/137bf9c088ff512cbbf73889a02805e3a9ffe6ae))
+* **theme:** added pair reset when change chain ([ff611dd](https://github.com/1inch-community/interface/commit/ff611dd556a95314e515800e624da3916838979c))
+* **theme:** added rainbow color schema ([d7dadfd](https://github.com/1inch-community/interface/commit/d7dadfd22e185b916dcb33efbf8c04e0bb2087cc))
+* **theme:** added random color schema ([85491ac](https://github.com/1inch-community/interface/commit/85491ac2f5a8d1dfa19ed4420cfafc4fa4bd7bed))
+* **ui-components:** added showShadow flag in base card ([4557fd5](https://github.com/1inch-community/interface/commit/4557fd5172676fc9f71b77de93486e0a7dacac04))
+* **widgets-swap-form:** added handling zero amount in swap button ([f7dd176](https://github.com/1inch-community/interface/commit/f7dd1764ebd329d926e481e1495b3637db638cb5))
+
 # [1.0.0-dev.8](https://github.com/1inch-community/interface/compare/v1.0.0-dev.7...v1.0.0-dev.8) (2024-05-20)
 
 

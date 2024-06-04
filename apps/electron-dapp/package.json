@@ -1,6 +1,6 @@
 {
   "name": "electron-dapp",
-  "version": "1.0.0-dev.8",
+  "version": "1.0.0-dev.9",
   "main": "./out/main/index.js",
   "scripts": {
     "start": "electron-vite dev"
