@@ -16,6 +16,10 @@ export const wrapperNativeTokenMap: Readonly<Record<ChainId, Address>> = {
   [ChainId.zkSyncEra]: '0x5aea5775959fbc2557cc8789bc1bf90a239d9a91',
 }
 
+export function getWrapperNativeTokenAddress(chainId: ChainId): Address {
+  return wrapperNativeTokenMap[chainId]
+}
+
 export function getWrapperNativeToken(chainId: ChainId): IToken {
   const chain = getChainById(chainId)
   return {
@@ -23,6 +27,14 @@ export function getWrapperNativeToken(chainId: ChainId): IToken {
     symbol: `W${chain.nativeCurrency.symbol}`,
     name: `W${chain.nativeCurrency.symbol}`,
     decimals: chain?.nativeCurrency?.decimals ?? 18,
-    address: wrapperNativeTokenMap[chainId]
+    address: wrapperNativeTokenMap[chainId],
+    isInternalWrapToken: true
   }
+}
+
+export function getSymbolFromWrapToken(token: IToken) {
+  if (token.isInternalWrapToken) {
+    return token.symbol.slice(1)
+  }
+  return token.symbol
 }

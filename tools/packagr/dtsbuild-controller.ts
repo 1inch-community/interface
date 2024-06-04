@@ -132,6 +132,7 @@ export class DtsBuildController {
     const program = ts.createProgram(fileNames, options)
     const emitResult = program.emit();
     const allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
+    this.logger.removeError('diagnostic types error')
     for (const diagnostic of allDiagnostics) {
       if (diagnostic.file) {
         const { line, character } = ts.getLineAndCharacterOfPosition(diagnostic.file, diagnostic.start ?? 0);

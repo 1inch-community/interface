@@ -1,6 +1,5 @@
 import {fallback, http, Transport, webSocket} from "viem";
 import { ChainId } from '@one-inch-community/models';
-import { singletonField } from '../utils/singleton-field';
 
 export const batchConfig = {
   wait: 50,
@@ -14,7 +13,7 @@ function buildFallbackTransport(rpcList: string[]) {
     })),
     {
     rank: {
-      interval: 30_000,
+      interval: 60_000 * 5,
       sampleCount: rpcList.length,
       timeout: 500,
       weights: {
@@ -22,15 +21,15 @@ function buildFallbackTransport(rpcList: string[]) {
         stability: 0.7
       }
     },
-    retryCount: Math.round(rpcList.length / 2),
-    retryDelay: 100
+    retryCount: 10,
+    retryDelay: 30_000
   })
 }
 
 function buildFallbackWSTransport(rpcList: string[]) {
   return fallback(rpcList.map(rpc => webSocket(rpc)), {
     rank: {
-      interval: 10_000,
+      interval: 60_000 * 5,
       sampleCount: rpcList.length,
       timeout: 500,
       weights: {
@@ -38,16 +37,28 @@ function buildFallbackWSTransport(rpcList: string[]) {
         stability: 0.7
       }
     },
-    retryCount: Math.round(rpcList.length / 2),
-    retryDelay: 100
+    retryCount: 3,
+    retryDelay: 30_000
   })
 }
 
-export const transportMap: Record<ChainId, Transport> = singletonField('__transport_map', () => ({
+export const transportMap: Record<ChainId, Transport> = {
   [ChainId.eth]: buildFallbackTransport([
     'https://ethereum.publicnode.com',
     'https://rpc.mevblocker.io',
     'https://eth.merkle.io',
+    'https://1rpc.io/eth',
+    'https://rpc.flashbots.net',
+    'https://eth-pokt.nodies.app',
+    'https://eth.meowrpc.com',
+    'https://eth.drpc.org',
+    'https://eth.llamarpc.com',
+    'https://eth-mainnet.public.blastapi.io',
+    'https://rpc.ankr.com/eth',
+    'https://cloudflare-eth.com',
+    'https://eth-mainnet.gateway.pokt.network/v1/5f3453978e354ab992c4da79',
+    'https://nodes.mewapi.io/rpc/eth',
+    'https://endpoints.omniatech.io/v1/eth/mainnet/public',
     'https://ethereum-mainnet-rpc.allthatnode.com', // global
     'https://ethereum-mainnet-archive.allthatnode.com', // archive global
     'https://ethereum-mainnet-rpc-germany.allthatnode.com', // germany
@@ -119,17 +130,22 @@ export const transportMap: Record<ChainId, Transport> = singletonField('__transp
     'https://zksync.meowrpc.com',
     'https://zksync.drpc.org',
   ]),
-}))
+}
 
-export const transportWSMap: Record<ChainId, Transport> = singletonField('__transport_ws_map', () => ({
+export const transportWSMap: Record<ChainId, Transport> = {
   [ChainId.eth]: buildFallbackWSTransport([
+    'wss://ethereum-rpc.publicnode.com',
     'wss://ethereum.publicnode.com',
+    'wss://eth.drpc.org',
   ]),
   [ChainId.bnb]: buildFallbackWSTransport([
     'wss://bsc.publicnode.com',
+    'wss://bsc-rpc.publicnode.com',
   ]),
   [ChainId.matic]: buildFallbackWSTransport([
     'wss://polygon-bor.publicnode.com',
+    'wss://polygon.gateway.tenderly.co',
+    'wss://polygon.drpc.org',
   ]),
   [ChainId.op]: buildFallbackWSTransport([
     'wss://optimism.publicnode.com',
@@ -156,4 +172,4 @@ export const transportWSMap: Record<ChainId, Transport> = singletonField('__tran
   [ChainId.zkSyncEra]: buildFallbackWSTransport([
     'wss://mainnet.era.zksync.io/ws'
   ]),
-}))
+}

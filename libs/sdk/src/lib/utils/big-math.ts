@@ -1,10 +1,10 @@
 export class BigMath {
 
   private constructor() {
-    throw new Error('BigMath not support instance creating use static methods: dev, mul, add, sub');
+    throw new Error('BigMath does not support instance creation. Use static methods: div, mul, add, sub, avr, pow, min, max.');
   }
 
-  static dev(
+  static div(
     numerator: bigint,
     denominator: bigint,
     numeratorDecimals: number,
@@ -36,10 +36,11 @@ export class BigMath {
     if (valueA === 0n || valueB === 0n) {
       return 0n;
     }
-
     const product = valueA * valueB;
-    const scale = (BigInt(10) ** BigInt(valueADecimals + valueBDecimals)) / (BigInt(10) ** BigInt(resultDecimals));
-    return product / scale;
+    const totalDecimals = BigInt(valueADecimals + valueBDecimals);
+    const scale = 10n ** totalDecimals;
+    const resultScale = 10n ** BigInt(resultDecimals);
+    return (product * resultScale) / scale;
   }
 
   static add(
@@ -91,4 +92,53 @@ export class BigMath {
     const sum = scaledNumbers.reduce((acc, curr) => acc + curr, BigInt(0));
     return sum / BigInt(numbers.length)
   }
+
+  static pow(
+    base: bigint,
+    exponent: number,
+    baseDecimals: number,
+    resultDecimals: number = baseDecimals
+  ): bigint {
+    if (exponent < 0) {
+      throw new Error('Negative exponents are not supported.');
+    }
+    if (exponent === 0) {
+      return BigInt(10) ** BigInt(resultDecimals);
+    }
+
+    const factor = BigInt(10) ** BigInt(baseDecimals);
+    const adjustedBase = base * factor;
+    let result = adjustedBase ** BigInt(exponent);
+
+    const resultScale = BigInt(10) ** BigInt(exponent * baseDecimals);
+    result = result / resultScale;
+
+    if (resultDecimals !== baseDecimals) {
+      const scale = BigInt(10) ** BigInt(resultDecimals - baseDecimals);
+      result = result * scale;
+    }
+
+    return result;
+  }
+
+  static min(...values: bigint[]): bigint {
+    let result: bigint = values[0];
+    for (const value of values) {
+      if (value < result) {
+        result = value;
+      }
+    }
+    return result;
+  }
+
+  static max(...values: bigint[]): bigint {
+    let result = values[0];
+    for (const value of values) {
+      if (value > result) {
+        result = value;
+      }
+    }
+    return result;
+  }
 }
+

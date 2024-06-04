@@ -2,7 +2,7 @@ import { html, LitElement } from 'lit';
 import { connectWalletViewStyle } from './connect-wallet-view.style';
 import { customElement, property } from 'lit/decorators.js';
 import { IConnectWalletController } from '@one-inch-community/models';
-import { getMobileMatchMedia, observe, changeMobileMatchMedia } from '@one-inch-community/lit';
+import { observe, getMobileMatchMediaAndSubscribe } from '@one-inch-community/lit';
 import { OverlayController } from '@one-inch-community/ui-components/overlay';
 import '@one-inch-community/ui-components/button';
 import { defer, map } from 'rxjs';
@@ -19,7 +19,7 @@ export class ConnectWalletViewElement extends LitElement {
 
   @property({ type: Object, attribute: false }) controller?: IConnectWalletController
 
-  private readonly mobileMatchMedia = getMobileMatchMedia()
+  private readonly mobileMatchMedia = getMobileMatchMediaAndSubscribe(this)
 
   private readonly overlay = new OverlayController(
     '#app-root',
@@ -42,10 +42,6 @@ export class ConnectWalletViewElement extends LitElement {
       return isConnected ? this.getConnectedView() : this.getConnectWalletButton()
     })
   )
-
-  protected override firstUpdated() {
-    changeMobileMatchMedia(this)
-  }
 
   protected override render() {
     return html`${observe(this.view$)}`

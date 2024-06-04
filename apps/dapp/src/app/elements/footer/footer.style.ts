@@ -12,12 +12,16 @@ export const footerStyle = css`
         padding: 0 72px;
         background-color: var(--color-background-bg-body);
         gap: 8px;
+        margin-top: 32px;
     }
     
     .mobile-footer {
         height: 72px;
-        position: fixed;
+        width: 100vw;
+        position: sticky;
         padding: 16px 8px;
+        bottom: 0;
+        z-index: 9;
         justify-content: space-between;
     }
     

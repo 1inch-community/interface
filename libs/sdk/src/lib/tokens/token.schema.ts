@@ -1,6 +1,6 @@
 import Dexie, { Table } from 'dexie';
-import { type Address, isAddressEqual } from 'viem';
-import { IBalancesTokenRecord, ChainId, ITokenRecord, ITokenDto } from '@one-inch-community/models';
+import { type Address, Hex, isAddressEqual } from 'viem';
+import { IBalancesTokenRecord, ChainId, ITokenRecord, ITokenDto, IPermitRecord } from '@one-inch-community/models';
 import { QueueCache } from '../cache';
 import { nativeTokenAddress } from '../chain';
 
@@ -25,6 +25,7 @@ export class TokenSchema extends Dexie {
 
   private tokens!: Table<ITokenRecord, string>;
   private balances!: Table<IBalancesTokenRecord, string>;
+  private permit!: Table<IPermitRecord, string>;
 
   private readonly tokenCache = new QueueCache<string, ITokenRecord>(50)
 
@@ -50,11 +51,20 @@ export class TokenSchema extends Dexie {
         'tokenAddress',
         'walletAddress',
         'amount'
+      ].join(', '),
+      permit: [
+        'id', // 'chainId:ownerAddress:spenderAddress:tokenAddress'
+        'chainId',
+        'contractAddress',
+        'ownerAddress',
+        'spenderAddress',
+        'createTimestamp',
+        'permit'
       ].join(', ')
     });
   }
 
-  async getToken(chainId: ChainId, address: Address): Promise<ITokenRecord> {
+  async getToken(chainId: ChainId, address: Address): Promise<ITokenRecord | null> {
     const recordId = getId(chainId, address);
     if (this.tokenCache.has(recordId)) {
       return this.tokenCache.get(recordId)!
@@ -64,7 +74,7 @@ export class TokenSchema extends Dexie {
       .equals(recordId)
       .toArray();
     this.tokenCache.set(recordId, records[0])
-    return records[0];
+    return records[0] ?? null;
   }
 
   async getNativeToken(chainId: ChainId) {
@@ -130,13 +140,13 @@ export class TokenSchema extends Dexie {
     return result
   }
 
-  async getTokenBalance(chainId: ChainId, tokenAddress: Address, walletAddress: Address): Promise<IBalancesTokenRecord> {
+  async getTokenBalance(chainId: ChainId, tokenAddress: Address, walletAddress: Address): Promise<IBalancesTokenRecord | null> {
     const recordId = getId(chainId, walletAddress, tokenAddress);
     const records = await this.balances
       .where('id')
       .equals(recordId)
       .toArray();
-    return records[0];
+    return records[0] ?? null;
   }
 
   async setTokens(chainId: ChainId, tokens: ITokenDto[]) {
@@ -173,6 +183,19 @@ export class TokenSchema extends Dexie {
       });
     }
     await this.balances.bulkPut(balancesRecords);
+  }
+
+  async setPermit(chainId: ChainId, owner: Address, spender: Address, contract: Address, permit: Hex) {
+    const id = getId(chainId, owner, spender, contract)
+    await this.permit.put({
+      id,
+      chainId: chainId,
+      ownerAddress: owner,
+      spenderAddress: spender,
+      contractAddress: contract,
+      createTimestamp: Date.now(),
+      permit
+    })
   }
 
   async getAllFavoriteTokenAddresses(chainId: ChainId) {

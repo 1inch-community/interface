@@ -17,7 +17,7 @@ export const buttonStyle = css`
         gap: 8px;
         border: 1px solid var(--button-border-color, none);
         background-color: var(--button-background-color);
-        color: var(--button-text-color, var(--color-core-white));
+        color: var(--button-text-color-ext, var(--button-text-color, var(--color-core-white)));
         box-sizing: border-box;
         transition: background-color .2s, box-shadow .2s, color .2s, transform .1s;
         outline: none;
@@ -33,7 +33,7 @@ export const buttonStyle = css`
     @media (hover: hover) {
         button:enabled:hover {
             background-color: var(--button-background-color-hover);
-            color: var(--button-text-color-hover, var(--button-text-color));
+            color: var(--button-text-color-ext-hover, var(--button-text-color-hover, var(--button-text-color)));
         }
     }
     

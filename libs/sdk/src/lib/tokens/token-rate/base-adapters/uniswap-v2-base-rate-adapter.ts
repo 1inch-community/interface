@@ -1,9 +1,8 @@
-import { ChainId, IToken, ITokenRateAdapter } from '@one-inch-community/models';
-import { Address, getAddress, isAddressEqual, parseAbi } from 'viem';
+import { ChainId, IToken, ITokenRateSourceAdapter, Rate } from '@one-inch-community/models';
+import { Address, getAddress, isAddressEqual, parseAbi, zeroAddress } from 'viem';
 import { getClient } from '../../../chain';
 import { BigMath } from '../../../utils';
-import { BlockTimeCache, LongTimeCache } from '../../../cache';
-import { CacheActivePromise } from '../../../utils/decorators';
+import { LongTimeCache } from '../../../cache';
 
 const FactoryContractABI = parseAbi([
   'function getPair(address tokenA, address tokenB) external view returns (address pair)'
@@ -15,12 +14,9 @@ const PoolContractABI = parseAbi([
   'function token1() external view returns (address)'
 ])
 
-const zeroAddress: Address = '0x0000000000000000000000000000000000000000'
-
-export class UniswapV2BaseRateAdapter implements ITokenRateAdapter {
+export class UniswapV2BaseRateAdapter implements ITokenRateSourceAdapter {
 
   private readonly pools = new LongTimeCache<string, [Address, Address]>(`${this.name}_pools`, 7)
-  private readonly rateCache = new BlockTimeCache<string, bigint>()
 
   constructor(
     public readonly name: string,
@@ -33,16 +29,8 @@ export class UniswapV2BaseRateAdapter implements ITokenRateAdapter {
     return this.supportedChain.includes(chainId)
   }
 
-  @CacheActivePromise((_, chainId: ChainId, sourceToken: IToken, destinationToken: IToken) => [chainId, sourceToken.address, destinationToken.address].join(':'))
-  async getRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken): Promise<bigint | null> {
-    const id = [sourceToken.address, destinationToken.address].join(':')
+  async getRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken): Promise<Rate | null> {
     try {
-
-      const rateFromCache = this.rateCache.get(chainId, id) ?? null
-      if (rateFromCache !== null) {
-        return rateFromCache
-      }
-
       const srcTokenAddress = getAddress(sourceToken.address)
       const dstTokenAddress = getAddress(destinationToken.address)
       const [pool, token0]: [Address, Address] = await this.getPool(chainId, srcTokenAddress, dstTokenAddress)
@@ -50,21 +38,36 @@ export class UniswapV2BaseRateAdapter implements ITokenRateAdapter {
         return null
       }
       const reserves = await this.getReserves(chainId, pool)
+      const lastBlockTimestamp = reserves[2]
+      if (Date.now() - (lastBlockTimestamp * 1000) > 3.6e+6) { // 1h
+        return null
+      }
       const isRevertRate = !isAddressEqual(sourceToken.address, token0)
-      const rate = BigMath.dev(
+      const rate = BigMath.div(
+        isRevertRate ? reserves[0] : reserves[1],
+        isRevertRate ? reserves[1] : reserves[0],
+        destinationToken.decimals,
+        sourceToken.decimals,
+        sourceToken.decimals,
+      )
+      const revertedRate = BigMath.div(
         isRevertRate ? reserves[1] : reserves[0],
         isRevertRate ? reserves[0] : reserves[1],
         sourceToken.decimals,
         destinationToken.decimals,
         destinationToken.decimals
       )
-
-      this.rateCache.set(chainId, id, rate)
-
-      return rate
+      return {
+        chainId,
+        rate,
+        revertedRate,
+        isReverted: isRevertRate,
+        sourceToken,
+        destinationToken
+      }
     } catch (error) {
       console.error(`Error in UniswapV2BaseAdapter adapter name ${this.name}`, error)
-      return this.rateCache.get(chainId, id)
+      return null
     }
   }
 
@@ -78,13 +81,21 @@ export class UniswapV2BaseRateAdapter implements ITokenRateAdapter {
       return this.pools.get(id2)!
     }
     const client = getClient(chainId)
-    const pool: Address = await client.readContract({
+    let pool: Address = await client.readContract({
       address: getAddress(this.factoryContractGetter(chainId)),
       functionName: 'getPair',
       args: [srcTokenAddress, dstTokenAddress],
       abi: FactoryContractABI
     })
-    let token0 = zeroAddress
+    if (pool !== zeroAddress) {
+      pool = await client.readContract({
+        address: getAddress(this.factoryContractGetter(chainId)),
+        functionName: 'getPair',
+        args: [dstTokenAddress, srcTokenAddress],
+        abi: FactoryContractABI
+      })
+    }
+    let token0: Address = zeroAddress
     if (pool !== zeroAddress) {
       token0 = await client.readContract({
         address: pool,

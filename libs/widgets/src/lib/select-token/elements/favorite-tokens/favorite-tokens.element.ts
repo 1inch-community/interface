@@ -8,7 +8,7 @@ import '@one-inch-community/ui-components/button';
 import '@one-inch-community/widgets/token-icon';
 import '@one-inch-community/ui-components/icon';
 import { favoriteTokensStyles } from './favorite-tokens.styles';
-import { BehaviorSubject, combineLatest, defer, map, shareReplay, startWith, switchMap, tap } from 'rxjs';
+import { BehaviorSubject, combineLatest, debounceTime, defer, map, shareReplay, startWith, switchMap, tap } from 'rxjs';
 import { observe, animationMap, subscribe } from '@one-inch-community/lit';
 import { TokenController } from '@one-inch-community/sdk';
 import { scrollbarStyle } from '@one-inch-community/ui-components/theme';
@@ -32,14 +32,14 @@ export class FavoriteTokensElement extends LitElement {
     defer(() => this.getFavoriteTokens()),
     defer(() => this.getChainId())
   ]).pipe(
+    debounceTime(0),
     switchMap(([tokens, chainId]) => TokenController.getTokenList(chainId, tokens)),
     map(tokens => tokens.sort((token1, token2) => token2.priority - token1.priority)),
     startWith([]),
     tap(tokens => {
       if (tokens.length && this.classList.contains('empty')) {
         this.classList.remove('empty');
-      }
-      if (!tokens.length && !this.classList.contains('empty')) {
+      } else {
         this.classList.add('empty');
       }
     }),
@@ -47,7 +47,7 @@ export class FavoriteTokensElement extends LitElement {
       if (!this.classList.contains('transition-host')) {
         setTimeout(() => {
           this.classList.add('transition-host');
-        }, 100);
+        }, 300);
       }
     }),
     map((tokens: (ITokenRecord | null)[]) => {

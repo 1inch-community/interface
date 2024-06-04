@@ -1,22 +1,18 @@
-import { html, LitElement, TemplateResult } from 'lit';
+import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
-import { map as litMap } from 'lit/directives/map.js';
-import { cache } from 'lit/directives/cache.js';
-import { classMap } from 'lit/directives/class-map.js';
-import { styleMap } from 'lit/directives/style-map.js';
-import '@lit-labs/virtualizer'
 import '../token-list-item'
 import '@one-inch-community/ui-components/icon'
 import { tokenListStyle } from './token-list.style';
 import { consume } from '@lit/context';
 import { ChainId, ISelectTokenContext } from '@one-inch-community/models';
 import { selectTokenContext } from '../../context';
-import { combineLatest, debounceTime, defer, map, startWith } from 'rxjs';
-import { observe, resizeObserver } from '@one-inch-community/lit';
+import { defer, shareReplay, tap } from 'rxjs';
+import { observe, subscribe } from '@one-inch-community/lit';
 import { scrollbarStyle } from '@one-inch-community/ui-components/theme';
 import { Address } from 'viem';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { ISceneContext, sceneContext } from '@one-inch-community/ui-components/scene';
+import '@one-inch-community/ui-components/scroll';
 import '../token-list-stub-item'
 
 
@@ -34,33 +30,38 @@ export class TokenListElement extends LitElement {
 
   @consume({ context: sceneContext })
   sceneContext?: ISceneContext
+  @state() private chainId: ChainId | null = null
+  @state() private walletAddress: Address | null = null
 
-  @state() private transitionReady = false
-
-  private view$ = defer(() => combineLatest([
-    this.getTokenAddressList(),
-    this.getChainId(),
-    this.getConnectedWalletAddress(),
-    resizeObserver(this)
-  ])).pipe(
-    debounceTime(0),
-    map(([ tokenAddresses, chainId, walletAddress ]) => this.getTokenListView(tokenAddresses, chainId, walletAddress ?? undefined)),
-    startWith(this.getLoaderView()),
+  private readonly addressList$ = defer(() => this.getTokenAddressList()).pipe(
+    shareReplay({ refCount: true, bufferSize: 1 })
   )
 
-  protected override render(): TemplateResult {
-    if (!this.transitionReady) return this.getLoaderView()
+  protected override render() {
     return html`
-      <div class="list-container">
-        ${observe(this.view$)}
-      </div>`
+      <inch-scroll-view-virtualizer-consumer
+        .items=${observe(this.addressList$, this.getStubAddresses())}
+        .keyFunction="${((address: Address) => [this.chainId, this.walletAddress, address].join(':')) as any}"
+        .renderItem=${((address: Address) => html`
+            <inch-token-list-item
+              tokenAddress="${address}"
+              walletAddress="${ifDefined(this.walletAddress ?? undefined)}"
+              chainId="${ifDefined(this.chainId ?? undefined)}"
+            ></inch-token-list-item>`
+        )}
+      ></inch-scroll-view-virtualizer-consumer>
+    `
   }
 
   protected override async firstUpdated() {
-    if (this.sceneContext && this.sceneContext.animationInProgress) {
-      await this.sceneContext.animationInEnd
-    }
-    this.transitionReady = true
+    subscribe(this, [
+      this.getConnectedWalletAddress().pipe(tap(address => this.walletAddress = address)),
+      this.getChainId().pipe(tap(chainId => this.chainId = chainId)),
+      this.addressList$
+    ], { requestUpdate: false })
+    subscribe(this, [
+      this.getFavoriteTokens(),
+    ])
   }
 
   private getTokenAddressList() {
@@ -73,52 +74,18 @@ export class TokenListElement extends LitElement {
     return this.context.chainId$
   }
 
+  private getFavoriteTokens() {
+    if (!this.context) throw new Error('');
+    return this.context.favoriteTokens$;
+  }
+
   private getConnectedWalletAddress() {
     if (!this.context) throw new Error('')
     return this.context.connectedWalletAddress$
   }
 
-  private getLoaderView() {
-    const classes = {
-      'loader-view-container': true
-    }
-    return html`
-      <div class="${classMap(classes)}">
-        ${litMap<unknown>(Array.from(Array(30).keys()), () => html`<inch-token-list-stub-item></inch-token-list-stub-item>`)}
-      </div>
-    `
-  }
-
-
-  private getTokenListView(tokenAddresses: Address[], chainId: ChainId, walletAddress?: Address): TemplateResult {
-    const offsetHeight = this.offsetHeight
-
-    const styles = {
-      overflow: 'auto',
-      display: 'block',
-      position: 'relative',
-      contain: 'size layout',
-      minHeight: '150px',
-      height: `${offsetHeight}px`
-    }
-
-    return html`
-      ${cache(html`
-        <lit-virtualizer
-          scroller
-          style="${styleMap(styles)}"
-          .items=${tokenAddresses}
-          .keyFunction="${((address: Address) => [chainId, walletAddress, address].join(':')) as any}"
-          .renderItem=${((address: Address) => html`
-            <inch-token-list-item
-              tokenAddress="${address}"
-              walletAddress="${ifDefined(walletAddress)}"
-              chainId="${chainId}"
-            ></inch-token-list-item>`
-          ) as any}
-        ></lit-virtualizer>
-      `)}
-    `
+  private getStubAddresses() {
+    return Array.from(Array(30)).map((_, index) => `0x${index.toString(16)}`)
   }
 }
 

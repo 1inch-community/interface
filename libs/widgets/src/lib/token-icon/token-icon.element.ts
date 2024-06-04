@@ -120,7 +120,7 @@ async function loadFromDatabase(data: RepositoryPayload): Promise<HTMLImageEleme
     return null
   }
   const token = await TokenController.getToken(data.chainId, data.address)
-  if (!token.logoURL) {
+  if (!token || !token.logoURL) {
     return null
   }
   return await new Promise((resolve) => {

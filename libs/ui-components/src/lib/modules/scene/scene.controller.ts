@@ -1,9 +1,11 @@
 import { html, render, TemplateResult } from 'lit';
 import { sceneStyle } from './scene.style';
 import { SceneWrapperElement } from './scene-wrapper.element';
-import { AnimationType } from './animations/animation-type';
-import { slideAnimation } from './animations/slide.animation';
+import { Animation } from './animations/animation';
+import { slideAnimation } from './animations';
 import { appendStyle } from '@one-inch-community/lit';
+import { asyncFrame } from '../async/async-frame';
+import { ScrollViewProviderElement } from '@one-inch-community/ui-components/scroll';
 
 type RenderConfig<T extends string> = Record<T, () => TemplateResult>
 
@@ -14,7 +16,7 @@ interface SceneConfigItem {
   maxWidth?: number | string;
   minHeight?: number | string;
   maxHeight?: number | string;
-  lazyRender?: boolean
+  lazyRender?: boolean;
 }
 
 export class SceneController<T extends string, U extends T> {
@@ -31,15 +33,18 @@ export class SceneController<T extends string, U extends T> {
 
   constructor(private readonly rootSceneName: U,
               private readonly config: SceneConfig<T>,
-              private readonly animation: AnimationType = slideAnimation()) {
+              private readonly animation: Animation = slideAnimation()) {
   }
 
   render(config: RenderConfig<T>): TemplateResult {
-    const isFirstRender = !this.currentScenes
+    if (this.transitionInProgress) {
+      return html`${this.sceneContainer}`;
+    }
+    const isFirstRender = !this.currentScenes;
     this.currentScenes = config;
     const sceneName = this.getCurrentSceneName();
     const currentSceneConfig = this.config[sceneName];
-    const isLazyRenderScene = currentSceneConfig.lazyRender ?? false
+    const isLazyRenderScene = currentSceneConfig.lazyRender ?? false;
     if (!isLazyRenderScene || isFirstRender) {
       const sceneFactory = this.getScene(sceneName);
       if (!sceneFactory) {
@@ -99,14 +104,25 @@ export class SceneController<T extends string, U extends T> {
       isBack ? upScene.animationOutStart() : upScene.animationInStart();
       isBack ? downScene.animationOutStart() : downScene.animationInStart();
 
-      await this.animation.beforeAppend(upScene, downScene, isBack ?? false);
       this.sceneContainerAppendChild(sceneName, nextSceneWrapper);
-      await this.animation.afterAppend(upScene, downScene, isBack ?? false);
+      await asyncFrame()
+      const nextSceneWrapperRect = nextSceneWrapper.getBoundingClientRect();
+      const currentSceneWrapperRect = currentSceneWrapper.getBoundingClientRect();
+      await this.animation.preparation(upScene, downScene, isBack ?? false);
+      await Promise.all([
+        this.animation.transition(upScene, downScene, isBack ?? false),
+        this.resizeContainer(nextSceneWrapperRect, currentSceneWrapperRect)
+      ]);
 
+      appendStyle(this.sceneContainer, {
+        width: '',
+        height: ''
+      });
       this.sceneContainer.firstChild && this.sceneContainer.removeChild(this.sceneContainer.firstChild);
 
       isBack ? upScene.animationOutEnd() : upScene.animationInEnd();
       isBack ? downScene.animationOutEnd() : downScene.animationInEnd();
+
     } finally {
       this.transitionInProgress = false;
     }
@@ -141,18 +157,34 @@ export class SceneController<T extends string, U extends T> {
     const formatValue = (value?: number | string) => {
       if (!value) return '';
       return (typeof value === 'number') ? `${value}px` : value;
+    };
+    if (config.maxHeight) {
+      this.sceneContainer.maxHeight = parseInt(config.maxHeight.toString())
     }
     appendStyle(this.sceneContainer, {
-      minHeight: formatValue(config.minHeight),
-      maxHeight: formatValue(config.maxHeight),
       minWidth: formatValue(config.minWidth),
       maxWidth: formatValue(config.maxWidth)
+    });
+  }
+
+  private async resizeContainer(nextRect: DOMRect, currentRect: DOMRect) {
+    await this.sceneContainer.animate([
+      { height: `${currentRect.height}px`, width: `${currentRect.width}px` },
+      { height: `${nextRect.height}px`, width: `${nextRect.width}px` }
+    ], {
+      duration: 200,
+      easing: 'cubic-bezier(.2, .8, .2, 1)'
+    }).finished;
+
+    appendStyle(this.sceneContainer, {
+      width: `${nextRect.width}px`,
+      height: `${nextRect.height}px`
     });
   }
 }
 
 function buildSceneContainer() {
-  const sceneContainer: HTMLDivElement = document.createElement('div');
+  const sceneContainer = document.createElement(ScrollViewProviderElement.tagName);
   sceneContainer.id = 'scene-container';
   sceneContainer.classList.add('scene-container');
   return sceneContainer;

@@ -4,7 +4,7 @@ import { css } from 'lit';
 export const fusionSwapInfoMainStyle = css`
     
     :host {
-        --font-size: 16px
+        --font-size: 16px;
     }
     
     .container {
@@ -18,12 +18,14 @@ export const fusionSwapInfoMainStyle = css`
         justify-content: space-between;
         border-radius: 16px;
         color: var(--color-content-content-primary);
+        cursor: pointer;
     }
 
     .open {
-        height: 176px;
+        height: 236px;
         grid-template-rows: min-content 1fr;
         grid-row-gap: 16px;
+        cursor: auto;
     }
 
     .icon {
@@ -109,13 +111,13 @@ export const fusionSwapInfoMainStyle = css`
         grid-column-start: 1;
         grid-column-end: 3;
         flex-direction: column;
-        opacity: 0;
+        visibility: hidden;
         transform: translate3d(0, -15px, 0);
         transition: transform .2s, opacity .2s;
     }
     
     .open .content-container {
-        opacity: 1;
+        visibility: visible;
         transform: translate3d(0, 0, 0);
     }
     
@@ -135,6 +137,8 @@ export const fusionSwapInfoMainStyle = css`
         font-style: normal;
         font-weight: 500;
         line-height: 24px;
+        cursor: pointer;
+        transition: color .2s;
     }
     
     .row-title {
@@ -143,6 +147,20 @@ export const fusionSwapInfoMainStyle = css`
         font-style: normal;
         font-weight: 400;
         line-height: 24px;
+    }
+    
+    .row-content {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        color: var(--primary);
+        text-align: right;
+        font-size: var(--font-size);
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px;
+        transition: opacity .2s, transform .2s;
+        will-change: opacity;
     }
 
     @media (hover: hover) {
@@ -153,11 +171,19 @@ export const fusionSwapInfoMainStyle = css`
         .container:not(.open):hover .rate-loader {
             background-color: var(--color-background-bg-positive-hover);
         }
+        
+        .row-slippage:hover {
+            color: var(--primary-hover);
+        }
     }
     
     ${mobileMediaCSS(css`
         :host {
             --font-size: 13px
+        }
+        
+        .open {
+            grid-row-gap: 0;
         }
     `)}
 `

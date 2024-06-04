@@ -1,25 +1,72 @@
-import { IConnectWalletController } from '@one-inch-community/models';
+import { IConnectWalletController, Rate } from '@one-inch-community/models';
 import { ISwapContextStrategy } from './models/swap-context-strategy.interface';
 import { PairHolder } from './pair-holder';
-import { combineLatest, defer, map, Observable, shareReplay, switchMap } from 'rxjs';
+import {
+  combineLatest,
+  debounceTime,
+  defer,
+  distinctUntilChanged,
+  map,
+  Observable,
+  shareReplay,
+  switchMap
+} from 'rxjs';
 import { buildDefaultTokenRageProvider } from '../tokens';
+import { BigMath } from '../utils';
 
 export class SwapContextOnChainStrategy implements ISwapContextStrategy {
 
-  readonly rate$: Observable<bigint> = defer(() => combineLatest([
+  private readonly sourceTokenSnapshot$ = this.pairHolder.streamSnapshot('source')
+  private readonly destinationTokenSnapshot$ = this.pairHolder.streamSnapshot('destination')
+  private readonly sourceTokenAmount$ = this.sourceTokenSnapshot$.pipe(map(snapshot => snapshot.amountRaw), distinctUntilChanged())
+
+  readonly rate$: Observable<Rate | null> = defer(() => combineLatest([
     this.walletController.data.chainId$,
-    this.pairHolder.streamSnapshot('source'),
-    this.pairHolder.streamSnapshot('destination')
+    this.sourceTokenSnapshot$,
+    this.destinationTokenSnapshot$,
   ])).pipe(
+    debounceTime(0),
     switchMap(([chainId, sourceTokenSnapshot, destinationTokenSnapshot]) => {
       const sourceToken = sourceTokenSnapshot.token
       const destinationToken = destinationTokenSnapshot.token
-      if (!sourceToken || !destinationToken || !chainId) return [0n]
-      return this.rateProvider.listenRate(chainId, destinationToken, sourceToken)
+      if (!sourceToken || !destinationToken || !chainId) return [null]
+      return this.rateProvider.listenOnChainRate(chainId, sourceToken, destinationToken)
     }),
-    map(rate => rate ?? 0n),
     shareReplay({ refCount: true, bufferSize: 1 })
   );
+
+  readonly destinationTokenAmount$ = combineLatest([
+    this.rate$,
+    this.sourceTokenAmount$.pipe(distinctUntilChanged())
+  ]).pipe(
+    map(([rate, sourceTokenAmount]) => {
+      if (!rate || !sourceTokenAmount) return 0n
+      const sourceToken = rate.sourceToken
+      const destinationToken = rate.destinationToken
+      if (rate.isReverted) {
+        return BigMath.div(
+          sourceTokenAmount,
+          rate.revertedRate,
+          sourceToken.decimals,
+          destinationToken.decimals,
+          destinationToken.decimals
+        )
+      }
+      return BigMath.mul(
+        sourceTokenAmount,
+        rate.rate,
+        sourceToken.decimals,
+        sourceToken.decimals,
+        destinationToken.decimals
+      )
+    })
+  )
+
+  readonly autoSlippage$ = combineLatest([
+
+  ]).pipe(
+
+  )
 
   constructor(
     private readonly pairHolder: PairHolder,

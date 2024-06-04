@@ -3,6 +3,29 @@ import { defineConfig } from 'vite';
 
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { createHtmlPlugin } from 'vite-plugin-html';
+import minifyHTML from 'rollup-plugin-minify-html-literals'
+import { defaultShouldMinify } from 'minify-html-literals'
+import basicSsl from '@vitejs/plugin-basic-ssl'
+
+function isCSS(text: string): boolean {
+  return (text.includes(':host') || text.includes(':root') || text.includes('@keyframes') || text.includes('@media') || text.includes('@font-face') || text.includes('var(--'));
+}
+
+function isHTML(text: string): boolean {
+  return (text.includes('<inch') || text.includes('<div') || text.includes('<span') || text.includes('<button') || text.includes('<svg'));
+}
+
+function shouldMinify(template: any) {
+  return (
+    defaultShouldMinify(template) ||
+    template.parts.some((part: { text: string }) => {
+      return (
+        isCSS(part.text) ||
+        isHTML(part.text)
+      );
+    })
+  );
+}
 
 export default defineConfig(({ mode }) => {
   const isProduction  = process.env['DAPP_IS_PRODUCTION'] ? Boolean(process.env['DAPP_IS_PRODUCTION']) : mode === 'production';
@@ -35,6 +58,15 @@ export default defineConfig(({ mode }) => {
 
     plugins: [
       nxViteTsPaths(),
+      basicSsl({
+        certDir: './dev-cert',
+        name: 'one-inch-community-dev',
+        domains: [
+          'localhost',
+          '1inch.local'
+        ]
+      }),
+      isProduction ? (minifyHTML as any).default({ options: { shouldMinify } }) : null,
       createHtmlPlugin({
         inject: {
           data: {
@@ -42,7 +74,7 @@ export default defineConfig(({ mode }) => {
           },
         },
       }),
-    ],
+    ].filter(Boolean),
 
     // Uncomment this if you are using workers.
     // worker: {
@@ -61,8 +93,6 @@ export default defineConfig(({ mode }) => {
         compress: isProduction,
       }
     },
-    esbuild: {
-      legalComments: 'none'
-    },
+    esbuild: { legalComments: 'none' },
   }
 });

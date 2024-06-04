@@ -1,4 +1,4 @@
-import { IConnectWalletController } from '@one-inch-community/models';
+import { IConnectWalletController, Rate } from '@one-inch-community/models';
 import { ISwapContextStrategy } from './models/swap-context-strategy.interface';
 import { PairHolder } from './pair-holder';
 import {
@@ -6,29 +6,42 @@ import {
   debounceTime,
   defer,
   distinctUntilChanged,
-  map, scan,
+  map, Observable,
   shareReplay,
   switchMap,
   withLatestFrom
 } from 'rxjs';
 import { BigMath, OneInchDevPortalAdapter } from '../utils';
 import { SwapContextOnChainStrategy } from './swap-context-onchain.strategy';
+import { TokenController } from '../tokens';
 
 export class SwapContextFusionStrategy implements ISwapContextStrategy {
 
+  private readonly sourceTokenAmount$ = combineLatest([
+    this.walletController.data.chainId$,
+    this.walletController.data.activeAddress$,
+    this.pairHolder.streamSnapshot('source')
+  ]).pipe(
+    switchMap(([chainId, activeAddress, snapshot ]) => {
+      const token = snapshot.token
+      if (!chainId || !activeAddress || !token) return [0n]
+      return TokenController.liveQuery(() => TokenController.getTokenBalance(chainId, token.address, activeAddress).then(record => BigInt(record?.amount ?? '0')))
+    })
+  )
 
   private readonly quoteReceive$ = defer(() => combineLatest([
     this.walletController.data.chainId$,
     this.walletController.data.activeAddress$,
     this.pairHolder.streamSnapshot('source'),
-    this.pairHolder.streamSnapshot('destination')
+    this.pairHolder.streamSnapshot('destination'),
+    this.sourceTokenAmount$
   ])).pipe(
-    debounceTime(0),
-    switchMap(([ chainId, activeAddress, sourceTokenSnapshot, destinationTokenSnapshot ]) => {
+    debounceTime(300),
+    switchMap(([ chainId, activeAddress, sourceTokenSnapshot, destinationTokenSnapshot, sourceTokenBalance ]) => {
       const sourceToken = sourceTokenSnapshot.token
       const destinationToken = destinationTokenSnapshot.token
       const amount = sourceTokenSnapshot.amountRaw
-      if (!chainId || !activeAddress || !sourceToken || !destinationToken || amount === 0n) return [null]
+      if (!amount || !chainId || !activeAddress || !sourceToken || !destinationToken || amount === 0n || sourceTokenBalance === 0n || amount > sourceTokenBalance) return [null]
       return this.devPortalAdapter.getFusionQuoteReceive(
         chainId,
         sourceToken.address,
@@ -37,6 +50,7 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy {
         activeAddress
       )
     }),
+    distinctUntilChanged(),
     shareReplay({ bufferSize: 1, refCount: true })
   )
 
@@ -57,27 +71,53 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy {
     })
   )
 
-  readonly rate$ = combineLatest([
+  readonly rate$: Observable<Rate | null> = combineLatest([
     this.quoteReceive$,
     this.averageDestinationTokenAmount$
   ]).pipe(
     debounceTime(0),
-    withLatestFrom(this.pairHolder.streamSnapshot('source'), this.pairHolder.streamSnapshot('destination')),
-    scan((previousValue: null | bigint, [ [ quoteReceive, averageDestinationTokenAmount ], sourceTokenSnapshot, destinationTokenSnapshot ]) => {
+    withLatestFrom(
+      this.walletController.data.chainId$,
+      this.pairHolder.streamSnapshot('source'),
+      this.pairHolder.streamSnapshot('destination')
+    ),
+    map(([ [ quoteReceive, averageDestinationTokenAmount ], chainId, sourceTokenSnapshot, destinationTokenSnapshot ]) => {
       const sourceToken = sourceTokenSnapshot.token
       const destinationToken = destinationTokenSnapshot.token
-      if (!quoteReceive || !sourceToken || !destinationToken) return null
+      if (!quoteReceive || !sourceToken || !destinationToken || !chainId) return null
       const sourceTokenAmount = BigInt(quoteReceive.fromTokenAmount)
-      return BigMath.dev(
+      const rate = BigMath.div(
         averageDestinationTokenAmount,
         sourceTokenAmount,
         destinationToken.decimals,
         sourceToken.decimals,
       )
-    }, null),
+      const revertedRate = BigMath.div(
+        sourceTokenAmount,
+        averageDestinationTokenAmount,
+        sourceToken.decimals,
+        destinationToken.decimals,
+      )
+      return {
+        chainId,
+        rate,
+        revertedRate,
+        sourceToken,
+        destinationToken,
+        isReverted: false,
+      } as Rate
+    }),
+    distinctUntilChanged(),
     switchMap(rate => {
       if (!rate) return this.fallback.rate$
       return [rate]
+    })
+  )
+
+  readonly destinationTokenAmount$ = this.quoteReceive$.pipe(
+    switchMap(data => {
+      if (!data) return this.fallback.destinationTokenAmount$
+      return [BigInt(data.toTokenAmount)]
     })
   )
 
@@ -87,7 +127,6 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy {
     private readonly devPortalAdapter = new OneInchDevPortalAdapter(),
     private readonly fallback = new SwapContextOnChainStrategy(pairHolder, walletController)
   ) {
-    this.rate$.subscribe()
   }
 
   destroy() {

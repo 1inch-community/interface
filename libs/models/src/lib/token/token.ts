@@ -7,4 +7,5 @@ export interface IToken {
   readonly symbol: string
   readonly decimals: number
   readonly name: string
+  readonly isInternalWrapToken?: true
 }

@@ -1,14 +1,22 @@
 import { html, LitElement } from 'lit';
 import { fusionSwapInfoMainStyle } from './fusion-swap-info-main.style';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { observe } from '@one-inch-community/lit';
+import { observe, dispatchEvent } from '@one-inch-community/lit';
 import { consume } from '@lit/context';
 import { swapContext } from '../../context';
-import { combineLatest, debounceTime, defer, distinctUntilChanged, shareReplay, startWith, switchMap } from 'rxjs';
-import { ISwapContext } from '@one-inch-community/models';
+import {
+  debounceTime,
+  defer, distinctUntilChanged,
+  shareReplay,
+  startWith,
+  switchMap
+} from 'rxjs';
+import { ISwapContext, Rate } from '@one-inch-community/models';
 import { formatUnits, parseUnits } from 'viem';
-import { BigMath, formatSmartNumber, isTokensEqual, TokenController } from '@one-inch-community/sdk';
+import { formatSmartNumber, getSymbolFromWrapToken, isRateEqual, isTokensEqual, TokenController } from '@one-inch-community/sdk';
+import "@one-inch-community/ui-components/button"
+import "@one-inch-community/ui-components/icon"
 
 @customElement(FusionSwapInfoMainElement.tagName)
 export class FusionSwapInfoMainElement extends LitElement {
@@ -16,52 +24,48 @@ export class FusionSwapInfoMainElement extends LitElement {
 
   static override styles = fusionSwapInfoMainStyle
 
-  @state() isOpen = false;
+  @property({ type: Boolean }) isOpen = false;
 
   @consume({ context: swapContext, subscribe: true })
   context?: ISwapContext;
 
   readonly rate$ = defer(() => this.getContext().rate$);
-  readonly chainId$ = defer(() => this.getContext().chainId$);
-  readonly sourceToken$ = defer(() => this.getContext().getTokenByType('source'));
-  readonly destinationToken$ = defer(() => this.getContext().getTokenByType('destination'));
 
-  readonly rateView$ = combineLatest([
-    this.chainId$,
-    this.rate$,
-    this.sourceToken$,
-    this.destinationToken$
-  ]).pipe(
+  readonly rateView$ = this.rate$.pipe(
     debounceTime(0),
-    distinctUntilChanged(([chainId1, rate1, sourceToken1, destinationToken1], [chainId2, rate2, sourceToken2, destinationToken2]) => {
-      return chainId1 === chainId2
-        && rate1 === rate2
-        && (!(sourceToken1 && sourceToken2) || isTokensEqual(sourceToken1, sourceToken2))
-        && (!(destinationToken1 && destinationToken2) || isTokensEqual(destinationToken1, destinationToken2))
-        && sourceToken1 === sourceToken2
-        && destinationToken1 === destinationToken2;
-    }),
-    switchMap(async ([chainId, rate, sourceToken, destinationToken]) => {
-      if (!chainId || !sourceToken || !destinationToken || rate === 0n) return this.getLoadRateView();
-      const rateFormated = formatSmartNumber(formatUnits(rate, sourceToken.decimals), 2);
-
-      const tokenPrice = await TokenController.getTokenUSDPrice(chainId, destinationToken.address);
-      const tokenPriceBn = parseUnits(tokenPrice, destinationToken.decimals);
-      const rateUsd = BigMath.mul(
-        rate,
-        tokenPriceBn,
-        sourceToken.decimals,
-        destinationToken.decimals
-      );
-      const rateUsdFormated = formatSmartNumber(formatUnits(rateUsd, destinationToken.decimals), 2);
+    distinctUntilChanged(rateViewDistinctUntilChangedHandler),
+    switchMap(async (rateData) => {
+      if (rateData === null) return this.getLoadRateView();
+      const { chainId, rate, revertedRate, sourceToken, destinationToken } = rateData
+      const primaryToken = await TokenController.getPriorityToken(chainId, [
+        sourceToken.address,
+        destinationToken.address
+      ])
+      const secondaryToken = isTokensEqual(primaryToken, sourceToken) ? destinationToken : sourceToken
+      const isRevertedRate = isTokensEqual(primaryToken, sourceToken)
+      const targetRate = isRevertedRate ? revertedRate : rate
+      const rateFormated = formatSmartNumber(formatUnits(targetRate, secondaryToken.decimals), 2);
+      const tokenPrice = await TokenController.getTokenUSDPrice(chainId, secondaryToken.address);
+      const rateUsd = parseUnits(tokenPrice, secondaryToken.decimals)
+      const rateUsdFormated = formatSmartNumber(formatUnits(rateUsd, secondaryToken.decimals), 2);
       return html`
-        <span class="rate-view">1 ${sourceToken.symbol} = ${rateFormated} ${destinationToken.symbol}  <span
+        <span class="rate-view">1 ${getSymbolFromWrapToken(secondaryToken)} = ${rateFormated} ${primaryToken.symbol}  <span
           class="dst-token-rate-usd-price">~$${rateUsdFormated}</span></span>
       `;
     }),
     startWith(this.getLoadRateView()),
     shareReplay({ bufferSize: 1, refCount: true })
   );
+
+  override connectedCallback() {
+    super.connectedCallback();
+    dispatchEvent(this, 'changeFusionInfoOpenState', this.isOpen)
+  }
+
+  override disconnectedCallback() {
+    super.disconnectedCallback();
+    dispatchEvent(this, 'changeFusionInfoOpenState', false)
+  }
 
   protected override render() {
     const classes = {
@@ -77,7 +81,10 @@ export class FusionSwapInfoMainElement extends LitElement {
       'fusion-icon-open': this.isOpen
     };
     return html`
-      <div class="${classMap(classes)}" @click="${() => this.isOpen = true}">
+      <div class="${classMap(classes)}" @click="${() => {
+        this.isOpen = true;
+        dispatchEvent(this, 'changeFusionInfoOpenState', this.isOpen)
+      }}">
         <div class="rate-container">
           ${observe(this.rateView$)}
         </div>
@@ -93,8 +100,14 @@ export class FusionSwapInfoMainElement extends LitElement {
         <div class="content-container">
           <div class="content-row">
             <span class="row-title">Slippage tolerance</span>
-            <div class="row-content row-slippage">
+            <div @click="${() => dispatchEvent(this, 'openSlippageSettings', null)}" class="row-content row-slippage">
               0.4% · Auto
+            </div>
+          </div>
+          <div class="content-row">
+            <span class="row-title">Auction time</span>
+            <div @click="${() => dispatchEvent(this, 'openAuctionTimeSettings', null)}" class="row-content row-slippage">
+              180s · Auto
             </div>
           </div>
           <div class="content-row">
@@ -103,7 +116,10 @@ export class FusionSwapInfoMainElement extends LitElement {
           </div>
           <div class="content-row">
             <span class="row-title">Network Fee</span>
-            <div class="row-content"></div>
+            <div class="row-content">
+              <inch-icon icon="fusion16"></inch-icon>
+              <span>Free</span>
+            </div>
           </div>
         </div>
       </div>
@@ -120,6 +136,7 @@ export class FusionSwapInfoMainElement extends LitElement {
     event.preventDefault();
     event.stopPropagation();
     this.isOpen = !this.isOpen;
+    dispatchEvent(this, 'changeFusionInfoOpenState', this.isOpen)
   }
 
   private getContext() {
@@ -127,6 +144,13 @@ export class FusionSwapInfoMainElement extends LitElement {
     return this.context;
   }
 
+}
+
+function rateViewDistinctUntilChangedHandler(rate1: Rate | null, rate2: Rate | null) {
+  if (rate1 === null || rate2 === null) {
+      return false;
+  }
+  return isRateEqual(rate1, rate2);
 }
 
 declare global {

@@ -84,30 +84,46 @@ export class DependenciesFinder {
   }
 
   private async findAllDependencies(filePath: string, options: ts.CompilerOptions, target: string | ((name: string) => boolean)) {
-    const imports = new Set<string>()
-    const moduleFiles = await findFilesByName(path.dirname(filePath), file => file.includes('.ts'))
+    const imports = new Set<string>();
+    const moduleFiles = await findFilesByName(path.dirname(filePath), file => file.includes('.ts'));
 
     const program = ts.createProgram(moduleFiles, options);
-    const sourceFiles = moduleFiles.map(file => program.getSourceFile(file))
+    const sourceFiles = moduleFiles.map(file => program.getSourceFile(file));
 
     for (const sourceFile of sourceFiles) {
       if (!sourceFile || sourceFile.fileName.includes('node_modules')) {
-        continue
+        continue;
       }
       ts.forEachChild(sourceFile, node => {
-        if (ts.isImportDeclaration(node) && node.moduleSpecifier) {
-          const specifier = node.moduleSpecifier;
-          if (ts.isStringLiteral(specifier)) {
-            const moduleName = specifier.text;
-            if (typeof target === 'function' ? target(moduleName) : moduleName.startsWith(target)) {
-              imports.add(moduleName);
-            }
-          }
-        }
-      })
+        this.findImportsInNode(node, imports, target);
+      });
     }
 
-    return imports
+    return imports;
+  }
+
+  private findImportsInNode(node: ts.Node, imports: Set<string>, target: string | ((name: string) => boolean)) {
+    if (ts.isImportDeclaration(node) && node.moduleSpecifier) {
+      const specifier = node.moduleSpecifier;
+      if (ts.isStringLiteral(specifier)) {
+        const moduleName = specifier.text;
+        if (typeof target === 'function' ? target(moduleName) : moduleName.startsWith(target)) {
+          imports.add(moduleName);
+        }
+      }
+    }
+
+    if (ts.isCallExpression(node) && node.expression.kind === ts.SyntaxKind.ImportKeyword) {
+      const [arg] = node.arguments;
+      if (arg && ts.isStringLiteral(arg)) {
+        const moduleName = arg.text;
+        if (typeof target === 'function' ? target(moduleName) : moduleName.startsWith(target)) {
+          imports.add(moduleName);
+        }
+      }
+    }
+
+    ts.forEachChild(node, child => this.findImportsInNode(child, imports, target));
   }
 
 }

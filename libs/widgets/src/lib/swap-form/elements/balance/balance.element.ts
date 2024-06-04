@@ -6,7 +6,7 @@ import { swapContext } from '../../context';
 import { balanceStyles } from './balance.styles';
 import { catchError, combineLatest, defer, filter, map, switchMap } from 'rxjs';
 import { formatUnits } from 'viem';
-import { formatNumber, getBalance } from '@one-inch-community/sdk';
+import { formatNumber, TokenController } from '@one-inch-community/sdk';
 import { observe } from '@one-inch-community/lit';
 
 @customElement(BalanceElement.tagName)
@@ -32,8 +32,11 @@ export class BalanceElement extends LitElement {
     filter(([address]) => !!address),
     switchMap(([ walletAddress, token, chainId ]) => {
       if (!walletAddress || !token || !chainId) return [html`<br>`]
-      return defer(() => getBalance(chainId, walletAddress, token.address)).pipe(
-        map(balance => formatNumber(formatUnits(balance, token.decimals), 6)),
+      return defer(() => TokenController.liveQuery(() => TokenController.getTokenBalance(chainId, token.address, walletAddress))).pipe(
+        filter(Boolean),
+        map(balanceRecord => {
+          return formatNumber(formatUnits(BigInt(balanceRecord.amount), token.decimals), 6)
+        }),
         map(balance => this.getBalanceView(balance)),
         catchError(() => [html`<br>`])
       )

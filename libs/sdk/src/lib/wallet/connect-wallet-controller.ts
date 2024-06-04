@@ -291,8 +291,8 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
 
 function isEqualsProviders(provider1: any, provider2: any): boolean {
   if (provider1 === provider2) return true
-  const keys1 = Object.keys(provider1)
-  const keys2 = Object.keys(provider2)
+  const keys1 = Object.keys(provider1 ?? {})
+  const keys2 = Object.keys(provider2 ?? {})
   if (keys1.length !== keys2.length) return false;
   for (const key of keys1) {
     if (provider1[key] !== provider2[key]) {

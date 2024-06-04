@@ -1,25 +1,17 @@
 import { html, LitElement, PropertyValues } from 'lit';
 import { ContextProvider } from '@lit/context';
 import { customElement, property } from 'lit/decorators.js';
-import { isAddressEqual } from 'viem';
 import '@one-inch-community/ui-components/card'
 import "@one-inch-community/ui-components/icon"
 import "@one-inch-community/ui-components/button"
 import { IConnectWalletController, IToken } from '@one-inch-community/models';
 import { SwapContext } from '@one-inch-community/sdk';
-import { defer, distinctUntilChanged, map } from 'rxjs';
-import { observe } from '@one-inch-community/lit';
+import { combineLatest, defer, distinctUntilChanged, map, startWith, tap } from 'rxjs';
+import { subscribe } from '@one-inch-community/lit';
 import { swapFromStyle } from './swap-from.style';
 import { swapContext } from './context';
 import './elements'
-
-function hasChangedToken(value: IToken, oldValue: IToken): boolean {
-  if (!oldValue) return true
-  return value.symbol !== oldValue.symbol
-    || value.chainId !== oldValue.chainId
-    || !isAddressEqual(value.address, oldValue.address)
-    || value.decimals !== oldValue.decimals
-}
+import { when } from 'lit/directives/when.js';
 
 @customElement(SwapFromElement.tagName)
 export class SwapFromElement extends LitElement {
@@ -27,22 +19,35 @@ export class SwapFromElement extends LitElement {
 
   static override styles = swapFromStyle
 
-  @property({ type: Object, hasChanged: hasChangedToken }) srcToken: IToken | null = null
+  static lastFusionRenderIsEmptyState = true
 
-  @property({ type: Object, hasChanged: hasChangedToken }) dstToken: IToken | null = null
+  @property({ type: Object, attribute: false }) srcToken: IToken | null = null
+
+  @property({ type: Object, attribute: false }) dstToken: IToken | null = null
 
   @property({ type: Object, attribute: false }) walletController?: IConnectWalletController
 
   readonly context = new ContextProvider(this, { context: swapContext })
 
-  private readonly fusionView$ = defer(() => this.getWalletController().data.activeAddress$).pipe(
+  private readonly fusionView$ = combineLatest([
+    defer(() => this.getWalletController().data.activeAddress$),
+    defer(() => this.getContext().getTokenByType('source')),
+    defer(() => this.getContext().getTokenByType('destination'))
+  ]).pipe(
+    map(([address, sourceToken, destinationToken ]) => !address || !sourceToken || !destinationToken),
+    startWith(SwapFromElement.lastFusionRenderIsEmptyState),
     distinctUntilChanged(),
-    map(address => {
-      if (!address) return html``
-
-      return html`<inch-fusion-swap-info></inch-fusion-swap-info>`
+    tap((isEmpty) => {
+      SwapFromElement.lastFusionRenderIsEmptyState = isEmpty
     })
   )
+
+  override connectedCallback() {
+    super.connectedCallback();
+    subscribe(this, [
+      this.fusionView$
+    ])
+  }
 
   override disconnectedCallback() {
     super.disconnectedCallback();
@@ -50,11 +55,11 @@ export class SwapFromElement extends LitElement {
   }
 
   protected override updated(changedProperties: PropertyValues) {
-    const context =   this.getContext()
+    const context = this.getContext()
     if (changedProperties.has('srcToken') || changedProperties.has('dstToken')) {
       context.setPair({
-        srcToken: this.srcToken ?? undefined,
-        dstToken: this.dstToken ?? undefined,
+        srcToken: this.srcToken,
+        dstToken: this.dstToken,
       })
       this.requestUpdate()
     }
@@ -79,11 +84,16 @@ export class SwapFromElement extends LitElement {
           <inch-swap-form-input disabled tokenType="destination"></inch-swap-form-input>
         </div>
         
-        ${observe(this.fusionView$)}
-
+        ${when(!SwapFromElement.lastFusionRenderIsEmptyState, () => html`<inch-fusion-swap-info></inch-fusion-swap-info>`)}
+        
         <inch-swap-button></inch-swap-button>
       </div>
     `
+  }
+
+  private getFusionInfoView(isEmpty: boolean) {
+    if (isEmpty) return html``
+    return html`<inch-fusion-swap-info></inch-fusion-swap-info>`
   }
 
   private getWalletController() {
@@ -97,8 +107,8 @@ export class SwapFromElement extends LitElement {
         this.getWalletController()
       )
       context.setPair({
-        srcToken: this.srcToken ?? undefined,
-        dstToken: this.dstToken ?? undefined,
+        srcToken: this.srcToken,
+        dstToken: this.dstToken,
       })
       this.context.setValue(context);
     }

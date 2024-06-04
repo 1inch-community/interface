@@ -31,5 +31,4 @@ export const scrollbarStyle = css`
             height: 2px;
         }
     `)}
-  
 `

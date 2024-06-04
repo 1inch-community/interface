@@ -1,7 +1,7 @@
-import { AnimationType } from './animation-type';
-import { appendStyle } from '@one-inch-community/lit';
+import { Animation } from './animation';
+import { appendStyle, isSafari } from '@one-inch-community/lit';
 
-export function slideAnimation(): AnimationType {
+export function slideAnimation(): Animation {
   const initStyle = {
     position: 'absolute',
     top: '0',
@@ -9,7 +9,8 @@ export function slideAnimation(): AnimationType {
     bottom: '0',
     right: '0',
     zIndex: '9',
-    backfaceVisibility: 'hidden'
+    backfaceVisibility: 'hidden',
+    height: isSafari() ? '100%' : ''
   }
   const resetStyle = {
     position: '',
@@ -21,15 +22,16 @@ export function slideAnimation(): AnimationType {
     transform: '',
     filter: '',
     backfaceVisibility: '',
-    willChange: ''
+    willChange: '',
+    height: ''
   }
   const animationConfig: KeyframeAnimationOptions = {
-    duration: 600,
+    duration: 800,
     easing: 'cubic-bezier(.2, .8, .2, 1)'
   }
 
   return {
-    beforeAppend: async (upLayer: HTMLElement, downLayer: HTMLElement, isBack: boolean) => {
+    preparation: async (upLayer: HTMLElement, downLayer: HTMLElement, isBack: boolean) => {
       appendStyle(upLayer, {
         ...initStyle,
         zIndex: '9',
@@ -43,12 +45,12 @@ export function slideAnimation(): AnimationType {
         filter: isBack ? 'blur(3px)' : 'blur(0)'
       })
     },
-    afterAppend: async (upLayer: HTMLElement, downLayer: HTMLElement, isBack: boolean) => {
+    transition: async (upLayer: HTMLElement, downLayer: HTMLElement, isBack: boolean) => {
       await Promise.all([
         upLayer.animate([
-          { transform: isBack ? 'translate3d(0, 0, 0)' : 'translate3d(100%, 0, 0)' },
-          { transform: isBack ? 'translate3d(100%, 0, 0)' : 'translate3d(0, 0, 0)' },
-        ], animationConfig).finished,
+          { transform: isBack ? 'translate3d(0, 0, 0)' : 'translate3d(105%, 0, 0)' },
+          { transform: isBack ? 'translate3d(105%, 0, 0)' : 'translate3d(0, 0, 0)' },
+        ], animationConfig),
         downLayer.animate([
           {
             transform: isBack ? 'translate3d(-50%, 0, 0) scale(.9)' : 'translate3d(0, 0, 0) scale(1)',

@@ -17,6 +17,8 @@ export class WalletManageElement extends LitElement {
 
   @property({ type: Object, attribute: false }) controller?: IConnectWalletController
 
+  @property({ type: Boolean }) showShadow?: boolean
+
   private readonly mobileMedia = getMobileMatchMedia()
 
   private readonly context = new ContextProvider(this, { context: controllerContext })
@@ -35,7 +37,7 @@ export class WalletManageElement extends LitElement {
     const headerText = this.controller.isConnected ? 'Wallet management' : 'Connect wallet'
 
     return html`
-      <inch-card forMobileView="${ifDefined(this.mobileMedia.matches ? '' : undefined)}">
+      <inch-card showShadow="${ifDefined(this.showShadow)}" forMobileView="${ifDefined(this.mobileMedia.matches ? '' : undefined)}">
         <inch-card-header closeButton headerText="${headerText}"></inch-card-header>
         <inch-wallet-list></inch-wallet-list>
       </inch-card>

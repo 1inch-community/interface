@@ -1,4 +1,4 @@
-import { IToken, Pair } from '@one-inch-community/models';
+import { IToken, Pair, NullableValue } from '@one-inch-community/models';
 import { TokenContext } from './token-context';
 import { startWith, Subject, switchMap } from 'rxjs';
 
@@ -17,9 +17,9 @@ export class PairHolder {
     this.pairChance$.next()
   }
 
-  setPair(pair: Partial<Pair>): void {
-    pair.srcToken && this.setToken(pair.srcToken, 'source')
-    pair.dstToken && this.setToken(pair.dstToken, 'destination')
+  setPair(pair: NullableValue<Pair>): void {
+    this.setToken(pair.srcToken, 'source')
+    this.setToken(pair.dstToken, 'destination')
     this.pairChance$.next()
   }
 
@@ -38,7 +38,7 @@ export class PairHolder {
     return this.getTokenContext(tokenType).getSnapshot()
   }
 
-  private setToken(token: IToken, tokenType: TokenType) {
+  private setToken(token: IToken | null, tokenType: TokenType) {
     this.getTokenContext(tokenType).setToken(token)
   }
 

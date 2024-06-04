@@ -1,13 +1,3 @@
-import { css } from 'lit';
+import { makeColorSchema } from '../color-utils';
 
-export const violetStyle = css`
-  
-  :root {
-      --primary: #9e77ed;
-      --primary-50: rgb(158 119 237 / 50%);
-      --primary-hover: #7f56d9;
-      --secondary: #9e77ed1f;
-      --secondary-hover: #7f56d93d;
-  }
-
-`
+export const violetStyle = makeColorSchema('#2f8af5')
