@@ -1,6 +1,6 @@
 {
   "name": "one-inch-community",
-  "version": "1.0.0-dev.9",
+  "version": "1.0.0-dev.10",
   "license": "MIT",
   "scripts": {
     "start": "nx run one-inch-community:start",
