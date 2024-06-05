@@ -1,3 +1,10 @@
+# [1.0.0-dev.15](https://github.com/1inch-community/interface/compare/v1.0.0-dev.14...v1.0.0-dev.15) (2024-06-05)
+
+
+### Bug Fixes
+
+* **lit:** fixed memory leak ([f389b29](https://github.com/1inch-community/interface/commit/f389b29c7884b4117aa80e8fb51a5ff81d63bf65))
+
 # [1.0.0-dev.14](https://github.com/1inch-community/interface/compare/v1.0.0-dev.13...v1.0.0-dev.14) (2024-06-04)
 
 
