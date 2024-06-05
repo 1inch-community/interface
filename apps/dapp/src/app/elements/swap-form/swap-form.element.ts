@@ -57,8 +57,8 @@ export class SwapFormElement extends LitElement {
   private readonly unicornLoaderRef  = createRef<HTMLElement>()
 
   private readonly desktopScene = new SceneController('swapForm', {
-    swapForm: { minWidth: 556, maxHeight: 621, lazyRender: true },
-    selectToken: { minWidth: 556, maxHeight: 680 }
+    swapForm: { minWidth: 556, maxWidth: 556, maxHeight: 621, lazyRender: true },
+    selectToken: { minWidth: 556, maxWidth: 556, maxHeight: 680 }
   })
 
   private readonly selectTokenMobileOverlay = new OverlayMobileController('app-root')
@@ -123,7 +123,7 @@ export class SwapFormElement extends LitElement {
     return html`
       <inch-icon ${ref(this.unicornLoaderRef)} class="unicorn-loader" icon="unicornRun"></inch-icon>
       <div ${ref(this.swapFormContainerRef)} class="${classMap(classes)}">
-        <inch-card>
+        <inch-card style="max-width: 100vw">
           <inch-swap-form
             .srcToken="${this.srcToken}"
             .dstToken="${this.dstToken}"
