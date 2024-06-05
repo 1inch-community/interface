@@ -27,6 +27,8 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
             z-index: 9;
             overflow: hidden;
             box-sizing: border-box;
+            padding-left: 1px;
+            padding-right: 1px;
             background-color: var(--color-background-bg-primary);
         }
         
@@ -37,8 +39,7 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
                 backdrop-filter: blur(20px);
                 border-top-left-radius: 24px;
                 border-top-right-radius: 24px;
-                padding-left: 8px;
-                padding-right: 8px;
+                padding: 0 8px 0 8px;
                 transition: background-color .2s;
             }
             

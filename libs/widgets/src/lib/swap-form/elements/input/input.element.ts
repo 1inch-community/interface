@@ -96,12 +96,12 @@ export class InputElement extends LitElement {
     this.input.disabled = this.tokenType === 'destination'
     return html`
       <div class="input-container ${classMap(classes)}">
-        <div class="flex-container">
+        <div class="flex-container symbol-title-name">
           <div class="input-title">${this.getInputTitle()}</div>
           ${observe(this.tokenView$)}
         </div>
         
-        <div class="flex-container">
+        <div class="flex-container balance-amount-fiat">
           <inch-swap-balance tokenType="${ifDefined(this.tokenType)}"></inch-swap-balance>
           ${this.input}
           <inch-fiat-balance tokenType="${ifDefined(this.tokenType)}"></inch-fiat-balance>
@@ -130,7 +130,7 @@ export class InputElement extends LitElement {
         <span class="symbol">${symbol}</span>
         <inch-icon icon="chevronDown16"></inch-icon>
       </button>
-      <div class="token-name">${name}</div>
+      <span class="token-name">${name}</span>
     `
   }
 

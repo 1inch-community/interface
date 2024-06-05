@@ -11,7 +11,7 @@ export const inputStyle = css`
         padding: 16px;
         box-sizing: border-box;
         display: grid;
-        grid-template-columns: 1fr 2fr;
+        grid-template-columns: minmax(40%, 50%) minmax(50%, 60%);
         justify-content: space-between;
     }
 
@@ -34,6 +34,7 @@ export const inputStyle = css`
         letter-spacing: 0;
         text-align: left;
         color: var(--color-content-content-secondary);
+        width: fit-content;
     }
 
     .symbol-container {
@@ -45,13 +46,13 @@ export const inputStyle = css`
         cursor: pointer;
         color: var(--color-content-content-primary);
         border-radius: 16px;
-        width: fit-content;
         padding: 8px;
         margin-left: -8px;
         transition: background-color .2s;
         outline: none;
         user-select: none;
         -webkit-tap-highlight-color: transparent;
+        width: 100%;
     }
     
     .symbol {
@@ -60,6 +61,9 @@ export const inputStyle = css`
         line-height: 32px;
         letter-spacing: 0;
         text-align: left;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
     }
     
     .token-name {
@@ -69,6 +73,10 @@ export const inputStyle = css`
         letter-spacing: 0;
         text-align: left;
         color: var(--color-content-content-secondary);
+        font-style: normal;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
     }
     
     .amount-input {
@@ -117,7 +125,7 @@ export const inputStyle = css`
             font-size: 20px;
         }
         .input-title, .token-name {
-            font-size: 14px;
+            font-size: 13px;
         }
         .input-container {
             height: 116px;
