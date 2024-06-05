@@ -130,6 +130,7 @@ export class SwapFormElement extends LitElement {
             .walletController="${connectWalletController}"
             @changeFusionInfoOpenState="${(event: CustomEvent) => this.onChangeFusionInfoOpenState(event)}"
             @openTokenSelector="${(event: CustomEvent) => this.onOpenMobileSelectToken(event)}"
+            @changeChain="${() => this.onOpenChangeChainView()}"
             @connectWallet="${() => this.onOpenConnectWalletView()}"
           ></inch-swap-form>
         </inch-card>
@@ -154,6 +155,7 @@ export class SwapFormElement extends LitElement {
                 .dstToken="${sceneLazyValue(this, () => this.dstToken)}"
                 .walletController="${connectWalletController}"
                 @switchPair="${() => this.onSwitchPair()}"
+                @changeChain="${() => this.onOpenChangeChainView()}"
                 @openTokenSelector="${(event: CustomEvent) => this.onOpenSelectToken(event)}"
                 @connectWallet="${() => this.onOpenConnectWalletView()}"
               ></inch-swap-form>
@@ -230,6 +232,16 @@ export class SwapFormElement extends LitElement {
         @closeCard="${() => this.connectWalletOverlay.close(id)}"
         .controller="${connectWalletController}"
       ></inch-wallet-manage>
+    `)
+  }
+
+  private async onOpenChangeChainView() {
+    const id = await this.connectWalletOverlay.open(html`
+      <inch-chain-selector-list
+        showShadow
+        @closeCard="${() => this.connectWalletOverlay.close(id)}"
+        .controller="${connectWalletController}"
+      ></inch-chain-selector-list>
     `)
   }
 

@@ -1,19 +1,15 @@
-import { html, LitElement } from 'lit';
+import { html, LitElement, PropertyValues } from 'lit';
 import { chainSelectorListStyle } from './chain-selector-list.style';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import '@one-inch-community/ui-components/card';
 import { ChainId, IConnectWalletController } from '@one-inch-community/models';
-import { getMobileMatchMediaAndSubscribe } from '@one-inch-community/lit';
+import { getMobileMatchMediaAndSubscribe, subscribe } from '@one-inch-community/lit';
 import { scrollbarStyle } from '@one-inch-community/ui-components/theme';
 import '@one-inch-community/ui-components/scroll';
 import '../chain-selector-list-item';
-
-type ChainViewInfo = {
-  name: string
-  iconName: string
-  chainId: ChainId
-}
+import { tap } from 'rxjs';
+import { chainList } from '../../chain-view-config';
 
 @customElement(ChainSelectorListElement.tagName)
 export class ChainSelectorListElement extends LitElement {
@@ -24,22 +20,25 @@ export class ChainSelectorListElement extends LitElement {
     scrollbarStyle
   ]
 
-  @property({ type: Array }) infoList?: ChainViewInfo[]
-
-  @property({ type: Number }) activeChainId?: ChainId
-
   @property({ type: Object, attribute: false }) controller?: IConnectWalletController;
+
+  @state() activeChainId?: ChainId
 
   private readonly mobileMedia = getMobileMatchMediaAndSubscribe(this);
 
+  protected override firstUpdated() {
+    if (!this.controller) throw new Error('')
+    subscribe(this, [
+      this.controller.data.chainId$.pipe(tap(chainId => this.activeChainId = chainId ?? undefined))
+    ], { requestUpdate: false })
+  }
+
   protected override render() {
-    if (!this.infoList) return
     return this.mobileMedia.matches ? this.getMobileList() : this.getDesktopList()
   }
 
   private getList() {
-    if (!this.infoList) return
-    return this.infoList.map(info => html`
+    return chainList.map(info => html`
       <inch-chain-selector-list-item
         .info="${info}"
         .controller="${this.controller}"

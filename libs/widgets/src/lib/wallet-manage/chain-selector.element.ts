@@ -1,6 +1,6 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { ChainId, IConnectWalletController } from '@one-inch-community/models';
+import { IConnectWalletController } from '@one-inch-community/models';
 import '@one-inch-community/ui-components/button';
 import '@one-inch-community/ui-components/icon';
 import { observe, getMobileMatchMediaAndSubscribe } from '@one-inch-community/lit';
@@ -8,44 +8,9 @@ import { chainSelectorStyle } from './chain-selector.style';
 import { defer, filter, map } from 'rxjs';
 import { when } from 'lit/directives/when.js';
 import { OverlayController } from '@one-inch-community/ui-components/overlay';
-import { isL2Chain, isSupportFusion } from '@one-inch-community/sdk';
+import { chainViewConfig } from './chain-view-config';
+import './elements/chain-selector-list'
 
-type ChainViewInfo = {
-  name: string
-  iconName: string
-  priority?: number
-}
-
-type ChainViewFull = {
-  chainId: ChainId
-} & ChainViewInfo
-
-const chainViewConfig: Record<ChainId, ChainViewInfo> = {
-  [ChainId.eth]: { name: 'Ethereum', iconName: 'eth24' },
-  [ChainId.arbitrum]: { name: 'Arbitrum', iconName: 'arbitrum24' },
-  [ChainId.op]: { name: 'Optimism', iconName: 'op24' },
-  [ChainId.zkSyncEra]: { name: 'zkSync Era', iconName: 'zkSyncEra24' },
-  [ChainId.bnb]: { name: 'BNB Smart Chain', iconName: 'bnb24', priority: 1 },
-  [ChainId.matic]: { name: 'Polygon', iconName: 'matic24', priority: 1 },
-  [ChainId.gnosis]: { name: 'Gnosis', iconName: 'gnosis24' },
-  [ChainId.avalanche]: { name: 'Avalanche', iconName: 'avalanche24' },
-  [ChainId.fantom]: { name: 'Fantom', iconName: 'fantom24' },
-  [ChainId.aurora]: { name: 'Aurora', iconName: 'aurora24' },
-  [ChainId.klaytn]: { name: 'Klaytn', iconName: 'klaytn24' }
-};
-
-const chainList: ChainViewFull[] = Object.keys(chainViewConfig)
-  .filter(chainId => isSupportFusion(+chainId))
-  .map((chainId) => ({ ...(chainViewConfig as any)[chainId], chainId: Number(chainId) }))
-  .sort((info1: ChainViewFull, info2: ChainViewFull) => {
-    if (info1.chainId == ChainId.eth) return -1;
-    if (info2.chainId == ChainId.eth) return 1;
-    if (isL2Chain(info1.chainId)) return -1;
-    if (isL2Chain(info2.chainId)) return 1;
-
-
-    return (info2.priority ?? 0) - (info1.priority ?? 0);
-  });
 
 @customElement(ChainSelectorElement.tagName)
 export class ChainSelectorElement extends LitElement {
@@ -79,11 +44,6 @@ export class ChainSelectorElement extends LitElement {
     })
   );
 
-  override connectedCallback() {
-    super.connectedCallback();
-    import('./elements/chain-selector-list')
-  }
-
   protected override render() {
     return html`
       <inch-button @click="${() => this.onClick()}" size="l" type="primary-gray">
@@ -101,9 +61,7 @@ export class ChainSelectorElement extends LitElement {
     }
     this.overlayId = await this.overlay.open(html`
       <inch-chain-selector-list
-        .infoList="${chainList}"
         .controller="${this.controller}"
-        activeChainId="${observe(this.chainId$)}"
         @closeCard="${() => this.closeOverlay()}"
       ></inch-chain-selector-list>
     `);
