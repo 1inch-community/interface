@@ -56,7 +56,7 @@ export class OverlayMobileController implements IOverlayController {
   private createOverlayContainer(openTarget: TemplateResult | HTMLElement) {
     const overlayContainer = document.createElement(ScrollViewProviderElement.tagName)
     const overlayIndex = this.activeOverlayMap.size + 1
-    const offsetStep = 3
+    const offsetStep = 2
     overlayContainer.maxHeight = (100 - (overlayIndex * offsetStep)) * window.innerHeight / 100
     overlayContainer.setAttribute('overlay-index', overlayIndex.toString())
     appendStyle(overlayContainer, {
@@ -67,6 +67,10 @@ export class OverlayMobileController implements IOverlayController {
       alignItems: 'flex-end',
       bottom: '0',
       left: '0',
+      boxSizing: 'border-box',
+      boxShadow: '0 -3px 4px 0 var(--primary-12), 0 6px 12px 0 var(--primary-12)',
+      borderTopLeftRadius: '24px',
+      borderTopRightRadius: '24px',
     })
     render(html`${openTarget}`, overlayContainer)
     this.container.appendChild(overlayContainer)
