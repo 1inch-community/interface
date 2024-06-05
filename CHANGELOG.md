@@ -1,3 +1,20 @@
+# [1.0.0-dev.16](https://github.com/1inch-community/interface/compare/v1.0.0-dev.15...v1.0.0-dev.16) (2024-06-05)
+
+
+### Bug Fixes
+
+* **dapp:** fixed swap form size in desktop version ([c7506d3](https://github.com/1inch-community/interface/commit/c7506d3790c54ab121d9095626d38b4e9a1399eb))
+* **ui-components/overlay:** fixed mobile overlay view ([4bafe24](https://github.com/1inch-community/interface/commit/4bafe2455f16c9dcc60ec83ecf355b9afe6b67c4))
+* **ui-components/scroll:** fixed virtual scroll view ([60bb84c](https://github.com/1inch-community/interface/commit/60bb84cc77da40e992dad3b4e90b9ca0c0d89e86))
+* **widgets/swap-form:** fixed font size and view in mobile version ([20391ac](https://github.com/1inch-community/interface/commit/20391ac01666ef2bf552dd50c11c7162eefe20ca))
+
+# [1.0.0-dev.15](https://github.com/1inch-community/interface/compare/v1.0.0-dev.14...v1.0.0-dev.15) (2024-06-05)
+
+
+### Bug Fixes
+
+* **lit:** fixed memory leak ([f389b29](https://github.com/1inch-community/interface/commit/f389b29c7884b4117aa80e8fb51a5ff81d63bf65))
+
 # [1.0.0-dev.14](https://github.com/1inch-community/interface/compare/v1.0.0-dev.13...v1.0.0-dev.14) (2024-06-04)
 
 

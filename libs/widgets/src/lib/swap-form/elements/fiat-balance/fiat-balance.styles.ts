@@ -10,11 +10,14 @@ export const fiatBalanceStyles = css`
         letter-spacing: 0;
         text-align: right;
         color: var(--color-content-content-secondary);
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
     }
 
     ${mobileMediaCSS(css`
         :host {
-            font-size: 14px;
+            font-size: 13px;
         }
     `)}
 

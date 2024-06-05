@@ -14,7 +14,7 @@ export const balanceStyles = css`
 
     ${mobileMediaCSS(css`
         :host {
-            font-size: 14px;
+            font-size: 13px;
         }
     `)}
 `
