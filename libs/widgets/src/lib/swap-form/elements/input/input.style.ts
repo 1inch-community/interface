@@ -11,7 +11,7 @@ export const inputStyle = css`
         padding: 16px;
         box-sizing: border-box;
         display: grid;
-        grid-template-columns: minmax(40%, 50%) minmax(50%, 60%);
+        grid-template-columns: minmax(40%, auto) minmax(auto, 70%);
         justify-content: space-between;
     }
 
@@ -52,7 +52,6 @@ export const inputStyle = css`
         outline: none;
         user-select: none;
         -webkit-tap-highlight-color: transparent;
-        width: 100%;
     }
     
     .symbol {
@@ -106,6 +105,10 @@ export const inputStyle = css`
     .amount-input:disabled {
         opacity: 1;
         color: var(--color-content-content-primary);
+    }
+    
+    .balance-amount-fiat {
+        align-items: flex-end;
     }
     
     @media (hover: hover) {

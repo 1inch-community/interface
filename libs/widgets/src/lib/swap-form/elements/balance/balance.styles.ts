@@ -9,6 +9,7 @@ export const balanceStyles = css`
         line-height: 24px;
         letter-spacing: 0;
         text-align: right;
+        width: fit-content;
         color: var(--color-content-content-secondary);
     }
 

@@ -258,6 +258,14 @@ export class SwapButton extends LitElement {
       `;
     }
 
+    if (rate === null) {
+      return html`
+        <inch-button type="secondary" size="${size}" fullSize disabled>
+          No liquidity for swap
+        </inch-button>
+      `;
+    }
+
     return html`
       <inch-button @click="${() => this.onSwap()}" type="primary" size="${size}" fullSize>
         Swap
