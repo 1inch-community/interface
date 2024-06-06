@@ -62,9 +62,16 @@ export const tokenListItemStyle = css`
     
     .usd-balance-and-favorite-start {
         display: flex;
-        gap: 8px;
         align-items: center;
         margin-left: auto;
+    }
+    
+    .is-favorite-start {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
     
     @media (hover: hover) {

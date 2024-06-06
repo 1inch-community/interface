@@ -51,6 +51,7 @@ export const inputStyle = css`
         transition: background-color .2s;
         outline: none;
         user-select: none;
+        width: fit-content;
         -webkit-tap-highlight-color: transparent;
     }
     
