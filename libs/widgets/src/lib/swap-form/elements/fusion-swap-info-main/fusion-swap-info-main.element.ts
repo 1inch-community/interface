@@ -82,6 +82,7 @@ export class FusionSwapInfoMainElement extends LitElement {
     };
     return html`
       <div class="${classMap(classes)}" @click="${() => {
+        if (this.isOpen) return
         this.isOpen = true;
         dispatchEvent(this, 'changeFusionInfoOpenState', this.isOpen)
       }}">

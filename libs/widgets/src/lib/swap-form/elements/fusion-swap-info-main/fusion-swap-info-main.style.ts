@@ -22,7 +22,7 @@ export const fusionSwapInfoMainStyle = css`
     }
 
     .open {
-        height: 236px;
+        height: 180px;
         grid-template-rows: min-content 1fr;
         grid-row-gap: 16px;
         cursor: auto;
@@ -184,6 +184,10 @@ export const fusionSwapInfoMainStyle = css`
         
         .open {
             grid-row-gap: 0;
+        }
+
+        .content-row {
+            height: 30px;
         }
     `)}
 `

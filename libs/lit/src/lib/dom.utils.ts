@@ -29,7 +29,7 @@ export function dispatchEvent<V>(ctx: HTMLElement, type: string, value: V, event
   ctx.dispatchEvent(buildEvent(type, value, event))
 }
 
-export function setThemeColor(color: string) {
+export function setBrowserMetaColorColor(color: string) {
   const themeMetaElement = document.head.querySelector('#theme-color') as HTMLMetaElement
   if (!themeMetaElement) {
     createAndAppendInHeaderElement('meta', (meta) => {

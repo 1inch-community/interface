@@ -1,14 +1,14 @@
 import { brandColorMap, mainColorMap } from './themes';
 import { mainColorStyleElement, brandColorStyleElement } from './theme-elements';
 import { MainColors, BrandColors } from './themes/themes';
-import { applyStyle, setThemeColor } from '@one-inch-community/lit';
+import { applyStyle, setBrowserMetaColorColor } from '@one-inch-community/lit';
 import { Observable, ReplaySubject } from 'rxjs';
 
 let currentMainColor: MainColors
 let currentBrandColor: BrandColors
 
-const themeColors: Record<MainColors, (() => string)> = {
-  [MainColors.systemSync]: () => getThemeColorsSystem(),
+const browserMetaColors: Record<MainColors, (() => string)> = {
+  [MainColors.systemSync]: () => getBrowserMetaColor(),
   [MainColors.light]: () => '#f1f1f1',
   [MainColors.lightBlue]: () => '#f1f1f1',
   [MainColors.dark]: () => '#0e0e0e',
@@ -19,11 +19,11 @@ const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
 const changeAppTheme$ = new ReplaySubject<{mainColor: MainColors, brandColor: BrandColors}>(1)
 
-function getThemeColorsSystem() {
+export function getBrowserMetaColor() {
   if (mediaQuery.matches) {
-    return themeColors[MainColors.dark]();
+    return browserMetaColors[MainColors.dark]();
   }
-  return themeColors[MainColors.light]();
+  return browserMetaColors[MainColors.light]();
 }
 
 export async function themeChangeMainColor(mainColorName: MainColors, event?: MouseEvent) {
@@ -58,7 +58,7 @@ export async function themeChange(
     const brandColor = await brandColorMap[brandColorName]()
     applyStyle(mainColorStyleElement, mainColor)
     applyStyle(brandColorStyleElement, brandColor)
-    setThemeColor(themeColors[mainColorName]())
+    setBrowserMetaColorColor(browserMetaColors[mainColorName]())
     currentMainColor = mainColorName
     currentBrandColor = brandColorName
     document.documentElement.setAttribute('theme', isDarkTheme(mainColorName) ? 'dark' : 'light')

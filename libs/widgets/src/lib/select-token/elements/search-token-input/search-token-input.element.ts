@@ -54,12 +54,6 @@ export class SearchTokenInputElement extends LitElement {
   }
 
   protected override async firstUpdated() {
-    const input = this.renderRoot.querySelector('#search') as HTMLInputElement
-    if (!input) return
-    if (this.sceneContext && this.sceneContext.animationInProgress) {
-      await this.sceneContext.animationInEnd
-    }
-    requestAnimationFrame(() => input.focus())
     subscribe(this, [
       this.context?.searchInProgress$.pipe(tap(state => this.searchInProgress = state)) ?? of()
     ], { requestUpdate: false })

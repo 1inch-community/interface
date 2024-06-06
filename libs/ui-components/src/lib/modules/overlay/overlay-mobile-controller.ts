@@ -1,11 +1,13 @@
 import { IOverlayController } from './overlay-controller.interface';
 import { html, render, TemplateResult } from 'lit';
 import { getContainer } from './overlay-container';
-import { appendStyle, resizeObserver } from '@one-inch-community/lit';
+import { appendStyle, getMobileMatchMediaEmitter, resizeObserver, setBrowserMetaColorColor } from '@one-inch-community/lit';
 import { asyncFrame } from '@one-inch-community/ui-components/async';
 import { getOverlayId } from './overlay-id-generator';
 import { fromEvent, Subscription, tap, merge, filter, map, distinctUntilChanged, switchMap, skip } from 'rxjs';
 import { ScrollViewProviderElement } from '@one-inch-community/ui-components/scroll';
+import { getBrowserMetaColor } from '../theme/theme-change';
+import { applyColorBrightness } from '../theme/themes/color-utils';
 
 export class OverlayMobileController implements IOverlayController {
 
@@ -87,7 +89,7 @@ export class OverlayMobileController implements IOverlayController {
   private subscribeOnEvents(overlayId: number) {
     const overlayContainer = this.activeOverlayMap.get(overlayId)!
     const subscription = merge(
-      fromEvent(window, 'resize').pipe(
+      getMobileMatchMediaEmitter().pipe(
         tap(() => this.updatePosition(overlayId))
       ),
       resizeObserver(overlayContainer).pipe(
@@ -131,7 +133,7 @@ export class OverlayMobileController implements IOverlayController {
   private calculateIsHalfView(element: ScrollViewProviderElement): boolean {
     const height = element.clientHeight
     const maxHeight = element.maxHeight ?? 0
-    return (height * 100 / maxHeight) < 100
+    return (height * 100 / maxHeight) < 90
   }
 
   private getDefaultAnimationOptions() {
@@ -159,6 +161,7 @@ export class OverlayMobileController implements IOverlayController {
       borderRadius: halfView ? '' : !isBack ? this.borderRadius : '0',
       backgroundColor: halfView ? '' : !isBack ? this.backgroundColor : this.backgroundColorDefault
     })
+    this.changeBrowserMetaColor(halfView, isBack)
     return await Promise.all([
       overlayContainer.animate([
         transitionOverlayContainerStart(),
@@ -187,9 +190,10 @@ export class OverlayMobileController implements IOverlayController {
       borderRadius: !isBack ? this.borderRadius : '0',
       backgroundColor: !isBack ? this.backgroundColor : this.backgroundColorDefault
     })
+    this.changeBrowserMetaColor(isBack, false)
     await rootNode.animate([
       transitionRootNodeStart(),
-      transitionRootNodeEnd()
+      transitionRootNodeEnd(),
     ],this.getDefaultAnimationOptions()).finished
     appendStyle(rootNode, transitionRootNodeEnd())
   }
@@ -242,6 +246,14 @@ export class OverlayMobileController implements IOverlayController {
       borderRadius: halfView ? '' : this.borderRadius,
       backgroundColor: halfView ? '' : this.backgroundColor
     })
+  }
+
+  private changeBrowserMetaColor(halfView: boolean, isBack: boolean) {
+    let color = getBrowserMetaColor()
+    if (halfView && !isBack) {
+      color = applyColorBrightness(color, parseFloat(this.brightnessHalfView))
+    }
+    setBrowserMetaColorColor(color)
   }
 
 }

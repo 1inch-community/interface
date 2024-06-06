@@ -40,12 +40,10 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
                 background-color: transparent;
                 -webkit-backdrop-filter: blur(20px);
                 backdrop-filter: blur(20px);
-                border-top-left-radius: 24px;
-                border-top-right-radius: 24px;
-                padding: 0 8px 0 8px;
+                padding: 8px 8px 0 8px;
                 top: -8px;
                 left: -8px;
-                width: calc(100% + 16px);
+                width: 100vw;
                 transition: background-color .2s;
             }
 

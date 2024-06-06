@@ -139,6 +139,16 @@ export function getColorFromString(str: string): string {
   return rgbToHex(r, g, b);
 }
 
+export function applyColorBrightness(hex: string, brightness: number) {
+  let [r, g, b] = hexToRgb(hex);
+
+  r = Math.min(255, Math.max(0, r * brightness));
+  g = Math.min(255, Math.max(0, g * brightness));
+  b = Math.min(255, Math.max(0, b * brightness));
+
+  return rgbToHex(Math.round(r), Math.round(g), Math.round(b));
+}
+
 export function makeColorSchema(primaryColor: string) {
   return css`
       :root {
