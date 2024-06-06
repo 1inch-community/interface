@@ -7,7 +7,7 @@ import { consume } from '@lit/context';
 import { ScrollContext, scrollContext } from './scroll-context';
 import '@lit-labs/virtualizer'
 import type { LitVirtualizer } from '@lit-labs/virtualizer'
-import { appendStyle, mobileMediaCSS, resizeObserver, subscribe } from '@one-inch-community/lit';
+import { appendStyle, getMobileMatchMediaAndSubscribe, getMobileMatchMediaEmitter, mobileMediaCSS, resizeObserver, subscribe } from '@one-inch-community/lit';
 import { tap, merge, of, fromEvent } from 'rxjs';
 import { mainViewportContext } from './main-viewport-context';
 
@@ -18,6 +18,11 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
   static override styles = [
     scrollbarStyle,
     css`
+
+        :host {
+            position: relative;
+        }
+
         .scroll-header {
             position: absolute;
             top: 0;
@@ -27,11 +32,9 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
             z-index: 9;
             overflow: hidden;
             box-sizing: border-box;
-            padding-left: 1px;
-            padding-right: 1px;
             background-color: var(--color-background-bg-primary);
         }
-        
+
         ${mobileMediaCSS(css`
             .scroll-header {
                 background-color: transparent;
@@ -40,9 +43,12 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
                 border-top-left-radius: 24px;
                 border-top-right-radius: 24px;
                 padding: 0 8px 0 8px;
+                top: -8px;
+                left: -8px;
+                width: calc(100% + 16px);
                 transition: background-color .2s;
             }
-            
+
             .scroll-header-background-color-blur {
                 background-color: var(--primary-12);
             }
@@ -69,6 +75,8 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
 
   private readonly headerStub = document.createElement('div')
 
+  private readonly mobileMedia = getMobileMatchMediaAndSubscribe(this)
+
   get virtualizer() {
     if (!this.virtualizerRef.value) throw new Error('')
     return this.virtualizerRef.value
@@ -80,6 +88,7 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
     this.updateHeaderSize()
     subscribe(this, [
       merge(
+        getMobileMatchMediaEmitter(),
         resizeObserver(this.context),
         resizeObserver(this.virtualizer),
         this.mainViewportContext ? resizeObserver(this.mainViewportContext) : of()
@@ -119,11 +128,31 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
   }
 
   private updateView() {
+    if (this.mobileMedia.matches) {
+      this.updateViewMobile()
+    } else {
+      this.updateViewDesktop()
+    }
+    if (this.virtualizerRef.value && this.header) {
+      appendStyle(this.virtualizerRef.value, {
+        width: 'calc(100% + 10px)',
+        marginRight: '10px'
+      })
+    }
+  }
+
+  private updateViewMobile() {
     if (!this.context || !this.virtualizerRef.value) return
     const contextRect = this.getViewPortBoundingClientRect()
     const virtualizerRect = this.virtualizer.getBoundingClientRect()
     this.globalOffsetY = virtualizerRect.top - contextRect.top + 8 * 2
     this.virtualizer.style.minHeight = `${(this.context.maxHeight ?? 0) - this.globalOffsetY}px`
+  }
+
+  private updateViewDesktop() {
+    if (!this.context || !this.virtualizerRef.value || !this.headerRef.value) return
+    const contextRect = this.getViewPortBoundingClientRect()
+    this.virtualizer.style.minHeight = `${(contextRect.height)}px`
   }
 
   private getViewPortBoundingClientRect() {
