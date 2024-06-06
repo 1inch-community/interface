@@ -1,3 +1,15 @@
+# [1.0.0-dev.19](https://github.com/1inch-community/interface/compare/v1.0.0-dev.18...v1.0.0-dev.19) (2024-06-06)
+
+
+### Bug Fixes
+
+* **ui-components/scroll:** fix calculation viewport size in desktop view ([e5b17a2](https://github.com/1inch-community/interface/commit/e5b17a2cc569ad965af092b29084a1906960b408))
+
+
+### Features
+
+* **widgets/select-token:** added token searching ([9317a8b](https://github.com/1inch-community/interface/commit/9317a8b5aecbdd1a4d5f4411b6a2af00cf12f207))
+
 # [1.0.0-dev.18](https://github.com/1inch-community/interface/compare/v1.0.0-dev.17...v1.0.0-dev.18) (2024-06-06)
 
 
