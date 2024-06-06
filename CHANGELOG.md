@@ -1,3 +1,15 @@
+# [1.0.0-dev.18](https://github.com/1inch-community/interface/compare/v1.0.0-dev.17...v1.0.0-dev.18) (2024-06-06)
+
+
+### Bug Fixes
+
+* **widgets:** fix swap-form and select-token styles ([2e1b1bc](https://github.com/1inch-community/interface/commit/2e1b1bcaa81dd818019c3c10097b8196f4165366))
+
+
+### Features
+
+* **ui-components/overlay:** change overlay style ([f6e3c1f](https://github.com/1inch-community/interface/commit/f6e3c1f4a15e1d356378398f27a62c73c720eb23))
+
 # [1.0.0-dev.17](https://github.com/1inch-community/interface/compare/v1.0.0-dev.16...v1.0.0-dev.17) (2024-06-06)
 
 
