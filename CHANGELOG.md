@@ -1,3 +1,10 @@
+# [1.0.0-dev.22](https://github.com/1inch-community/interface/compare/v1.0.0-dev.21...v1.0.0-dev.22) (2024-06-06)
+
+
+### Bug Fixes
+
+* **ui-component/overlay:** fixed swipe closing ([ea7a2c0](https://github.com/1inch-community/interface/commit/ea7a2c0eb81f57cf62f3959b2f16bd1199e76587))
+
 # [1.0.0-dev.21](https://github.com/1inch-community/interface/compare/v1.0.0-dev.20...v1.0.0-dev.21) (2024-06-06)
 
 
