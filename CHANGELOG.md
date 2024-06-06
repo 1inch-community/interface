@@ -1,3 +1,10 @@
+# [1.0.0-dev.20](https://github.com/1inch-community/interface/compare/v1.0.0-dev.19...v1.0.0-dev.20) (2024-06-06)
+
+
+### Bug Fixes
+
+* various small view fixes ([e9e6c6d](https://github.com/1inch-community/interface/commit/e9e6c6d5de03e0b51031f1f3f0352d8118e1dce8))
+
 # [1.0.0-dev.19](https://github.com/1inch-community/interface/compare/v1.0.0-dev.18...v1.0.0-dev.19) (2024-06-06)
 
 
