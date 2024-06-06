@@ -14,7 +14,7 @@ import {
   distinctUntilChanged,
   switchMap,
   skip,
-  takeUntil, async
+  takeUntil
 } from 'rxjs';
 import { ScrollViewProviderElement } from '@one-inch-community/ui-components/scroll';
 import { getBrowserMetaColor } from '../theme/theme-change';
@@ -129,6 +129,7 @@ export class OverlayMobileController implements IOverlayController {
       ),
       //
       fromEvent<TouchEvent>(this.container, 'touchstart').pipe(
+        filter(() => (overlayContainer.scrollTopFromConsumer ?? 0) === 0),
         switchMap(startEvent => {
           const startPoint = startEvent.touches[0].clientY
           let currentDelta = 0

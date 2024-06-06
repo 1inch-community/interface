@@ -9,9 +9,15 @@ import { appendStyle } from '@one-inch-community/lit';
 export class ScrollViewProviderElement extends LitElement implements ScrollContext {
   static tagName = 'inch-scroll-view-provider' as const;
 
+  scrollTopFromConsumer?: number;
+
   @property({ type: Number, attribute: false }) maxHeight?: number;
 
   private readonly context = new ContextProvider(this, { context: scrollContext })
+
+  setScrollTopFromConsumer(state: number): void {
+    this.scrollTopFromConsumer = state
+  }
 
   protected override firstUpdated() {
     this.context.setValue(this)

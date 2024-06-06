@@ -48,7 +48,8 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
             }
 
             .scroll-header-background-color-blur {
-                background-color: var(--primary-12);
+                background: var(--primary-12);
+                background: linear-gradient(to bottom, var(--color-background-bg-primary), var(--primary-12));
             }
         `)}
 
@@ -100,7 +101,10 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
           tap(() => this.updateHeaderSize()),
         ),
         fromEvent(this.virtualizerRef.value, 'scroll').pipe(
-          tap(() => this.updateHeaderBackground())
+          tap(() => {
+            this.context.setScrollTopFromConsumer(this.virtualizerRef.value?.scrollTop ?? 0)
+            this.updateHeaderBackground()
+          })
         )
       ], { requestUpdate: false })
     }
