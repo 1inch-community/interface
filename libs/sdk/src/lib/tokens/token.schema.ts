@@ -211,7 +211,7 @@ export class TokenSchema extends Dexie {
     return result
   }
 
-  async getSortedForViewTokenAddresses(chainId: ChainId, walletAddress?: Address): Promise<{
+  async getSortedForViewTokenAddresses(chainId: ChainId, filterPattern: string, walletAddress?: Address): Promise<{
     notZero: Address[],
     zero: Address[]
   }> {
@@ -220,6 +220,7 @@ export class TokenSchema extends Dexie {
     const favoriteTokenSet = new Set<Address>()
     const notZero: Address[] = [];
     const zero: Address[] = [];
+    const _filterPattern = filterPattern.toLowerCase()
 
     if (walletAddress) {
       await this.balances
@@ -233,6 +234,12 @@ export class TokenSchema extends Dexie {
       .where('chainId')
       .equals(chainId)
       .each(record => {
+        if (_filterPattern !== '') {
+          if (!record.address.toLowerCase().includes(_filterPattern)
+            && !record.name.toLowerCase().startsWith(_filterPattern)
+            && !record.symbol.toLowerCase().startsWith(_filterPattern)) return;
+        }
+
         if (balances[record.address] && balances[record.address] > 0n) {
           notZero.push(record.address);
           return;

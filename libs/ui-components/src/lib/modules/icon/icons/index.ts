@@ -1,5 +1,6 @@
 import { TemplateResult } from 'lit';
 import { IconContext } from './icon-context';
+import { emptySearch } from './empty_search.svg';
 
 export type IconsRecord = {
   loader: () => Promise<TemplateResult | ((context: IconContext) => TemplateResult)>
@@ -32,6 +33,8 @@ export const icons: Record<string, IconsRecord> = {
   logoFull: { width: '102px', height: '40px', loader: () => import('./logo-full.svg').then(m => m.logoFullSvg) },
   unicornRun: { width: '38px', height: '24px', loader: () => import('./unicorn_run.svg').then(m => m.unicornRunSvg) },
   fire48: { width: '48px', height: '48px', loader: () => import('./fire_48.png').then(m => m.fire48Png) },
+  emptySearch: { width: '160px', height: '160px', loader: () => import('./empty_search.svg').then(m => m.emptySearch) },
+
   // chain icons
   eth24: { width: '24px', height: '24px', loader: () => import('./chain/eth_24.svg').then(m => m.eth24Svg) },
   bnb24: { width: '24px', height: '24px', loader: () => import('./chain/bnb_24.svg').then(m => m.bnb24Svg) },

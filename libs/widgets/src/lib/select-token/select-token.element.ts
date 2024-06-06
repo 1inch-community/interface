@@ -35,9 +35,11 @@ export class SelectTokenElement extends LitElement {
     return html`
       <inch-token-list
         .header="${() => html`
-          <inch-card-header backButton headerText="Select token"></inch-card-header>
-          <inch-search-token-input></inch-search-token-input>
-          <inch-favorite-tokens></inch-favorite-tokens>
+          <div style="margin-left: 1px; margin-right: 1px">
+            <inch-card-header backButton headerText="Select token"></inch-card-header>
+            <inch-search-token-input></inch-search-token-input>
+            <inch-favorite-tokens></inch-favorite-tokens>
+          </div>
         `}"
       ></inch-token-list>
     `

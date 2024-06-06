@@ -30,6 +30,28 @@ export const searchTokenInputStyle = css`
         line-height: 24px;
     }
     
+    .loader {
+        width: 24px;
+        min-width: 24px;
+        height: 24px;
+        min-height: 24px;
+        border-radius: 50%;
+        border: 2px solid;
+        border-bottom-color: var(--secondary);
+        border-top-color: var(--secondary);
+        animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+        0% {
+            transform: rotate(0deg);
+        }
+
+        100% {
+            transform: rotate(360deg);
+        }
+    }
+    
     .search-token-input::placeholder {
         color: var(--color-content-content-secondary);
     }

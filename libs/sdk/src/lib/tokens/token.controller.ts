@@ -29,12 +29,12 @@ class TokenControllerImpl {
    * @param {Address} [walletAddress] - The connected wallet address. (Optional)
    * @returns {Promise<Address[]>} - A promise that resolves to an array of sorted token addresses.
    */
-  async getSortedForViewTokenAddresses(chainId: ChainId, walletAddress?: Address): Promise<Address[]> {
+  async getSortedForViewTokenAddresses(chainId: ChainId, filterPattern: string, walletAddress?: Address): Promise<Address[]> {
     await this.updateTokenDatabase(chainId)
     if (walletAddress) {
       await this.updateBalanceDatabase(chainId, walletAddress)
     }
-    const result = await this.schema.getSortedForViewTokenAddresses(chainId, walletAddress)
+    const result = await this.schema.getSortedForViewTokenAddresses(chainId, filterPattern, walletAddress)
     if (walletAddress) {
       const prices = await this.getTokenUSDPrices(chainId, result.notZero)
       const tokens = await this.getTokenMap(chainId, result.notZero)

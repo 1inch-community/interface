@@ -75,7 +75,6 @@ export class OverlayMobileController implements IOverlayController {
       bottom: '0',
       left: '0',
       boxSizing: 'border-box',
-      boxShadow: '0 -3px 4px 0 var(--primary-12), 0 6px 12px 0 var(--primary-12)',
       borderTopLeftRadius: '24px',
       borderTopRightRadius: '24px',
     })

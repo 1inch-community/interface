@@ -14,6 +14,8 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { ISceneContext, sceneContext } from '@one-inch-community/ui-components/scene';
 import '@one-inch-community/ui-components/scroll';
 import '../token-list-stub-item'
+import { when } from 'lit/directives/when.js';
+import { getChainById, isChainId } from '@one-inch-community/sdk';
 
 
 @customElement(TokenListElement.tagName)
@@ -34,13 +36,34 @@ export class TokenListElement extends LitElement {
   sceneContext?: ISceneContext
   @state() private chainId: ChainId | null = null
   @state() private walletAddress: Address | null = null
+  @state() private isEmpty = false
 
   private readonly addressList$ = defer(() => this.getTokenAddressList()).pipe(
+    tap(list => {
+      this.isEmpty = list.length === 0
+      this.requestUpdate()
+    }),
     shareReplay({ refCount: true, bufferSize: 1 })
   )
 
   protected override render() {
+    const searchValue = this.context?.getSearchTokenValue() ?? ''
+    const searchValueExist = searchValue !== ''
+    const unsupportedChainId = !isChainId(this.chainId)
+    const chain = getChainById(this.chainId ?? ChainId.eth)
     return html`
+      ${when(unsupportedChainId, () => html`
+        <div class="overlay-message">
+          <h3>Unsupported chain</h3>
+        </div>
+      `)}
+      ${when(this.isEmpty && searchValueExist && !unsupportedChainId, () => html`
+        <div class="overlay-message">
+          <inch-icon icon="emptySearch"></inch-icon>
+          <h3>Token not found on ${chain.name} Network</h3>
+          <span>Try changing your search query, or switch to another Network</span>
+        </div>
+      `)}
       <inch-scroll-view-virtualizer-consumer
         .header="${this.header}"
         .items=${observe(this.addressList$, this.getStubAddresses())}
