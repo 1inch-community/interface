@@ -4,7 +4,18 @@ import { getContainer } from './overlay-container';
 import { appendStyle, getMobileMatchMediaEmitter, resizeObserver, setBrowserMetaColorColor } from '@one-inch-community/lit';
 import { asyncFrame } from '@one-inch-community/ui-components/async';
 import { getOverlayId } from './overlay-id-generator';
-import { fromEvent, Subscription, tap, merge, filter, map, distinctUntilChanged, switchMap, skip } from 'rxjs';
+import {
+  fromEvent,
+  Subscription,
+  tap,
+  merge,
+  filter,
+  map,
+  distinctUntilChanged,
+  switchMap,
+  skip,
+  takeUntil, async
+} from 'rxjs';
 import { ScrollViewProviderElement } from '@one-inch-community/ui-components/scroll';
 import { getBrowserMetaColor } from '../theme/theme-change';
 import { applyColorBrightness } from '../theme/themes/color-utils';
@@ -89,9 +100,11 @@ export class OverlayMobileController implements IOverlayController {
   private subscribeOnEvents(overlayId: number) {
     const overlayContainer = this.activeOverlayMap.get(overlayId)!
     const subscription = merge(
+      //
       getMobileMatchMediaEmitter().pipe(
         tap(() => this.updatePosition(overlayId))
       ),
+      //
       resizeObserver(overlayContainer).pipe(
         filter(() => {
           const overlayIndex = Number(overlayContainer.getAttribute('overlay-index'))
@@ -105,6 +118,7 @@ export class OverlayMobileController implements IOverlayController {
           return this.transitionHalfView(rootNode, halfView)
         })
       ),
+      //
       fromEvent(this.container, 'click').pipe(
         filter(() => {
           const overlayIndex = Number(overlayContainer.getAttribute('overlay-index'))
@@ -112,6 +126,42 @@ export class OverlayMobileController implements IOverlayController {
         }),
         filter(event => event.target === this.container),
         tap(() => this.updatePosition(overlayId))
+      ),
+      //
+      fromEvent<TouchEvent>(this.container, 'touchstart').pipe(
+        switchMap(startEvent => {
+          const startPoint = startEvent.touches[0].clientY
+          let currentDelta = 0
+          let closeReady = false
+          return fromEvent<TouchEvent>(this.container, 'touchmove').pipe(
+            filter(() => !closeReady),
+            tap(event => {
+              const currentPoint = event.touches[0].clientY
+              const delta = currentPoint - startPoint
+              if (delta < 0) return
+              if (delta > 80) {
+                closeReady = true
+                this.updatePosition(overlayId)
+              }
+              currentDelta = delta
+              appendStyle(this.container, {
+                transform: `translateY(${delta}px)`
+              })
+            }),
+            takeUntil(fromEvent<TouchEvent>(this.container, 'touchend').pipe(
+              switchMap(async () => {
+                if (closeReady) return
+                await this.container.animate([
+                  { transform: `translateY(${currentDelta}px)` },
+                  { transform: `translateY(0px)` }
+                ], this.getDefaultAnimationOptions()).finished
+                appendStyle(this.container, {
+                  transform: ``
+                })
+              })
+            ))
+          )
+        })
       )
     ).subscribe()
 
@@ -236,7 +286,8 @@ export class OverlayMobileController implements IOverlayController {
       appendStyle(this.container, {
         position: '',
         width: '',
-        height: ''
+        height: '',
+        transform: ''
       })
       return
     }
