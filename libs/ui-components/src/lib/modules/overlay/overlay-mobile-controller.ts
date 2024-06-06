@@ -9,6 +9,13 @@ import { ScrollViewProviderElement } from '@one-inch-community/ui-components/scr
 
 export class OverlayMobileController implements IOverlayController {
 
+  private readonly borderRadius = '8px'
+  private readonly brightnessHalfView = '.7'
+  private readonly scale = '.9'
+  private readonly topOffset = '-5%'
+  private readonly backgroundColor = 'var(--color-background-bg-active)'
+  private readonly backgroundColorDefault = 'var(--color-background-bg-body)'
+
   private readonly container = getContainer()
 
   get isOpen() {
@@ -125,7 +132,7 @@ export class OverlayMobileController implements IOverlayController {
   private calculateIsHalfView(element: ScrollViewProviderElement): boolean {
     const height = element.clientHeight
     const maxHeight = element.maxHeight ?? 0
-    return (height * 100 / maxHeight) < 70
+    return (height * 100 / maxHeight) < 100
   }
 
   private getDefaultAnimationOptions() {
@@ -136,13 +143,23 @@ export class OverlayMobileController implements IOverlayController {
   }
 
   private async transition(overlayContainer: HTMLElement, rootNode: HTMLElement, isBack: boolean, halfView: boolean) {
-    const blur = '3px'
-    const scale = '.9'
-    const offset = '-6%'
+    const scale = this.scale
+    const brightnessHalfView = this.brightnessHalfView
+    const offset = this.topOffset
     const transitionOverlayContainerStart = () => ({ transform: `translate3d(0, ${isBack ? '0' : '100%'}, 0)` })
     const transitionOverlayContainerEnd = () => ({ transform: `translate3d(0, ${!isBack ? '0' : '100%'}, 0)` })
-    const transitionRootNodeStart = () => ({ filter: `blur(${isBack ? blur : '0'})`, transform: halfView ? '' : `scale(${isBack ? scale : '1'}) translate3d(0, ${isBack ? offset : '0'}, 0)` })
-    const transitionRootNodeEnd = () => ({ filter: `blur(${!isBack ? blur : '0'})`, transform: halfView ? '' : `scale(${!isBack ? scale : '1'}) translate3d(0, ${!isBack ? offset : '0'}, 0)` })
+    const transitionRootNodeStart = () => ({
+      filter: halfView ? `brightness(${isBack ? brightnessHalfView : '1'})` : '',
+      transform: halfView ? '' : `scale(${isBack ? scale : '1'}) translate3d(0, ${isBack ? offset : '0'}, 0)`,
+      borderRadius: halfView ? '' : isBack ? this.borderRadius : '0',
+      backgroundColor: halfView ? '' : isBack ? this.backgroundColor : this.backgroundColorDefault
+    })
+    const transitionRootNodeEnd = () => ({
+      filter: halfView ? `brightness(${!isBack ? brightnessHalfView : '1'})` : '',
+      transform: halfView ? '' : `scale(${!isBack ? scale : '1'}) translate3d(0, ${!isBack ? offset : '0'}, 0)`,
+      borderRadius: halfView ? '' : !isBack ? this.borderRadius : '0',
+      backgroundColor: halfView ? '' : !isBack ? this.backgroundColor : this.backgroundColorDefault
+    })
     return await Promise.all([
       overlayContainer.animate([
         transitionOverlayContainerStart(),
@@ -156,10 +173,21 @@ export class OverlayMobileController implements IOverlayController {
   }
 
   private async transitionHalfView(rootNode: HTMLElement, isBack: boolean) {
-    const scale = '.9'
-    const offset = '-6%'
-    const transitionRootNodeStart = () => ({ transform: `scale(${isBack ? scale : '1'}) translate3d(0, ${isBack ? offset : '0'}, 0)` })
-    const transitionRootNodeEnd = () => ({ transform: `scale(${!isBack ? scale : '1'}) translate3d(0, ${!isBack ? offset : '0'}, 0)` })
+    const scale = this.scale
+    const brightnessHalfView = this.brightnessHalfView
+    const offset = this.topOffset
+    const transitionRootNodeStart = () => ({
+      filter: `brightness(${!isBack ? brightnessHalfView : '1'})`,
+      transform: `scale(${isBack ? scale : '1'}) translate3d(0, ${isBack ? offset : '0'}, 0)`,
+      borderRadius: isBack ? this.borderRadius : '0',
+      backgroundColor: isBack ? this.backgroundColor : this.backgroundColorDefault
+    })
+    const transitionRootNodeEnd = () => ({
+      filter: `brightness(${isBack ? brightnessHalfView : '1'})`,
+      transform: `scale(${!isBack ? scale : '1'}) translate3d(0, ${!isBack ? offset : '0'}, 0)`,
+      borderRadius: !isBack ? this.borderRadius : '0',
+      backgroundColor: !isBack ? this.backgroundColor : this.backgroundColorDefault
+    })
     await rootNode.animate([
       transitionRootNodeStart(),
       transitionRootNodeEnd()
@@ -199,6 +227,8 @@ export class OverlayMobileController implements IOverlayController {
         bottom: '',
         zIndex: '',
         pointerEvents: '',
+        backgroundColor: '',
+        borderRadius: ''
       })
       appendStyle(this.container, {
         position: '',
@@ -208,8 +238,10 @@ export class OverlayMobileController implements IOverlayController {
       return
     }
     appendStyle(rootNode, {
-      filter: 'blur(3px)',
-      transform: halfView ? '' : 'scale(.9) translate3d(0, -6%, 0)'
+      filter: halfView ? `brightness(${this.brightnessHalfView})` : '',
+      transform: halfView ? '' : `scale(${this.scale}) translate3d(0, ${this.topOffset}, 0)`,
+      borderRadius: halfView ? '' : this.borderRadius,
+      backgroundColor: halfView ? '' : this.backgroundColor
     })
   }
 
