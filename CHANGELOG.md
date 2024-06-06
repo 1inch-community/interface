@@ -1,3 +1,10 @@
+# [1.0.0-dev.21](https://github.com/1inch-community/interface/compare/v1.0.0-dev.20...v1.0.0-dev.21) (2024-06-06)
+
+
+### Features
+
+* **ui-component/overlay:** added closing overlay with a top-down gesture ([ca6d674](https://github.com/1inch-community/interface/commit/ca6d6745b81bfffd16bd7c6336472e593c16e3e5))
+
 # [1.0.0-dev.20](https://github.com/1inch-community/interface/compare/v1.0.0-dev.19...v1.0.0-dev.20) (2024-06-06)
 
 
