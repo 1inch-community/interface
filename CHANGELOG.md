@@ -1,3 +1,16 @@
+# [1.0.0-dev.17](https://github.com/1inch-community/interface/compare/v1.0.0-dev.16...v1.0.0-dev.17) (2024-06-06)
+
+
+### Bug Fixes
+
+* **widgets/swap-form:** fixed flexible style swap form view in mobile ([cde711a](https://github.com/1inch-community/interface/commit/cde711a706365190af9d558b2a254b00bddf0aee))
+
+
+### Features
+
+* **sdk:** added router v6 contract addresses ([8c09f86](https://github.com/1inch-community/interface/commit/8c09f8689e3c261691e4688f9ba7f00db99164e3))
+* **widgets/swap-form:** added check chain in swap button ([c59dc44](https://github.com/1inch-community/interface/commit/c59dc44ab55e50e803f6e76341467c45b6395b51))
+
 # [1.0.0-dev.16](https://github.com/1inch-community/interface/compare/v1.0.0-dev.15...v1.0.0-dev.16) (2024-06-05)
 
 
