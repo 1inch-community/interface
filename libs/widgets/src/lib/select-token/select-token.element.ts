@@ -9,8 +9,10 @@ import './elements/search-token-input'
 import './elements/token-list'
 import './elements/favorite-tokens'
 import { ChainId } from '@one-inch-community/models';
-import { createMainViewportContext } from '@one-inch-community/ui-components/scroll';
 import { Address } from 'viem';
+import { subscribe } from '@one-inch-community/lit';
+import { tap } from 'rxjs';
+import { classMap } from 'lit/directives/class-map.js';
 
 
 @customElement(SelectTokenElement.tagName)
@@ -23,17 +25,18 @@ export class SelectTokenElement extends LitElement {
 
   @property({ type: String }) connectedWalletAddress?: Address
 
+  private isEmpty = true
+
   readonly context = new ContextProvider(this, { context: selectTokenContext })
 
-  override connectedCallback() {
-    super.connectedCallback();
-    createMainViewportContext(this)
-  }
-
   protected override render() {
+    const classes = {
+      empty: this.isEmpty
+    }
     this.initContext()
     return html`
       <inch-token-list
+        class="${classMap(classes)}"
         .header="${() => html`
           <div style="margin-left: 1px; margin-right: 1px">
             <inch-card-header backButton headerText="Select token"></inch-card-header>
@@ -43,6 +46,12 @@ export class SelectTokenElement extends LitElement {
         `}"
       ></inch-token-list>
     `
+  }
+
+  protected override firstUpdated() {
+    subscribe(this, [
+      this.getTokenAddressList().pipe(tap(list => this.isEmpty = list.length === 0))
+    ])
   }
 
   protected override updated(changedProperties: PropertyValues) {
@@ -69,6 +78,11 @@ export class SelectTokenElement extends LitElement {
     context.setChainId(chainId)
     context.setConnectedWalletAddress(connectedWalletAddress)
     this.context.setValue(context)
+  }
+
+  private getTokenAddressList() {
+    if (!this.context.value) throw new Error('')
+    return this.context.value.tokenAddressList$
   }
 }
 

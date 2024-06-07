@@ -3,6 +3,7 @@ import { html, render, TemplateResult } from 'lit';
 import { getContainer } from './overlay-container';
 import { appendStyle, getMobileMatchMediaEmitter, resizeObserver, setBrowserMetaColorColor } from '@one-inch-community/lit';
 import { asyncFrame } from '@one-inch-community/ui-components/async';
+import { getBrowserMetaColor, applyColorBrightness, interpolateColorRange, getCssValue } from '@one-inch-community/ui-components/theme';
 import { getOverlayId } from './overlay-id-generator';
 import {
   fromEvent,
@@ -17,9 +18,6 @@ import {
   takeUntil
 } from 'rxjs';
 import { ScrollViewProviderElement } from '@one-inch-community/ui-components/scroll';
-import { getBrowserMetaColor } from '../theme/theme-change';
-import { applyColorBrightness } from '../theme/themes/color-utils';
-import { getCssValue } from '../theme/theme-utils';
 
 export class OverlayMobileController implements IOverlayController {
 
@@ -130,7 +128,7 @@ export class OverlayMobileController implements IOverlayController {
         tap(() => this.updatePosition(overlayId))
       ),
       //
-      fromEvent<TouchEvent>(this.container, 'touchstart').pipe(
+      fromEvent<TouchEvent>(overlayContainer, 'touchstart', { passive: true }).pipe(
         filter(() => (overlayContainer.scrollTopFromConsumer ?? 0) === 0),
         switchMap(startEvent => {
           const halfView = this.calculateIsHalfView(overlayContainer)
@@ -145,7 +143,7 @@ export class OverlayMobileController implements IOverlayController {
           let scale = Number(this.scale)
           let offset = this.topOffsetPercent
           let bgColor = this.backgroundColor
-          return fromEvent<TouchEvent>(this.container, 'touchmove').pipe(
+          return fromEvent<TouchEvent>(overlayContainer, 'touchmove', { passive: true }).pipe(
             filter(() => !closeReady),
             tap(event => {
               const currentPoint = event.touches[0].clientY
@@ -158,46 +156,55 @@ export class OverlayMobileController implements IOverlayController {
               }
               currentDelta = delta
               currentDeltaPoint = deltaPoint
-              appendStyle(this.container, {
+              overlayContainer.setAttribute('offset', delta.toString())
+              appendStyle(overlayContainer, {
                 transform: `translateY(${deltaPoint}px)`
               })
               if (!halfView) {
                 scale = ((delta * (1 - Number(this.scale))) / swipeMaxForClose) + Number(this.scale)
                 offset = this.topOffsetPercent - ((delta * this.topOffsetPercent) / swipeMaxForClose)
-
+                bgColor = interpolateColorRange(bgColorStart, bgColorEnd, 0, 100, delta)
                 rootNode.setAttribute('scale', scale.toString())
                 rootNode.setAttribute('offset', offset.toString())
+                rootNode.setAttribute('bgColor', bgColor.toString())
                 appendStyle(rootNode, {
-                  transform: `scale(${scale}) translate3d(0, ${offset}%, 0)`
+                  transform: `scale(${scale}) translate3d(0, ${offset}%, 0)`,
+                  backgroundColor: bgColor
                 })
               }
             }),
-            takeUntil(fromEvent<TouchEvent>(this.container, 'touchend').pipe(
+            takeUntil(merge(
+              fromEvent<TouchEvent>(overlayContainer, 'touchend', { passive: true }),
+              fromEvent<TouchEvent>(overlayContainer, 'touchcancel', { passive: true })
+            ).pipe(
               switchMap(async (endEvent) => {
-                console.log(endEvent.timeStamp - startEvent.timeStamp, currentDelta)
-                if (endEvent.timeStamp - startEvent.timeStamp < 300 && currentDelta > swipeMaxForClose / 2) {
+                if (currentDeltaPoint === 0) return
+                if (endEvent.timeStamp - startEvent.timeStamp < 300 && currentDelta > (swipeMaxForClose / 2)) {
                   this.updatePosition(overlayId)
                   return
                 }
                 if (closeReady) return
                 await Promise.all([
-                  this.container.animate([
+                  overlayContainer.animate([
                     { transform: `translateY(${currentDeltaPoint}px)` },
                     { transform: `translateY(0px)` }
                   ], this.getDefaultAnimationOptions()).finished,
                   !halfView ? rootNode.animate([
-                    { transform: `scale(${scale}) translate3d(0, ${offset}%, 0)` },
-                    { transform: `scale(${this.scale}) translate3d(0, ${this.topOffsetPercent}%, 0)` },
+                    { transform: `scale(${scale}) translate3d(0, ${offset}%, 0)`, backgroundColor: bgColor },
+                    { transform: `scale(${this.scale}) translate3d(0, ${this.topOffsetPercent}%, 0)`,  backgroundColor: this.backgroundColor },
                   ], this.getDefaultAnimationOptions()).finished : Promise.resolve()
                 ])
-                appendStyle(this.container, {
+                overlayContainer.removeAttribute('offset')
+                appendStyle(overlayContainer, {
                   transform: ``
                 })
                 if (!halfView) {
                   rootNode.removeAttribute('scale')
                   rootNode.removeAttribute('offset')
+                  rootNode.removeAttribute('bgColor')
                   appendStyle(rootNode, {
-                    transform: `scale(${this.scale}) translate3d(0, ${this.topOffsetPercent}%, 0)`
+                    transform: `scale(${this.scale}) translate3d(0, ${this.topOffsetPercent}%, 0)`,
+                    backgroundColor: this.backgroundColor
                   })
                 }
               })
@@ -239,19 +246,21 @@ export class OverlayMobileController implements IOverlayController {
     const scale = rootNode.getAttribute('scale') ?? this.scale
     const brightnessHalfView = this.brightnessHalfView
     const offset = Number(rootNode.getAttribute('offset') ?? this.topOffsetPercent)
-    const transitionOverlayContainerStart = () => ({ transform: `translate3d(0, ${isBack ? '0' : '100%'}, 0)` })
-    const transitionOverlayContainerEnd = () => ({ transform: `translate3d(0, ${!isBack ? '0' : '100%'}, 0)` })
+    const backgroundColor = rootNode.getAttribute('bgColor') ?? this.backgroundColor
+    const mainOverlayOffset = overlayContainer.getAttribute('offset') ?? '0'
+    const transitionOverlayContainerStart = () => ({ transform: `translate3d(0, ${isBack ? mainOverlayOffset : '100'}%, 0)` })
+    const transitionOverlayContainerEnd = () => ({ transform: `translate3d(0, ${!isBack ? mainOverlayOffset : '100'}%, 0)` })
     const transitionRootNodeStart = () => ({
       filter: halfView ? `brightness(${isBack ? brightnessHalfView : '1'})` : '',
       transform: halfView ? '' : `scale(${isBack ? scale : '1'}) translate3d(0, ${isBack ? offset : '0'}%, 0)`,
       borderRadius: halfView ? '' : isBack ? this.borderRadius : '0',
-      backgroundColor: halfView ? '' : isBack ? this.backgroundColor : this.backgroundColorDefault
+      backgroundColor: halfView ? '' : isBack ? backgroundColor : this.backgroundColorDefault
     })
     const transitionRootNodeEnd = () => ({
       filter: halfView ? `brightness(${!isBack ? brightnessHalfView : '1'})` : '',
       transform: halfView ? '' : `scale(${!isBack ? scale : '1'}) translate3d(0, ${!isBack ? offset : '0'}%, 0)`,
       borderRadius: halfView ? '' : !isBack ? this.borderRadius : '0',
-      backgroundColor: halfView ? '' : !isBack ? this.backgroundColor : this.backgroundColorDefault
+      backgroundColor: halfView ? '' : !isBack ? backgroundColor : this.backgroundColorDefault
     })
     this.changeBrowserMetaColor(halfView, isBack)
     return await Promise.all([
@@ -303,37 +312,12 @@ export class OverlayMobileController implements IOverlayController {
     })
     rootNode.removeAttribute('scale')
     rootNode.removeAttribute('offset')
-    appendStyle(this.container, {
-      position: 'fixed',
-      width: '100%',
-      height: '100%'
-    })
+    rootNode.removeAttribute('bgColor')
   }
 
   private appendStyleAfterTransition(rootNode: HTMLElement, isBack: boolean, halfView: boolean) {
     if (isBack) {
-      appendStyle(rootNode, {
-        filter: '',
-        transform: '',
-        position: '',
-        willChange: '',
-        overflow: '',
-        top: '',
-        left: '',
-        right: '',
-        bottom: '',
-        zIndex: '',
-        pointerEvents: '',
-        backgroundColor: '',
-        borderRadius: ''
-      })
-      appendStyle(this.container, {
-        position: '',
-        width: '',
-        height: '',
-        transform: ''
-      })
-      return
+      return this.resetRootNodeStyle(rootNode)
     }
     appendStyle(rootNode, {
       filter: halfView ? `brightness(${this.brightnessHalfView})` : '',
@@ -349,6 +333,24 @@ export class OverlayMobileController implements IOverlayController {
       color = applyColorBrightness(color, parseFloat(this.brightnessHalfView))
     }
     setBrowserMetaColorColor(color)
+  }
+
+  private resetRootNodeStyle(rootNode: HTMLElement) {
+    appendStyle(rootNode, {
+      filter: '',
+      transform: '',
+      position: '',
+      willChange: '',
+      overflow: '',
+      top: '',
+      left: '',
+      right: '',
+      bottom: '',
+      zIndex: '',
+      pointerEvents: '',
+      backgroundColor: '',
+      borderRadius: ''
+    })
   }
 
 }

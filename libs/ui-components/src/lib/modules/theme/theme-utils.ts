@@ -1,5 +1,7 @@
+const pattern = /(?<=var\().*?(?=\))/;
 export function getCssValue(cssVarName: string): string {
-  const root = document.documentElement;
-  const style = getComputedStyle(root);
-  return  style.getPropertyValue(cssVarName).trim();
+  const match = cssVarName.match(pattern);
+  const value = match ? match[0] : cssVarName;
+  const style = getComputedStyle(document.documentElement);
+  return  style.getPropertyValue(value).trim();
 }

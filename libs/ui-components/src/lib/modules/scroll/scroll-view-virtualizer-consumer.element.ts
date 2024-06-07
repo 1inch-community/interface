@@ -59,7 +59,7 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
   @property({ type: Array }) items: unknown[] = []
   @property({ type: Object }) keyFunction?: ((item: unknown, index: number) => unknown)
   @property({ type: Object }) renderItem?: ((item: unknown, index: number) => TemplateResult<1>)
-  @property({ type: Object }) header?: (() => TemplateResult)
+  @property({ type: Object }) header?: (() => TemplateResult<1>)
 
   @consume({ context: scrollContext, subscribe: true })
   private context!: ScrollContext
