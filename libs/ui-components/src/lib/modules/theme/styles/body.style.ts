@@ -9,6 +9,8 @@ export const bodyStyle = css`
         height: 100vh;
         overflow: auto;
         overscroll-behavior: none;
+        touch-action: pan-y;
+        overscroll-behavior: none;
     }
 
     body {

@@ -11,6 +11,8 @@ export const appStyle = css`
         flex-direction: column;
         justify-content: space-between;
         background-color: var(--color-background-bg-body);
+        overscroll-behavior: none;
+        touch-action: pan-y;
     }
     
     ${mobileMediaCSS(css`

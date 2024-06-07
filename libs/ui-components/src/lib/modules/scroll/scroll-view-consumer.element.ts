@@ -21,6 +21,8 @@ export class ScrollViewConsumerElement extends LitElement {
         }
         .overflow {
             overflow: auto;
+            overscroll-behavior: none;
+            touch-action: pan-y;
             display: block;
             position: relative;
             contain: size layout;

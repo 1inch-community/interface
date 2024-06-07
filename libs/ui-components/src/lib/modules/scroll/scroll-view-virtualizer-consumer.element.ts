@@ -7,7 +7,14 @@ import { consume } from '@lit/context';
 import { ScrollContext, scrollContext } from './scroll-context';
 import '@lit-labs/virtualizer'
 import type { LitVirtualizer } from '@lit-labs/virtualizer'
-import { appendStyle, getMobileMatchMediaAndSubscribe, getMobileMatchMediaEmitter, mobileMediaCSS, resizeObserver, subscribe } from '@one-inch-community/lit';
+import {
+  appendStyle,
+  getMobileMatchMediaAndSubscribe,
+  getMobileMatchMediaEmitter,
+  mobileMediaCSS,
+  resizeObserver,
+  subscribe
+} from '@one-inch-community/lit';
 import { tap, merge, of, fromEvent } from 'rxjs';
 import { mainViewportContext } from './main-viewport-context';
 
@@ -100,7 +107,7 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
         resizeObserver(this.headerRef.value).pipe(
           tap(() => this.updateHeaderSize()),
         ),
-        fromEvent(this.virtualizerRef.value, 'scroll').pipe(
+        fromEvent<MouseEvent>(this.virtualizerRef.value, 'scroll', { passive: true }).pipe(
           tap(() => {
             this.context.setScrollTopFromConsumer(this.virtualizerRef.value?.scrollTop ?? 0)
             this.updateHeaderBackground()
@@ -121,6 +128,7 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
       `)}
       <lit-virtualizer
         ${ref(this.virtualizerRef)}
+        style="overscroll-behavior: none; touch-action: pan-y;"
         scroller
         .items=${this.getItems()}
         .keyFunction="${this.keyFunction ?? ((_: unknown, index: number) => index)}"
