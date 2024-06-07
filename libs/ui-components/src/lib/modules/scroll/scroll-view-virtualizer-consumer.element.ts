@@ -17,17 +17,19 @@ import {
 } from '@one-inch-community/lit';
 import { tap, merge, of, fromEvent } from 'rxjs';
 import { mainViewportContext } from './main-viewport-context';
+import { getScrollbarStyle } from '../theme/styles/scrollbar.style';
 
 @customElement(ScrollViewVirtualizerConsumerElement.tagName)
 export class ScrollViewVirtualizerConsumerElement extends LitElement {
   static tagName = 'inch-scroll-view-virtualizer-consumer';
 
   static override styles = [
-    scrollbarStyle,
+    getScrollbarStyle('lit-virtualizer', true),
     css`
-
         :host {
             position: relative;
+            display: flex;
+            flex-direction: column;
         }
 
         .scroll-header {
@@ -90,6 +92,9 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
 
   protected override firstUpdated() {
     if (!this.context || !this.virtualizerRef.value) return
+    const style = document.createElement('style')
+    style.textContent = scrollbarStyle.cssText
+    this.virtualizerRef.value.shadowRoot?.appendChild(style)
     this.updateView()
     this.updateHeaderSize()
     subscribe(this, [
@@ -128,7 +133,6 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
       `)}
       <lit-virtualizer
         ${ref(this.virtualizerRef)}
-        style="overscroll-behavior: none; touch-action: pan-y;"
         scroller
         .items=${this.getItems()}
         .keyFunction="${this.keyFunction ?? ((_: unknown, index: number) => index)}"
@@ -142,12 +146,6 @@ export class ScrollViewVirtualizerConsumerElement extends LitElement {
       this.updateViewMobile()
     } else {
       this.updateViewDesktop()
-    }
-    if (this.virtualizerRef.value && this.header) {
-      appendStyle(this.virtualizerRef.value, {
-        width: 'calc(100% + 10px)',
-        marginRight: '10px'
-      })
     }
   }
 

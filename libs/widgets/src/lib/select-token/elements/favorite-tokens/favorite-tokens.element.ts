@@ -11,7 +11,7 @@ import { favoriteTokensStyles } from './favorite-tokens.styles';
 import { BehaviorSubject, combineLatest, debounceTime, defer, map, shareReplay, startWith, switchMap, tap } from 'rxjs';
 import { observe, animationMap, subscribe } from '@one-inch-community/lit';
 import { TokenController } from '@one-inch-community/sdk';
-import { scrollbarStyle } from '@one-inch-community/ui-components/theme';
+import { getScrollbarStyle } from '@one-inch-community/ui-components/theme';
 import { emitSelectTokenEvent } from '../../events';
 
 @customElement(FavoriteTokensElement.tagName)
@@ -20,7 +20,6 @@ export class FavoriteTokensElement extends LitElement {
 
   static override styles = [
     favoriteTokensStyles,
-    scrollbarStyle
   ];
 
   @consume({ context: selectTokenContext })

@@ -7,15 +7,11 @@ export const bodyStyle = css`
         position: fixed;
         width: 100vw;
         height: 100vh;
-        overflow: auto;
-        overscroll-behavior: none;
-        touch-action: pan-y;
-        overscroll-behavior: none;
+        overflow: hidden;
     }
 
     body {
         margin: 0;
-        touch-action: pan-y;
         background-color: var(--color-background-bg-body);
         box-sizing: border-box;
     }

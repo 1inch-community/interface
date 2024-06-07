@@ -1,11 +1,10 @@
-import { html, LitElement, PropertyValues } from 'lit';
+import { html, LitElement } from 'lit';
 import { chainSelectorListStyle } from './chain-selector-list.style';
 import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import '@one-inch-community/ui-components/card';
 import { ChainId, IConnectWalletController } from '@one-inch-community/models';
 import { getMobileMatchMediaAndSubscribe, subscribe } from '@one-inch-community/lit';
-import { scrollbarStyle } from '@one-inch-community/ui-components/theme';
 import '@one-inch-community/ui-components/scroll';
 import '../chain-selector-list-item';
 import { tap } from 'rxjs';
@@ -16,8 +15,7 @@ export class ChainSelectorListElement extends LitElement {
   static tagName = 'inch-chain-selector-list' as const;
 
   static override styles = [
-    chainSelectorListStyle,
-    scrollbarStyle
+    chainSelectorListStyle
   ]
 
   @property({ type: Object, attribute: false }) controller?: IConnectWalletController;

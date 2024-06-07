@@ -8,7 +8,6 @@ import { ChainId, ISelectTokenContext } from '@one-inch-community/models';
 import { selectTokenContext } from '../../context';
 import { defer, shareReplay, tap } from 'rxjs';
 import { observe, subscribe } from '@one-inch-community/lit';
-import { scrollbarStyle } from '@one-inch-community/ui-components/theme';
 import { Address } from 'viem';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { ISceneContext, sceneContext } from '@one-inch-community/ui-components/scene';
@@ -23,8 +22,7 @@ export class TokenListElement extends LitElement {
   static tagName = 'inch-token-list' as const
 
   static override styles = [
-    tokenListStyle,
-    scrollbarStyle
+    tokenListStyle
   ]
 
   @property({ type: Object }) header?: (() => TemplateResult<1>)

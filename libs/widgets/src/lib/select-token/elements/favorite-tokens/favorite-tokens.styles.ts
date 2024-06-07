@@ -24,6 +24,7 @@ export const favoriteTokensStyles = css`
     .favorite-container-scroll {
         overflow-y: hidden;
         overflow-x: auto;
+        touch-action: pan-x;
         position: relative;
         width: 100%;
         padding-top: 16px;
@@ -31,21 +32,16 @@ export const favoriteTokensStyles = css`
         margin-bottom: 8px;
         height: 36px;
     }
+
+    .favorite-container-scroll::-webkit-scrollbar {
+        display: none;
+    }
     
     .favorite-container {
         display: flex;
         gap: 12px;
         height: 36px;
         position: absolute;
-    }
-
-    ::-webkit-scrollbar {
-        height: 2px;
-    }
-
-    .favorite-container-scroll::-webkit-scrollbar-thumb {
-        transition: background-color .2s;
-        background: var(--color-background-bg-primary);
     }
     
     .favorite-token-item-container {
@@ -71,9 +67,6 @@ export const favoriteTokensStyles = css`
     }
     
     @media (hover: hover) {
-        .favorite-container-scroll:hover::-webkit-scrollbar-thumb {
-            background: var(--primary);
-        }
         .favorite-token-item-container:hover .remove-favorite-token {
             transform: scale(1) translate(0, 0);
         }
