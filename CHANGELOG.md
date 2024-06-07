@@ -1,3 +1,16 @@
+# [1.0.0-dev.23](https://github.com/1inch-community/interface/compare/v1.0.0-dev.22...v1.0.0-dev.23) (2024-06-07)
+
+
+### Bug Fixes
+
+* **ui-component/overlay:** fixed event handling ([34f0eb6](https://github.com/1inch-community/interface/commit/34f0eb6e05416e679d854244b53504145c5efdef))
+
+
+### Features
+
+* **ui-component/overlay:** added background move when swipe ([6dcdf39](https://github.com/1inch-community/interface/commit/6dcdf39798abbcf31133b6e4cdc1dcf2e0cc9cc3))
+* **ui-component/overlay:** optimization swap close logic ([13b3bf0](https://github.com/1inch-community/interface/commit/13b3bf09526d1414cf38a79b4034fa1f69533b31))
+
 # [1.0.0-dev.22](https://github.com/1inch-community/interface/compare/v1.0.0-dev.21...v1.0.0-dev.22) (2024-06-06)
 
 
