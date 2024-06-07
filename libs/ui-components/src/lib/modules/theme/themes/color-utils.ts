@@ -72,6 +72,16 @@ function interpolateColorArray(colors: string[], steps: number) {
   return result;
 }
 
+export function interpolateColorRange(startColorHex: string, endColorHex: string, rangeMin: number, rangeMax: number, value: number) {
+  const startColorRgb = hexToRgb(startColorHex);
+  const endColorHexRgb = hexToRgb(endColorHex);
+  const factor = (value - rangeMin) / (rangeMax - rangeMin);
+  const r = interpolate(startColorRgb[0], endColorHexRgb[0], factor);
+  const g = interpolate(startColorRgb[1], endColorHexRgb[1], factor);
+  const b = interpolate(startColorRgb[2], endColorHexRgb[2], factor);
+  return rgbToHex(r, g, b);
+}
+
 export function hexToRGBA(hex: string, alfa = 100): CSSResult {
   const [ r, g, b ] = hexToRgb(hex)
   return unsafeCSS(`rgba(${r}, ${g}, ${b}, ${alfa}%)`);
