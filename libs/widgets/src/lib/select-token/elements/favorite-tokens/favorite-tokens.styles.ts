@@ -31,6 +31,7 @@ export const favoriteTokensStyles = css`
         padding-bottom: 8px;
         margin-bottom: 8px;
         height: 36px;
+        scrollbar-width: none;
     }
 
     .favorite-container-scroll::-webkit-scrollbar {

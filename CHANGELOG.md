@@ -1,3 +1,10 @@
+# [1.0.0-dev.24](https://github.com/1inch-community/interface/compare/v1.0.0-dev.23...v1.0.0-dev.24) (2024-06-07)
+
+
+### Bug Fixes
+
+* remove old code and fix scroll behavior ([98953cb](https://github.com/1inch-community/interface/commit/98953cbd0105f1c06ff26810bef335d3c54f4bf2))
+
 # [1.0.0-dev.23](https://github.com/1inch-community/interface/compare/v1.0.0-dev.22...v1.0.0-dev.23) (2024-06-07)
 
 
