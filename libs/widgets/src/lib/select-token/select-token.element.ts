@@ -38,7 +38,7 @@ export class SelectTokenElement extends LitElement {
       <inch-token-list
         class="${classMap(classes)}"
         .header="${() => html`
-          <div style="margin-left: 1px; margin-right: 1px">
+          <div style="margin-left: 1px; margin-right: 1px; pointer-events: auto;">
             <inch-card-header backButton headerText="Select token"></inch-card-header>
             <inch-search-token-input></inch-search-token-input>
             <inch-favorite-tokens></inch-favorite-tokens>
