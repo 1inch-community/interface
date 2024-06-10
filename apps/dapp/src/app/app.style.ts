@@ -4,15 +4,23 @@ import { mobileMediaCSS } from '@one-inch-community/lit';
 export const appStyle = css`
     
     :host {
+        --height: 100vh;
         overflow-y: auto;
         overflow-x: hidden;
-        height: 100svh;
+        height: var(--height);
         display: flex;
         flex-direction: column;
         justify-content: space-between;
         background-color: var(--color-background-bg-body);
         overscroll-behavior: none;
         touch-action: pan-y;
+        transition: height .2s;
+    }
+
+    @supports (height: 100dvh) {
+        :host {
+            --height: 100dvh;
+        }
     }
     
     ${mobileMediaCSS(css`
