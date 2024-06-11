@@ -2,7 +2,7 @@ import { ManifestOptions } from 'vite-plugin-pwa';
 
 export const manifest = (baseHref?: string): Partial<ManifestOptions> => ({
   id: 'one_inch_dapp',
-  start_url: '/',
+  start_url: baseHref ?? '/',
   name: '1inch dApp',
   short_name: '1inch dApp',
   description: '1inch dApp',
