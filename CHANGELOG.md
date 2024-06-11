@@ -1,3 +1,11 @@
+# [1.0.0-dev.25](https://github.com/1inch-community/interface/compare/v1.0.0-dev.24...v1.0.0-dev.25) (2024-06-10)
+
+
+### Bug Fixes
+
+* fixed style for ios safari ([86e7f3f](https://github.com/1inch-community/interface/commit/86e7f3f2bc62f744ae5a1bf567f378726ef04278))
+* global fix scroll behavior ([5597585](https://github.com/1inch-community/interface/commit/5597585eb7fa04566c7981685677f75c1f58c135))
+
 # [1.0.0-dev.24](https://github.com/1inch-community/interface/compare/v1.0.0-dev.23...v1.0.0-dev.24) (2024-06-07)
 
 
