@@ -1,18 +1,31 @@
-/// <reference types='vitest' />
 import { defineConfig } from 'vite';
-
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { createHtmlPlugin } from 'vite-plugin-html';
 import minifyHTML from 'rollup-plugin-minify-html-literals'
 import { defaultShouldMinify } from 'minify-html-literals'
 import basicSsl from '@vitejs/plugin-basic-ssl'
+import { VitePWA } from 'vite-plugin-pwa';
+import { manifest } from './manifest.mjs';
 
 function isCSS(text: string): boolean {
-  return (text.includes(':host') || text.includes(':root') || text.includes('@keyframes') || text.includes('@media') || text.includes('@font-face') || text.includes('var(--'));
+  return (
+    text.includes(':host')
+    || text.includes(':root')
+    || text.includes('@keyframes')
+    || text.includes('@media')
+    || text.includes('@font-face')
+    || text.includes('var(--')
+  );
 }
 
 function isHTML(text: string): boolean {
-  return (text.includes('<inch') || text.includes('<div') || text.includes('<span') || text.includes('<button') || text.includes('<svg'));
+  return (
+    text.includes('<inch')
+    || text.includes('<div')
+    || text.includes('<span')
+    || text.includes('<button')
+    || text.includes('<svg')
+  );
 }
 
 function shouldMinify(template: any) {
@@ -58,14 +71,14 @@ export default defineConfig(({ mode }) => {
 
     plugins: [
       nxViteTsPaths(),
-      basicSsl({
-        certDir: './dev-cert',
-        name: 'one-inch-community-dev',
-        domains: [
-          'localhost',
-          '1inch.local'
-        ]
-      }),
+      // basicSsl({
+      //   certDir: './dev-cert',
+      //   name: 'one-inch-community-dev',
+      //   domains: [
+      //     'localhost',
+      //     '1inch.local'
+      //   ]
+      // }),
       isProduction ? (minifyHTML as any).default({ options: { shouldMinify } }) : null,
       createHtmlPlugin({
         inject: {
@@ -74,6 +87,59 @@ export default defineConfig(({ mode }) => {
           },
         },
       }),
+      VitePWA({
+        registerType: 'autoUpdate',
+        manifest: manifest(baseHref),
+        workbox: {
+          runtimeCaching: [
+            {
+              urlPattern: ({ url }) => url.origin !== self.location.origin && /\.(png|jpg|jpeg|svg|gif)$/.test(url.pathname),
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'external-images',
+                expiration: {
+                  maxEntries: 50,
+                  maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+                },
+                cacheableResponse: {
+                  statuses: [0, 200]
+                }
+              }
+            },
+            {
+              urlPattern: /.*\.svg-.*\.js(\?.*)?$/,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'js-svg-templates',
+                expiration: {
+                  maxEntries: 100,
+                  maxAgeSeconds: 60 * 60 * 24 * 365, // 365 days
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+            {
+              urlPattern: /^(?!.*\.svg-.*\.js$).*\.js(\?.*)?$/,
+              handler: 'StaleWhileRevalidate',
+              options: {
+                cacheName: 'js-bundles',
+                expiration: {
+                  maxEntries: 100,
+                  maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+          ]
+        },
+        devOptions: {
+          enabled: !isProduction
+        }
+      })
     ].filter(Boolean),
 
     // Uncomment this if you are using workers.

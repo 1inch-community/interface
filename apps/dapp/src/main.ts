@@ -11,3 +11,11 @@ Promise.all([
     document.body.appendChild(main)
   })
 
+// @ts-ignore
+import('virtual:pwa-register').then(({ registerSW }) => {
+  registerSW({
+    onRegisteredSW: (_, worker: ServiceWorkerRegistration) => worker.update(),
+    onNeedRefresh: () => console.log('update ready'),
+    onOfflineReady: () => console.log('offline ready'),
+  })
+})
