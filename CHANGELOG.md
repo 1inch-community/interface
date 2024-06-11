@@ -1,3 +1,11 @@
+# [1.0.0-dev.27](https://github.com/1inch-community/interface/compare/v1.0.0-dev.26...v1.0.0-dev.27) (2024-06-11)
+
+
+### Features
+
+* added PWA ([434cbd3](https://github.com/1inch-community/interface/commit/434cbd33777d3efa74587f9a1a5707eb4a7c7d99))
+* **swap-form:** optimization ux in swap form ([95d3227](https://github.com/1inch-community/interface/commit/95d322776457f6e121613c400853c240ee4ddf9b))
+
 # [1.0.0-dev.26](https://github.com/1inch-community/interface/compare/v1.0.0-dev.25...v1.0.0-dev.26) (2024-06-11)
 
 
