@@ -66,6 +66,18 @@ export class SwapContext implements ISwapContext {
     )
   }
 
+  wrapNativeToken(amount: bigint): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
+  getApprove(): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
+  getPermit(): Promise<void> {
+    throw new Error('Method not implemented.');
+  }
+
   destroy() {
     this.subscription.unsubscribe()
     this.lastSwapContextStrategy?.destroy()

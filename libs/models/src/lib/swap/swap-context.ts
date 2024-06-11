@@ -16,6 +16,9 @@ export interface ISwapContext {
   getTokenAmountByType(type: 'source' | 'destination'): Observable<bigint | null>
   getTokenRawAmountByType(type: 'source' | 'destination'): Observable<bigint | null>
   setTokenAmountByType(type: 'source' | 'destination', value: bigint, markDirty?: boolean): void
+  wrapNativeToken(amount: bigint): Promise<void>
+  getApprove(): Promise<void>
+  getPermit(): Promise<void>
 }
 
 export type Pair = {

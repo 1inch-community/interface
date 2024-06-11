@@ -22,7 +22,7 @@ export const fusionSwapInfoMainStyle = css`
     }
 
     .open {
-        height: 180px;
+        height: 236px;
         grid-template-rows: min-content 1fr;
         grid-row-gap: 16px;
         cursor: auto;

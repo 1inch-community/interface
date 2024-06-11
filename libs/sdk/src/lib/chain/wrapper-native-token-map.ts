@@ -1,5 +1,5 @@
 import { ChainId, IToken } from "@one-inch-community/models";
-import { Address } from "viem";
+import { Address, WalletClient } from 'viem';
 import { getChainById } from './viem-chain-map';
 
 export const wrapperNativeTokenMap: Readonly<Record<ChainId, Address>> = {
