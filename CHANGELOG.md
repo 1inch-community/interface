@@ -1,3 +1,11 @@
+# [1.0.0-dev.26](https://github.com/1inch-community/interface/compare/v1.0.0-dev.25...v1.0.0-dev.26) (2024-06-11)
+
+
+### Features
+
+* **swap-form:** added min receive view ([6b4a49d](https://github.com/1inch-community/interface/commit/6b4a49d0704cbd2976e635b982569bf1e9d6c4ba))
+* **swap-form:** changed swap form logic work ([189ce4b](https://github.com/1inch-community/interface/commit/189ce4b4c0cb0bde1311b610567cbd1c3f8b79f2))
+
 # [1.0.0-dev.25](https://github.com/1inch-community/interface/compare/v1.0.0-dev.24...v1.0.0-dev.25) (2024-06-10)
 
 
