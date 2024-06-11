@@ -188,6 +188,7 @@ export const fusionSwapInfoMainStyle = css`
         
         .open {
             grid-row-gap: 0;
+            height: 180px;
         }
 
         .content-row {

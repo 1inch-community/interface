@@ -1,9 +1,9 @@
 import { html, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { consume } from '@lit/context';
 import { classMap } from 'lit/directives/class-map.js'
 import { ifDefined } from 'lit/directives/if-defined.js'
-import { combineLatest, defer, filter, firstValueFrom, fromEvent, map, tap } from 'rxjs';
+import { combineLatest, defer, filter, firstValueFrom, map, tap } from 'rxjs';
 import { Maskito } from '@maskito/core';
 import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import "@one-inch-community/widgets/token-icon"
@@ -27,6 +27,8 @@ export class InputElement extends LitElement {
   @property({ type: Boolean, attribute: true, reflect: true }) disabled = false
 
   @property({ type: String, attribute: true, reflect: true }) tokenType?: 'source' | 'destination'
+
+  @state() isFocus = false
 
   @consume({ context: swapContext, subscribe: true })
   context?: ISwapContext
@@ -52,6 +54,9 @@ export class InputElement extends LitElement {
     this.input.inputMode = 'decimal'
     this.input.autocomplete = 'off'
     this.input.placeholder = this.tokenType === 'source' ? '0' : ''
+    this.input.onfocus = () => this.onFocus()
+    this.input.onblur = () => this.onBlur()
+    this.input.oninput = ((event: InputEvent) => this.onInput(event)) as any
 
     const updateMask$ = this.token$.pipe(
       tap(token => {
@@ -59,10 +64,6 @@ export class InputElement extends LitElement {
         this.maskedInput.destroy()
         this.maskedInput = this.buildMask(token.decimals)
       })
-    )
-
-    const onInput$ = fromEvent<InputEvent>(this.input, 'input').pipe(
-      tap(event => this.onInput(event))
     )
 
     const updateInputValue$ = combineLatest([
@@ -73,13 +74,15 @@ export class InputElement extends LitElement {
         if (!amount || !token) return '0'
         return formatUnits(amount, token.decimals)
       }),
-      filter(amount => amount !== this.input.value),
+      filter((amount, index) => {
+        if (index === 0 && amount === '0') return false
+        return (amount !== this.input.value);
+      }),
       tap(amount => this.input.value = formatNumber(amount, 6))
     )
 
     subscribe(this, [
       updateMask$,
-      onInput$,
       updateInputValue$,
     ], { requestUpdate: false })
   }
@@ -91,7 +94,8 @@ export class InputElement extends LitElement {
 
   protected override render() {
     const classes = {
-      disabled: this.disabled
+      disabled: this.disabled,
+      focus: this.isFocus
     }
     this.input.disabled = this.tokenType === 'destination'
     return html`
@@ -118,6 +122,16 @@ export class InputElement extends LitElement {
       </inch-button>
       <br>
     `
+  }
+
+  private onFocus() {
+    this.isFocus = true
+    dispatchEvent(this, 'focusTokenInput', this.tokenType)
+  }
+
+  private onBlur() {
+    this.isFocus = false
+    dispatchEvent(this, 'blurTokenInput', this.tokenType)
   }
 
   private tokenView(token: IToken) {

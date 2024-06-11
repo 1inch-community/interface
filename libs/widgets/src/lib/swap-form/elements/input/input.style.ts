@@ -112,6 +112,10 @@ export const inputStyle = css`
         align-items: flex-end;
     }
     
+    .focus:not(.disabled) {
+        box-shadow: 0 0 0 1px var(--color-background-bg-positive-hover); 
+    }
+    
     @media (hover: hover) {
         .input-container:not(.disabled):hover {
             box-shadow: 0 0 0 1px var(--color-background-bg-positive-hover);
