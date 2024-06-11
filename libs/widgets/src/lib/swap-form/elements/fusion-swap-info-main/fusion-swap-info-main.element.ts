@@ -10,11 +10,12 @@ import {
   defer, distinctUntilChanged,
   shareReplay,
   startWith,
-  switchMap
+  switchMap,
+  withLatestFrom,
 } from 'rxjs';
 import { ISwapContext, Rate } from '@one-inch-community/models';
 import { formatUnits, parseUnits } from 'viem';
-import { formatSmartNumber, getSymbolFromWrapToken, isRateEqual, isTokensEqual, TokenController } from '@one-inch-community/sdk';
+import { BigMath, smartFormatNumber, getSymbolFromWrapToken, isRateEqual, isTokensEqual, TokenController, smartFormatAndShorteningNumber } from '@one-inch-community/sdk';
 import "@one-inch-community/ui-components/button"
 import "@one-inch-community/ui-components/icon"
 
@@ -30,6 +31,9 @@ export class FusionSwapInfoMainElement extends LitElement {
   context?: ISwapContext;
 
   readonly rate$ = defer(() => this.getContext().rate$);
+  readonly minReceive$ = defer(() => this.getContext().minReceive$);
+  readonly chainId$ = defer(() => this.getContext().chainId$);
+  readonly destinationToken$ = defer(() => this.getContext().getTokenByType('destination'));
 
   readonly rateView$ = this.rate$.pipe(
     debounceTime(0),
@@ -44,10 +48,10 @@ export class FusionSwapInfoMainElement extends LitElement {
       const secondaryToken = isTokensEqual(primaryToken, sourceToken) ? destinationToken : sourceToken
       const isRevertedRate = isTokensEqual(primaryToken, sourceToken)
       const targetRate = isRevertedRate ? revertedRate : rate
-      const rateFormated = formatSmartNumber(formatUnits(targetRate, secondaryToken.decimals), 2);
+      const rateFormated = smartFormatNumber(formatUnits(targetRate, secondaryToken.decimals), 2);
       const tokenPrice = await TokenController.getTokenUSDPrice(chainId, secondaryToken.address);
       const rateUsd = parseUnits(tokenPrice, secondaryToken.decimals)
-      const rateUsdFormated = formatSmartNumber(formatUnits(rateUsd, secondaryToken.decimals), 2);
+      const rateUsdFormated = smartFormatNumber(formatUnits(rateUsd, secondaryToken.decimals), 2);
       return html`
         <span class="rate-view">1 ${getSymbolFromWrapToken(secondaryToken)} = ${rateFormated} ${primaryToken.symbol}  <span
           class="dst-token-rate-usd-price">~$${rateUsdFormated}</span></span>
@@ -56,6 +60,27 @@ export class FusionSwapInfoMainElement extends LitElement {
     startWith(this.getLoadRateView()),
     shareReplay({ bufferSize: 1, refCount: true })
   );
+
+  readonly minReceiveView$ = this.minReceive$.pipe(
+    withLatestFrom(this.destinationToken$, this.chainId$),
+    switchMap(async ([ minReceive, dstToken, chainId ]) => {
+      if (!dstToken || !chainId) return html``
+      const tokenPrice = await TokenController.getTokenUSDPrice(chainId, dstToken.address);
+      const rateUsd = parseUnits(tokenPrice, dstToken.decimals)
+      const amountUsd = BigMath.mul(
+        minReceive,
+        rateUsd,
+        dstToken.decimals,
+        dstToken.decimals
+      )
+      const amountUsdFormated = smartFormatAndShorteningNumber(formatUnits(amountUsd, dstToken.decimals), 2);
+
+      return html`
+        <span>~$${amountUsdFormated}</span>
+        <span class="min-receive">${smartFormatAndShorteningNumber(formatUnits(minReceive, dstToken.decimals), 2)} ${dstToken.symbol}</span>
+      `
+    })
+  )
 
   override connectedCallback() {
     super.connectedCallback();
@@ -113,7 +138,9 @@ export class FusionSwapInfoMainElement extends LitElement {
           </div>
           <div class="content-row">
             <span class="row-title">Minimum receive</span>
-            <div class="row-content"></div>
+            <div class="row-content">
+              ${observe(this.minReceiveView$)}
+            </div>
           </div>
           <div class="content-row">
             <span class="row-title">Network Fee</span>

@@ -28,7 +28,8 @@ export function formatDecimals(value: string, decimalPlaces: number): string {
   return value.substring(0, dotIndex);
 }
 
-export function formatSmartNumber(value: string, charsAfterZero: number, defaultDecimalPlaces: number = charsAfterZero): string {
+export function smartFormatNumber(value: string, charsAfterZero: number, defaultDecimalPlaces: number = charsAfterZero): string {
+  if (value.length === 1) return value
   const dotIndex = value.indexOf('.');
   if (dotIndex === -1) {
     return formatNumber(value, defaultDecimalPlaces)
@@ -46,4 +47,25 @@ export function formatSmartNumber(value: string, charsAfterZero: number, default
     }
   }
   return formatNumber(value, defaultDecimalPlaces)
+}
+
+export function smartFormatAndShorteningNumber(value: string, charsAfterZero: number, defaultDecimalPlaces: number = charsAfterZero) {
+  if (value.length === 1) return value
+  const formated = smartFormatNumber(value, charsAfterZero, defaultDecimalPlaces)
+  const cleanedFormated = formated.replace(/\s+/g, '');
+  const [integerPart] = cleanedFormated.split('.');
+  const len = integerPart.length
+
+  if (len <= 6) {
+    return formated
+  }
+  if (len > 6 && len <= 9) {
+    const millions = cleanedFormated.slice(0, len - 6);
+    const remainder = cleanedFormated.slice(len - 6, len - 5);
+    return `${millions}.${remainder}M`;
+  }
+
+  const billions = cleanedFormated.slice(0, len - 9);
+  const remainder = cleanedFormated.slice(len - 9, len - 8);
+  return `${billions}.${remainder}B`;
 }

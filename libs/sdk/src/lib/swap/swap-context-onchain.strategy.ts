@@ -7,7 +7,7 @@ import {
   defer,
   distinctUntilChanged,
   map,
-  Observable,
+  Observable, of,
   shareReplay,
   switchMap
 } from 'rxjs';
@@ -61,6 +61,8 @@ export class SwapContextOnChainStrategy implements ISwapContextStrategy {
       )
     })
   )
+
+  readonly minReceive$ = this.destinationTokenAmount$
 
   readonly autoSlippage$ = combineLatest([
 

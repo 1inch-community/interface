@@ -7,6 +7,7 @@ import { Rate } from '../token-price';
 
 export interface ISwapContext {
   readonly rate$: Observable<Rate | null>
+  readonly minReceive$: Observable<bigint>
   readonly chainId$: Observable<ChainId | null>
   readonly connectedWalletAddress$: Observable<Address | null>
   destroy(): void

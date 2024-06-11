@@ -162,6 +162,10 @@ export const fusionSwapInfoMainStyle = css`
         transition: opacity .2s, transform .2s;
         will-change: opacity;
     }
+    
+    .min-receive {
+        color: var(--color-content-content-primary);
+    }
 
     @media (hover: hover) {
         .container:not(.open):hover {

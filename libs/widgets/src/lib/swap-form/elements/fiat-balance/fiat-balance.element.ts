@@ -6,7 +6,7 @@ import { ISwapContext } from '@one-inch-community/models';
 import { observe } from '@one-inch-community/lit';
 import { catchError, combineLatest, defer, filter, map, switchMap } from 'rxjs';
 import { formatUnits } from 'viem';
-import { formatSmartNumber, TokenController } from '@one-inch-community/sdk';
+import { smartFormatNumber, TokenController } from '@one-inch-community/sdk';
 import { fiatBalanceStyles } from './fiat-balance.styles';
 
 @customElement(FiatBalanceElement.tagName)
@@ -40,7 +40,7 @@ export class FiatBalanceElement extends LitElement {
           if (!amount) return html`<br>`
           const balanceFormatted = formatUnits(BigInt(amount ?? 0), token.decimals);
           const balanceUsd = Number(balanceFormatted) * Number(tokenPrice);
-          return this.getBalanceView(formatSmartNumber(balanceUsd.toString(), 1))
+          return this.getBalanceView(smartFormatNumber(balanceUsd.toString(), 1))
         }),
         catchError(() => [html`<br>`])
       )

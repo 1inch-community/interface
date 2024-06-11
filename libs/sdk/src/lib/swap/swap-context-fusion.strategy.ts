@@ -71,6 +71,13 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy {
     })
   )
 
+  readonly minReceive$ = this.recommendedPreset$.pipe(
+    switchMap(preset => {
+      if (!preset) return this.fallback.minReceive$
+      return [BigInt(preset.auctionEndAmount)]
+    })
+  )
+
   readonly rate$: Observable<Rate | null> = combineLatest([
     this.quoteReceive$,
     this.averageDestinationTokenAmount$
