@@ -289,7 +289,7 @@ function getId(...args: unknown[]) {
 }
 
 function calcTokenPriority(dto: ITokenDto): number {
-  let priority = dto?.providers?.length ?? 0;
+  let priority = dto.providers?.length ?? 0;
   priority += TokenPriority[dto.symbol] ?? 0;
   for (const tag of dto.tags) {
     priority += (TokenPriority[tag] ?? 0);

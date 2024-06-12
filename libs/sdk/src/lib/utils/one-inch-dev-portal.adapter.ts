@@ -1,4 +1,4 @@
-import { ChainId, ITokenDto, FusionQuoteReceiveDto } from '@one-inch-community/models';
+import { ChainId, ITokenDto, FusionQuoteReceiveDto, GasPriceDto } from '@one-inch-community/models';
 import type { Address } from 'viem';
 import { getEnvironmentValue } from '../environment';
 import { TimeCache } from '../cache';
@@ -6,6 +6,7 @@ import { CacheActivePromise } from './decorators';
 
 const tokenPriceCache = new TimeCache<ChainId, Record<Address, string>>(10000)
 const fusionQuoteReceiveCache = new TimeCache<string, FusionQuoteReceiveDto | null>(5000)
+const gasPriceCache = new TimeCache<ChainId, GasPriceDto>(5000)
 
 export class OneInchDevPortalAdapter {
 
@@ -23,7 +24,7 @@ export class OneInchDevPortalAdapter {
   }
 
 
-  @CacheActivePromise((_, chainId: ChainId) => chainId.toString())
+  @CacheActivePromise()
   async getTokenPrices(chainId: ChainId): Promise<Record<Address, string>> {
     const cacheValue = tokenPriceCache.get(chainId)
     if (cacheValue) {
@@ -39,7 +40,7 @@ export class OneInchDevPortalAdapter {
   /**
    * doc link https://portal.1inch.dev/documentation/fusion/swagger/quoter?method=get&path=%2Fv1.0%2F1%2Fquote%2Freceive
    * */
-  @CacheActivePromise((...args: unknown[]) => args.slice(1).join(':'))
+  @CacheActivePromise()
   async getFusionQuoteReceive(
     chainId: ChainId,
     fromTokenAddress: Address,
@@ -73,5 +74,23 @@ export class OneInchDevPortalAdapter {
     const result = await response.json();
     fusionQuoteReceiveCache.set(id, result)
     return { ...result, chainId }
+  }
+
+  /**
+   * doc link https://portal.1inch.dev/documentation/gas-price/swagger?method=get&path=%2Fv1.5%2F1
+   * */
+  @CacheActivePromise()
+  async getGasPrice(chainId: ChainId): Promise<GasPriceDto | null> {
+    const cacheValue = gasPriceCache.get(chainId)
+    if (cacheValue) {
+      return cacheValue
+    }
+    const response = await fetch(`${this.host}/gas-price/v1.5/${chainId}`);
+    if (!response.ok) {
+      return null
+    }
+    const result = await response.json();
+    gasPriceCache.set(chainId, result)
+    return result
   }
 }

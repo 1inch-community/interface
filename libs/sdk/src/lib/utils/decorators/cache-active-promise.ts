@@ -1,4 +1,3 @@
-
 export function CacheActivePromise<Ctx extends object, T extends Array<unknown>>(keyExtractor?: (ctx: Ctx, ...args: T) => string) {
   const cacheStorage = new WeakMap<object, Map<string, Promise<unknown>>>()
 
@@ -15,7 +14,7 @@ export function CacheActivePromise<Ctx extends object, T extends Array<unknown>>
     const method: ((...args: T) => Promise<unknown>) = propertyDescriptor.value;
     propertyDescriptor.value = function(...args: T) {
       const cache = getCache(this as Ctx)
-      const key = keyExtractor ? keyExtractor(...[this as Ctx, ...args]) : JSON.stringify(args);
+      const key = keyExtractor ? keyExtractor(...[this as Ctx, ...args]) : JSON.stringify(args, stringifyReplacer);
 
       if (cache.has(key)) {
         return cache.get(key);
@@ -28,4 +27,12 @@ export function CacheActivePromise<Ctx extends object, T extends Array<unknown>>
 
     return propertyDescriptor
   }
+}
+
+function stringifyReplacer(_: string, value: unknown) {
+  if (typeof value === 'bigint') {
+    return value.toString();
+  }
+
+  return value
 }

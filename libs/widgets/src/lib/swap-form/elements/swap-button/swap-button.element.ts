@@ -208,36 +208,19 @@ export class SwapButtonElement extends LitElement {
       return dispatchEvent(this, 'openTokenSelector', 'destination', event)
     }
     if (this.buttonState === SwapButtonState.exceedingMaximumAmount) {
-      return this.onSetMax()
+      return await this.context?.setMaxAmount()
     }
-    if (this.buttonState === SwapButtonState.wrapNativeToken) {
-      const amount = await firstValueFrom(this.sourceTokenAmount$)
-      if (!amount) return
-      await this.context?.wrapNativeToken(amount)
-      await this.onSwap()
-      return
-    }
-    if (this.buttonState === SwapButtonState.lowAllowance) {
-      return
-    }
-    if (this.buttonState === SwapButtonState.readyToSwap) {
-      await this.onSwap()
-      return
+    const snapshot = await this.context?.getSnapshot()
+    if (snapshot) {
+      dispatchEvent(this, 'confirmSwap', snapshot, event)
     }
   }
 
   private getButtonType() {
     if (this.buttonState === SwapButtonState.readyToSwap) return 'primary'
     if (this.buttonState === SwapButtonState.wrapNativeToken) return 'primary'
+    if (this.buttonState === SwapButtonState.lowAllowance) return 'primary'
     return 'secondary'
-  }
-
-  private async onSetMax() {
-    const sourceToken = await firstValueFrom(this.sourceToken$);
-    const connectedWalletAddress = await firstValueFrom(this.connectedWalletAddress$);
-    if (!sourceToken || !connectedWalletAddress) return;
-    const balance = await TokenController.getTokenBalance(sourceToken.chainId, sourceToken.address, connectedWalletAddress);
-    this.context?.setTokenAmountByType('source', BigInt(balance?.amount ?? 0), true);
   }
 
   private async onSwap() {

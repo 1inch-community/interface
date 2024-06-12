@@ -1,6 +1,7 @@
 import { ChainId, IToken } from "@one-inch-community/models";
-import { Address, WalletClient } from 'viem';
+import { Address, parseAbi } from 'viem';
 import { getChainById } from './viem-chain-map';
+import { getClient } from './chain-client';
 
 export const wrapperNativeTokenMap: Readonly<Record<ChainId, Address>> = {
   [ChainId.eth]: '0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2',
@@ -16,6 +17,10 @@ export const wrapperNativeTokenMap: Readonly<Record<ChainId, Address>> = {
   [ChainId.zkSyncEra]: '0x5aea5775959fbc2557cc8789bc1bf90a239d9a91',
 }
 
+const abi = parseAbi([
+  'function deposit() public payable'
+])
+
 export function getWrapperNativeTokenAddress(chainId: ChainId): Address {
   return wrapperNativeTokenMap[chainId]
 }
@@ -26,7 +31,7 @@ export function getWrapperNativeToken(chainId: ChainId): IToken {
     chainId,
     symbol: `W${chain.nativeCurrency.symbol}`,
     name: `W${chain.nativeCurrency.symbol}`,
-    decimals: chain?.nativeCurrency?.decimals ?? 18,
+    decimals: chain.nativeCurrency.decimals,
     address: wrapperNativeTokenMap[chainId],
     isInternalWrapToken: true
   }
@@ -37,4 +42,27 @@ export function getSymbolFromWrapToken(token: IToken) {
     return token.symbol.slice(1)
   }
   return token.symbol
+}
+
+export async function estimateWrap(chainId: ChainId, value: bigint) {
+  const client = getClient(chainId)
+  const address = getWrapperNativeTokenAddress(chainId)
+  return await client.estimateContractGas({
+    abi,
+    address,
+    value,
+    functionName: 'deposit',
+  })
+}
+
+export async function getWrapSimulationRequest(chainId: ChainId, value: bigint) {
+  const client = getClient(chainId)
+  const address = getWrapperNativeTokenAddress(chainId)
+  const result = await client.simulateContract({
+    abi,
+    address,
+    value,
+    functionName: 'deposit',
+  })
+  return result.request
 }

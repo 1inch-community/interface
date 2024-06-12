@@ -4,6 +4,7 @@ import { ChainId } from '../chain';
 import { IToken } from '../token/token';
 import { NullableValue } from '../base';
 import { Rate } from '../token-price';
+import { SwapSnapshot } from './swap-snapshot';
 
 export interface ISwapContext {
   readonly rate$: Observable<Rate | null>
@@ -18,6 +19,9 @@ export interface ISwapContext {
   getTokenRawAmountByType(type: 'source' | 'destination'): Observable<bigint | null>
   setTokenAmountByType(type: 'source' | 'destination', value: bigint, markDirty?: boolean): void
   wrapNativeToken(amount: bigint): Promise<void>
+  getSnapshot(): Promise<SwapSnapshot>
+  getMaxAmount(): Promise<bigint>
+  setMaxAmount(): Promise<void>
   getApprove(): Promise<void>
   getPermit(): Promise<void>
 }

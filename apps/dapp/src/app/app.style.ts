@@ -1,5 +1,5 @@
 import { css } from 'lit';
-import { mobileMediaCSS } from '@one-inch-community/lit';
+import { mobileMediaCSS, safariPWACss } from '@one-inch-community/lit';
 
 export const appStyle = css`
     
@@ -26,6 +26,12 @@ export const appStyle = css`
     ${mobileMediaCSS(css`
         :host::-webkit-scrollbar {
             display: none;
+        }
+    `)}
+    
+    ${safariPWACss(css`
+        :host {
+            height: calc(var(--height) - 10px);
         }
     `)}
 

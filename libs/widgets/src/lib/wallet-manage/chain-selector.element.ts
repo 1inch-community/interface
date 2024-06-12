@@ -48,8 +48,10 @@ export class ChainSelectorElement extends LitElement {
     return html`
       <inch-button @click="${() => this.onClick()}" size="l" type="primary-gray">
         <inch-icon class="${observe(this.unsupportedChainId$)}" icon="${observe(this.chainIdIconName$)}"></inch-icon>
-        ${when(!this.mobileMedia.matches, () => html`<span>${observe(this.chainIdName$)}</span>`)}
-        <inch-icon icon="chevronDown16"></inch-icon>
+        ${when(!this.mobileMedia.matches, () => html`
+          <span>${observe(this.chainIdName$)}</span>
+          <inch-icon icon="chevronDown16"></inch-icon>
+        `)}
       </inch-button>
     `;
   }

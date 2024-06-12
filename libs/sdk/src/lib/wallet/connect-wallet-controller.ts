@@ -1,7 +1,7 @@
 import { ChainId, IConnectWalletController, IConnectWalletControllerInternal, IWalletAdapter, EIP6963ProviderDetail, EIP6963ProviderInfo, IDataAdapter } from "@one-inch-community/models"
 import { debounceTime, defaultIfEmpty, fromEvent, Subject, take, takeUntil, tap, timer } from 'rxjs';
 import { UniversalBrowserExtensionAdapter } from './adapters/universal-browser-extension-adapter';
-import { Address } from 'viem';
+import { Address, WriteContractParameters, WriteContractReturnType } from 'viem';
 import { GlobalDataAdapter } from './global-data-adapter';
 import {
   addConnectedWallet, getActiveAddress,
@@ -13,7 +13,7 @@ import {
 } from './storage';
 import { adapterId } from './adapter-id';
 import { getInjectedProviderDetail, getInjectedProviderSupported } from './injected-provider-detail';
-import { WalletConnectV2Adapter, getWalletConnectProviderDetail } from "./adapters/wallet-connect-v2-adapter";
+import { WalletConnectV2Adapter, getWalletConnectProviderDetail } from './adapters/wallet-connect-v2-adapter';
 
 export class WalletControllerImpl implements IConnectWalletController, IConnectWalletControllerInternal {
 
@@ -145,6 +145,14 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
   async setActiveAddress(info: EIP6963ProviderInfo, address: Address) {
     const id = adapterId(info)
     return await this.setActiveAddressInner(id, address)
+  }
+
+  async writeContract(params: WriteContractParameters): Promise<WriteContractReturnType> {
+    if (!this.currentActiveAdapter || !this.currentActiveAdapter.client) {
+      throw new Error('Wallet not connected')
+    }
+    const client = this.currentActiveAdapter.client
+    return await client.writeContract(params)
   }
 
   private async setActiveAddressInner(id: string, address: Address) {

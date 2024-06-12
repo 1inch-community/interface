@@ -116,6 +116,12 @@ export const inputStyle = css`
         box-shadow: 0 0 0 1px var(--color-background-bg-positive-hover); 
     }
     
+    .balance-and-max {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    
     @media (hover: hover) {
         .input-container:not(.disabled):hover {
             box-shadow: 0 0 0 1px var(--color-background-bg-positive-hover);
@@ -123,6 +129,10 @@ export const inputStyle = css`
         .symbol-container:hover {
             background-color: var(--color-background-bg-positive-hover);
         }
+    }
+    
+    .set-max-in-progress {
+        
     }
 
     ${mobileMediaCSS(css`

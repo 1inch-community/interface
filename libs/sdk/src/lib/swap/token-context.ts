@@ -1,12 +1,6 @@
 import { map, Observable, startWith, Subject } from 'rxjs';
-import { IToken } from '@one-inch-community/models';
+import { IToken, NullableValue, TokenSnapshot } from '@one-inch-community/models';
 import { isTokensEqual } from '../tokens';
-
-type TokenAndAmount = {
-  amountRaw: bigint | null,
-  amountView: bigint | null,
-  token: IToken | null
-}
 
 export class TokenContext {
 
@@ -20,6 +14,8 @@ export class TokenContext {
       return
     }
     this.token = token ?? null
+    this.amount = 0n
+    this.amountForView = 0n
     this.signalChange$.next()
   }
 
@@ -34,7 +30,7 @@ export class TokenContext {
     this.signalChange$.next()
   }
 
-  getSnapshot(): TokenAndAmount {
+  getSnapshot(): NullableValue<TokenSnapshot> {
     return {
       token: this.token,
       amountRaw: this.amount,
@@ -42,7 +38,7 @@ export class TokenContext {
     }
   }
 
-  streamSnapshot(): Observable<TokenAndAmount> {
+  streamSnapshot(): Observable<NullableValue<TokenSnapshot>> {
     return this.signalChange$.pipe(
       map(() => this.getSnapshot()),
       startWith(this.getSnapshot())

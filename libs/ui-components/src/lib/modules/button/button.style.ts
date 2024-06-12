@@ -52,6 +52,12 @@ export const buttonStyle = css`
 `
 
 export const buttonSizeStyle = css`
+
+    .xs {
+        padding: 0 2px;
+        border-radius: 4px;
+        font-size: 12px;
+    }
     
     .m {
         padding: 6px 12px;
