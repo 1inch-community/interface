@@ -8,6 +8,7 @@
     "build:lib": "ts-node --project ./tools/packagr/tsconfig.json tools/packagr/main.ts"
   },
   "dependencies": {
+    "@1inch/fusion-sdk": "^2.1.4",
     "@lit-labs/virtualizer": "2.0.12",
     "@lit/context": "1.1.0",
     "@lit/task": "1.0.0",
@@ -19,7 +20,6 @@
     "@walletconnect/universal-provider": "2.12.2",
     "dexie": "3.2.7",
     "eventemitter3": "5.0.1",
-    "evm-proxy-detection": "^2.0.1",
     "lit": "3.1.2",
     "rxjs": "7.8.1",
     "tslib": "2.6.2",

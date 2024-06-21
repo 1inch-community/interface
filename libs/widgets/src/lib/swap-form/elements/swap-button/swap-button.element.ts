@@ -21,7 +21,17 @@ import {
   getMobileMatchMediaAndSubscribe,
   subscribe
 } from '@one-inch-community/lit';
-import { getAllowance, getOneInchRouterV6ContractAddress, isChainId, isNativeToken, JsonParser, storage, TokenController } from '@one-inch-community/sdk';
+import {
+  getAllowance,
+  getOneInchRouterV6ContractAddress,
+  isChainId,
+  isNativeToken,
+  isSupportPermit2,
+  JsonParser,
+  storage,
+  TokenController,
+  hasPermit
+} from '@one-inch-community/sdk';
 import { BrandColors, getThemeChange } from '@one-inch-community/ui-components/theme';
 import { swapButtonStyle } from './swap-button.style';
 import { when } from 'lit/directives/when.js';
@@ -36,8 +46,12 @@ enum SwapButtonState {
   exceedingMaximumAmount,
   rateNotExist,
   checkAllowance,
-  lowAllowance,
-  wrapNativeToken
+  lowAllowanceNeedApprove,
+  lowAllowanceNeedPermit,
+  wrapNativeToken,
+
+  permitInWallet,
+  approveInWallet
 }
 
 @customElement(SwapButtonElement.tagName)
@@ -144,7 +158,12 @@ export class SwapButtonElement extends LitElement {
       const allowance = await getAllowance(chainId, srcToken.address, walletAddress, contract)
       const amount = await firstValueFrom(this.sourceTokenAmount$)
       if (amount && allowance < amount) {
-        return SwapButtonState.lowAllowance
+        if (isSupportPermit2(chainId)) {
+          const isHasPermit = await hasPermit(chainId, srcToken.address, walletAddress, contract)
+          if (isHasPermit) return state
+          return SwapButtonState.lowAllowanceNeedPermit
+        }
+        return SwapButtonState.lowAllowanceNeedApprove
       }
       return state
     }),
@@ -178,8 +197,9 @@ export class SwapButtonElement extends LitElement {
         `)}
         ${when(this.buttonState === SwapButtonState.readyToSwap, () => html`<span>Swap</span>`)}
         ${when(this.buttonState === SwapButtonState.checkAllowance, () => html`<span>Check allowance</span>`)}
-        ${when(this.buttonState === SwapButtonState.wrapNativeToken, () => html`<span>Wrap ${this.srcToken?.symbol} to W${this.srcToken?.symbol} and Swap</span>`)}
-        ${when(this.buttonState === SwapButtonState.lowAllowance, () => html`<span>Low allowance</span>`)}
+        ${when(this.buttonState === SwapButtonState.wrapNativeToken, () => html`<span>Native token not supported now</span>`)}
+        ${when(this.buttonState === SwapButtonState.lowAllowanceNeedApprove, () => html`<span>Approve and Swap</span>`)}
+        ${when(this.buttonState === SwapButtonState.lowAllowanceNeedPermit, () => html`<span>Permit and Swap</span>`)}
         ${when(this.buttonState === SwapButtonState.walletNotConnected, () => html`<span>Connect wallet</span>`)}
         ${when(this.buttonState === SwapButtonState.unselectedSourceToken, () => html`<span>Select source token</span>`)}
         ${when(this.buttonState === SwapButtonState.unselectedDestinationToken, () => html`<span>Select destination token</span>`)}
@@ -190,36 +210,67 @@ export class SwapButtonElement extends LitElement {
           <span class="on-hover">Set max ${this.srcToken?.symbol}</span>
           <br>
         `)}
+        ${when(this.buttonState === SwapButtonState.permitInWallet, () => html`
+          <span class="off-hover">Wait wallet response</span>
+          <span class="on-hover">Permit swap in wallet</span>
+          <br>
+        `)}
+        ${when(this.buttonState === SwapButtonState.approveInWallet, () => html`
+          <span class="off-hover">Wait wallet response</span>
+          <span class="on-hover">Allow swap in wallet</span>
+          <br>
+        `)}
       </inch-button>
     `;
   }
 
   private async onClickSwapButton(event: MouseEvent) {
-    if (this.buttonState === SwapButtonState.unsupportedChain) {
-      return dispatchEvent(this, 'changeChain', null)
+    if (!this.context) {
+      throw new Error('')
     }
-    if (this.buttonState === SwapButtonState.walletNotConnected) {
-      return dispatchEvent(this, 'connectWallet', null)
-    }
-    if (this.buttonState === SwapButtonState.unselectedSourceToken) {
-      return dispatchEvent(this, 'openTokenSelector', 'source', event)
-    }
-    if (this.buttonState === SwapButtonState.unselectedDestinationToken) {
-      return dispatchEvent(this, 'openTokenSelector', 'destination', event)
-    }
-    if (this.buttonState === SwapButtonState.exceedingMaximumAmount) {
-      return await this.context?.setMaxAmount()
-    }
-    const snapshot = await this.context?.getSnapshot()
-    if (snapshot) {
-      dispatchEvent(this, 'confirmSwap', snapshot, event)
+    const stateState = this.buttonState
+    try {
+      if (this.buttonState === SwapButtonState.unsupportedChain) {
+        return dispatchEvent(this, 'changeChain', null)
+      }
+      if (this.buttonState === SwapButtonState.walletNotConnected) {
+        return dispatchEvent(this, 'connectWallet', null)
+      }
+      if (this.buttonState === SwapButtonState.unselectedSourceToken) {
+        return dispatchEvent(this, 'openTokenSelector', 'source', event)
+      }
+      if (this.buttonState === SwapButtonState.unselectedDestinationToken) {
+        return dispatchEvent(this, 'openTokenSelector', 'destination', event)
+      }
+      if (this.buttonState === SwapButtonState.exceedingMaximumAmount) {
+        return await this.context.setMaxAmount()
+      }
+      if (this.buttonState === SwapButtonState.lowAllowanceNeedApprove) {
+        this.buttonState = SwapButtonState.approveInWallet
+        await this.context.getApprove()
+        this.buttonState = SwapButtonState.readyToSwap
+      }
+      if (this.buttonState === SwapButtonState.lowAllowanceNeedPermit) {
+        this.buttonState = SwapButtonState.permitInWallet
+        await this.context.getPermit()
+        this.buttonState = SwapButtonState.readyToSwap
+      }
+      if (this.buttonState === SwapButtonState.readyToSwap) {
+        const snapshot = await this.context.getSnapshot()
+        if (snapshot) {
+          dispatchEvent(this, 'confirmSwap', snapshot, event)
+        }
+      }
+    } catch (error) {
+      this.buttonState = stateState
     }
   }
 
   private getButtonType() {
     if (this.buttonState === SwapButtonState.readyToSwap) return 'primary'
-    if (this.buttonState === SwapButtonState.wrapNativeToken) return 'primary'
-    if (this.buttonState === SwapButtonState.lowAllowance) return 'primary'
+    // if (this.buttonState === SwapButtonState.wrapNativeToken) return 'primary'
+    if (this.buttonState === SwapButtonState.lowAllowanceNeedApprove) return 'primary'
+    if (this.buttonState === SwapButtonState.lowAllowanceNeedPermit) return 'primary'
     return 'secondary'
   }
 

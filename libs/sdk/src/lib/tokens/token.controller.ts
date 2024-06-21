@@ -6,7 +6,7 @@ import { averageBlockTime } from '../chain/average-block-time';
 import { TokenUsdOnChainPriceProvider } from './token-usd-on-chain-price.provider';
 import { liveQuery } from 'dexie';
 import { CacheActivePromise } from '../utils/decorators';
-import { getBalances } from '../chain';
+import { getBalances, isSupportedEIP2612 } from '../chain';
 
 const lastUpdateTokenDatabaseTimestampStorageKey = `last-update-token-database-timestamp-v${TokenSchema.databaseVersion}`
 const lastUpdateTokenBalanceDatabaseTimestampStorageKey = `last-update-token-balance-database-timestamp-v${TokenSchema.databaseVersion}`
@@ -156,6 +156,17 @@ class TokenControllerImpl {
       result[address] = prices[address] ?? '0'
     }
     return result
+  }
+
+  async isSupportedTokenPermit(chainId: ChainId, tokenAddress: Address): Promise<boolean> {
+    const token = await this.schema.getToken(chainId, tokenAddress)
+    if (!token) return false
+    if (token.eip2612 === null) {
+      const state = await isSupportedEIP2612(chainId, tokenAddress)
+      await this.schema.setEip2612Support(chainId, tokenAddress, state)
+      return state
+    }
+    return token.eip2612
   }
 
   /**

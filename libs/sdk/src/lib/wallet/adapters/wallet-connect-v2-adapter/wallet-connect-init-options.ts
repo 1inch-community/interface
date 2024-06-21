@@ -51,6 +51,7 @@ export const options = async (): Promise<EthereumProviderOptions> => {
         '--wcm-background-color': 'var(--primary)',
         '--wcm-accent-color': 'var(--primary)',
         '--wcm-color-bg-2': 'none',
+        '--wcm-z-index': '2000',
         '--wcm-color-fg-1': 'var(--color-content-content-primary)',
       }
     }

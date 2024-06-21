@@ -2,7 +2,6 @@ import { AbiFunction, Address, Hex, parseAbi, toFunctionSelector, maxUint256 } f
 import { getClient } from './chain-client';
 import { ChainId } from '@one-inch-community/models';
 import { QueueCache } from '../cache';
-import { getImplementationAddress } from './proxy-contract';
 
 type EIP712Parameter = {
   name: string
@@ -118,15 +117,6 @@ export async function isSupportedEIP2612(chainId: ChainId, contract: Address): P
     isSupportedEIP2612 && (isSupportedEIP2612 = checkExistPermitSelector(lowerCaseCode))
     isSupportedEIP2612 && (isSupportedEIP2612 = checkExistDomainSeparatorSelector(lowerCaseCode))
     isSupportedEIP2612 && (isSupportedEIP2612 = checkExistNonceSelector(lowerCaseCode))
-    if (!isSupportedEIP2612) {
-      const implAddress = await getImplementationAddress(chainId, contract)
-      const implCode = await getCode(chainId, implAddress);
-      const lowerCaseImplCode = implCode.toLowerCase() as Hex
-      isSupportedEIP2612 = true
-      isSupportedEIP2612 && (isSupportedEIP2612 = checkExistPermitSelector(lowerCaseImplCode))
-      isSupportedEIP2612 && (isSupportedEIP2612 = checkExistDomainSeparatorSelector(lowerCaseImplCode))
-      isSupportedEIP2612 && (isSupportedEIP2612 = checkExistNonceSelector(lowerCaseImplCode))
-    }
     return isSupportedEIP2612
   } catch (error) {
     return false

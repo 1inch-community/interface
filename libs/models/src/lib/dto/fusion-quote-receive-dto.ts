@@ -10,6 +10,7 @@ export interface FusionQuoteReceiveDto {
   toTokenAmount: string
   fromTokenAmount: string
   feeToken: Address
+  autoK: number
 }
 
 export interface FusionPresetDto {

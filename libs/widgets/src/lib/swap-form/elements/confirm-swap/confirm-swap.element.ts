@@ -1,4 +1,4 @@
-import { html, LitElement, PropertyValues } from 'lit';
+import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { choose } from 'lit/directives/choose.js';
 import { confirmSwapStyle } from './confirm-swap.style';
@@ -7,9 +7,10 @@ import '@one-inch-community/widgets/token-icon'
 import '@one-inch-community/ui-components/card'
 import '@one-inch-community/ui-components/button'
 import '@one-inch-community/ui-components/icon'
-import { getWrapperNativeToken, isNativeToken, smartFormatNumber } from '@one-inch-community/sdk';
+import { getBlockEmitter, getWrapperNativeToken, isNativeToken, smartFormatNumber, TokenController } from '@one-inch-community/sdk';
 import { formatUnits } from 'viem';
-import { getMobileMatchMediaAndSubscribe } from '@one-inch-community/lit';
+import { getMobileMatchMediaAndSubscribe, observe } from '@one-inch-community/lit';
+import { exhaustMap, Observable, shareReplay } from 'rxjs';
 
 @customElement(ConfirmSwapElement.tagName)
 export class ConfirmSwapElement extends LitElement {
@@ -19,18 +20,14 @@ export class ConfirmSwapElement extends LitElement {
 
   @property({ type: Object }) swapSnapshot!: SwapSnapshot
 
-  @state() state: 'swap' | 'wrap' = 'swap'
+  @state() state: 'swap' | 'wrap' | null = null
+
+  private fiatAmountMap = new Map<string, Observable<string>>()
 
   private readonly mobileMedia = getMobileMatchMediaAndSubscribe(this);
 
   private get needWrap() {
     return isNativeToken(this.swapSnapshot.sourceToken.token.address)
-  }
-
-  protected override firstUpdated() {
-    if (this.needWrap) {
-      this.state = 'wrap'
-    }
   }
 
   protected override render() {
@@ -74,7 +71,7 @@ export class ConfirmSwapElement extends LitElement {
             ])}
           </span>
           
-          <span>~$999</span>
+          <span>${observe(this.getFiatAmountStream(tokenSnapshot))}</span>
         </div>
         <div class="token-view-row">
           <div class="symbol-view">
@@ -114,6 +111,24 @@ export class ConfirmSwapElement extends LitElement {
         </div>
       </div>
     `
+  }
+
+  private getFiatAmountStream(tokenSnapshot: TokenSnapshot) {
+    if (this.fiatAmountMap.has(tokenSnapshot.token.address)) {
+      return this.fiatAmountMap.get(tokenSnapshot.token.address)!
+    }
+
+    const stream = getBlockEmitter(this.swapSnapshot.chainId).pipe(
+      exhaustMap(async () => {
+        const usdPrice = await TokenController.getTokenUSDPrice(this.swapSnapshot.chainId, tokenSnapshot.token.address)
+        const balanceFormatted = formatUnits(BigInt(tokenSnapshot.amountView), tokenSnapshot.token.decimals);
+        const balanceUsd = Number(balanceFormatted) * Number(usdPrice);
+        return `~$${smartFormatNumber(balanceUsd.toString(), 2)}`
+      }),
+      shareReplay({ bufferSize: 1, refCount: true })
+    )
+    this.fiatAmountMap.set(tokenSnapshot.token.address, stream)
+    return stream
   }
 
 }

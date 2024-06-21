@@ -1,5 +1,6 @@
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
+import { ISwapContext } from '@one-inch-community/models';
 import { fusionSwapInfoStyle } from './fusion-swap-info.style';
 import '@one-inch-community/ui-components/icon';
 import '@one-inch-community/ui-components/button';
@@ -7,6 +8,8 @@ import '../fusion-swap-info-slippage';
 import '../fusion-swap-info-auction-time';
 import '../fusion-swap-info-main';
 import { SceneController, shiftAnimation } from '@one-inch-community/ui-components/scene';
+import { consume } from '@lit/context';
+import { swapContext } from '../../context';
 
 @customElement(FusionSwapInfoElement.tagName)
 export class FusionSwapInfoElement extends LitElement {
@@ -16,6 +19,9 @@ export class FusionSwapInfoElement extends LitElement {
     fusionSwapInfoStyle,
     SceneController.styles()
   ];
+
+  @consume({ context: swapContext })
+  context?: ISwapContext;
 
   private isOpenFusionInfo = false;
 
@@ -36,6 +42,7 @@ export class FusionSwapInfoElement extends LitElement {
       `,
       slippage: () => html`
         <inch-fusion-swap-info-slippage
+          .settings="${this.context?.getSettingsController('slippage')}"
           @back="${() => {
             this.isOpenFusionInfo = true;
             this.scene.back();
@@ -44,6 +51,7 @@ export class FusionSwapInfoElement extends LitElement {
       `,
       auctionTime: () => html`
         <inch-fusion-swap-info-auction-time
+          .settings="${this.context?.getSettingsController('auctionTime')}"
           @back="${() => {
             this.isOpenFusionInfo = true;
             this.scene.back();

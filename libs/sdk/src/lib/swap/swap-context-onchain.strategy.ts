@@ -1,4 +1,4 @@
-import { IConnectWalletController, Rate } from '@one-inch-community/models';
+import { IConnectWalletController, Rate, SwapSettings } from '@one-inch-community/models';
 import { ISwapContextStrategy } from './models/swap-context-strategy.interface';
 import { PairHolder } from './pair-holder';
 import {
@@ -64,15 +64,13 @@ export class SwapContextOnChainStrategy implements ISwapContextStrategy {
 
   readonly minReceive$ = this.destinationTokenAmount$
 
-  readonly autoSlippage$ = combineLatest([
-
-  ]).pipe(
-
-  )
+  readonly autoSlippage$ = of(null)
+  readonly autoAuctionTime$ = of(null)
 
   constructor(
     private readonly pairHolder: PairHolder,
     private readonly walletController: IConnectWalletController,
+    private readonly settings: SwapSettings,
     private readonly rateProvider = buildDefaultTokenRageProvider()
   ) {
   }

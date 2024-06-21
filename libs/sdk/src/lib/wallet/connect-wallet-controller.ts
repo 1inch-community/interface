@@ -1,7 +1,7 @@
 import { ChainId, IConnectWalletController, IConnectWalletControllerInternal, IWalletAdapter, EIP6963ProviderDetail, EIP6963ProviderInfo, IDataAdapter } from "@one-inch-community/models"
 import { debounceTime, defaultIfEmpty, fromEvent, Subject, take, takeUntil, tap, timer } from 'rxjs';
 import { UniversalBrowserExtensionAdapter } from './adapters/universal-browser-extension-adapter';
-import { Address, WriteContractParameters, WriteContractReturnType } from 'viem';
+import { Address, WriteContractParameters, WriteContractReturnType, SignTypedDataParameters } from 'viem';
 import { GlobalDataAdapter } from './global-data-adapter';
 import {
   addConnectedWallet, getActiveAddress,
@@ -151,8 +151,14 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
     if (!this.currentActiveAdapter || !this.currentActiveAdapter.client) {
       throw new Error('Wallet not connected')
     }
-    const client = this.currentActiveAdapter.client
-    return await client.writeContract(params)
+    return await this.currentActiveAdapter.writeContract(params)
+  }
+
+  async signTypedData(typeData: SignTypedDataParameters) {
+    if (!this.currentActiveAdapter || !this.currentActiveAdapter.client) {
+      throw new Error('Wallet not connected')
+    }
+    return await this.currentActiveAdapter.signTypedData(typeData)
   }
 
   private async setActiveAddressInner(id: string, address: Address) {

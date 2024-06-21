@@ -8,6 +8,13 @@ const tokenPriceCache = new TimeCache<ChainId, Record<Address, string>>(10000)
 const fusionQuoteReceiveCache = new TimeCache<string, FusionQuoteReceiveDto | null>(5000)
 const gasPriceCache = new TimeCache<ChainId, GasPriceDto>(5000)
 
+export type QuoteReceiveCustomPreset = {
+  auctionDuration: number
+  auctionStartAmount: string
+  auctionEndAmount: string
+  points: {toTokenAmount: string; delay: number}[]
+}
+
 export class OneInchDevPortalAdapter {
 
   private readonly host: string = getEnvironmentValue('oneInchDevPortalHost')
@@ -47,12 +54,14 @@ export class OneInchDevPortalAdapter {
     toTokenAddress: Address,
     amount: bigint,
     walletAddress: Address,
+    customPreset?: QuoteReceiveCustomPreset,
     enableEstimate = false,
-    isLedgerLive = false
   ): Promise<FusionQuoteReceiveDto | null> {
+    const { auctionDuration, auctionEndAmount, auctionStartAmount, points } = customPreset ?? {}
     const id = [
-      chainId, fromTokenAddress, toTokenAddress, amount, walletAddress, enableEstimate, isLedgerLive
-    ].join(':')
+      chainId, fromTokenAddress, toTokenAddress, amount, walletAddress, enableEstimate,
+      auctionDuration, auctionEndAmount, auctionStartAmount, points?.join(',')
+    ].filter(Boolean).join(':')
 
     if (fusionQuoteReceiveCache.has(id)) {
       return fusionQuoteReceiveCache.get(id)
@@ -64,9 +73,13 @@ export class OneInchDevPortalAdapter {
       walletAddress,
       amount: amount.toString(),
       enableEstimate: enableEstimate.toString(),
-      isLedgerLive: isLedgerLive.toString(),
+      isLedgerLive: 'false',
     });
-    const response = await fetch(`${this.host}/fusion/quoter/v1.0/${chainId}/quote/receive?${queryParams}`);
+
+    const response = await fetch(`${this.host}/fusion/quoter/v2.0/${chainId}/quote/receive?${queryParams}`, {
+      method: !customPreset ? 'GET' : 'POST',
+      body: customPreset && JSON.stringify(customPreset)
+    });
     if (!response.ok) {
       fusionQuoteReceiveCache.set(id, null)
       return null

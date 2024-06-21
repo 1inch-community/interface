@@ -3,7 +3,7 @@ import { IWalletAdapter } from './wallet-adapter';
 import { Observable } from 'rxjs';
 import { EIP6963ProviderInfo } from './provider';
 import { IDataAdapter, IGlobalDataAdapter } from './data-adapter';
-import { Address, WriteContractParameters, WriteContractReturnType } from 'viem';
+import { Address, SignTypedDataParameters, WriteContractParameters, WriteContractReturnType, SignTypedDataReturnType } from 'viem';
 
 export interface IConnectWalletController {
   readonly data: IDataAdapter & IGlobalDataAdapter;
@@ -17,6 +17,7 @@ export interface IConnectWalletController {
   getDataAdapter(info: EIP6963ProviderInfo): IDataAdapter
   setActiveAddress(info: EIP6963ProviderInfo, address: Address): Promise<void>
   writeContract(params: WriteContractParameters): Promise<WriteContractReturnType>
+  signTypedData(typeData: SignTypedDataParameters): Promise<SignTypedDataReturnType>
 }
 
 export interface IConnectWalletControllerInternal {

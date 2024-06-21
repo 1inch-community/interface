@@ -133,6 +133,7 @@ export class SwapFormElement extends LitElement {
             .srcToken="${this.srcToken}"
             .dstToken="${this.dstToken}"
             .walletController="${connectWalletController}"
+            @switchPair="${() => this.onSwitchPair()}"
             @confirmSwap="${(event: CustomEvent) => this.onOpenMobileConfirmSwap(event)}"
             @changeFusionInfoOpenState="${(event: CustomEvent) => this.onChangeFusionInfoOpenState(event)}"
             @openTokenSelector="${(event: CustomEvent) => this.onOpenMobileSelectToken(event)}"

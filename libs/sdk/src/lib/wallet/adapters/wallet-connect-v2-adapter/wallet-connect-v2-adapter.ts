@@ -5,7 +5,14 @@ import {
   IProviderDataAdapterInternal,
   IWalletAdapter
 } from '@one-inch-community/models';
-import { Address, WalletClient } from 'viem';
+import {
+  Address,
+  SignTypedDataParameters,
+  SignTypedDataReturnType,
+  WalletClient,
+  WriteContractParameters,
+  WriteContractReturnType
+} from 'viem';
 import { ProviderDataAdapter } from '../../provider-data-adapter';
 import { createClientAndSyncChain } from '../create-client-and-sync-chain';
 import type { MultiConnectProvider } from './multi-connect-provider';
@@ -14,7 +21,7 @@ export class WalletConnectV2Adapter implements IWalletAdapter {
 
   readonly data: IDataAdapter & IProviderDataAdapterInternal;
 
-  private provider: MultiConnectProvider | null = null
+  private provider: MultiConnectProvider | null = null;
 
   client: WalletClient | null = null;
 
@@ -62,6 +69,14 @@ export class WalletConnectV2Adapter implements IWalletAdapter {
 
   setActiveAddress(address: Address | null): void {
     this.provider?.setActiveAddress(address)
+  }
+
+  async writeContract(params: WriteContractParameters): Promise<WriteContractReturnType> {
+    throw new Error('Method not implemented.');
+  }
+
+  async signTypedData(typeData: SignTypedDataParameters): Promise<SignTypedDataReturnType> {
+    throw new Error('Method not implemented.');
   }
 
 }

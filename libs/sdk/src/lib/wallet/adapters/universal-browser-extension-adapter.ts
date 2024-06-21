@@ -1,16 +1,24 @@
 import { ChainId, EIP6963ProviderDetail, IWalletAdapter } from '@one-inch-community/models';
 import { createClient, createClientAndSyncChain } from './create-client-and-sync-chain';
-import { Address, WalletClient } from 'viem';
+import {
+  Address, Hex,
+  SignTypedDataParameters,
+  SignTypedDataReturnType,
+  WalletClient,
+  WriteContractParameters,
+  WriteContractReturnType
+} from 'viem';
 import { ProviderDataAdapter } from '../provider-data-adapter';
+import { isUserRejectError, WalletError } from '../wallet-errors';
 
 export class UniversalBrowserExtensionAdapter implements IWalletAdapter {
 
-  readonly data: ProviderDataAdapter
+  readonly data: ProviderDataAdapter;
 
-  client: WalletClient | null = null
+  client: WalletClient | null = null;
 
   constructor(private readonly providerDetail: EIP6963ProviderDetail) {
-    this.data = new ProviderDataAdapter(this.providerDetail.info)
+    this.data = new ProviderDataAdapter(this.providerDetail.info);
   }
 
   async connect(chainId: ChainId): Promise<boolean> {
@@ -55,4 +63,39 @@ export class UniversalBrowserExtensionAdapter implements IWalletAdapter {
     this.data.setActiveAddress(address)
   }
 
+  async writeContract(params: WriteContractParameters): Promise<WriteContractReturnType> {
+    if (!(await this.isConnected()) || !this.client) {
+      throw new Error('Wallet not connected')
+    }
+    return await this.client.writeContract(params)
+  }
+
+  async signTypedData(typeData: SignTypedDataParameters): Promise<SignTypedDataReturnType> {
+    if (!(await this.isConnected()) || !this.client) {
+      throw new Error('Wallet not connected')
+    }
+    try {
+      return await this.client.signTypedData(typeData)
+    } catch (error: any) {
+      if (isUserRejectError(error as WalletError)) {
+        throw new error
+      }
+      console.log(error)
+    }
+    const address = (await this.data.getActiveAddress())!
+    const data = JSON.stringify(typeData, stringifyReplacer)
+    return await this.providerDetail.provider.request({
+      method: 'eth_signTypedData_v3',
+      params: [address, data],
+    }) as Hex
+  }
+
+}
+
+function stringifyReplacer(_: string, value: unknown) {
+  if (typeof value === 'bigint') {
+    return value.toString();
+  }
+
+  return value
 }

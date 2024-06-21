@@ -7,17 +7,18 @@ import { consume } from '@lit/context';
 import { swapContext } from '../../context';
 import {
   debounceTime,
-  defer, distinctUntilChanged,
+  defer, distinctUntilChanged, map,
   shareReplay,
   startWith,
   switchMap,
-  withLatestFrom,
+  withLatestFrom
 } from 'rxjs';
 import { ISwapContext, Rate } from '@one-inch-community/models';
 import { formatUnits, parseUnits } from 'viem';
-import { BigMath, smartFormatNumber, getSymbolFromWrapToken, isRateEqual, isTokensEqual, TokenController, smartFormatAndShorteningNumber } from '@one-inch-community/sdk';
+import { BigMath, smartFormatNumber, formatSeconds, getSymbolFromWrapToken, isRateEqual, isTokensEqual, TokenController, smartFormatAndShorteningNumber } from '@one-inch-community/sdk';
 import "@one-inch-community/ui-components/button"
 import "@one-inch-community/ui-components/icon"
+import { when } from 'lit/directives/when.js';
 
 @customElement(FusionSwapInfoMainElement.tagName)
 export class FusionSwapInfoMainElement extends LitElement {
@@ -34,6 +35,33 @@ export class FusionSwapInfoMainElement extends LitElement {
   readonly minReceive$ = defer(() => this.getContext().minReceive$);
   readonly chainId$ = defer(() => this.getContext().chainId$);
   readonly destinationToken$ = defer(() => this.getContext().getTokenByType('destination'));
+  readonly slippage$ = defer(() => this.getContext().slippage$).pipe(
+    map((slippage) => {
+
+      return html`
+        ${slippage.value === null ? '' : html`<span>${slippage.value}% · </span>`}
+        <span>
+          ${when(slippage.type === 'auto', () => 'Auto')}
+          ${when(slippage.type === 'custom', () => 'Custom')}
+          ${when(slippage.type === 'preset', () => 'Manual')}
+        </span>
+      `
+    })
+  );
+
+  readonly auctionTime$ = defer(() => this.getContext().auctionTime$).pipe(
+    map((slippage) => {
+
+      return html`
+        ${slippage.value === null ? '' : html`<span>${formatSeconds(slippage.value)} · </span>`}
+        <span>
+          ${when(slippage.type === 'auto', () => 'Auto')}
+          ${when(slippage.type === 'custom', () => 'Custom')}
+          ${when(slippage.type === 'preset', () => 'Manual')}
+        </span>
+      `
+    })
+  );
 
   readonly rateView$ = this.rate$.pipe(
     debounceTime(0),
@@ -77,7 +105,7 @@ export class FusionSwapInfoMainElement extends LitElement {
 
       return html`
         <span>~$${amountUsdFormated}</span>
-        <span class="min-receive">${smartFormatAndShorteningNumber(formatUnits(minReceive, dstToken.decimals), 2)} ${dstToken.symbol}</span>
+        <span class="min-receive">${smartFormatAndShorteningNumber(formatUnits(minReceive, dstToken.decimals), 6)} ${dstToken.symbol}</span>
       `
     })
   )
@@ -127,13 +155,13 @@ export class FusionSwapInfoMainElement extends LitElement {
           <div class="content-row">
             <span class="row-title">Slippage tolerance</span>
             <div @click="${() => dispatchEvent(this, 'openSlippageSettings', null)}" class="row-content row-slippage">
-              0.4% · Auto
+              ${observe(this.slippage$)}
             </div>
           </div>
           <div class="content-row">
             <span class="row-title">Auction time</span>
             <div @click="${() => dispatchEvent(this, 'openAuctionTimeSettings', null)}" class="row-content row-slippage">
-              180s · Auto
+              ${observe(this.auctionTime$)}
             </div>
           </div>
           <div class="content-row">
