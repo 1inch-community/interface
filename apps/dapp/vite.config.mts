@@ -91,6 +91,7 @@ export default defineConfig(({ mode }) => {
         registerType: 'autoUpdate',
         manifest: manifest(baseHref),
         workbox: {
+          disableDevLogs: true,
           runtimeCaching: [
             {
               urlPattern: ({ url }) => url.origin !== self.location.origin && /\.(png|jpg|jpeg|svg|gif)$/.test(url.pathname),

@@ -4,7 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import '@one-inch-community/ui-components/card'
 import "@one-inch-community/ui-components/icon"
 import "@one-inch-community/ui-components/button"
-import { IConnectWalletController, IToken } from '@one-inch-community/models';
+import { IConnectWalletController, IToken, ISwapContext } from '@one-inch-community/models';
 import { SwapContext } from '@one-inch-community/sdk';
 import { combineLatest, defer, distinctUntilChanged, map, startWith, tap } from 'rxjs';
 import { subscribe } from '@one-inch-community/lit';
@@ -26,6 +26,8 @@ export class SwapFromElement extends LitElement {
   @property({ type: Object, attribute: false }) dstToken: IToken | null = null
 
   @property({ type: Object, attribute: false }) walletController?: IConnectWalletController
+
+  @property({ type: Object, attribute: false }) swapContext?: ISwapContext
 
   readonly context = new ContextProvider(this, { context: swapContext })
 
@@ -51,6 +53,9 @@ export class SwapFromElement extends LitElement {
 
   override disconnectedCallback() {
     super.disconnectedCallback();
+    if (this.swapContext) {
+      return
+    }
     this.context.value?.destroy()
   }
 
@@ -72,10 +77,7 @@ export class SwapFromElement extends LitElement {
 
     return html`
       <div class="swap-form-container">
-        <inch-card-header headerText="Swap tokens" headerTextPosition="left">
-          <inch-button slot="right-container" type="tertiary-gray" size="m">
-            <inch-icon icon="authRefresh36"></inch-icon>
-          </inch-button>
+        <inch-card-header headerText="Swap" headerTextPosition="left">
         </inch-card-header>
         
         <div class="input-container">
@@ -103,6 +105,10 @@ export class SwapFromElement extends LitElement {
 
   private getContext() {
     if (!this.context.value) {
+      if (this.swapContext) {
+        this.context.setValue(this.swapContext);
+        return this.swapContext
+      }
       const context = new SwapContext(
         this.getWalletController()
       )

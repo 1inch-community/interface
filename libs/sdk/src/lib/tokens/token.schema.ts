@@ -139,6 +139,13 @@ export class TokenSchema extends Dexie {
     return records[0] ?? null;
   }
 
+  async isEmptyTokenBalanceStorage(chainId: ChainId, walletAddress: Address) {
+    return this.balances
+      .filter(record => record.chainId === chainId && isAddressEqual(record.walletAddress, walletAddress))
+      .toArray()
+      .then(list => list.length === 0)
+  }
+
   async setTokens(chainId: ChainId, tokens: ITokenDto[]) {
     const tableTokens: ITokenRecord[] = [];
     for (const token of tokens) {

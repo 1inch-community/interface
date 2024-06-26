@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { buttonSizeStyle, buttonStyle, buttonTypeStyle } from './button.style';
+import { buttonLoaderStyle, buttonSizeStyle, buttonStyle, buttonTypeStyle } from './button.style';
 import { vibrate } from '@one-inch-community/lit';
 
 type ButtonSize = 'xs' | 'm' | 'l' | 'xl' | 'xxl'
@@ -24,7 +24,8 @@ export class ButtonElement extends LitElement {
   static override styles = [
     buttonStyle,
     buttonSizeStyle,
-    buttonTypeStyle
+    buttonTypeStyle,
+    buttonLoaderStyle
   ]
 
   @property({ type: String, attribute: true }) size: ButtonSize = 'xl'
@@ -34,6 +35,8 @@ export class ButtonElement extends LitElement {
   @property({ type: Boolean, attribute: true }) fullSize = false
 
   @property({ type: Boolean, attribute: true }) disabled = false
+
+  @property({ type: Boolean, attribute: true }) loader = false
 
   @property({ type: Boolean, attribute: true }) disabledSlotPointerEvent = false
 
@@ -45,6 +48,7 @@ export class ButtonElement extends LitElement {
       [this.type]: true,
       'only-icon': this.isIconButton,
       'full-size': this.fullSize,
+      'loader': this.loader,
       'active-box-shadow-inset': this.type.includes('secondary')
         && !this.type.includes('gray'),
     }

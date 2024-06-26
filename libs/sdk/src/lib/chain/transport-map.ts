@@ -44,6 +44,7 @@ function buildFallbackWSTransport(rpcList: string[]) {
 
 export const transportMap: Record<ChainId, Transport> = {
   [ChainId.eth]: buildFallbackTransport([
+    'https://ethereum-rpc.publicnode.com',
     'https://ethereum.publicnode.com',
     'https://rpc.mevblocker.io',
     'https://eth.merkle.io',
@@ -68,20 +69,27 @@ export const transportMap: Record<ChainId, Transport> = {
   ]),
   [ChainId.bnb]: buildFallbackTransport([
     'https://bsc.publicnode.com',
+    'https://bsc-rpc.publicnode.com',
     'https://endpoints.omniatech.io/v1/bsc/mainnet/public',
     'https://bsc-pokt.nodies.app',
     'https://bsc.meowrpc.com',
     'https://bsc.drpc.org',
+    'https://1rpc.io/bnb',
   ]),
   [ChainId.matic]: buildFallbackTransport([
-    'https://polygon.llamarpc.com',
-    'https://endpoints.omniatech.io/v1/matic/mainnet/public',
+    'https://polygon-bor-rpc.publicnode.com',
+    'https://polygon-rpc.com',
+    'https://polygon-pokt.nodies.app',
+    'https://polygon-heimdall-rpc.publicnode.com:443',
     'https://endpoints.omniatech.io/v1/matic/mainnet/public',
     'https://polygon-bor.publicnode.com',
     'https://polygon.drpc.org',
     'https://polygon.meowrpc.com',
+    'https://polygon.llamarpc.com',
   ]),
   [ChainId.op]: buildFallbackTransport([
+    'https://optimism-rpc.publicnode.com',
+    'https://optimism.llamarpc.com',
     'https://optimism.publicnode.com',
     'https://op-pokt.nodies.app',
     'https://optimism.meowrpc.com',
@@ -97,6 +105,7 @@ export const transportMap: Record<ChainId, Transport> = {
   ]),
   [ChainId.gnosis]: buildFallbackTransport([
     'https://gnosis.publicnode.com',
+    'https://gnosis-rpc.publicnode.com',
     'https://rpc.gnosischain.com',
     'https://gnosis.drpc.org',
   ]),
@@ -143,8 +152,9 @@ export const transportWSMap: Record<ChainId, Transport> = {
     'wss://bsc-rpc.publicnode.com',
   ]),
   [ChainId.matic]: buildFallbackWSTransport([
+    'wss://polygon-bor-rpc.publicnode.com',
+    'wss://polygon-heimdall-rpc.publicnode.com:443/websocket',
     'wss://polygon-bor.publicnode.com',
-    'wss://polygon.gateway.tenderly.co',
     'wss://polygon.drpc.org',
   ]),
   [ChainId.op]: buildFallbackWSTransport([
@@ -155,6 +165,7 @@ export const transportWSMap: Record<ChainId, Transport> = {
   ]),
   [ChainId.gnosis]: buildFallbackWSTransport([
     'wss://rpc.gnosischain.com/wss',
+    'wss://gnosis-rpc.publicnode.com',
     'wss://gnosis.publicnode.com',
   ]),
   [ChainId.avalanche]: buildFallbackWSTransport([

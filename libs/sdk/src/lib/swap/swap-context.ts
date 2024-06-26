@@ -15,20 +15,26 @@ import {
   map,
   merge,
   Observable,
-  scan,
-  shareReplay,
   Subscription,
   switchMap,
   tap,
-  combineLatest
+  combineLatest,
+  withLatestFrom,
+  debounceTime,
+  of,
+  startWith,
+  shareReplay,
+  BehaviorSubject,
+  observeOn,
+  animationFrameScheduler
 } from 'rxjs';
 import { PairHolder, TokenType } from './pair-holder';
 import { SwapContextOnChainStrategy } from './swap-context-onchain.strategy';
 import { SwapContextFusionStrategy } from './swap-context-fusion.strategy';
-import { ISwapContextStrategy } from './models/swap-context-strategy.interface';
+import { ISwapContextStrategy, ISwapContextStrategyDataSnapshot } from './models/swap-context-strategy.interface';
 import { TokenController } from '../tokens';
 import {
-  estimateWrap,
+  estimateWrap, getBlockEmitter,
   getOneInchRouterV6ContractAddress, getPermit,
   getPermit2TypeData,
   isNativeToken,
@@ -44,49 +50,75 @@ export class SwapContext implements ISwapContext {
   private readonly subscription = new Subscription()
   private readonly oneInchApiAdapter = new OneInchDevPortalAdapter()
 
-  private lastSwapContextStrategy: ISwapContextStrategy | null = null;
-
-  readonly chainId$ = defer(() => this.walletController.data.chainId$);
-  readonly connectedWalletAddress$ = defer(() => this.walletController.data.activeAddress$);
-
   private readonly settings: SwapSettings = {
     slippage: new SettingsController('slippage'),
     auctionTime: new SettingsController('auctionTime')
   }
 
-  private readonly strategy$: Observable<ISwapContextStrategy> = this.connectedWalletAddress$.pipe(
-    map(address => address === null),
-    distinctUntilChanged(),
-    scan<boolean, ISwapContextStrategy, ISwapContextStrategy | null>((previousStrategy, useOneChainStrategy) => {
-      if (previousStrategy) {
-        previousStrategy.destroy()
-      }
-      return useOneChainStrategy
-        ? new SwapContextOnChainStrategy(this.pairHolder, this.walletController, this.settings)
-        : new SwapContextFusionStrategy(this.pairHolder, this.walletController, this.settings)
-    }, null),
-    tap(strategy => this.lastSwapContextStrategy = strategy),
+  private readonly contextStrategy = {
+    onChain: new SwapContextOnChainStrategy(this.pairHolder, this.walletController),
+    fusion: new SwapContextFusionStrategy(this.pairHolder, this.walletController, this.settings, this.oneInchApiAdapter)
+  }
+
+  readonly loading$ = new BehaviorSubject(false)
+
+  readonly chainId$ = defer(() => this.walletController.data.chainId$).pipe(
+    distinctUntilChanged()
+  );
+  readonly connectedWalletAddress$ = defer(() => this.walletController.data.activeAddress$).pipe(
+    distinctUntilChanged()
+  );
+  readonly block$ = this.chainId$.pipe(
+    switchMap(chainId => chainId ? getBlockEmitter(chainId) : of(null))
+  )
+
+  private readonly dataUpdateEmitter$: Observable<void> = merge(
+    this.block$,
+    this.chainId$,
+    this.connectedWalletAddress$,
+    this.pairHolder.streamSnapshot('source'),
+    this.pairHolder.streamSnapshot('destination'),
+  ).pipe(
+    observeOn(animationFrameScheduler),
+    debounceTime(500),
+    map(() => void 0),
+    startWith(void 0),
     shareReplay({ bufferSize: 1, refCount: true })
   )
 
-  readonly rate$ = this.strategy$.pipe(
-    switchMap(strategy => strategy.rate$),
+  private readonly activeStrategy$: Observable<ISwapContextStrategy> = this.connectedWalletAddress$.pipe(
+    map(address => address === null ? this.contextStrategy.onChain : this.contextStrategy.fusion)
   )
 
-  readonly minReceive$ = this.strategy$.pipe(
-    switchMap(strategy => strategy.minReceive$),
+  private readonly dataSnapshot$: Observable<ISwapContextStrategyDataSnapshot | null> = this.dataUpdateEmitter$.pipe(
+    withLatestFrom(this.connectedWalletAddress$),
+    switchMap(([ _, address ]) => {
+      this.loading$.next(true)
+      return this.getDataSnapshot(address === null)
+    }),
+    tap(() =>   this.loading$.next(false)),
+    tap(snap => console.log('snapshot', snap)),
+    shareReplay({ bufferSize: 1, refCount: true })
   )
 
-  readonly destinationTokenAmount$ = this.strategy$.pipe(
-    switchMap(strategy => strategy.destinationTokenAmount$)
+  readonly rate$ = this.dataSnapshot$.pipe(
+    map(snapshot => snapshot?.rate ?? null),
   )
 
-  readonly autoSlippage$ = this.strategy$.pipe(
-    switchMap(strategy => strategy.autoSlippage$),
+  readonly minReceive$ = this.dataSnapshot$.pipe(
+    map(snapshot => snapshot?.minReceive ?? 0n),
   )
 
-  readonly autoAuctionTime$ = this.strategy$.pipe(
-    switchMap(strategy => strategy.autoAuctionTime$),
+  readonly destinationTokenAmount$ = this.dataSnapshot$.pipe(
+    map(snapshot => snapshot?.destinationTokenAmount ?? 0n),
+  )
+
+  readonly autoSlippage$ = this.dataSnapshot$.pipe(
+    map(snapshot => snapshot?.autoSlippage ?? null),
+  )
+
+  readonly autoAuctionTime$ = this.dataSnapshot$.pipe(
+    map(snapshot => snapshot?.autoAuctionTime ?? null),
   )
 
   readonly slippage$: Observable<SettingsValue> = combineLatest([
@@ -117,7 +149,7 @@ export class SwapContext implements ISwapContext {
         this.destinationTokenAmount$.pipe(
           distinctUntilChanged(),
           tap(amount => {
-            this.setTokenAmountByType('destination', amount, true)
+            this.setTokenAmountByType('destination', amount)
           })
         )
       ).subscribe()
@@ -170,7 +202,6 @@ export class SwapContext implements ISwapContext {
 
   destroy() {
     this.subscription.unsubscribe()
-    this.lastSwapContextStrategy?.destroy()
   }
 
   setPair(pair: NullableValue<Pair>): void {
@@ -232,7 +263,7 @@ export class SwapContext implements ISwapContext {
 
   async setMaxAmount() {
     const amount = await this.getMaxAmount()
-    this.setTokenAmountByType('source', amount, true)
+    this.setTokenAmountByType('source', amount)
   }
 
   getTokenByType(type: TokenType): Observable<IToken | null> {
@@ -245,7 +276,7 @@ export class SwapContext implements ISwapContext {
   getTokenAmountByType(type: TokenType): Observable<bigint | null> {
     return this.pairHolder.streamSnapshot(type).pipe(
       map(snapshot => {
-        return snapshot.amountView
+        return snapshot.amount
       }),
       distinctUntilChanged(),
     )
@@ -253,17 +284,32 @@ export class SwapContext implements ISwapContext {
 
   getTokenRawAmountByType(type: TokenType): Observable<bigint | null> {
     return this.pairHolder.streamSnapshot(type).pipe(
-      map(snapshot => snapshot.amountRaw),
+      map(snapshot => snapshot.amount),
       distinctUntilChanged(),
     )
   }
 
-  setTokenAmountByType(type: TokenType, value: bigint, markDirty?: boolean): void {
-    this.pairHolder.setAmount(type, value, markDirty)
+  setTokenAmountByType(type: TokenType, value: bigint): void {
+    this.pairHolder.setAmount(type, value)
+  }
+
+  private async getDataSnapshot(useOnChainStrategy: boolean): Promise<ISwapContextStrategyDataSnapshot | null> {
+    if (!useOnChainStrategy) {
+      try {
+        return await this.contextStrategy.fusion.getDataSnapshot()
+      } catch (error) {
+        return this.getDataSnapshot(true)
+      }
+    }
+    try {
+      return await this.contextStrategy.onChain.getDataSnapshot()
+    } catch (error) {
+      return null
+    }
   }
 
 }
 
 function isTokenSnapshotNotNullable(snapshot: NullableValue<TokenSnapshot>): snapshot is TokenSnapshot {
-  return snapshot.token !== null && snapshot.amountRaw !== null && snapshot.amountView !== null
+  return snapshot.token !== null && snapshot.amount !== null
 }

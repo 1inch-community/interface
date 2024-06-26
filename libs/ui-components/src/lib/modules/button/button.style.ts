@@ -52,34 +52,38 @@ export const buttonStyle = css`
 `
 
 export const buttonSizeStyle = css`
+    
+    button {
+        border-radius: var(--border-radius);
+    }
 
     .xs {
         padding: 0 2px;
-        border-radius: 4px;
+        --border-radius: 4px;
         font-size: 12px;
     }
     
     .m {
         padding: 6px 12px;
-        border-radius: 8px;
+        --border-radius: 8px;
         font-size: 14px;
     }
 
     .l {
         padding: 8px 16px;
-        border-radius: 12px;
+        --border-radius: 12px;
         font-size: 14px;
     }
 
     .xl {
         padding: 12px 24px;
-        border-radius: 16px;
+        --border-radius: 16px;
         font-size: 16px;
     }
 
     .xxl {
         padding: 16px 24px;
-        border-radius: 16px;
+        --border-radius: 16px;
         font-size: 20px;
     }
 
@@ -108,6 +112,7 @@ export const buttonTypeStyle = css`
         --button-background-color-hover: var(--primary-hover);
         --button-box-shadow-color-active: var(--secondary);
         --button-text-color: var(--color-core-white);
+        --loader-color: var(--primary-hover);
     }
     
     .primary-critical {
@@ -182,4 +187,55 @@ export const buttonTypeStyle = css`
         color: var(--color-content-content-disabled);
         border: 1px solid var(--button-border-color-disabled, none);
     }
+`
+
+export const buttonLoaderStyle = css`
+
+    button.loader {
+        position: relative;
+        --loader-border-size: 2px;
+    }
+
+    button.loader:before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        box-sizing: border-box;
+        border-radius: var(--border-radius);
+        border: var(--loader-border-size) solid var(--loader-color, var(--button-box-shadow-color-active));
+        animation: loader 3s linear infinite;
+    }
+
+    @keyframes loader {
+        0% {
+            clip-path: polygon(0% 0%, 100% 0%, 100% 5%, 0% 5%);
+        }
+        10% {
+            clip-path: polygon(50% 0%, 100% 0%, 100% 50%, 50% 5%);
+        }
+        20% {
+            clip-path: polygon(95% 0%, 100% 0%, 100% 100%, 95% 100%);
+        }
+        40% {
+            clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%);
+        }
+        50% {
+            clip-path: polygon(0% 95%, 100% 95%, 100% 100%, 0% 100%);
+        }
+        70% {
+            clip-path: polygon(0% 50%, 50% 50%, 50% 100%, 0% 100%);
+        }
+        80% {
+            clip-path: polygon(0% 0%, 5% 0%, 5% 100%, 0% 100%);
+        }
+        90% {
+            clip-path: polygon(0% 0%, 50% 0%, 50% 50%, 0% 50%);
+        }
+        100% {
+            clip-path: polygon(0% 0%, 100% 0%, 100% 5%, 0% 5%);
+        }
+
 `

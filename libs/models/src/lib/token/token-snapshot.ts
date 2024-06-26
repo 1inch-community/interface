@@ -1,7 +1,6 @@
 import { IToken } from './token';
 
 export interface TokenSnapshot {
-  readonly amountRaw: bigint,
-  readonly amountView: bigint,
+  readonly amount: bigint,
   readonly token: IToken
 }

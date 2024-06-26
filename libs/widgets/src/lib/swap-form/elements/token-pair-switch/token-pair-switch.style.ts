@@ -27,7 +27,7 @@ export const tokenPairSwitchStyle = css`
         align-items: center;
         top: -13px;
         cursor: pointer;
-        transition: color .2s;
+        will-change: transform;
     }
     
     .switcher:disabled {

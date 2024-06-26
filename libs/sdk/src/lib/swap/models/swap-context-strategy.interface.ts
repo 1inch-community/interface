@@ -1,11 +1,17 @@
-import { Rate } from '@one-inch-community/models';
-import { Observable } from 'rxjs';
+import { ChainId, IToken, Rate } from "@one-inch-community/models"
 
 export interface ISwapContextStrategy {
-  readonly rate$: Observable<Rate | null>
-  readonly minReceive$: Observable<bigint>
-  readonly autoSlippage$: Observable<number | null>
-  readonly autoAuctionTime$: Observable<number | null>
-  readonly destinationTokenAmount$: Observable<bigint>
-  destroy(): void
+  getDataSnapshot(): Promise<ISwapContextStrategyDataSnapshot>
+}
+
+export interface ISwapContextStrategyDataSnapshot {
+  chainId: ChainId
+  sourceToken: IToken
+  destinationToken: IToken
+  sourceTokenAmount: bigint
+  destinationTokenAmount: bigint
+  minReceive: bigint
+  autoSlippage: number | null
+  autoAuctionTime: number | null
+  rate: Rate
 }

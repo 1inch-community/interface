@@ -59,7 +59,7 @@ export class ConfirmSwapElement extends LitElement {
   }
 
   private getTokenView(tokenSnapshot: TokenSnapshot, type: 'source' | 'wrap' | 'destination') {
-    const amount = formatUnits(tokenSnapshot.amountView, tokenSnapshot.token.decimals)
+    const amount = formatUnits(tokenSnapshot.amount, tokenSnapshot.token.decimals)
     return html`
       <div class="token-view">
         <div class="token-view-row token-view-top">
@@ -121,7 +121,7 @@ export class ConfirmSwapElement extends LitElement {
     const stream = getBlockEmitter(this.swapSnapshot.chainId).pipe(
       exhaustMap(async () => {
         const usdPrice = await TokenController.getTokenUSDPrice(this.swapSnapshot.chainId, tokenSnapshot.token.address)
-        const balanceFormatted = formatUnits(BigInt(tokenSnapshot.amountView), tokenSnapshot.token.decimals);
+        const balanceFormatted = formatUnits(BigInt(tokenSnapshot.amount), tokenSnapshot.token.decimals);
         const balanceUsd = Number(balanceFormatted) * Number(usdPrice);
         return `~$${smartFormatNumber(balanceUsd.toString(), 2)}`
       }),

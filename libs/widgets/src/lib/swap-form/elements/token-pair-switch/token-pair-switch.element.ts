@@ -22,6 +22,8 @@ export class TokenPairSwitchElement extends LitElement {
   private readonly buttonRef = createRef()
   private readonly mobileMedia = getMobileMatchMedia()
 
+  private isUp = false
+
   private readonly isDisabled$ = defer(() => {
     if (!this.context) throw new Error('')
     return combineLatest([
@@ -35,29 +37,35 @@ export class TokenPairSwitchElement extends LitElement {
   protected override firstUpdated() {
     if (!this.buttonRef.value) return
     if (!this.mobileMedia.matches) {
+      const options = {
+        duration: 200,
+        easing: 'cubic-bezier(.1, .3, .6, 1)'
+      }
       subscribe(this, [
         fromEvent(this.buttonRef.value, 'mouseenter').pipe(
           switchMap(async () => {
-            if (!this.iconRef.value) return
+            if (!this.iconRef.value || this.isUp) return
             await this.iconRef.value.animate([
               { transform: 'rotate(0deg)' },
               { transform: 'rotate(180deg)' },
-            ], { duration: 200 }).finished
+            ], options).finished
             appendStyle(this.iconRef.value, {
               transform: 'rotate(180deg)'
             })
+            this.isUp = true
           })
         ),
         fromEvent(this.buttonRef.value, 'mouseleave').pipe(
           switchMap(async () => {
-            if (!this.iconRef.value) return
+            if (!this.iconRef.value || !this.isUp) return
             await this.iconRef.value.animate([
               { transform: 'rotate(180deg)' },
               { transform: 'rotate(360deg)' },
-            ], { duration: 200 }).finished
+            ], options).finished
             appendStyle(this.iconRef.value, {
               transform: ''
             })
+            this.isUp = false
           })
         ),
       ])
@@ -77,9 +85,25 @@ export class TokenPairSwitchElement extends LitElement {
     `
   }
 
-  protected onClick() {
+  protected async onClick() {
+    if (!this.iconRef.value || (!this.isUp && !this.mobileMedia.matches)) return
     this.context?.switchPair()
     dispatchEvent(this, 'switchPair', null)
+    const options = {
+      duration: 200,
+      easing: 'cubic-bezier(.1, .3, .6, 1)'
+    }
+    if (!this.mobileMedia.matches) {
+      await this.iconRef.value.animate([
+        { transform: 'rotate(180deg)' },
+        { transform: 'rotate(360deg)' },
+      ], options).finished
+      appendStyle(this.iconRef.value, {
+        transform: ''
+      })
+      this.isUp = false
+    }
+
   }
 
 }

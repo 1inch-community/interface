@@ -3,7 +3,17 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { consume } from '@lit/context';
 import { classMap } from 'lit/directives/class-map.js'
 import { ifDefined } from 'lit/directives/if-defined.js'
-import { combineLatest, defer, filter, firstValueFrom, map, shareReplay, tap } from 'rxjs';
+import {
+  combineLatest,
+  defer,
+  distinctUntilChanged,
+  filter,
+  firstValueFrom, from, fromEvent,
+  map, Observable, of,
+  shareReplay,
+  startWith, switchMap,
+  tap
+} from 'rxjs';
 import { Maskito } from '@maskito/core';
 import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import "@one-inch-community/widgets/token-icon"
@@ -31,7 +41,7 @@ export class InputElement extends LitElement {
 
   @state() isFocus = false
   @state() connectedAddress: Address | null = null
-  @state() setMaxInProgress = true
+  @state() setMaxInProgress = false
 
   @consume({ context: swapContext, subscribe: true })
   context?: ISwapContext
@@ -44,6 +54,17 @@ export class InputElement extends LitElement {
   private readonly chainId$ = defer(() => this.getChainEventEmitter())
   private readonly connectedAddress$ = defer(() => this.getConnectedWalletAddress())
   private readonly amount$ = defer(() => this.getTokenAmountStream())
+  private readonly loading$ = defer(() => this.getLoadingStream())
+
+  private readonly loaderView$ = defer(() => this.loading$.pipe(
+    // map(() => true),
+    map(state => {
+      if (this.tokenType === 'source') return html`${this.input}`
+      if (state) return html`<span class="loader"></span>`
+      return html`${this.input}`
+    }),
+    startWith(html`${this.input}`)
+  ))
 
   private readonly input = document.createElement('input')
   private maskedInput = this.buildMask(6);
@@ -74,6 +95,26 @@ export class InputElement extends LitElement {
       })
     )
 
+    const loading$: Observable<void> = this.loading$.pipe(
+      switchMap(state => {
+        if (this.tokenType === 'source') return of(void 0)
+        if (state && !this.input.classList.contains('loading')) {
+          this.input.classList.add('loading')
+          return of(void 0);
+        }
+        if (!state && this.input.classList.contains('loading')) {
+          return from(this.input.animate([
+            {},
+            { opacity: 1 }
+          ], { duration: 2000 }).finished
+            .then(() => {
+              this.input.classList.remove('loading')
+            }))
+        }
+        return of(void 0)
+      })
+    )
+
     const updateInputValue$ = combineLatest([
       this.amount$,
       this.token$
@@ -92,6 +133,7 @@ export class InputElement extends LitElement {
     subscribe(this, [
       updateMask$,
       updateInputValue$,
+      loading$,
       this.token$.pipe(tap(token => this.token = token)),
       this.connectedAddress$.pipe(tap(address => this.connectedAddress = address))
     ], { requestUpdate: false })
@@ -107,9 +149,6 @@ export class InputElement extends LitElement {
       disabled: this.disabled,
       focus: this.isFocus
     }
-    const maxButtonClasses = {
-      'set-max-in-progress': this.setMaxInProgress
-    }
     this.input.disabled = this.tokenType === 'destination'
     return html`
       <div class="input-container ${classMap(classes)}">
@@ -122,11 +161,11 @@ export class InputElement extends LitElement {
           <div class="balance-and-max">
             <inch-swap-balance tokenType="${ifDefined(this.tokenType)}"></inch-swap-balance>
             ${when(this.connectedAddress && this.token && this.tokenType === 'source', () => html`
-              <inch-button class="${classMap(maxButtonClasses)}" @click="${async () => {
+              <inch-button @click="${async () => {
                 this.setMaxInProgress = true
                 await this.context?.setMaxAmount()
                 this.setMaxInProgress = false
-              }}" type="secondary" size="xs">MAX</inch-button>
+              }}" type="secondary" size="xs" loader="${ifDefined(this.setMaxInProgress ? '' : undefined)}">MAX</inch-button>
             `)}
           </div>
           ${this.input}
@@ -180,6 +219,12 @@ export class InputElement extends LitElement {
     if (!this.context) throw new Error('')
     if (!this.tokenType) throw new Error('')
     return this.context.getTokenAmountByType(this.tokenType)
+  }
+
+  private getLoadingStream() {
+    if (!this.context) throw new Error('')
+    if (!this.tokenType) throw new Error('')
+    return this.context.loading$
   }
 
   private getChainEventEmitter() {

@@ -1,47 +1,40 @@
-import { map, Observable, startWith, Subject } from 'rxjs';
+import { distinctUntilChanged, map, Observable, shareReplay, startWith, Subject } from 'rxjs';
 import { IToken, NullableValue, TokenSnapshot } from '@one-inch-community/models';
 import { isTokensEqual } from '../tokens';
 
 export class TokenContext {
 
-  private amountForView: bigint | null = null
-  private amount: bigint | null = null
-  private token: IToken | null = null
+  private lastSnapshot: NullableValue<TokenSnapshot> = { token: null, amount: null }
   private readonly signalChange$ = new Subject<void>()
 
   setToken(token: IToken | null) {
-    if (this.token && token && isTokensEqual(this.token, token)) {
+    const { token: tokenFromSnap } = this.lastSnapshot
+    if (tokenFromSnap && token && isTokensEqual(tokenFromSnap, token)) {
       return
     }
-    this.token = token ?? null
-    this.amount = 0n
-    this.amountForView = 0n
+    this.lastSnapshot = { ...this.lastSnapshot, token, amount: 0n }
     this.signalChange$.next()
   }
 
-  setAmount(amount: bigint, markDirty = false) {
-    if (this.amount === amount && !markDirty) {
+  setAmount(amount: bigint) {
+    const { amount: amountFromSnap } = this.lastSnapshot
+    if (amountFromSnap === amount) {
       return
     }
-    this.amount = amount
-    if (markDirty) {
-      this.amountForView = amount
-    }
+    this.lastSnapshot = { ...this.lastSnapshot, amount }
     this.signalChange$.next()
   }
 
   getSnapshot(): NullableValue<TokenSnapshot> {
-    return {
-      token: this.token,
-      amountRaw: this.amount,
-      amountView: this.amountForView,
-    }
+    return this.lastSnapshot
   }
 
   streamSnapshot(): Observable<NullableValue<TokenSnapshot>> {
     return this.signalChange$.pipe(
-      map(() => this.getSnapshot()),
-      startWith(this.getSnapshot())
+      map(() => this.lastSnapshot),
+      startWith(this.lastSnapshot),
+      distinctUntilChanged(),
+      shareReplay({ bufferSize: 1, refCount: true })
     )
   }
 

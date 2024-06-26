@@ -19,7 +19,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { when } from 'lit/directives/when.js';
 import '@one-inch-community/ui-components/card';
 import '@one-inch-community/widgets/swap-form';
-import { CacheActivePromise, isTokensEqual, storage, TokenController } from '@one-inch-community/sdk';
+import { CacheActivePromise, isTokensEqual, storage, SwapContext, TokenController } from '@one-inch-community/sdk';
 import { appendStyle, getMobileMatchMediaAndSubscribe, observe, subscribe, vibrate } from '@one-inch-community/lit';
 import { OverlayController, OverlayMobileController } from '@one-inch-community/ui-components/overlay';
 import { SceneController, sceneLazyValue } from '@one-inch-community/ui-components/scene';
@@ -53,6 +53,8 @@ export class SwapFormElement extends LitElement {
 
   private swapSnapshot: SwapSnapshot | null = null;
 
+  private readonly swapController = new SwapContext(connectWalletController)
+
   private readonly chainId$ = connectWalletController.data.chainId$;
   private readonly activeAddress$ = connectWalletController.data.activeAddress$;
 
@@ -61,7 +63,7 @@ export class SwapFormElement extends LitElement {
   private readonly unicornLoaderRef = createRef<HTMLElement>();
 
   private readonly desktopScene = new SceneController('swapForm', {
-    swapForm: { minWidth: 556, maxWidth: 556, maxHeight: 621, lazyRender: true },
+    swapForm: { minWidth: 556, maxWidth: 556, maxHeight: 625, lazyRender: true },
     selectToken: { minWidth: 556, maxWidth: 556, maxHeight: 680 },
     confirmSwap: { minWidth: 556, maxWidth: 556, maxHeight: 680 }
   });
@@ -87,6 +89,11 @@ export class SwapFormElement extends LitElement {
       ),
       this.mobileUpdate()
     ], { requestUpdate: false });
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.swapController.destroy()
   }
 
   protected firstUpdated() {
@@ -132,6 +139,7 @@ export class SwapFormElement extends LitElement {
           <inch-swap-form
             .srcToken="${this.srcToken}"
             .dstToken="${this.dstToken}"
+            .swapContext="${this.swapController}"
             .walletController="${connectWalletController}"
             @switchPair="${() => this.onSwitchPair()}"
             @confirmSwap="${(event: CustomEvent) => this.onOpenMobileConfirmSwap(event)}"
@@ -160,6 +168,7 @@ export class SwapFormElement extends LitElement {
                 ${ref(this.swapFormRef)}
                 .srcToken="${sceneLazyValue(this, () => this.srcToken)}"
                 .dstToken="${sceneLazyValue(this, () => this.dstToken)}"
+                .swapContext="${this.swapController}"
                 .walletController="${connectWalletController}"
                 @confirmSwap="${(event: CustomEvent) => this.onOpenConfirmSwap(event)}"
                 @switchPair="${() => this.onSwitchPair()}"

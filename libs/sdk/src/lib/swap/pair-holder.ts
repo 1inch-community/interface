@@ -23,8 +23,8 @@ export class PairHolder {
     this.pairChance$.next()
   }
 
-  setAmount( tokenType: TokenType, value: bigint, markDirty?: boolean) {
-    this.getTokenContext(tokenType).setAmount(value, markDirty)
+  setAmount( tokenType: TokenType, value: bigint) {
+    this.getTokenContext(tokenType).setAmount(value)
   }
 
   streamSnapshot(tokenType: TokenType) {

@@ -63,8 +63,9 @@ export class OneInchDevPortalAdapter {
       auctionDuration, auctionEndAmount, auctionStartAmount, points?.join(',')
     ].filter(Boolean).join(':')
 
-    if (fusionQuoteReceiveCache.has(id)) {
-      return fusionQuoteReceiveCache.get(id)
+    const cacheData = fusionQuoteReceiveCache.get(id)
+    if (cacheData) {
+      return cacheData
     }
 
     const queryParams = new URLSearchParams({

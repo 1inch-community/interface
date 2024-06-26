@@ -1,5 +1,6 @@
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import '@one-inch-community/ui-components/button';
 import { consume } from '@lit/context';
 import { swapContext } from '../../context';
@@ -53,6 +54,12 @@ enum SwapButtonState {
   permitInWallet,
   approveInWallet
 }
+
+const showLoader = [
+  SwapButtonState.checkAllowance,
+  SwapButtonState.permitInWallet,
+  SwapButtonState.approveInWallet,
+]
 
 @customElement(SwapButtonElement.tagName)
 export class SwapButtonElement extends LitElement {
@@ -189,7 +196,15 @@ export class SwapButtonElement extends LitElement {
     const size = this.mobileMedia.matches ? 'xl' : 'xxl';
 
     return html`
-      <inch-button class="smart-hover" @click="${(event: MouseEvent) => this.onClickSwapButton(event)}" type="${this.getButtonType()}" size="${size}" fullSize>
+      <inch-button
+        class="smart-hover"
+        @click="${(event: MouseEvent) => this.onClickSwapButton(event)}"
+        type="${this.getButtonType()}"
+        size="${size}"
+        loader="${ifDefined(this.getLoaderState())}"
+        fullSize
+      >
+        
         ${when(this.buttonState === SwapButtonState.unsupportedChain, () => html`
           <span class="off-hover">Chain ${this.chainId} not supported</span>
           <span class="on-hover">Change chain</span>
@@ -272,6 +287,13 @@ export class SwapButtonElement extends LitElement {
     if (this.buttonState === SwapButtonState.lowAllowanceNeedApprove) return 'primary'
     if (this.buttonState === SwapButtonState.lowAllowanceNeedPermit) return 'primary'
     return 'secondary'
+  }
+
+  private getLoaderState() {
+    if (showLoader.includes(this.buttonState)) {
+      return true
+    }
+    return
   }
 
   private async onSwap() {

@@ -25,7 +25,7 @@ export const sceneStyle = (config?: Partial<StyleConfig>) => {
           position: relative;
           overflow: hidden;
           border-radius: 16px;
-          will-change: width, height;
+          will-change: width, height, transform, filter;
       }
   `
 }

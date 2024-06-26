@@ -99,7 +99,7 @@ class TokenControllerImpl {
   }
 
   async getTokenBalance(chainId: ChainId, tokenAddress: Address, walletAddress: Address) {
-    await this.updateBalanceDatabase(chainId, walletAddress)
+    await this.updateBalanceDatabase(chainId, walletAddress, tokenAddress)
     return await this.schema.getTokenBalance(chainId, tokenAddress, walletAddress)
   }
 
@@ -193,21 +193,33 @@ class TokenControllerImpl {
    *
    * @param {ChainId} chainId - The ID of the chain.
    * @param {Address} walletAddress - The wallet address.
+   * @param {Address} tokenAddress - The token address.
    *
    * @return {Promise<void>} - A Promise that resolves once the balance database is updated.
    */
   @CacheActivePromise()
-  async updateBalanceDatabase(chainId: ChainId, walletAddress: Address): Promise<void> {
+  async updateBalanceDatabase(chainId: ChainId, walletAddress: Address, tokenAddress?: Address): Promise<void> {
     const id = [chainId, walletAddress].join(':')
     const lastUpdateTime = this.lastUpdateTokenBalanceDatabaseTimestampStorage?.[id]
     if (lastUpdateTime && Date.now() - lastUpdateTime < tokenBalanceDatabaseTTL[chainId]) return
-    let balances = await this.oneInchApiAdapter.getBalancesByWalletAddress(chainId, walletAddress).catch(() => null)
-    if (balances === null) {
-      balances = await this.getBalancesOnChain(chainId, walletAddress)
+
+    const update = async () => {
+      let balances = await this.oneInchApiAdapter.getBalancesByWalletAddress(chainId, walletAddress).catch(() => null)
+      if (balances === null) {
+        balances = await this.getBalancesOnChain(chainId, walletAddress)
+      }
+      await this.schema.setBalances(chainId, walletAddress, balances)
+      storage.updateEntity(lastUpdateTokenBalanceDatabaseTimestampStorageKey, id, Date.now())
+      this.lastUpdateTokenBalanceDatabaseTimestampStorage = storage.get<Record<string, number>>(lastUpdateTokenBalanceDatabaseTimestampStorageKey, JsonParser)
     }
-    await this.schema.setBalances(chainId, walletAddress, balances)
-    storage.updateEntity(lastUpdateTokenBalanceDatabaseTimestampStorageKey, id, Date.now())
-    this.lastUpdateTokenBalanceDatabaseTimestampStorage = storage.get<Record<string, number>>(lastUpdateTokenBalanceDatabaseTimestampStorageKey, JsonParser)
+
+    if (tokenAddress) {
+      const tokenBalances = await this.schema.getTokenBalance(chainId, tokenAddress, walletAddress)
+      if (tokenBalances === null) return await update()
+    } else if (await this.schema.isEmptyTokenBalanceStorage(chainId, walletAddress)) {
+      return await update()
+    }
+    update().catch(error => console.error(error))
   }
 
   liveQuery<T>(querier: () => T | Promise<T>) {

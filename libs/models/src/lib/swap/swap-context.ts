@@ -19,6 +19,7 @@ export interface ISwapContext {
   readonly connectedWalletAddress$: Observable<Address | null>
   readonly slippage$: Observable<SettingsValue>
   readonly auctionTime$: Observable<SettingsValue>
+  readonly loading$: Observable<boolean>
   destroy(): void
   setPair(pair: NullableValue<Pair>): void
   switchPair(): void

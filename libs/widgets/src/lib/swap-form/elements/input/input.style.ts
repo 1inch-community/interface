@@ -122,6 +122,20 @@ export const inputStyle = css`
         align-items: center;
     }
     
+    .loading {
+        will-change: opacity;
+        animation: stub-loader-animation 2s ease-in-out infinite;
+    }
+
+    @keyframes stub-loader-animation {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
+    }
+    
     @media (hover: hover) {
         .input-container:not(.disabled):hover {
             box-shadow: 0 0 0 1px var(--color-background-bg-positive-hover);
@@ -129,10 +143,6 @@ export const inputStyle = css`
         .symbol-container:hover {
             background-color: var(--color-background-bg-positive-hover);
         }
-    }
-    
-    .set-max-in-progress {
-        
     }
 
     ${mobileMediaCSS(css`
