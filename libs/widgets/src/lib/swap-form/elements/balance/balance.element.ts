@@ -4,9 +4,9 @@ import { consume } from '@lit/context';
 import { ISwapContext } from '@one-inch-community/models';
 import { swapContext } from '../../context';
 import { balanceStyles } from './balance.styles';
-import { catchError, combineLatest, defer, filter, map, switchMap } from 'rxjs';
+import { catchError, combineLatest, defer, filter, map, startWith, switchMap } from 'rxjs';
 import { formatUnits } from 'viem';
-import { formatNumber, TokenController } from '@one-inch-community/sdk';
+import { formatNumber, getBlockEmitter, TokenController } from '@one-inch-community/sdk';
 import { observe } from '@one-inch-community/lit';
 
 @customElement(BalanceElement.tagName)
@@ -27,6 +27,10 @@ export class BalanceElement extends LitElement {
       this.context.connectedWalletAddress$,
       this.context.getTokenByType(this.tokenType),
       this.context.chainId$,
+      this.context.chainId$.pipe(
+        switchMap(chainId => chainId ? getBlockEmitter(chainId) : []),
+        startWith(null),
+      ),
     ]);
   }).pipe(
     filter(([address]) => !!address),

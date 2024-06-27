@@ -14,7 +14,7 @@ import {
   map, Observable,
   of,
   startWith,
-  switchMap, tap,
+  switchMap, tap, merge,
   exhaustMap, withLatestFrom, Subject
 } from 'rxjs';
 import {
@@ -30,8 +30,8 @@ import {
   isSupportPermit2,
   JsonParser,
   storage,
-  TokenController,
-  hasPermit
+  hasPermit,
+  getBlockEmitter
 } from '@one-inch-community/sdk';
 import { BrandColors, getThemeChange } from '@one-inch-community/ui-components/theme';
 import { swapButtonStyle } from './swap-button.style';
@@ -86,19 +86,26 @@ export class SwapButtonElement extends LitElement {
   private readonly chainId$ = defer(() => this.getChainId());
   private readonly sourceTokenAmount$ = defer(() => this.getSourceTokenAmount());
   private readonly rate$ = defer(() => this.getRate());
+  private readonly block$ = this.chainId$.pipe(
+    switchMap(chainId => chainId ? getBlockEmitter(chainId) : [])
+  )
 
   private readonly updateView$ = new Subject<void>()
 
   private readonly exceedingMaximumAmount$ = combineLatest([
     this.connectedWalletAddress$,
     this.sourceToken$,
-    this.sourceTokenAmount$.pipe(startWith(0n))
+    this.sourceTokenAmount$.pipe(startWith(0n)),
+    merge(
+      this.chainId$,
+      this.block$
+    )
   ]).pipe(
     switchMap(([wallet, sourceToken, amount]) => {
-      if (!wallet || !sourceToken || amount === 0n) return of(false);
-      return TokenController.getTokenBalance(sourceToken.chainId, sourceToken.address, wallet).then(balance => {
+      if (!wallet || !sourceToken || amount === 0n || !this.context) return of(false);
+      return this.context.getMaxAmount().then(balance => {
         if (!balance) return false;
-        return !amount || amount > BigInt(balance.amount);
+        return !amount || amount > balance;
       });
     })
   );
