@@ -57,7 +57,7 @@ export class SwapContext implements ISwapContext {
 
   private readonly contextStrategy = {
     onChain: new SwapContextOnChainStrategy(this.pairHolder, this.walletController),
-    fusion: new SwapContextFusionStrategy(this.pairHolder, this.walletController, this.settings, this.oneInchApiAdapter)
+    fusion: new SwapContextFusionStrategy(this, this.pairHolder, this.walletController, this.settings, this.oneInchApiAdapter)
   }
 
   readonly loading$ = new BehaviorSubject(false)
@@ -79,7 +79,6 @@ export class SwapContext implements ISwapContext {
     this.pairHolder.streamSnapshot('source'),
     this.pairHolder.streamSnapshot('destination'),
   ).pipe(
-    observeOn(animationFrameScheduler),
     debounceTime(500),
     map(() => void 0),
     startWith(void 0),
@@ -97,7 +96,6 @@ export class SwapContext implements ISwapContext {
       return this.getDataSnapshot(address === null)
     }),
     tap(() =>   this.loading$.next(false)),
-    tap(snap => console.log('snapshot', snap)),
     shareReplay({ bufferSize: 1, refCount: true })
   )
 

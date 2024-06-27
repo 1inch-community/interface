@@ -1,13 +1,14 @@
-import { IConnectWalletController, Rate, SwapSettings } from '@one-inch-community/models';
+import { IConnectWalletController, ISwapContext, Rate, SwapSettings } from '@one-inch-community/models';
 import { ISwapContextStrategy, ISwapContextStrategyDataSnapshot } from './models/swap-context-strategy.interface';
 import { PairHolder } from './pair-holder';
 import { BigMath, type OneInchDevPortalAdapter } from '../utils';
-import { TokenController } from '../tokens';
+import { getWrapperNativeToken, isNativeToken } from '../chain';
 
 
 export class SwapContextFusionStrategy implements ISwapContextStrategy {
 
   constructor(
+    private readonly swapContext: ISwapContext,
     private readonly pairHolder: PairHolder,
     private readonly walletController: IConnectWalletController,
     private readonly settings: SwapSettings,
@@ -18,7 +19,8 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy {
   async getDataSnapshot(): Promise<ISwapContextStrategyDataSnapshot> {
     const sourceTokenSnapshot = this.pairHolder.getSnapshot('source')
     const destinationTokenSnapshot = this.pairHolder.getSnapshot('destination')
-    const { token: sourceToken, amount: sourceTokenAmount } = sourceTokenSnapshot
+    let { token: sourceToken } = sourceTokenSnapshot
+    const { amount: sourceTokenAmount } = sourceTokenSnapshot
     const { token: destinationToken } = destinationTokenSnapshot
     const chainId = await this.walletController.data.getChainId()
     const activeAddress = await this.walletController.data.getActiveAddress()
@@ -34,14 +36,14 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy {
       throw new Error('')
     }
 
-    const balance = await TokenController.getTokenBalance(chainId, sourceToken.address, activeAddress)
+    const balance = await this.swapContext.getMaxAmount()
 
-    if (balance === null) {
+    if (balance < sourceTokenAmount) {
       throw new Error('')
     }
 
-    if (BigInt(balance.amount) < sourceTokenAmount) {
-      throw new Error('')
+    if (isNativeToken(sourceToken.address)) {
+      sourceToken = getWrapperNativeToken(chainId)
     }
 
     const fusionQuoteReceive = await this.devPortalAdapter.getFusionQuoteReceive(
@@ -58,20 +60,17 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy {
 
     const { toTokenAmount, recommended_preset, presets, autoK } = fusionQuoteReceive
     const recommendedPreset = presets[recommended_preset]
-
-    const auctionStartAmount = BigInt(recommendedPreset.auctionStartAmount);
-    const auctionEndAmount = BigInt(recommendedPreset.auctionEndAmount);
-    const averageDestinationTokenAmount = (auctionStartAmount + auctionEndAmount) / 2n;
+    const marketPrice = BigInt(toTokenAmount)
 
     const rate = BigMath.div(
-      averageDestinationTokenAmount,
+      marketPrice,
       sourceTokenAmount,
       destinationToken.decimals,
       sourceToken.decimals
     );
     const revertedRate = BigMath.div(
       sourceTokenAmount,
-      averageDestinationTokenAmount,
+      marketPrice,
       sourceToken.decimals,
       destinationToken.decimals
     );
@@ -89,7 +88,6 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy {
     let minReceive = BigInt(recommendedPreset.auctionEndAmount)
     if (slippageSettings.value !== null) {
       const [ slippage ] = slippageSettings.value
-      const marketPrice = BigInt(toTokenAmount)
       const percentAmount = BigMath.calculatePercentage(marketPrice, slippage)
       minReceive = marketPrice - percentAmount
     }
@@ -100,7 +98,7 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy {
       destinationToken,
       sourceTokenAmount,
       minReceive,
-      destinationTokenAmount: BigInt(toTokenAmount),
+      destinationTokenAmount: marketPrice,
       autoAuctionTime: recommendedPreset.auctionDuration,
       autoSlippage: autoK,
       rate: rateData,
