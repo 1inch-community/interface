@@ -1,4 +1,6 @@
-import { ChainId, IToken, Rate } from "@one-inch-community/models"
+import { ChainId } from '../chain';
+import { IToken } from '../token';
+import { Rate } from '../token-price';
 
 export interface ISwapContextStrategy {
   getDataSnapshot(): Promise<ISwapContextStrategyDataSnapshot>

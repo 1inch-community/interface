@@ -50,14 +50,14 @@ export class FusionSwapInfoMainElement extends LitElement {
   );
 
   readonly auctionTime$ = defer(() => this.getContext().auctionTime$).pipe(
-    map((slippage) => {
+    map((auctionTime) => {
 
       return html`
-        ${slippage.value === null ? '' : html`<span>${formatSeconds(slippage.value)} · </span>`}
+        ${auctionTime.value === null ? '' : html`<span>${formatSeconds(auctionTime.value)} · </span>`}
         <span>
-          ${when(slippage.type === 'auto', () => 'Auto')}
-          ${when(slippage.type === 'custom', () => 'Custom')}
-          ${when(slippage.type === 'preset', () => 'Manual')}
+          ${when(auctionTime.type === 'auto', () => 'Auto')}
+          ${when(auctionTime.type === 'custom', () => 'Custom')}
+          ${when(auctionTime.type === 'preset', () => 'Manual')}
         </span>
       `
     })

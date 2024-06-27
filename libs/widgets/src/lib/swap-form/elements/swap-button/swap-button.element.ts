@@ -31,7 +31,8 @@ import {
   JsonParser,
   storage,
   hasPermit,
-  getBlockEmitter
+  getBlockEmitter,
+  CacheActivePromise
 } from '@one-inch-community/sdk';
 import { BrandColors, getThemeChange } from '@one-inch-community/ui-components/theme';
 import { swapButtonStyle } from './swap-button.style';
@@ -39,6 +40,7 @@ import { when } from 'lit/directives/when.js';
 
 enum SwapButtonState {
   readyToSwap,
+  readyToSwapLoading,
   unsupportedChain,
   walletNotConnected,
   unselectedSourceToken,
@@ -56,6 +58,7 @@ enum SwapButtonState {
 }
 
 const showLoader = [
+  SwapButtonState.readyToSwapLoading,
   SwapButtonState.checkAllowance,
   SwapButtonState.permitInWallet,
   SwapButtonState.approveInWallet,
@@ -118,7 +121,8 @@ export class SwapButtonElement extends LitElement {
     this.sourceTokenAmount$.pipe(startWith(0n)),
     this.chainId$,
     this.rate$.pipe(startWith(null)),
-    this.updateView$.pipe(startWith(null))
+    this.block$.pipe(startWith(null)),
+    this.updateView$.pipe(startWith(null)),
   ]).pipe(
     map( (params) => {
       const [
@@ -197,6 +201,7 @@ export class SwapButtonElement extends LitElement {
       ),
       this.calculateStatus$
     ]);
+    this.updateView$.next()
   }
 
   protected override render() {
@@ -217,7 +222,8 @@ export class SwapButtonElement extends LitElement {
           <span class="on-hover">Change chain</span>
           <br>
         `)}
-        ${when(this.buttonState === SwapButtonState.readyToSwap, () => html`<span>Swap</span>`)}
+        ${when(this.buttonState === SwapButtonState.readyToSwap, () => html`<span>Confirm swap</span>`)}
+        ${when(this.buttonState === SwapButtonState.readyToSwapLoading, () => html`<span>Confirm swap</span>`)}
         ${when(this.buttonState === SwapButtonState.checkAllowance, () => html`<span>Check allowance</span>`)}
         ${when(this.buttonState === SwapButtonState.wrapNativeToken, () => html`<span>Native token not supported now</span>`)}
         ${when(this.buttonState === SwapButtonState.lowAllowanceNeedApprove, () => html`<span>Approve and Swap</span>`)}
@@ -246,6 +252,7 @@ export class SwapButtonElement extends LitElement {
     `;
   }
 
+  @CacheActivePromise()
   private async onClickSwapButton(event: MouseEvent) {
     if (!this.context) {
       throw new Error('')
@@ -278,10 +285,13 @@ export class SwapButtonElement extends LitElement {
         this.buttonState = SwapButtonState.readyToSwap
       }
       if (this.buttonState === SwapButtonState.readyToSwap) {
+        this.buttonState = SwapButtonState.readyToSwapLoading
         const snapshot = await this.context.getSnapshot()
         if (snapshot) {
           dispatchEvent(this, 'confirmSwap', snapshot, event)
         }
+        this.buttonState = SwapButtonState.readyToSwap
+        this.updateView$.next()
       }
     } catch (error) {
       this.buttonState = stateState

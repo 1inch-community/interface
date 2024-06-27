@@ -1,16 +1,18 @@
-import { html, LitElement } from 'lit';
+import { html, LitElement, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { choose } from 'lit/directives/choose.js';
 import { confirmSwapStyle } from './confirm-swap.style';
-import { SwapSnapshot, TokenSnapshot } from '@one-inch-community/models';
+import { IToken, SwapSnapshot } from '@one-inch-community/models';
 import '@one-inch-community/widgets/token-icon'
 import '@one-inch-community/ui-components/card'
 import '@one-inch-community/ui-components/button'
 import '@one-inch-community/ui-components/icon'
-import { getBlockEmitter, getWrapperNativeToken, isNativeToken, smartFormatNumber, TokenController } from '@one-inch-community/sdk';
+import { formatSeconds, getBlockEmitter, getSymbolFromWrapToken, getWrapperNativeToken, isNativeToken,
+  isTokensEqual, smartFormatNumber, TokenController } from '@one-inch-community/sdk';
 import { formatUnits } from 'viem';
-import { getMobileMatchMediaAndSubscribe, observe } from '@one-inch-community/lit';
+import { async, getMobileMatchMediaAndSubscribe, observe } from '@one-inch-community/lit';
 import { exhaustMap, Observable, shareReplay } from 'rxjs';
+import { when } from 'lit/directives/when.js';
 
 @customElement(ConfirmSwapElement.tagName)
 export class ConfirmSwapElement extends LitElement {
@@ -27,7 +29,7 @@ export class ConfirmSwapElement extends LitElement {
   private readonly mobileMedia = getMobileMatchMediaAndSubscribe(this);
 
   private get needWrap() {
-    return isNativeToken(this.swapSnapshot.sourceToken.token.address)
+    return isNativeToken(this.swapSnapshot.sourceToken.address)
   }
 
   protected override render() {
@@ -35,14 +37,13 @@ export class ConfirmSwapElement extends LitElement {
     return html`
       <div class="confirm-swap-view">
         <inch-card-header backButton headerTextPosition="center" headerText="Confirm swap" headerTextPosition="left">
-          <inch-button slot="right-container" type="tertiary-gray" size="m">
-            <inch-icon icon="authRefresh36"></inch-icon>
-          </inch-button>
         </inch-card-header>
         
         ${this.getTokenViewContainer()}
 
-        <inch-button fullSize size="${size}">Confirm swap</inch-button>
+        ${this.getDetailInfo()}
+
+        <inch-button fullSize size="${size}">Swap</inch-button>
       </div>
     `
   }
@@ -50,16 +51,100 @@ export class ConfirmSwapElement extends LitElement {
   private getTokenViewContainer() {
     return html`
       <div class="token-view-container">
-        ${this.getTokenView(this.swapSnapshot.sourceToken, 'source')}
+        ${this.getTokenView(this.swapSnapshot.sourceToken, this.swapSnapshot.sourceTokenAmount,'source')}
         ${this.getSeparatorView(this.needWrap ? 'wrap' : 'swap')}
         ${this.getTokenWrapView()}
-        ${this.getTokenView(this.swapSnapshot.destinationToken, 'destination')}
+        ${this.getTokenView(this.swapSnapshot.destinationToken, this.swapSnapshot.destinationTokenAmount, 'destination')}
       </div>
     `
   }
 
-  private getTokenView(tokenSnapshot: TokenSnapshot, type: 'source' | 'wrap' | 'destination') {
-    const amount = formatUnits(tokenSnapshot.amount, tokenSnapshot.token.decimals)
+  private getDetailInfo() {
+    return html`
+      <div class="detail-info">
+        ${this.getDetailInfoRow('Price', html`${async(this.getRateView())}`)}
+        ${this.getDetailInfoRow('Slippage tolerance', this.getSlippageView())}
+        ${this.getDetailInfoRow('Auction time', this.getAuctionTimeView())}
+        ${this.getDetailInfoRow('Minimum receive', this.getMinReceive())}
+        ${this.getDetailInfoRow('Network Fee', html`
+          <div class="detail-info-raw-value detail-info-raw-settings-value">
+            <inch-icon icon="fusion16"></inch-icon>
+            <span>Free</span>
+          </div>
+        `)}
+      </div>
+    `
+  }
+
+  private async getRateView() {
+    const { chainId, rate, revertedRate, sourceToken, destinationToken } = this.swapSnapshot.rate
+    const primaryToken = await TokenController.getPriorityToken(chainId, [
+      sourceToken.address,
+      destinationToken.address
+    ])
+    const secondaryToken = isTokensEqual(primaryToken, sourceToken) ? destinationToken : sourceToken
+    const isRevertedRate = isTokensEqual(primaryToken, sourceToken)
+    const targetRate = isRevertedRate ? revertedRate : rate
+    const rateFormated = smartFormatNumber(formatUnits(targetRate, secondaryToken.decimals), 2);
+    return html`
+      <div class="detail-info-raw-value">
+        <span class="rate-view">1 ${getSymbolFromWrapToken(secondaryToken)} = ${rateFormated} ${primaryToken.symbol}</span>
+      </div>
+    `;
+  }
+
+  private getSlippageView() {
+    const slippage = this.swapSnapshot.slippage
+    return html`
+      <div class="detail-info-raw-value detail-info-raw-settings-value">
+        ${slippage.value === null ? '' : html`<span>${slippage.value}% · </span>`}
+        <span>
+          ${when(slippage.type === 'auto', () => 'Auto')}
+          ${when(slippage.type === 'custom', () => 'Custom')}
+          ${when(slippage.type === 'preset', () => 'Manual')}
+        </span>
+      </div>
+      `
+  }
+
+  private getAuctionTimeView() {
+    const auctionTime = this.swapSnapshot.auctionTime
+    return html`
+      <div class="detail-info-raw-value detail-info-raw-settings-value">
+        ${auctionTime.value === null ? '' : html`<span>${formatSeconds(auctionTime.value)} · </span>`}
+        <span>
+          ${when(auctionTime.type === 'auto', () => 'Auto')}
+          ${when(auctionTime.type === 'custom', () => 'Custom')}
+          ${when(auctionTime.type === 'preset', () => 'Manual')}
+      </span>
+      </div>
+    `
+  }
+
+  private getMinReceive() {
+    const amountView = formatUnits(this.swapSnapshot.minReceive, this.swapSnapshot.destinationToken.decimals)
+    return html`
+      <div class="detail-info-raw-value">
+        ${smartFormatNumber(amountView, 6)} ${this.swapSnapshot.destinationToken.symbol}
+      </div>
+    `
+  }
+
+  private getPriceView() {
+
+  }
+
+  private getDetailInfoRow(title: string, data: TemplateResult) {
+    return html`
+      <div class="detail-info-row">
+        <span class="detail-info-row-title">${title}</span>
+        <span>${data}</span>
+      </div>
+    `
+  }
+
+  private getTokenView(token: IToken, amount: bigint, type: 'source' | 'wrap' | 'destination') {
+    const amountView = formatUnits(amount, token.decimals)
     return html`
       <div class="token-view">
         <div class="token-view-row token-view-top">
@@ -71,18 +156,18 @@ export class ConfirmSwapElement extends LitElement {
             ])}
           </span>
           
-          <span>${observe(this.getFiatAmountStream(tokenSnapshot))}</span>
+          <span>${observe(this.getFiatAmountStream(token, amount))}</span>
         </div>
         <div class="token-view-row">
           <div class="symbol-view">
             <inch-token-icon
               chainId="${this.swapSnapshot.chainId}"
-              symbol="${tokenSnapshot.token.symbol}"
-              address="${tokenSnapshot.token.address}"
+              symbol="${token.symbol}"
+              address="${token.address}"
             ></inch-token-icon>
-            <span class="primary-text">${tokenSnapshot.token.symbol}</span>
+            <span class="primary-text">${token.symbol}</span>
           </div>
-          <span class="primary-text">${smartFormatNumber(amount, 6)}</span>
+          <span class="primary-text">${smartFormatNumber(amountView, 6)}</span>
         </div>
       </div>
     `
@@ -90,12 +175,8 @@ export class ConfirmSwapElement extends LitElement {
 
   private getTokenWrapView() {
     if (this.needWrap) {
-      const wrapTokenSnapshot: TokenSnapshot = {
-        ...this.swapSnapshot.sourceToken,
-        token: getWrapperNativeToken(this.swapSnapshot.chainId),
-      }
       return html`
-        ${this.getTokenView(wrapTokenSnapshot, 'wrap')}
+        ${this.getTokenView(getWrapperNativeToken(this.swapSnapshot.chainId), this.swapSnapshot.sourceTokenAmount,'wrap')}
         ${this.getSeparatorView('swap')}
       `
     }
@@ -113,21 +194,21 @@ export class ConfirmSwapElement extends LitElement {
     `
   }
 
-  private getFiatAmountStream(tokenSnapshot: TokenSnapshot) {
-    if (this.fiatAmountMap.has(tokenSnapshot.token.address)) {
-      return this.fiatAmountMap.get(tokenSnapshot.token.address)!
+  private getFiatAmountStream(token: IToken, amount: bigint) {
+    if (this.fiatAmountMap.has(token.address)) {
+      return this.fiatAmountMap.get(token.address)!
     }
 
     const stream = getBlockEmitter(this.swapSnapshot.chainId).pipe(
       exhaustMap(async () => {
-        const usdPrice = await TokenController.getTokenUSDPrice(this.swapSnapshot.chainId, tokenSnapshot.token.address)
-        const balanceFormatted = formatUnits(BigInt(tokenSnapshot.amount), tokenSnapshot.token.decimals);
+        const usdPrice = await TokenController.getTokenUSDPrice(this.swapSnapshot.chainId, token.address)
+        const balanceFormatted = formatUnits(amount, token.decimals);
         const balanceUsd = Number(balanceFormatted) * Number(usdPrice);
         return `~$${smartFormatNumber(balanceUsd.toString(), 2)}`
       }),
       shareReplay({ bufferSize: 1, refCount: true })
     )
-    this.fiatAmountMap.set(tokenSnapshot.token.address, stream)
+    this.fiatAmountMap.set(token.address, stream)
     return stream
   }
 

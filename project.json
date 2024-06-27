@@ -20,6 +20,17 @@
         ]
       }
     },
+    "postinstall": {
+      "executor": "nx:run-commands",
+      "options": {
+        "env": {
+          "skipIfStart": true
+        },
+        "commands": [
+          "pnpm run build:lib"
+        ]
+      }
+    },
     "watch-all-libs": {
       "executor": "nx:run-commands",
       "options": {

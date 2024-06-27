@@ -23,9 +23,8 @@ export const options = async (): Promise<EthereumProviderOptions> => {
     chains: [ ChainId.eth ],
     optionalChains,
     events: ['chainChanged', 'accountsChanged'],
-    methods: ['eth_sendTransaction', 'eth_signTransaction', 'eth_sign', 'personal_sign'],
+    methods: ['eth_sendTransaction', 'eth_signTransaction', 'eth_sign', 'personal_sign', 'eth_signTypedData_v4'],
     optionalMethods: [
-      'eth_signTypedData_v4',
       'wallet_switchEthereumChain',
       'wallet_addEthereumChain',
       'eth_getCode',

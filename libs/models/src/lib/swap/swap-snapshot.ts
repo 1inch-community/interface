@@ -1,8 +1,7 @@
-import { TokenSnapshot } from '../token';
-import { ChainId } from '../chain';
+import { SettingsValue } from './swap-context';
+import { ISwapContextStrategyDataSnapshot } from './swap-context-strategy';
 
-export interface SwapSnapshot {
-  chainId: ChainId
-  sourceToken: TokenSnapshot
-  destinationToken: TokenSnapshot
+export interface SwapSnapshot extends ISwapContextStrategyDataSnapshot {
+  slippage: SettingsValue
+  auctionTime: SettingsValue
 }

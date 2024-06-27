@@ -7,7 +7,8 @@ import {
   SwapSnapshot,
   TokenSnapshot,
   SwapSettings,
-  SettingsValue
+  SettingsValue,
+  ISwapContextStrategyDataSnapshot
 } from '@one-inch-community/models';
 import {
   defer,
@@ -24,14 +25,11 @@ import {
   of,
   startWith,
   shareReplay,
-  BehaviorSubject,
-  observeOn,
-  animationFrameScheduler
+  BehaviorSubject, firstValueFrom, Subject, skip
 } from 'rxjs';
 import { PairHolder, TokenType } from './pair-holder';
 import { SwapContextOnChainStrategy } from './swap-context-onchain.strategy';
 import { SwapContextFusionStrategy } from './swap-context-fusion.strategy';
-import { ISwapContextStrategy, ISwapContextStrategyDataSnapshot } from './models/swap-context-strategy.interface';
 import { TokenController } from '../tokens';
 import {
   estimateWrap, getBlockEmitter,
@@ -72,21 +70,21 @@ export class SwapContext implements ISwapContext {
     switchMap(chainId => chainId ? getBlockEmitter(chainId) : of(null))
   )
 
+  private readonly updateData$ = new Subject<void>()
+  private readonly updateDataComplete$ = new Subject<void>()
+
   private readonly dataUpdateEmitter$: Observable<void> = merge(
     this.block$,
     this.chainId$,
     this.connectedWalletAddress$,
     this.pairHolder.streamSnapshot('source'),
     this.pairHolder.streamSnapshot('destination'),
+    this.updateData$
   ).pipe(
     debounceTime(500),
     map(() => void 0),
     startWith(void 0),
     shareReplay({ bufferSize: 1, refCount: true })
-  )
-
-  private readonly activeStrategy$: Observable<ISwapContextStrategy> = this.connectedWalletAddress$.pipe(
-    map(address => address === null ? this.contextStrategy.onChain : this.contextStrategy.fusion)
   )
 
   private readonly dataSnapshot$: Observable<ISwapContextStrategyDataSnapshot | null> = this.dataUpdateEmitter$.pipe(
@@ -95,7 +93,10 @@ export class SwapContext implements ISwapContext {
       this.loading$.next(true)
       return this.getDataSnapshot(address === null)
     }),
-    tap(() =>   this.loading$.next(false)),
+    tap(() => {
+      this.loading$.next(false)
+      this.updateDataComplete$.next()
+    }),
     shareReplay({ bufferSize: 1, refCount: true })
   )
 
@@ -125,8 +126,9 @@ export class SwapContext implements ISwapContext {
   ]).pipe(
     map(([ autoSlippage, slippageSettings ]) => {
       if (slippageSettings) return { type: slippageSettings[1], value: slippageSettings[0] }
-      return { type: 'auto', value: autoSlippage }
-    })
+      return { type: 'auto', value: autoSlippage } as const
+    }),
+    shareReplay({ bufferSize: 1, refCount: true })
   )
 
   readonly auctionTime$: Observable<SettingsValue> = combineLatest([
@@ -135,8 +137,9 @@ export class SwapContext implements ISwapContext {
   ]).pipe(
     map(([ autoAuctionTime, auctionTimeSettings ]) => {
       if (auctionTimeSettings) return { type: auctionTimeSettings[1], value: auctionTimeSettings[0] }
-      return { type: 'auto', value: autoAuctionTime }
-    })
+      return { type: 'auto', value: autoAuctionTime } as const
+    }),
+    shareReplay({ bufferSize: 1, refCount: true })
   )
 
   constructor(
@@ -211,27 +214,18 @@ export class SwapContext implements ISwapContext {
   }
 
   async getSnapshot(): Promise<SwapSnapshot> {
-    const sourceToken = this.pairHolder.getSnapshot('source')
-    const destinationToken = this.pairHolder.getSnapshot('destination')
-    const chainId = await this.walletController.data.getChainId()
-
-    if (!isTokenSnapshotNotNullable(sourceToken)) {
-      throw new Error('')
-    }
-
-    if (!isTokenSnapshotNotNullable(destinationToken)) {
-      throw new Error('')
-    }
-
-    if (chainId === null) {
-      throw new Error('')
-    }
-
+    this.updateData$.next()
+    await firstValueFrom(this.updateDataComplete$)
+    const [ swapSnapshot, slippage, auctionTime ] = await Promise.all([
+      firstValueFrom(this.dataSnapshot$),
+      firstValueFrom(this.slippage$),
+      firstValueFrom(this.auctionTime$)
+    ])
     return {
-      chainId,
-      sourceToken,
-      destinationToken
-    }
+      ...swapSnapshot,
+      slippage,
+      auctionTime
+    } as SwapSnapshot
   }
 
   async getMaxAmount() {

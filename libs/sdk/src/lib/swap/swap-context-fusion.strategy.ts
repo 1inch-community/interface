@@ -1,5 +1,4 @@
-import { IConnectWalletController, ISwapContext, Rate, SwapSettings } from '@one-inch-community/models';
-import { ISwapContextStrategy, ISwapContextStrategyDataSnapshot } from './models/swap-context-strategy.interface';
+import { IConnectWalletController, ISwapContext, Rate, SwapSettings, ISwapContextStrategy, ISwapContextStrategyDataSnapshot } from '@one-inch-community/models';
 import { PairHolder } from './pair-holder';
 import { BigMath, type OneInchDevPortalAdapter } from '../utils';
 import { getWrapperNativeToken, isNativeToken } from '../chain';

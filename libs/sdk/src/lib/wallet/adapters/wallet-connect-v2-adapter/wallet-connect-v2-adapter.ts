@@ -16,6 +16,7 @@ import {
 import { ProviderDataAdapter } from '../../provider-data-adapter';
 import { createClientAndSyncChain } from '../create-client-and-sync-chain';
 import type { MultiConnectProvider } from './multi-connect-provider';
+import { firstValueFrom, switchMap, throwError, timer } from 'rxjs';
 
 export class WalletConnectV2Adapter implements IWalletAdapter {
 
@@ -72,11 +73,26 @@ export class WalletConnectV2Adapter implements IWalletAdapter {
   }
 
   async writeContract(params: WriteContractParameters): Promise<WriteContractReturnType> {
-    throw new Error('Method not implemented.');
+    if (!(await this.isConnected()) || !this.client) {
+      throw new Error('Wallet not connected')
+    }
+    return await Promise.any([
+      this.client.writeContract(params),
+      firstValueFrom(timer(60 * 1000 * 3).pipe( // 3 min
+        switchMap(() => throwError(() => new Error('wallet connect request timed out'))),
+      ))
+    ])
   }
 
   async signTypedData(typeData: SignTypedDataParameters): Promise<SignTypedDataReturnType> {
-    throw new Error('Method not implemented.');
+    if (!(await this.isConnected()) || !this.client) {
+      throw new Error('Wallet not connected')
+    }
+    return await Promise.race([
+      this.client.signTypedData(typeData),
+      firstValueFrom(timer(60 * 1000 * 3).pipe( // 3 min
+        switchMap(() => throwError(() => new Error('wallet connect request timed out'))),
+      ))
+    ])
   }
-
 }

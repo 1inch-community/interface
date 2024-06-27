@@ -1,6 +1,11 @@
 import { css } from 'lit';
+import { mobileMediaCSS } from '@one-inch-community/lit';
 
 export const confirmSwapStyle = css`
+
+    :host {
+        --font-size: 16px;
+    }
     
     .confirm-swap-view {
         display: flex;
@@ -28,7 +33,7 @@ export const confirmSwapStyle = css`
 
     .token-view-top {
         color: var(--color-content-content-secondary);
-        font-size: 16px;
+        font-size: var(--font-size);
         font-style: normal;
         font-weight: 400;
         line-height: 24px;
@@ -78,6 +83,41 @@ export const confirmSwapStyle = css`
         border-top-color: var(--primary);
         animation: spin 2s linear infinite;
     }
+    
+    .detail-info {
+        padding: 8px 0;
+    }
+    
+    .detail-info-row {
+        padding: 8px 16px;
+        display: flex;
+        justify-content: space-between;
+    }
+    
+    .detail-info-row-title {
+        color: var(--color-content-content-secondary);
+        font-size: var(--font-size);
+        font-style: normal;
+        font-weight: 400;
+        line-height: 24px;
+    }
+    
+    .detail-info-raw-value {
+        color: var(--color-content-content-primary);
+        text-align: right;
+        font-size: var(--font-size);
+        font-style: normal;
+        font-weight: 500;
+        line-height: 24px;
+        transition: color .2s;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    
+    .detail-info-raw-settings-value {
+        color: var(--primary);
+    }
 
     @keyframes spin {
         0% {
@@ -98,4 +138,31 @@ export const confirmSwapStyle = css`
         top: 50%;
         z-index: 1;
     }
+
+    ${mobileMediaCSS(css`
+        :host {
+            --font-size: 13px
+        }
+
+        .primary-text {
+            font-size: 20px;
+        }
+
+        .detail-info-row {
+            padding: 4px 8px;
+        }
+
+        .token-view {
+            gap: 4px;
+        }
+
+        .separator-arrow-container {
+            width: 28px;
+            height: 28px;
+        }
+
+        .token-view-container {
+            padding: 8px 16px;
+        }
+    `)}
 `

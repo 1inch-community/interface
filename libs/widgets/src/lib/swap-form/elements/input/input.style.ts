@@ -81,6 +81,7 @@ export const inputStyle = css`
     
     .amount-input {
         height: 48px;
+        padding: 0;
         color: var(--color-content-content-primary);
         box-sizing: border-box;
         font-size: 24px;
