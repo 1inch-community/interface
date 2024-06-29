@@ -190,7 +190,7 @@ export class SwapFormElement extends LitElement {
             `,
             confirmSwap: () => when(this.swapSnapshot, (swapSnapshot) => html`
               <inch-confirm-swap
-                .swapSnapshot="${swapSnapshot}"
+                .swapSnapshot="${swapSnapshot as any}"
                 .swapContext="${this.swapController}"
                 @backCard="${async () => {
                   await this.desktopScene.back();

@@ -35,14 +35,14 @@ import {
   estimateWrap, getBlockEmitter, getClient,
   getOneInchRouterV6ContractAddress, getPermit,
   getPermit2TypeData,
-  isNativeToken,
+  isNativeToken, preparePermit2ForSwap,
   savePermit
 } from '../chain';
 import { BigMath, OneInchDevPortalAdapter } from '../utils';
 import { SettingsController } from '../settings';
 import { getEnvironmentValue } from '../environment';
 import type { BlockchainProviderConnector, EIP712TypedData, HttpProviderConnector, OrderParams } from '@1inch/fusion-sdk';
-import { Address, Hex } from 'viem';
+import { Address, encodeFunctionData, Hex, parseSignature } from 'viem';
 
 
 export class SwapContext implements ISwapContext {
@@ -200,7 +200,8 @@ export class SwapContext implements ISwapContext {
       tokenSnapshot.token.address,
       walletAddress,
       getOneInchRouterV6ContractAddress(chainId),
-      sign
+      sign,
+      typeData.message
     );
   }
 
@@ -247,15 +248,15 @@ export class SwapContext implements ISwapContext {
       throw new Error('')
     }
     const fusionSDK = await this.getFusionSDKInstance(chainId)
-    const permit = await getPermit(chainId, sourceToken.address, walletAddress, getOneInchRouterV6ContractAddress(chainId))
+    const permitData = await getPermit(chainId, sourceToken.address, walletAddress, getOneInchRouterV6ContractAddress(chainId))
     const orderParams: OrderParams = {
       walletAddress,
       fromTokenAddress: sourceToken.address,
       toTokenAddress: destinationToken.address,
       amount: sourceTokenAmount.toString(),
     }
-    if (permit) {
-      orderParams.permit = permit
+    if (permitData) {
+      orderParams.permit = await preparePermit2ForSwap(walletAddress, permitData.signature, permitData.permitSingle)
       orderParams.isPermit2 = true
     }
     const { type: slippageType, value: slippageValue } = slippage

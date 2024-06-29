@@ -67,25 +67,32 @@ export class UniversalBrowserExtensionAdapter implements IWalletAdapter {
     if (!(await this.isConnected()) || !this.client) {
       throw new Error('Wallet not connected')
     }
-    return await this.client.writeContract(params)
+    const address = (await this.data.getActiveAddress())!
+    return await this.client.writeContract({
+      ...params,
+      account: address,
+    })
   }
 
   async signTypedData(typeData: SignTypedDataParameters): Promise<SignTypedDataReturnType> {
     if (!(await this.isConnected()) || !this.client) {
       throw new Error('Wallet not connected')
     }
+    const address = (await this.data.getActiveAddress())!
     try {
-      return await this.client.signTypedData(typeData)
+      return await this.client.signTypedData({
+        ...typeData,
+        account: address,
+      })
     } catch (error: any) {
       if (isUserRejectError(error as WalletError)) {
         throw new error
       }
       console.log(error)
     }
-    const address = (await this.data.getActiveAddress())!
     const data = JSON.stringify(typeData, stringifyReplacer)
     return await this.providerDetail.provider.request({
-      method: 'eth_signTypedData_v3',
+      method: 'eth_signTypedData_v4',
       params: [address, data],
     }) as Hex
   }
