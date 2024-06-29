@@ -1,5 +1,5 @@
 import { ChainId } from '../chain';
-import {
+import type {
   Address,
   SignTypedDataParameters,
   SignTypedDataReturnType,

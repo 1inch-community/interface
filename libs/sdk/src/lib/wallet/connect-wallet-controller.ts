@@ -1,7 +1,14 @@
 import { ChainId, IConnectWalletController, IConnectWalletControllerInternal, IWalletAdapter, EIP6963ProviderDetail, EIP6963ProviderInfo, IDataAdapter } from "@one-inch-community/models"
 import { debounceTime, defaultIfEmpty, fromEvent, Subject, take, takeUntil, tap, timer } from 'rxjs';
 import { UniversalBrowserExtensionAdapter } from './adapters/universal-browser-extension-adapter';
-import { Address, WriteContractParameters, WriteContractReturnType, SignTypedDataParameters } from 'viem';
+import type {
+  Address,
+  WriteContractParameters,
+  WriteContractReturnType,
+  SignTypedDataParameters,
+  CallParameters,
+  CallReturnType
+} from 'viem';
 import { GlobalDataAdapter } from './global-data-adapter';
 import {
   addConnectedWallet, getActiveAddress,

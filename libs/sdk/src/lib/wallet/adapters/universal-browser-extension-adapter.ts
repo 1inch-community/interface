@@ -1,6 +1,6 @@
 import { ChainId, EIP6963ProviderDetail, IWalletAdapter } from '@one-inch-community/models';
 import { createClient, createClientAndSyncChain } from './create-client-and-sync-chain';
-import {
+import type {
   Address, Hex,
   SignTypedDataParameters,
   SignTypedDataReturnType,

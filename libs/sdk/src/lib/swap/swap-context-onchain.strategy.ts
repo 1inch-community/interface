@@ -69,6 +69,7 @@ export class SwapContextOnChainStrategy implements ISwapContextStrategy {
       minReceive: destinationTokenAmount,
       autoAuctionTime: null,
       autoSlippage: null,
+      rawResponseData: null
     }
   }
 

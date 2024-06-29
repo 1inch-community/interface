@@ -15,7 +15,7 @@ import {
   of,
   startWith,
   switchMap, tap, merge,
-  exhaustMap, withLatestFrom, Subject
+  withLatestFrom, Subject, shareReplay
 } from 'rxjs';
 import {
   dispatchEvent,
@@ -107,10 +107,11 @@ export class SwapButtonElement extends LitElement {
     switchMap(([wallet, sourceToken, amount]) => {
       if (!wallet || !sourceToken || amount === 0n || !this.context) return of(false);
       return this.context.getMaxAmount().then(balance => {
-        if (!balance) return false;
+        if (balance === 0n) return true;
         return !amount || amount > balance;
       });
-    })
+    }),
+    shareReplay({ bufferSize: 1, refCount: true })
   );
 
   private readonly calculateStatus$: Observable<SwapButtonState> = combineLatest([
@@ -166,7 +167,7 @@ export class SwapButtonElement extends LitElement {
     distinctUntilChanged(),
     debounceTime(0),
     withLatestFrom(this.chainId$, this.connectedWalletAddress$, this.sourceToken$),
-    exhaustMap(async ([state, chainId, walletAddress, srcToken ]) => {
+    switchMap(async ([state, chainId, walletAddress, srcToken ]) => {
       if (state !== SwapButtonState.readyToSwap) {
         return state
       }

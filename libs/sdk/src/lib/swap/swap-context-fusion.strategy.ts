@@ -101,6 +101,7 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy {
       autoAuctionTime: recommendedPreset.auctionDuration,
       autoSlippage: autoK,
       rate: rateData,
+      rawResponseData: fusionQuoteReceive
     }
   }
 

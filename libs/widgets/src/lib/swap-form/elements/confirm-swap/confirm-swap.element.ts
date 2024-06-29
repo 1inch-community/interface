@@ -2,7 +2,7 @@ import { html, LitElement, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { choose } from 'lit/directives/choose.js';
 import { confirmSwapStyle } from './confirm-swap.style';
-import { IToken, SwapSnapshot } from '@one-inch-community/models';
+import { ISwapContext, IToken, SwapSnapshot, FusionQuoteReceiveDto } from '@one-inch-community/models';
 import '@one-inch-community/widgets/token-icon'
 import '@one-inch-community/ui-components/card'
 import '@one-inch-community/ui-components/button'
@@ -11,7 +11,7 @@ import { formatSeconds, getBlockEmitter, getSymbolFromWrapToken, getWrapperNativ
   isTokensEqual, smartFormatNumber, TokenController } from '@one-inch-community/sdk';
 import { formatUnits } from 'viem';
 import { async, getMobileMatchMediaAndSubscribe, observe } from '@one-inch-community/lit';
-import { exhaustMap, Observable, shareReplay } from 'rxjs';
+import { Observable, shareReplay, switchMap } from 'rxjs';
 import { when } from 'lit/directives/when.js';
 
 @customElement(ConfirmSwapElement.tagName)
@@ -20,7 +20,9 @@ export class ConfirmSwapElement extends LitElement {
 
   static override readonly styles = confirmSwapStyle
 
-  @property({ type: Object }) swapSnapshot!: SwapSnapshot
+  @property({ type: Object }) swapSnapshot!: SwapSnapshot<FusionQuoteReceiveDto>
+
+  @property({ type: Object, attribute: false }) swapContext?: ISwapContext
 
   @state() state: 'swap' | 'wrap' | null = null
 
@@ -43,9 +45,13 @@ export class ConfirmSwapElement extends LitElement {
 
         ${this.getDetailInfo()}
 
-        <inch-button fullSize size="${size}">Swap</inch-button>
+        <inch-button @click="${() => this.onSwap()}" fullSize size="${size}">Swap</inch-button>
       </div>
     `
+  }
+
+  private async onSwap() {
+    await this.swapContext?.fusionSwap(this.swapSnapshot)
   }
 
   private getTokenViewContainer() {
@@ -200,7 +206,7 @@ export class ConfirmSwapElement extends LitElement {
     }
 
     const stream = getBlockEmitter(this.swapSnapshot.chainId).pipe(
-      exhaustMap(async () => {
+      switchMap(async () => {
         const usdPrice = await TokenController.getTokenUSDPrice(this.swapSnapshot.chainId, token.address)
         const balanceFormatted = formatUnits(amount, token.decimals);
         const balanceUsd = Number(balanceFormatted) * Number(usdPrice);

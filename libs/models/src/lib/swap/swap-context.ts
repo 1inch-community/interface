@@ -6,6 +6,7 @@ import { NullableValue } from '../base';
 import { Rate } from '../token-price';
 import { SwapSnapshot } from './swap-snapshot';
 import { SwapSettings } from './swap-settings';
+import { FusionQuoteReceiveDto } from '../dto';
 
 export type SettingsValue = {
   type: 'auto' | 'custom' | 'preset'
@@ -28,6 +29,7 @@ export interface ISwapContext {
   getTokenRawAmountByType(type: 'source' | 'destination'): Observable<bigint | null>
   setTokenAmountByType(type: 'source' | 'destination', value: bigint, markDirty?: boolean): void
   getSettingsController<V extends keyof SwapSettings>(name: V): SwapSettings[V]
+  fusionSwap(swapSnapshot: SwapSnapshot<FusionQuoteReceiveDto | null>): Promise<void>
   wrapNativeToken(amount: bigint): Promise<void>
   getSnapshot(): Promise<SwapSnapshot>
   getMaxAmount(): Promise<bigint>

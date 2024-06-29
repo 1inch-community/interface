@@ -3,7 +3,7 @@ import { IWalletAdapter } from './wallet-adapter';
 import { Observable } from 'rxjs';
 import { EIP6963ProviderInfo } from './provider';
 import { IDataAdapter, IGlobalDataAdapter } from './data-adapter';
-import { Address, SignTypedDataParameters, WriteContractParameters, WriteContractReturnType, SignTypedDataReturnType } from 'viem';
+import type { Address, SignTypedDataParameters, WriteContractParameters, WriteContractReturnType, SignTypedDataReturnType } from 'viem';
 
 export interface IConnectWalletController {
   readonly data: IDataAdapter & IGlobalDataAdapter;

@@ -191,6 +191,7 @@ export class SwapFormElement extends LitElement {
             confirmSwap: () => when(this.swapSnapshot, (swapSnapshot) => html`
               <inch-confirm-swap
                 .swapSnapshot="${swapSnapshot}"
+                .swapContext="${this.swapController}"
                 @backCard="${async () => {
                   await this.desktopScene.back();
                   this.swapSnapshot = null;
@@ -300,6 +301,7 @@ export class SwapFormElement extends LitElement {
       <inch-card forMobileView style="width: 100%; height: 100%; display: flex;">
         <inch-confirm-swap
           .swapSnapshot="${swapSnapshot}"
+          .swapContext="${this.swapController}"
           @backCard="${async () => {
             await this.mobileOverlay.close(id);
             this.swapSnapshot = null;

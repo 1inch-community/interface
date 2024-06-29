@@ -6,7 +6,7 @@ export interface ISwapContextStrategy {
   getDataSnapshot(): Promise<ISwapContextStrategyDataSnapshot>
 }
 
-export interface ISwapContextStrategyDataSnapshot {
+export interface ISwapContextStrategyDataSnapshot<T = unknown> {
   chainId: ChainId
   sourceToken: IToken
   destinationToken: IToken
@@ -16,4 +16,5 @@ export interface ISwapContextStrategyDataSnapshot {
   autoSlippage: number | null
   autoAuctionTime: number | null
   rate: Rate
+  rawResponseData: T
 }
