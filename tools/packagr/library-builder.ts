@@ -72,8 +72,8 @@ export class LibraryBuilder {
     const exports: Record<string, unknown> = {}
     this.moduleBuilders.forEach(({ moduleName }) => {
       exports[`./${moduleName}`] = {
-        default: `./${moduleName}/index.esm.js`,
-        types: `./${moduleName}/index.d.ts`
+        types: `./${moduleName}/index.d.ts`,
+        default: `./${moduleName}/index.esm.js`
       }
     })
     const packageJson = await getProjectPackageJson()

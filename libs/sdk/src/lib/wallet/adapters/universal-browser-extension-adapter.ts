@@ -92,7 +92,7 @@ export class UniversalBrowserExtensionAdapter implements IWalletAdapter {
     }
     const data = JSON.stringify(typeData, stringifyReplacer)
     return await this.providerDetail.provider.request({
-      method: 'eth_signTypedData_v4',
+      method: 'eth_signTypedData_v3',
       params: [address, data],
     }) as Hex
   }

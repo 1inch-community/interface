@@ -125,8 +125,8 @@ export class ModuleBuilder {
       peerDependencies: libPackageJson?.peerDependencies ?? {},
       exports: {
         '.': {
-          import: module,
           types: types,
+          import: module,
         }
       },
     }, getModuleDistPath(this.libName, this.moduleName))

@@ -1,13 +1,12 @@
 import {
   Address,
-  parseAbi,
   SignTypedDataParameters,
   maxUint160,
   Hex,
   parseSignature,
   encodeFunctionData,
   encodeAbiParameters,
-  decodeAbiParameters, maxUint256, maxUint48
+  decodeAbiParameters, maxUint48
 } from 'viem';
 import { ChainId } from '@one-inch-community/models';
 import { getClient } from './chain-client';
@@ -15,8 +14,19 @@ import { permit2ContractAddress } from './contracts';
 import { LongTimeAsyncCache } from '../cache';
 
 type PermitLongTimeCacheItem = {
-  permitSingle: Record<string, unknown>
+  permitSingle: PermitSingle
   signature: Hex
+}
+
+type PermitSingle = {
+  details: {
+    token: Address,
+    amount: bigint,
+    expiration: number
+    nonce: number
+  },
+  spender: Address,
+  sigDeadline: number
 }
 
 const permitLongTimeCache = new LongTimeAsyncCache<PermitLongTimeCacheItem, string>('permit2', 29)
@@ -51,15 +61,15 @@ export async function getPermit2TypeData(chainId: ChainId, tokenAddress: Address
   }
   const { nonce } = await getAllowanceData(chainId, tokenAddress, walletAddress, spenderAddress);
 
-  const permitSingle: Record<string, unknown> = {
+  const permitSingle: PermitSingle = {
     details: {
       token: tokenAddress,
       amount: maxUint160,
-      expiration: toDeadline(1000 * 60 * 60 * 24 * 30), // 30 day
+      expiration: Number(maxUint48), // 30 day
       nonce
     },
     spender: spenderAddress,
-    sigDeadline: toDeadline(1000 * 60 * 60 * 24 * 30), // 30 day
+    sigDeadline: Number(maxUint48), // 30 day
   };
 
   const domain = {
@@ -92,7 +102,7 @@ export async function getAllowanceData(chainId: ChainId, tokenAddress: Address, 
   return { amount, expiration, nonce }
 }
 
-export async function savePermit(chainId: ChainId, tokenAddress: Address, walletAddress: Address, spenderAddress: Address, signData: Hex, permitSingle: Record<string, unknown>) {
+export async function savePermit(chainId: ChainId, tokenAddress: Address, walletAddress: Address, spenderAddress: Address, signData: Hex, permitSingle: PermitSingle) {
   const id = [chainId, tokenAddress, walletAddress, spenderAddress].join(":")
   await permitLongTimeCache.set(id, {
     permitSingle,
@@ -110,7 +120,7 @@ export async function hasPermit(chainId: ChainId, tokenAddress: Address, walletA
   return result !== null
 }
 
-export async function preparePermit2ForSwap(owner: Address, permit2Sign: Hex, permitSingle: Record<string, unknown>): Promise<Hex> {
+export async function preparePermit2ForSwap(chainId: ChainId, owner: Address, permit2Sign: Hex, permitSingle: PermitSingle): Promise<Hex> {
   const signature = parseSignature(permit2Sign)
   const permitCallFull = encodeFunctionData({
     abi: await loadAbi(),
@@ -118,9 +128,9 @@ export async function preparePermit2ForSwap(owner: Address, permit2Sign: Hex, pe
     args: [owner, permitSingle, (signature.r + signature.yParity)]
   })
   const permitCallParams = cutSelector(permitCallFull)
-  const token = (permitSingle as any).details.token
-  const spender = (permitSingle as any).spender
-  return permitCallParams
+  const result = [permit2ContractAddress(chainId), trim0x(permitCallParams)].join('') as Hex
+
+  return result
 }
 
 function cutSelector(data: Hex): Hex {

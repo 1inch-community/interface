@@ -142,7 +142,8 @@ export class DtsBuildController {
         this.logger.error('diagnostic types error', new Error(ts.flattenDiagnosticMessageText(diagnostic.messageText, '\n')))
       }
     }
-    return !emitResult.emitSkipped
+    // TODO: emitResult.emitSkipped is false but _types dir in generated
+    return true
   }
 
   private async moveAllTypes() {

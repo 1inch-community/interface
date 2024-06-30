@@ -8,8 +8,7 @@
     "build:lib": "ts-node --project ./tools/packagr/tsconfig.json tools/packagr/main.ts"
   },
   "dependencies": {
-    "@1inch/fusion-sdk": "2.1.5-rc.1",
-    "@1inch/limit-order-sdk": "4.9.3-rc.0",
+    "@1inch/fusion-sdk": "2.1.5-rc.2",
     "@lit-labs/virtualizer": "2.0.13",
     "@lit/context": "1.1.2",
     "@lit/task": "1.0.1",

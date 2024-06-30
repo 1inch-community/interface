@@ -201,7 +201,7 @@ export class SwapContext implements ISwapContext {
       walletAddress,
       getOneInchRouterV6ContractAddress(chainId),
       sign,
-      typeData.message
+      typeData.message as any
     );
   }
 
@@ -256,7 +256,7 @@ export class SwapContext implements ISwapContext {
       amount: sourceTokenAmount.toString(),
     }
     if (permitData) {
-      orderParams.permit = await preparePermit2ForSwap(walletAddress, permitData.signature, permitData.permitSingle)
+      orderParams.permit = await preparePermit2ForSwap(chainId, walletAddress, permitData.signature, permitData.permitSingle)
       orderParams.isPermit2 = true
     }
     const { type: slippageType, value: slippageValue } = slippage

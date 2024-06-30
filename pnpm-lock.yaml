@@ -6,11 +6,8 @@ settings:
 
 dependencies:
   '@1inch/fusion-sdk':
-    specifier: 2.1.5-rc.1
-    version: 2.1.5-rc.1(assert@2.1.0)
-  '@1inch/limit-order-sdk':
-    specifier: 4.9.3-rc.0
-    version: 4.9.3-rc.0(assert@2.1.0)
+    specifier: 2.1.5-rc.2
+    version: 2.1.5-rc.2(assert@2.1.0)
   '@lit-labs/virtualizer':
     specifier: 2.0.13
     version: 2.0.13
@@ -200,8 +197,8 @@ packages:
     engines: {node: '>=18.16.0'}
     dev: false
 
-  /@1inch/fusion-sdk@2.1.5-rc.1(assert@2.1.0):
-    resolution: {integrity: sha512-pvhumBgS1JXIsvX9zD2VWZXnFajbYSgaXtoYWBbo/WRD9/UJY9+MvEf3Tj7f3jVU1iYkv8+GfRr+4t56ifOsfQ==}
+  /@1inch/fusion-sdk@2.1.5-rc.2(assert@2.1.0):
+    resolution: {integrity: sha512-OVv6Bx1B2XFy9VUK0GSE/JfKrzX52a/h89wRUbtA4rA0dmBq3/NJVKtfrQv83xn42W5WCm3EwBwUt5jzUtU7qg==}
     peerDependencies:
       assert: ^2.0.0
       axios: '>=1 <2'
@@ -212,31 +209,11 @@ packages:
         optional: true
     dependencies:
       '@1inch/byte-utils': 2.3.0
-      '@1inch/limit-order-sdk': 4.9.2(assert@2.1.0)
+      '@1inch/limit-order-sdk': 4.9.3-rc.0(assert@2.1.0)
       assert: 2.1.0
       ethers: 6.13.1
       tslib: 2.6.3
       ws: 8.17.1
-    transitivePeerDependencies:
-      - bufferutil
-      - utf-8-validate
-    dev: false
-
-  /@1inch/limit-order-sdk@4.9.2(assert@2.1.0):
-    resolution: {integrity: sha512-PXQFZ0waj+ZYjKCPZMDTsqOOrmponDDPBxfkaYArqjeuJ1wop2XtBvGboToNb7Ui/nYq8juyMp6lciETydXQKA==}
-    engines: {node: '>=18.16.0'}
-    peerDependencies:
-      assert: ^2.0.0
-      axios: '>=1 <2'
-    peerDependenciesMeta:
-      assert:
-        optional: true
-      axios:
-        optional: true
-    dependencies:
-      '@1inch/byte-utils': 2.2.1
-      assert: 2.1.0
-      ethers: 6.13.1
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
