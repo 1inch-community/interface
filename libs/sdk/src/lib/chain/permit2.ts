@@ -6,7 +6,7 @@ import {
   parseSignature,
   encodeFunctionData,
   encodeAbiParameters,
-  decodeAbiParameters, maxUint48
+  decodeAbiParameters, maxUint48, toBytes, toHex
 } from 'viem';
 import { ChainId } from '@one-inch-community/models';
 import { getClient } from './chain-client';
@@ -32,13 +32,13 @@ type PermitSingle = {
 const permitLongTimeCache = new LongTimeAsyncCache<PermitLongTimeCacheItem, string>('permit2', 29)
 
 const permit2SupportedChain: Record<ChainId, boolean> = {
-  [ChainId.eth]: true,
-  [ChainId.bnb]: true,
-  [ChainId.matic]: true,
-  [ChainId.op]: true,
-  [ChainId.arbitrum]: true,
-  [ChainId.gnosis]: true,
-  [ChainId.avalanche]: true,
+  [ChainId.eth]: false, // true,
+  [ChainId.bnb]: false, // true,
+  [ChainId.matic]: false, // true,
+  [ChainId.op]: false, // true,
+  [ChainId.arbitrum]: false, // true,
+  [ChainId.gnosis]: false, // true,
+  [ChainId.avalanche]: false, // true,
   [ChainId.fantom]: false,
   [ChainId.aurora]: false,
   [ChainId.klaytn]: false,
@@ -60,7 +60,6 @@ export async function getPermit2TypeData(chainId: ChainId, tokenAddress: Address
     throw new Error(`chain ${chainId} not supported Permit2`)
   }
   const { nonce } = await getAllowanceData(chainId, tokenAddress, walletAddress, spenderAddress);
-
   const permitSingle: PermitSingle = {
     details: {
       token: tokenAddress,
@@ -125,12 +124,26 @@ export async function preparePermit2ForSwap(chainId: ChainId, owner: Address, pe
   const permitCallFull = encodeFunctionData({
     abi: await loadAbi(),
     functionName: 'permit',
-    args: [owner, permitSingle, (signature.r + signature.yParity)]
+    args: [
+      owner,
+      permitSingle,
+      `${signature.r}${trim0x(computeYParityAndS(signature.s, signature.v === 27n ? 0 : 1))}`
+    ]
   })
   const permitCallParams = cutSelector(permitCallFull)
-  const result = [permit2ContractAddress(chainId), trim0x(permitCallParams)].join('') as Hex
+  const token = permitSingle.details.token
+  const spender = permitSingle.spender
+  return  decompressPermit(compressPermit(permitCallParams), token, owner, spender)
+}
 
-  return result
+function computeYParityAndS(s: string, yParity: number): string {
+  const sHex = toBytes(s)
+
+  if (yParity === 1) {
+    sHex[0] |= 0x80
+  }
+
+  return toHex(sHex)
 }
 
 function cutSelector(data: Hex): Hex {

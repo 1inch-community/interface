@@ -5,7 +5,13 @@ import '@one-inch-community/ui-components/segmented-control'
 import '@one-inch-community/ui-components/icon'
 import type { SegmentedControlItem } from '@one-inch-community/ui-components/segmented-control';
 import { SwapSettings } from '@one-inch-community/models';
-import { dispatchEvent, appendStyle, subscribe, getMobileMatchMediaAndSubscribe } from '@one-inch-community/lit';
+import {
+  dispatchEvent,
+  appendStyle,
+  subscribe,
+  getMobileMatchMediaAndSubscribe,
+  translate
+} from '@one-inch-community/lit';
 import { Maskito } from '@maskito/core';
 import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import { fromEvent, tap } from 'rxjs';
@@ -71,7 +77,7 @@ export class FusionSwapInfoSlippageElement extends LitElement {
     return html`
       <div @click="${() => this.onBack()}" class="slippage-title">
         <inch-icon class="back-icon" icon="chevronDown16"></inch-icon>
-        <span>Slippage tolerance</span>
+        <span>${translate('widgets.swap-form.fusion-info.slippage-tolerance')}</span>
       </div>
       <inch-segmented-control
         .items="${this.segments}"

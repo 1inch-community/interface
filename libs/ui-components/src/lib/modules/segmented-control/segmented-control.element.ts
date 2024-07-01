@@ -3,7 +3,8 @@ import { customElement, property } from 'lit/decorators.js';
 import { segmentedControlContainerStyle, segmentedControlItemStyle } from './segmented-control.style';
 import { classMap } from 'lit/directives/class-map.js';
 import { map } from 'lit/directives/map.js';
-import { buildEvent } from '@one-inch-community/lit';
+import { buildEvent, isRTLCurrentLocale, localeChange$, subscribe } from '@one-inch-community/lit';
+import { tap } from 'rxjs';
 
 type SegmentedControlSize = 'm' | 'l'
 
@@ -51,6 +52,9 @@ export class SegmentedControlElement extends LitElement {
     await new Promise(resolve => setTimeout(resolve, 60))
     this.caretRef?.classList.add('caret-transition')
     this.requestUpdate()
+    subscribe(this, [
+      localeChange$.pipe(tap(() => this.updated()))
+    ])
   }
 
   protected override updated() {
@@ -66,7 +70,7 @@ export class SegmentedControlElement extends LitElement {
       offset += el.offsetWidth;
     }
     this.caretRef.style.width = `${width}px`;
-    this.caretRef.style.transform = `translateX(${offset}px)`;
+    this.caretRef.style.transform = `translateX(${offset * (isRTLCurrentLocale() ? -1 : 1)}px)`;
   }
 
   protected getItemView(item: SegmentedControlItem) {

@@ -6,7 +6,7 @@ export const appStyle = css`
     :host {
         --height: 100vh;
         overflow-y: auto;
-        overflow-x: hidden;
+        overflow-x: hidden !important;
         height: var(--height);
         display: flex;
         flex-direction: column;

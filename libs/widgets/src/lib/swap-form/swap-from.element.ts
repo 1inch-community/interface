@@ -7,7 +7,7 @@ import "@one-inch-community/ui-components/button"
 import { IConnectWalletController, IToken, ISwapContext } from '@one-inch-community/models';
 import { SwapContext } from '@one-inch-community/sdk';
 import { combineLatest, defer, distinctUntilChanged, map, startWith, tap } from 'rxjs';
-import { subscribe } from '@one-inch-community/lit';
+import { subscribe, translate } from '@one-inch-community/lit';
 import { swapFromStyle } from './swap-from.style';
 import { swapContext } from './context';
 import './elements'
@@ -77,7 +77,7 @@ export class SwapFromElement extends LitElement {
 
     return html`
       <div class="swap-form-container">
-        <inch-card-header headerText="Swap" headerTextPosition="left">
+        <inch-card-header headerText="${translate('widgets.swap-form.header.swap')}" headerTextPosition="left">
         </inch-card-header>
         
         <div class="input-container">

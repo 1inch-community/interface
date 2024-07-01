@@ -6,9 +6,8 @@ import { ifDefined } from 'lit/directives/if-defined.js'
 import {
   combineLatest,
   defer,
-  distinctUntilChanged,
   filter,
-  firstValueFrom, from, fromEvent,
+  from,
   map, Observable, of,
   shareReplay,
   startWith, switchMap,
@@ -25,9 +24,10 @@ import '../balance'
 import '../fiat-balance'
 import { inputStyle } from './input.style';
 import { swapContext } from '../../context';
-import { observe, subscribe, dispatchEvent } from '@one-inch-community/lit';
+import { observe, subscribe, dispatchEvent, translate, isRTLCurrentLocale, localeChange$ } from '@one-inch-community/lit';
 import { Address, formatUnits, parseUnits } from 'viem';
 import { when } from 'lit/directives/when.js';
+import { choose } from 'lit/directives/choose.js';
 
 @customElement(InputElement.tagName)
 export class InputElement extends LitElement {
@@ -137,6 +137,10 @@ export class InputElement extends LitElement {
       this.token$.pipe(tap(token => this.token = token)),
       this.connectedAddress$.pipe(tap(address => this.connectedAddress = address))
     ], { requestUpdate: false })
+
+    subscribe(this, [
+      localeChange$
+    ])
   }
 
   override disconnectedCallback() {
@@ -150,10 +154,14 @@ export class InputElement extends LitElement {
       focus: this.isFocus
     }
     this.input.disabled = this.tokenType === 'destination'
+    this.updateInputRtl()
     return html`
       <div class="input-container ${classMap(classes)}">
         <div class="flex-container symbol-title-name">
-          <div class="input-title">${this.getInputTitle()}</div>
+          <div class="input-title">${choose(this.tokenType, [
+            ['source', () => html`${translate('widgets.swap-form.input.title.you_pay')}`],
+            ['destination', () => html`${translate('widgets.swap-form.input.title.you_receive')}`]
+          ])}</div>
           ${observe(this.tokenView$)}
         </div>
         
@@ -205,8 +213,17 @@ export class InputElement extends LitElement {
         <span class="symbol">${symbol}</span>
         <inch-icon icon="chevronDown16"></inch-icon>
       </button>
-      <span class="token-name">${name}</span>
+      <div class="token-name">${name}</div>
     `
+  }
+
+  private updateInputRtl() {
+    if (isRTLCurrentLocale() && !this.input.classList.contains('input-rtl')) {
+      this.input.classList.add('input-rtl')
+    }
+    if (!isRTLCurrentLocale() && this.input.classList.contains('input-rtl')) {
+      this.input.classList.remove('input-rtl')
+    }
   }
 
   private getTokenEventEmitter() {
@@ -235,16 +252,6 @@ export class InputElement extends LitElement {
   private getConnectedWalletAddress() {
     if (!this.context) throw new Error('')
     return this.context.connectedWalletAddress$
-  }
-
-  private getInputTitle() {
-    if (this.tokenType === 'source') {
-      return 'You pay'
-    }
-    if (this.tokenType === 'destination') {
-      return 'You receive'
-    }
-    throw new Error(`invalid token type ${this.tokenType} in swap input`)
   }
 
   private onInput(event: InputEvent) {

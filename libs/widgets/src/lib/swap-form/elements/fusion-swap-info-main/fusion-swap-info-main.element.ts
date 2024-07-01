@@ -2,7 +2,7 @@ import { html, LitElement } from 'lit';
 import { fusionSwapInfoMainStyle } from './fusion-swap-info-main.style';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { observe, dispatchEvent } from '@one-inch-community/lit';
+import { observe, dispatchEvent, translate } from '@one-inch-community/lit';
 import { consume } from '@lit/context';
 import { swapContext } from '../../context';
 import {
@@ -153,25 +153,25 @@ export class FusionSwapInfoMainElement extends LitElement {
         </div>
         <div class="content-container">
           <div class="content-row">
-            <span class="row-title">Slippage tolerance</span>
+            <span class="row-title">${translate('widgets.swap-form.fusion-info.slippage-tolerance')}</span>
             <div @click="${() => dispatchEvent(this, 'openSlippageSettings', null)}" class="row-content row-slippage">
               ${observe(this.slippage$)}
             </div>
           </div>
           <div class="content-row">
-            <span class="row-title">Auction time</span>
+            <span class="row-title">${translate('widgets.swap-form.fusion-info.auction-time')}</span>
             <div @click="${() => dispatchEvent(this, 'openAuctionTimeSettings', null)}" class="row-content row-slippage">
               ${observe(this.auctionTime$)}
             </div>
           </div>
           <div class="content-row">
-            <span class="row-title">Minimum receive</span>
+            <span class="row-title">${translate('widgets.swap-form.fusion-info.min-receive')}</span>
             <div class="row-content">
               ${observe(this.minReceiveView$)}
             </div>
           </div>
           <div class="content-row">
-            <span class="row-title">Network Fee</span>
+            <span class="row-title">${translate('widgets.swap-form.fusion-info.net-fee')}</span>
             <div class="row-content">
               <inch-icon icon="fusion16"></inch-icon>
               <span>Free</span>

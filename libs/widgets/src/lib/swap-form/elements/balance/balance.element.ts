@@ -7,7 +7,7 @@ import { balanceStyles } from './balance.styles';
 import { catchError, combineLatest, defer, filter, map, startWith, switchMap } from 'rxjs';
 import { formatUnits } from 'viem';
 import { formatNumber, getBlockEmitter, TokenController } from '@one-inch-community/sdk';
-import { observe } from '@one-inch-community/lit';
+import { observe, translate } from '@one-inch-community/lit';
 
 @customElement(BalanceElement.tagName)
 export class BalanceElement extends LitElement {
@@ -54,7 +54,7 @@ export class BalanceElement extends LitElement {
 
   private getBalanceView(balance: string) {
     return html`
-      <span>Balance: ${balance}</span>
+      <span>${translate('widgets.swap-form.input.balance.balance')}: ${balance}</span>
     `
   }
 }

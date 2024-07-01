@@ -78,6 +78,10 @@ export const inputStyle = css`
         text-overflow: ellipsis;
         overflow: hidden;
     }
+
+    .token-name:dir(rtl) {
+        text-align: right;
+    }
     
     .amount-input {
         height: 48px;
@@ -94,6 +98,10 @@ export const inputStyle = css`
         outline: none;
         user-select: none;
         width: 100%;
+    }
+    
+    .input-rtl {
+        text-align: left; 
     }
 
     .amount-input[type="number"]::-webkit-inner-spin-button,
@@ -126,6 +134,10 @@ export const inputStyle = css`
     .loading {
         will-change: opacity;
         animation: stub-loader-animation 2s ease-in-out infinite;
+    }
+    
+    .input-rtl {
+        text-align: end;
     }
 
     @keyframes stub-loader-animation {

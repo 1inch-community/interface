@@ -247,6 +247,9 @@ export class SwapContext implements ISwapContext {
     if (walletAddress === null) {
       throw new Error('')
     }
+    if (!rawResponseData) {
+      throw new Error('')
+    }
     const fusionSDK = await this.getFusionSDKInstance(chainId)
     const permitData = await getPermit(chainId, sourceToken.address, walletAddress, getOneInchRouterV6ContractAddress(chainId))
     const orderParams: OrderParams = {
@@ -254,6 +257,7 @@ export class SwapContext implements ISwapContext {
       fromTokenAddress: sourceToken.address,
       toTokenAddress: destinationToken.address,
       amount: sourceTokenAmount.toString(),
+      preset: rawResponseData.recommended_preset as any
     }
     if (permitData) {
       orderParams.permit = await preparePermit2ForSwap(chainId, walletAddress, permitData.signature, permitData.permitSingle)
@@ -262,7 +266,6 @@ export class SwapContext implements ISwapContext {
     const { type: slippageType, value: slippageValue } = slippage
     const { type: auctionTimeType, value: auctionTimeValue } = auctionTime
     if (slippageType !== 'auto' || auctionTimeType !== 'auto') {
-      if (!rawResponseData) throw new Error('')
       const preset = rawResponseData.presets[rawResponseData.recommended_preset]
       const auctionEndAmount = destinationTokenAmount - BigMath.calculatePercentage(destinationTokenAmount, slippageValue ?? rawResponseData.autoK)
       orderParams.customPreset = {
@@ -270,6 +273,7 @@ export class SwapContext implements ISwapContext {
         auctionDuration: auctionTimeValue ?? preset.auctionDuration,
         auctionStartAmount: preset.auctionStartAmount,
       }
+      orderParams.preset = 'custom' as any
     }
 
     const createOrderResponse = await fusionSDK.createOrder(orderParams)
@@ -398,6 +402,6 @@ class FusionHttpProviderConnector implements HttpProviderConnector {
         method: 'POST',
         body: JSON.stringify(data)
       })
-      return resp.json()
+      return resp.json().catch(() => void 0)
     }
 }

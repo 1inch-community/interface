@@ -20,7 +20,7 @@ import {
 import {
   dispatchEvent,
   getMobileMatchMediaAndSubscribe,
-  subscribe
+  subscribe, translate
 } from '@one-inch-community/lit';
 import {
   getAllowance,
@@ -223,30 +223,30 @@ export class SwapButtonElement extends LitElement {
           <span class="on-hover">Change chain</span>
           <br>
         `)}
-        ${when(this.buttonState === SwapButtonState.readyToSwap, () => html`<span>Confirm swap</span>`)}
-        ${when(this.buttonState === SwapButtonState.readyToSwapLoading, () => html`<span>Confirm swap</span>`)}
-        ${when(this.buttonState === SwapButtonState.checkAllowance, () => html`<span>Check allowance</span>`)}
-        ${when(this.buttonState === SwapButtonState.wrapNativeToken, () => html`<span>Native token not supported now</span>`)}
-        ${when(this.buttonState === SwapButtonState.lowAllowanceNeedApprove, () => html`<span>Approve and Swap</span>`)}
-        ${when(this.buttonState === SwapButtonState.lowAllowanceNeedPermit, () => html`<span>Permit and Swap</span>`)}
-        ${when(this.buttonState === SwapButtonState.walletNotConnected, () => html`<span>Connect wallet</span>`)}
-        ${when(this.buttonState === SwapButtonState.unselectedSourceToken, () => html`<span>Select source token</span>`)}
-        ${when(this.buttonState === SwapButtonState.unselectedDestinationToken, () => html`<span>Select destination token</span>`)}
-        ${when(this.buttonState === SwapButtonState.zeroAmount, () => html`<span>Enter amount to swap</span>`)}
-        ${when(this.buttonState === SwapButtonState.rateNotExist, () => html`<span>No liquidity for swap</span>`)}
+        ${when(this.buttonState === SwapButtonState.readyToSwap, () => html`<span>${translate('widgets.swap-form.swap-button.confirm-swap')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.readyToSwapLoading, () => html`<span>${translate('widgets.swap-form.swap-button.confirm-swap')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.checkAllowance, () => html`<span>${translate('widgets.swap-form.swap-button.check-allowance')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.wrapNativeToken, () => html`<span>${translate('widgets.swap-form.swap-button.native-token-not-supported')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.lowAllowanceNeedApprove, () => html`<span>${translate('widgets.swap-form.swap-button.approve-and-swap')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.lowAllowanceNeedPermit, () => html`<span>${translate('widgets.swap-form.swap-button.permit-and-swap')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.walletNotConnected, () => html`<span>${translate('widgets.swap-form.swap-button.connect-wallet')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.unselectedSourceToken, () => html`<span>${translate('widgets.swap-form.swap-button.select-source-token')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.unselectedDestinationToken, () => html`<span>${translate('widgets.swap-form.swap-button.select-destination-token')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.zeroAmount, () => html`<span>${translate('widgets.swap-form.swap-button.enter-amount-to-swap')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.rateNotExist, () => html`<span>${translate('widgets.swap-form.swap-button.no-liquidity-for-swap')}</span>`)}
         ${when(this.buttonState === SwapButtonState.exceedingMaximumAmount, () => html`
-          <span class="off-hover">Insufficient ${this.srcToken?.symbol} balance</span>
-          <span class="on-hover">Set max ${this.srcToken?.symbol}</span>
+          <span class="off-hover">${translate('widgets.swap-form.swap-button.insufficient-balance', { symbol: this.srcToken?.symbol })}</span>
+          <span class="on-hover">${translate('widgets.swap-form.swap-button.set-max', { symbol: this.srcToken?.symbol })}</span>
           <br>
         `)}
         ${when(this.buttonState === SwapButtonState.permitInWallet, () => html`
-          <span class="off-hover">Wait wallet response</span>
-          <span class="on-hover">Permit swap in wallet</span>
+          <span class="off-hover">${translate('widgets.swap-form.swap-button.wait-wallet-response')}</span>
+          <span class="on-hover">${translate('widgets.swap-form.swap-button.permit-swap-in-wallet')}</span>
           <br>
         `)}
         ${when(this.buttonState === SwapButtonState.approveInWallet, () => html`
-          <span class="off-hover">Wait wallet response</span>
-          <span class="on-hover">Allow swap in wallet</span>
+          <span class="off-hover">${translate('widgets.swap-form.swap-button.wait-wallet-response')}</span>
+          <span class="on-hover">${translate('widgets.swap-form.swap-button.allow-swap-in-wallet')}</span>
           <br>
         `)}
       </inch-button>

@@ -29,6 +29,7 @@ export const icons: Record<string, IconsRecord> = {
   link24: { width: '24px', height: '24px', loader: () => import('./link_24.svg').then(m => m.link24Svg) },
   alert24: { width: '24px', height: '24px', loader: () => import('./alert_24.svg').then(m => m.alert24Svg) },
   l2Chain24: { width: '24px', height: '24px', loader: () => import('./l2-chain_24.svg').then(m => m.l2Chain24Svg) },
+  l2ChainRTL24: { width: '24px', height: '24px', loader: () => import('./l2-chain-rtl_24.svg').then(m => m.l2Chain24Svg) },
   authRefresh36: { width: '36px', height: '36px', loader: () => import('./auth-refresh_36.svg').then(m => m.authRefresh36Svg) },
   logoFull: { width: '102px', height: '40px', loader: () => import('./logo-full.svg').then(m => m.logoFullSvg) },
   unicornRun: { width: '38px', height: '24px', loader: () => import('./unicorn_run.svg').then(m => m.unicornRunSvg) },
