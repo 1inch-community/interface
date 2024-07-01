@@ -1,3 +1,23 @@
+# [1.0.0-dev.28](https://github.com/1inch-community/interface/compare/v1.0.0-dev.27...v1.0.0-dev.28) (2024-07-01)
+
+
+### Bug Fixes
+
+* change average block time ([a286ca4](https://github.com/1inch-community/interface/commit/a286ca484c156536bee2d4024f36f64f5e882b06))
+* fixed manifest PWA ([d81187d](https://github.com/1inch-community/interface/commit/d81187ddaa013a797bd71fda43bbef8a4fa8615c))
+* fixed various ui/ux bugs ([bd787c1](https://github.com/1inch-community/interface/commit/bd787c197d6542925f6ec272b686fba3e179a693))
+
+
+### Features
+
+* added confirm swap view ([bb3c336](https://github.com/1inch-community/interface/commit/bb3c336e106cc97f4fa8b8149326d3cc174bde76))
+* added data updating by new block in swap button and swap balance view ([a7d0c32](https://github.com/1inch-community/interface/commit/a7d0c3228cc8daad78e0eef39ba7802c2d39e83a))
+* added filtering by token balance before request to the devportal api ([0b3e728](https://github.com/1inch-community/interface/commit/0b3e728d353b1808435451618b69124396bfdeaf))
+* added i18n system ([8c158ba](https://github.com/1inch-community/interface/commit/8c158bafc909d682bcc8baa5e264b4ab4947c0c9))
+* added swap algorithm ([d94a032](https://github.com/1inch-community/interface/commit/d94a032b8c91141953d207a395bb75d13754c800))
+* permit2 ([f39b6e5](https://github.com/1inch-community/interface/commit/f39b6e56f074dd89f0170d399d2d8a552fd75119))
+* permit2 and confirm swap view ([ec149ac](https://github.com/1inch-community/interface/commit/ec149ac7a6ee721b37efe331aebaec8d6db159cb))
+
 # [1.0.0-dev.27](https://github.com/1inch-community/interface/compare/v1.0.0-dev.26...v1.0.0-dev.27) (2024-06-11)
 
 
