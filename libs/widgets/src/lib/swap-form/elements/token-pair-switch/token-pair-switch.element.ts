@@ -45,6 +45,7 @@ export class TokenPairSwitchElement extends LitElement {
         fromEvent(this.buttonRef.value, 'mouseenter').pipe(
           switchMap(async () => {
             if (!this.iconRef.value || this.isUp) return
+            this.isUp = true
             await this.iconRef.value.animate([
               { transform: 'rotate(0deg)' },
               { transform: 'rotate(180deg)' },
@@ -52,12 +53,12 @@ export class TokenPairSwitchElement extends LitElement {
             appendStyle(this.iconRef.value, {
               transform: 'rotate(180deg)'
             })
-            this.isUp = true
           })
         ),
         fromEvent(this.buttonRef.value, 'mouseleave').pipe(
           switchMap(async () => {
             if (!this.iconRef.value || !this.isUp) return
+            this.isUp = false
             await this.iconRef.value.animate([
               { transform: 'rotate(180deg)' },
               { transform: 'rotate(360deg)' },
@@ -65,7 +66,6 @@ export class TokenPairSwitchElement extends LitElement {
             appendStyle(this.iconRef.value, {
               transform: ''
             })
-            this.isUp = false
           })
         ),
       ])

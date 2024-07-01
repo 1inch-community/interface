@@ -10,9 +10,10 @@ import '@one-inch-community/ui-components/icon'
 import { formatSeconds, getBlockEmitter, getSymbolFromWrapToken, getWrapperNativeToken, isNativeToken,
   isTokensEqual, smartFormatNumber, TokenController } from '@one-inch-community/sdk';
 import { formatUnits } from 'viem';
-import { async, getMobileMatchMediaAndSubscribe, observe } from '@one-inch-community/lit';
+import { async, dispatchEvent, getMobileMatchMediaAndSubscribe, observe } from '@one-inch-community/lit';
 import { Observable, shareReplay, switchMap } from 'rxjs';
 import { when } from 'lit/directives/when.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 
 @customElement(ConfirmSwapElement.tagName)
 export class ConfirmSwapElement extends LitElement {
@@ -25,6 +26,8 @@ export class ConfirmSwapElement extends LitElement {
   @property({ type: Object, attribute: false }) swapContext?: ISwapContext
 
   @state() state: 'swap' | 'wrap' | null = null
+
+  @state() swapInProgress = false
 
   private fiatAmountMap = new Map<string, Observable<string>>()
 
@@ -45,13 +48,26 @@ export class ConfirmSwapElement extends LitElement {
 
         ${this.getDetailInfo()}
 
-        <inch-button @click="${() => this.onSwap()}" fullSize size="${size}">Swap</inch-button>
+        <inch-button loader="${ifDefined(this.swapInProgress ? '' : undefined)}" @click="${() => this.onSwap()}" fullSize size="${size}" type="${this.swapInProgress ? 'secondary' : 'primary'}">
+          ${when(this.swapInProgress,
+            () => html`<span>Confirm swap in wallet</span>`,
+            () => html`<span>Swap</span>`,
+          )}
+        </inch-button>
       </div>
     `
   }
 
   private async onSwap() {
-    await this.swapContext?.fusionSwap(this.swapSnapshot)
+    if (this.swapInProgress) return
+    try {
+      this.swapInProgress = true
+      await this.swapContext?.fusionSwap(this.swapSnapshot)
+      dispatchEvent(this, 'backCard', null)
+    } catch (error) {
+      //
+    }
+    this.swapInProgress = false
   }
 
   private getTokenViewContainer() {
@@ -134,10 +150,6 @@ export class ConfirmSwapElement extends LitElement {
         ${smartFormatNumber(amountView, 6)} ${this.swapSnapshot.destinationToken.symbol}
       </div>
     `
-  }
-
-  private getPriceView() {
-
   }
 
   private getDetailInfoRow(title: string, data: TemplateResult) {
