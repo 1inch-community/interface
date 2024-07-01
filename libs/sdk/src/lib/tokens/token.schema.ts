@@ -1,6 +1,6 @@
 import Dexie, { Table } from 'dexie';
-import { type Address, Hex, isAddressEqual } from 'viem';
-import { IBalancesTokenRecord, ChainId, ITokenRecord, ITokenDto, IPermitRecord } from '@one-inch-community/models';
+import { type Address, isAddressEqual } from 'viem';
+import { IBalancesTokenRecord, ChainId, ITokenRecord, ITokenDto } from '@one-inch-community/models';
 import { QueueCache } from '../cache';
 import { nativeTokenAddress } from '../chain';
 
@@ -21,11 +21,10 @@ const TokenPriority: Record<string, number> = {
 
 export class TokenSchema extends Dexie {
 
-  static databaseVersion = 3;
+  static databaseVersion = 4;
 
   private tokens!: Table<ITokenRecord, string>;
   private balances!: Table<IBalancesTokenRecord, string>;
-  private permit!: Table<IPermitRecord, string>;
 
   private readonly tokenCache = new QueueCache<string, ITokenRecord>(50)
 
@@ -52,15 +51,6 @@ export class TokenSchema extends Dexie {
         'walletAddress',
         'amount'
       ].join(', '),
-      permit: [
-        'id', // 'chainId:ownerAddress:spenderAddress:tokenAddress'
-        'chainId',
-        'contractAddress',
-        'ownerAddress',
-        'spenderAddress',
-        'createTimestamp',
-        'permit'
-      ].join(', ')
     });
   }
 
@@ -149,6 +139,13 @@ export class TokenSchema extends Dexie {
     return records[0] ?? null;
   }
 
+  async isEmptyTokenBalanceStorage(chainId: ChainId, walletAddress: Address) {
+    return this.balances
+      .filter(record => record.chainId === chainId && isAddressEqual(record.walletAddress, walletAddress))
+      .toArray()
+      .then(list => list.length === 0)
+  }
+
   async setTokens(chainId: ChainId, tokens: ITokenDto[]) {
     const tableTokens: ITokenRecord[] = [];
     for (const token of tokens) {
@@ -156,7 +153,7 @@ export class TokenSchema extends Dexie {
         id: getId(chainId, token.address),
         address: token.address,
         decimals: token.decimals,
-        eip2612: token.extensions?.eip2612 ?? false,
+        eip2612: token.extensions?.eip2612 ?? null,
         name: token.name,
         symbol: token.symbol,
         tags: token.tags,
@@ -183,19 +180,6 @@ export class TokenSchema extends Dexie {
       });
     }
     await this.balances.bulkPut(balancesRecords);
-  }
-
-  async setPermit(chainId: ChainId, owner: Address, spender: Address, contract: Address, permit: Hex) {
-    const id = getId(chainId, owner, spender, contract)
-    await this.permit.put({
-      id,
-      chainId: chainId,
-      ownerAddress: owner,
-      spenderAddress: spender,
-      contractAddress: contract,
-      createTimestamp: Date.now(),
-      permit
-    })
   }
 
   async getAllFavoriteTokenAddresses(chainId: ChainId) {
@@ -282,6 +266,11 @@ export class TokenSchema extends Dexie {
     await this.tokens.update(recordId, { isFavorite: state })
   }
 
+  async setEip2612Support(chainId: ChainId, address: Address, state: boolean) {
+    const recordId = getId(chainId, address);
+    await this.tokens.update(recordId, { eip2612: state })
+  }
+
 }
 
 function getId(...args: unknown[]) {
@@ -289,7 +278,7 @@ function getId(...args: unknown[]) {
 }
 
 function calcTokenPriority(dto: ITokenDto): number {
-  let priority = dto?.providers?.length ?? 0;
+  let priority = dto.providers?.length ?? 0;
   priority += TokenPriority[dto.symbol] ?? 0;
   for (const tag of dto.tags) {
     priority += (TokenPriority[tag] ?? 0);

@@ -3,6 +3,7 @@ export interface Environment {
   walletConnectProjectId: string
   baseHref: string
   appVersion: string
+  infuraApiKey: string
 }
 
 declare const __environment__: Environment

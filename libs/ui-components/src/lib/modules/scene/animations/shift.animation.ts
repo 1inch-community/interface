@@ -22,7 +22,6 @@ export function shiftAnimation(): Animation {
     transform: '',
     filter: '',
     backfaceVisibility: '',
-    willChange: '',
     height: ''
   }
   const animationConfig: KeyframeAnimationOptions = {
@@ -40,7 +39,6 @@ export function shiftAnimation(): Animation {
       appendStyle(downLayer, {
         ...initStyle,
         zIndex: '8',
-        willChange: 'transform, filter',
         transform: isBack ? 'translate3d(-100%, 0, 0)' : 'translate3d(0, 0, 0)',
       })
     },

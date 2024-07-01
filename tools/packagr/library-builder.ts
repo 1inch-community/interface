@@ -72,8 +72,8 @@ export class LibraryBuilder {
     const exports: Record<string, unknown> = {}
     this.moduleBuilders.forEach(({ moduleName }) => {
       exports[`./${moduleName}`] = {
-        default: `./${moduleName}/index.esm.js`,
-        types: `./${moduleName}/index.d.ts`
+        types: `./${moduleName}/index.d.ts`,
+        default: `./${moduleName}/index.esm.js`
       }
     })
     const packageJson = await getProjectPackageJson()
@@ -102,7 +102,7 @@ export class LibraryBuilder {
     }
     const crossDepsSet = await this.dependenciesFinder.findLibraryCrossDependencies(moduleInfo.map(info => info.modulePublicApiPath))
     const crossDeps = [ ...crossDepsSet ]
-    this.logger.log('wait build cross dependencies')
+    this.logger.log('wait build cross dependencies, ' + crossDeps.join(', '))
     await Promise.all(crossDeps.map(deps => this.statusController!.waitReady(deps)))
     this.logger.log('build cross dependencies ready')
   }

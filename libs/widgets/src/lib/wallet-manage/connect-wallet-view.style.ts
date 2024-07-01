@@ -3,7 +3,7 @@ import { css } from 'lit';
 export const connectWalletViewStyle = css`
 
     .connect-wallet-view-container {
-        padding: 8px;
+        padding: 8px 5px 8px 8px;
         display: flex;
         align-items: center;
         gap: 8px;
@@ -12,7 +12,7 @@ export const connectWalletViewStyle = css`
         height: 40px;
         box-sizing: border-box;
     }
-    
+
     .connect-wallet-view-icon {
         width: 24px;
         height: 24px;

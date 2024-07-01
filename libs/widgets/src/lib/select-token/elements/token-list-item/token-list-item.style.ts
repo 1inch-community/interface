@@ -59,11 +59,20 @@ export const tokenListItemStyle = css`
         line-height: 24px;
         white-space: nowrap
     }
+
+    .usd-balance {
+        
+    }
     
     .usd-balance-and-favorite-start {
         display: flex;
         align-items: center;
         margin-left: auto;
+    }
+
+    .usd-balance-and-favorite-start:dir(rtl) {
+        margin-right: auto;
+        margin-left: 0;
     }
     
     .is-favorite-start {
@@ -84,6 +93,11 @@ export const tokenListItemStyle = css`
             transition: transform .2s;
         }
 
+        .item-container:not(.is-favorite-token) .usd-balance:dir(rtl) {
+            transform: translateX(-24px);
+            transition: transform .2s;
+        }
+
         .item-container:not(.is-favorite-token) .is-favorite-start {
             transform: scale(0);
             transition: transform .2s;
@@ -94,6 +108,10 @@ export const tokenListItemStyle = css`
         }
 
         .item-container:hover .usd-balance {
+            transform: translateX(0);
+        }
+
+        .item-container:hover .usd-balance:dir(rtl) {
             transform: translateX(0);
         }
     }

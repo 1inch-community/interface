@@ -4,6 +4,10 @@ export class BigMath {
     throw new Error('BigMath does not support instance creation. Use static methods: div, mul, add, sub, avr, pow, min, max.');
   }
 
+  static from(number: number, decimals: number): bigint {
+    return BigInt(number * (10 ** decimals));
+  }
+
   static div(
     numerator: bigint,
     denominator: bigint,
@@ -139,6 +143,14 @@ export class BigMath {
       }
     }
     return result;
+  }
+
+  static calculatePercentage(value: bigint, percentage: number): bigint {
+    if (percentage < 0 || percentage > 100) {
+      throw new Error("Percentage must be a number between 0 and 100");
+    }
+    const decimalPercentage = percentage / 100;
+    return (value * BigInt(decimalPercentage * 1e32)) / BigInt(1e32);
   }
 }
 

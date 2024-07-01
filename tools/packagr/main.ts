@@ -10,12 +10,16 @@ const isWatch = Boolean(process.env['isWatch']);
 const isProduction = Boolean(process.env['isProduction']);
 const oneModuleLibrary = Boolean(process.env['oneModuleLibrary']);
 const killClone = Boolean(process.env['killClone']);
+const skipIfStart = Boolean(process.env['skipIfStart']);
 
 
 (async () => {
   const packageJson = await getProjectPackageJson()
   const processName = [packageJson.name, libName ?? '', 'builder'].filter(Boolean).join('-')
   const buildingIsRun = await isProcessRunning(processName)
+  if (buildingIsRun && skipIfStart) {
+    return process.exit(0)
+  }
   if (buildingIsRun && killClone) {
     await killProcess(processName)
   }

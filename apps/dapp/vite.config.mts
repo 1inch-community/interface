@@ -91,6 +91,7 @@ export default defineConfig(({ mode }) => {
         registerType: 'autoUpdate',
         manifest: manifest(baseHref),
         workbox: {
+          disableDevLogs: true,
           runtimeCaching: [
             {
               urlPattern: ({ url }) => url.origin !== self.location.origin && /\.(png|jpg|jpeg|svg|gif)$/.test(url.pathname),
@@ -98,8 +99,22 @@ export default defineConfig(({ mode }) => {
               options: {
                 cacheName: 'external-images',
                 expiration: {
-                  maxEntries: 50,
-                  maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+                  maxEntries: 1500,
+                  maxAgeSeconds: 60 * 60 * 24 * 90 // 90 days
+                },
+                cacheableResponse: {
+                  statuses: [0, 200]
+                }
+              }
+            },
+            {
+              urlPattern: ({ url }) => url.origin === self.location.origin && /\.(woff2)$/.test(url.pathname),
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'fonts',
+                expiration: {
+                  maxEntries: 100,
+                  maxAgeSeconds: 60 * 60 * 24 * 360 // 360 days
                 },
                 cacheableResponse: {
                   statuses: [0, 200]

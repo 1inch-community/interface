@@ -1,6 +1,6 @@
 import { LitElement, html } from 'lit';
 import { fusionSwapInfoAuctionTimeStyle } from './fusion-swap-info-auction-time.style';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import '@one-inch-community/ui-components/segmented-control'
 import '@one-inch-community/ui-components/icon'
 import type { SegmentedControlItem } from '@one-inch-community/ui-components/segmented-control';
@@ -8,6 +8,7 @@ import { dispatchEvent, appendStyle, subscribe, getMobileMatchMediaAndSubscribe 
 import { Maskito } from '@maskito/core';
 import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import { fromEvent, tap } from 'rxjs';
+import { SwapSettings } from '@one-inch-community/models';
 
 @customElement(FusionSwapInfoAuctionTimeElement.tagName)
 export class FusionSwapInfoAuctionTimeElement extends LitElement {
@@ -17,6 +18,10 @@ export class FusionSwapInfoAuctionTimeElement extends LitElement {
 
   private readonly mobileMedia = getMobileMatchMediaAndSubscribe(this)
 
+  @property({ type: Object }) settings?: SwapSettings['auctionTime']
+
+  private readonly segmentsCustom = { label: 'Custom', value: 'custom', template: () => html`${this.customAuctionTimeInput}` }
+
   private readonly segments: SegmentedControlItem[] = [
     { label: 'Auto', value: 'auto' },
     { label: '3m', value: 60 * 3 },
@@ -25,14 +30,17 @@ export class FusionSwapInfoAuctionTimeElement extends LitElement {
     { label: '30m', value: 60 * 30 },
     this.mobileMedia.matches ? null : { label: '1H', value: 60 * 60 },
     this.mobileMedia.matches ? null : { label: '2H', value: 60 * 60 * 2 },
-    { label: 'Custom', template: () => html`${this.customAuctionTimeInput}` },
+    this.segmentsCustom,
   ].filter(Boolean) as SegmentedControlItem[]
+
+  private readonly postfix = 's'
 
   private readonly customAuctionTimeInput = document.createElement('input')
 
   override connectedCallback() {
     super.connectedCallback();
     this.buildMask()
+    this.settings?.startChangingValue()
     this.customAuctionTimeInput.placeholder = 'Custom s'
     this.customAuctionTimeInput.inputMode = 'decimal'
     this.customAuctionTimeInput.autocomplete = 'off'
@@ -52,6 +60,8 @@ export class FusionSwapInfoAuctionTimeElement extends LitElement {
           if (this.customAuctionTimeInput.value.length === 1) {
             this.customAuctionTimeInput.value = '';
           }
+          const inputValue = this.getValue()
+          this.settings?.setValue([ inputValue, 'custom' ])
         })
       )
     ], { requestUpdate: false })
@@ -62,13 +72,14 @@ export class FusionSwapInfoAuctionTimeElement extends LitElement {
       fontSize: this.mobileMedia.matches ? '13px' : '16px',
     })
     return html`
-      <div @click="${() => dispatchEvent(this, 'back', null)}" class="slippage-title">
+      <div @click="${() => this.onBack()}" class="slippage-title">
         <inch-icon class="back-icon" icon="chevronDown16"></inch-icon>
         <span>Auction time</span>
       </div>
       <inch-segmented-control
         .items="${this.segments}"
-        .select="${this.segments[0]}"
+        .select="${this.getStartSection()}"
+        @change="${(event: CustomEvent) => this.onChange(event)}"
       ></inch-segmented-control>
     `
   }
@@ -77,8 +88,54 @@ export class FusionSwapInfoAuctionTimeElement extends LitElement {
     return new Maskito(this.customAuctionTimeInput, maskitoNumberOptionsGenerator({
       max: 60 * 60 * 30,
       min: 60 * 3,
-      postfix: 's'
+      postfix: this.postfix
     }));
+  }
+
+  private onBack() {
+    const value = this.settings?.value ?? null
+    if (value && value[1] === 'custom' && (value[0] === null || isNaN(value[0]))) {
+      this.settings?.resetValue()
+    }
+    this.settings?.endChangingValue()
+    dispatchEvent(this, 'back', null)
+  }
+
+  private onChange({ detail }: CustomEvent) {
+    const value = detail.value
+    if (value === 'auto') {
+      this.settings?.cleanValue()
+      return
+    }
+    if (value === 'custom') {
+      const inputValue = this.getValue()
+      this.settings?.setValue([ inputValue, 'custom' ])
+      return
+    }
+    this.settings?.setValue([ detail.value, 'preset' ])
+  }
+
+  private getStartSection(): SegmentedControlItem {
+    if (!this.settings || this.settings.value === null) return this.segments[0]
+    const [ value, type ] = this.settings.value
+    if (type === 'custom') {
+      if (isNaN(parseFloat(value as any))) return this.segments[0]
+      this.customAuctionTimeInput.value = `${value}s`
+      return this.segmentsCustom
+    }
+    if (type === 'preset') {
+      const preset = this.segments.find(item => item.value === value)
+      if (!preset) return this.segments[0]
+      return preset
+    }
+    throw new Error('Invalid auction time type');
+  }
+
+  private getValue() {
+    const strValue = this.customAuctionTimeInput.value
+      .replaceAll(' ', '')
+      .replace(this.postfix, '')
+    return parseInt(strValue, 10)
   }
 
 }

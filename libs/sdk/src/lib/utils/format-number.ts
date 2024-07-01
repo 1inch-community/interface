@@ -69,3 +69,62 @@ export function smartFormatAndShorteningNumber(value: string, charsAfterZero: nu
   const remainder = cleanedFormated.slice(len - 9, len - 8);
   return `${billions}.${remainder}B`;
 }
+
+export function formatSeconds(seconds: number): string {
+  const days = Math.floor(seconds / (24 * 3600));
+  seconds %= (24 * 3600);
+  const hours = Math.floor(seconds / 3600);
+  seconds %= 3600;
+  const minutes = Math.floor(seconds / 60);
+  seconds %= 60;
+
+  const parts: string[] = [];
+
+  if (days > 0) {
+    parts.push(`${days}D`);
+  }
+  if (hours > 0) {
+    parts.push(`${hours}H`);
+  }
+  if (minutes > 0) {
+    parts.push(`${minutes}m`);
+  }
+  if (seconds > 0 || parts.length === 0) {
+    parts.push(`${seconds}s`);
+  }
+
+  return parts.join(' ');
+}
+
+export function parseTimeString(timeString: string): number {
+  const timeParts = timeString.split(' ');
+  let totalSeconds = 0;
+
+  for (const part of timeParts) {
+    const unit = part.slice(-1);
+    const value = parseInt(part.slice(0, -1), 10);
+
+    if (isNaN(value)) {
+      continue;
+    }
+
+    switch (unit) {
+      case 'd':
+        totalSeconds += value * 24 * 3600;
+        break;
+      case 'h':
+        totalSeconds += value * 3600;
+        break;
+      case 'm':
+        totalSeconds += value * 60;
+        break;
+      case 's':
+        totalSeconds += value;
+        break;
+      default:
+        throw new Error(`Unknown time unit: ${unit}`);
+    }
+  }
+
+  return totalSeconds;
+}

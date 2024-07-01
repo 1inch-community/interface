@@ -3,7 +3,7 @@ import { customElement } from 'lit/decorators.js';
 import { consume } from '@lit/context';
 import { ScrollContext, scrollContext } from './scroll-context';
 import { subscribe, resizeObserver } from '@one-inch-community/lit';
-import { merge, tap } from 'rxjs';
+import { fromEvent, merge, tap } from 'rxjs';
 import { createRef, ref } from 'lit/directives/ref.js';
 import { scrollbarStyle } from '@one-inch-community/ui-components/theme';
 
@@ -56,8 +56,13 @@ export class ScrollViewConsumerElement extends LitElement {
         resizeObserver(this.contentRef.value!)
       ).pipe(
         tap(() => this.updateView())
+      ),
+      fromEvent<MouseEvent>(this.scrollContainer, 'scroll', { passive: true }).pipe(
+        tap(() => {
+          this.context.setScrollTopFromConsumer(this.scrollContainer?.scrollTop ?? 0)
+        })
       )
-    ])
+    ], { requestUpdate: false })
   }
 
   protected override render() {

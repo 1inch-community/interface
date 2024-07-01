@@ -6,6 +6,7 @@ export async function getEnv() {
     oneInchDevPortalHost: process.env.ONE_INCH_DEV_PORTAL_HOST,
     walletConnectProjectId: process.env.WALLET_CONNECT_PROJECT_ID,
     baseHref: process.env.BASE_HREF ?? '',
+    infuraApiKey: process.env.INFURA_API_KEY ?? '',
     appVersion: packageJson.version,
   }
 }

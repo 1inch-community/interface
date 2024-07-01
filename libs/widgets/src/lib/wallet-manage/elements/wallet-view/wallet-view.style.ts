@@ -89,6 +89,10 @@ export const walletViewStyle = css`
         transition: transform .2s;
     }
     
+    .sub-wallet-icon:dir(rtl) {
+        transform: scale(-1, 1);
+    }
+    
     @media (hover: hover) {
         .wallet-view-container:hover {
             background-color: var(--color-background-bg-secondary);

@@ -62,6 +62,10 @@ export const fusionSwapInfoMainStyle = css`
         transform: translate3d(20px, 0, 0);
     }
 
+    .fusion-icon-open:dir(rtl) {
+        transform: translate3d(-20px, 0, 0);
+    }
+
     .rate-container {
         width: 100%;
         display: flex;
@@ -73,6 +77,10 @@ export const fusionSwapInfoMainStyle = css`
         font-style: normal;
         font-weight: 400;
         line-height: 24px;
+    }
+
+    .rate-view:dir(rtl) {
+        direction: ltr;
     }
 
     .rate-loader {
@@ -184,6 +192,10 @@ export const fusionSwapInfoMainStyle = css`
     ${mobileMediaCSS(css`
         :host {
             --font-size: 13px
+        }
+        
+        .container {
+            padding: 16px 8px;
         }
         
         .open {

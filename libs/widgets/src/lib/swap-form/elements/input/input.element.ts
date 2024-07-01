@@ -3,7 +3,16 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { consume } from '@lit/context';
 import { classMap } from 'lit/directives/class-map.js'
 import { ifDefined } from 'lit/directives/if-defined.js'
-import { combineLatest, defer, filter, firstValueFrom, map, tap } from 'rxjs';
+import {
+  combineLatest,
+  defer,
+  filter,
+  from,
+  map, Observable, of,
+  shareReplay,
+  startWith, switchMap,
+  tap
+} from 'rxjs';
 import { Maskito } from '@maskito/core';
 import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import "@one-inch-community/widgets/token-icon"
@@ -15,8 +24,10 @@ import '../balance'
 import '../fiat-balance'
 import { inputStyle } from './input.style';
 import { swapContext } from '../../context';
-import { observe, subscribe, dispatchEvent } from '@one-inch-community/lit';
-import { formatUnits, parseUnits } from 'viem';
+import { observe, subscribe, dispatchEvent, translate, isRTLCurrentLocale, localeChange$ } from '@one-inch-community/lit';
+import { Address, formatUnits, parseUnits } from 'viem';
+import { when } from 'lit/directives/when.js';
+import { choose } from 'lit/directives/choose.js';
 
 @customElement(InputElement.tagName)
 export class InputElement extends LitElement {
@@ -29,13 +40,31 @@ export class InputElement extends LitElement {
   @property({ type: String, attribute: true, reflect: true }) tokenType?: 'source' | 'destination'
 
   @state() isFocus = false
+  @state() connectedAddress: Address | null = null
+  @state() setMaxInProgress = false
 
   @consume({ context: swapContext, subscribe: true })
   context?: ISwapContext
 
-  private readonly token$ = defer(() => this.getTokenEventEmitter())
+  private token: IToken | null = null
+
+  private readonly token$ = defer(() => this.getTokenEventEmitter()).pipe(
+    shareReplay({ bufferSize: 1, refCount: true })
+  )
   private readonly chainId$ = defer(() => this.getChainEventEmitter())
+  private readonly connectedAddress$ = defer(() => this.getConnectedWalletAddress())
   private readonly amount$ = defer(() => this.getTokenAmountStream())
+  private readonly loading$ = defer(() => this.getLoadingStream())
+
+  private readonly loaderView$ = defer(() => this.loading$.pipe(
+    // map(() => true),
+    map(state => {
+      if (this.tokenType === 'source') return html`${this.input}`
+      if (state) return html`<span class="loader"></span>`
+      return html`${this.input}`
+    }),
+    startWith(html`${this.input}`)
+  ))
 
   private readonly input = document.createElement('input')
   private maskedInput = this.buildMask(6);
@@ -66,6 +95,26 @@ export class InputElement extends LitElement {
       })
     )
 
+    const loading$: Observable<void> = this.loading$.pipe(
+      switchMap(state => {
+        if (this.tokenType === 'source') return of(void 0)
+        if (state && !this.input.classList.contains('loading')) {
+          this.input.classList.add('loading')
+          return of(void 0);
+        }
+        if (!state && this.input.classList.contains('loading')) {
+          return from(this.input.animate([
+            {},
+            { opacity: 1 }
+          ], { duration: 2000 }).finished
+            .then(() => {
+              this.input.classList.remove('loading')
+            }))
+        }
+        return of(void 0)
+      })
+    )
+
     const updateInputValue$ = combineLatest([
       this.amount$,
       this.token$
@@ -84,7 +133,14 @@ export class InputElement extends LitElement {
     subscribe(this, [
       updateMask$,
       updateInputValue$,
+      loading$,
+      this.token$.pipe(tap(token => this.token = token)),
+      this.connectedAddress$.pipe(tap(address => this.connectedAddress = address))
     ], { requestUpdate: false })
+
+    subscribe(this, [
+      localeChange$
+    ])
   }
 
   override disconnectedCallback() {
@@ -98,15 +154,28 @@ export class InputElement extends LitElement {
       focus: this.isFocus
     }
     this.input.disabled = this.tokenType === 'destination'
+    this.updateInputRtl()
     return html`
       <div class="input-container ${classMap(classes)}">
         <div class="flex-container symbol-title-name">
-          <div class="input-title">${this.getInputTitle()}</div>
+          <div class="input-title">${choose(this.tokenType, [
+            ['source', () => html`${translate('widgets.swap-form.input.title.you_pay')}`],
+            ['destination', () => html`${translate('widgets.swap-form.input.title.you_receive')}`]
+          ])}</div>
           ${observe(this.tokenView$)}
         </div>
         
         <div class="flex-container balance-amount-fiat">
-          <inch-swap-balance tokenType="${ifDefined(this.tokenType)}"></inch-swap-balance>
+          <div class="balance-and-max">
+            <inch-swap-balance tokenType="${ifDefined(this.tokenType)}"></inch-swap-balance>
+            ${when(this.connectedAddress && this.token && this.tokenType === 'source', () => html`
+              <inch-button @click="${async () => {
+                this.setMaxInProgress = true
+                await this.context?.setMaxAmount()
+                this.setMaxInProgress = false
+              }}" type="secondary" size="xs" loader="${ifDefined(this.setMaxInProgress ? '' : undefined)}">MAX</inch-button>
+            `)}
+          </div>
           ${this.input}
           <inch-fiat-balance tokenType="${ifDefined(this.tokenType)}"></inch-fiat-balance>
         </div>
@@ -144,8 +213,17 @@ export class InputElement extends LitElement {
         <span class="symbol">${symbol}</span>
         <inch-icon icon="chevronDown16"></inch-icon>
       </button>
-      <span class="token-name">${name}</span>
+      <div class="token-name">${name}</div>
     `
+  }
+
+  private updateInputRtl() {
+    if (isRTLCurrentLocale() && !this.input.classList.contains('input-rtl')) {
+      this.input.classList.add('input-rtl')
+    }
+    if (!isRTLCurrentLocale() && this.input.classList.contains('input-rtl')) {
+      this.input.classList.remove('input-rtl')
+    }
   }
 
   private getTokenEventEmitter() {
@@ -160,26 +238,27 @@ export class InputElement extends LitElement {
     return this.context.getTokenAmountByType(this.tokenType)
   }
 
+  private getLoadingStream() {
+    if (!this.context) throw new Error('')
+    if (!this.tokenType) throw new Error('')
+    return this.context.loading$
+  }
+
   private getChainEventEmitter() {
     if (!this.context) throw new Error('')
     return this.context.chainId$
   }
 
-  private getInputTitle() {
-    if (this.tokenType === 'source') {
-      return 'You pay'
-    }
-    if (this.tokenType === 'destination') {
-      return 'You receive'
-    }
-    throw new Error(`invalid token type ${this.tokenType} in swap input`)
+  private getConnectedWalletAddress() {
+    if (!this.context) throw new Error('')
+    return this.context.connectedWalletAddress$
   }
 
-  private async onInput(event: InputEvent) {
+  private onInput(event: InputEvent) {
     if (!this.tokenType) return
     const target = event.target as HTMLInputElement | null
     const valueString: string = target?.value ?? '';
-    const token = await firstValueFrom(this.token$)
+    const token = this.token
     if (!token) return
     const amount = parseUnits(valueString.replaceAll(' ', ''), token.decimals)
     this.context?.setTokenAmountByType(this.tokenType, amount)

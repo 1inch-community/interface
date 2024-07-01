@@ -18,7 +18,7 @@ const chainName: Record<ChainId, string> = {
 
 export const trustWalletRepository: Repository = ({ address, chainId }) => {
     return new Promise((resolve, reject) => {
-        if (!address || !chainId) return reject();
+        if (!address || !chainId || chainName[chainId] === '') return reject();
         const img = new Image();
         img.onload = () => resolve(img);
         img.onerror = reject;

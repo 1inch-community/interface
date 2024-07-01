@@ -1,12 +1,12 @@
 import { css } from 'lit';
-import { mobileMediaCSS } from '@one-inch-community/lit';
+import { mobileMediaCSS, safariPWACss } from '@one-inch-community/lit';
 
 export const appStyle = css`
     
     :host {
         --height: 100vh;
         overflow-y: auto;
-        overflow-x: hidden;
+        overflow-x: hidden !important;
         height: var(--height);
         display: flex;
         flex-direction: column;
@@ -26,6 +26,12 @@ export const appStyle = css`
     ${mobileMediaCSS(css`
         :host::-webkit-scrollbar {
             display: none;
+        }
+    `)}
+    
+    ${safariPWACss(css`
+        :host {
+            height: calc(var(--height) - 10px);
         }
     `)}
 

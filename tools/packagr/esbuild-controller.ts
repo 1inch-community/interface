@@ -1,4 +1,5 @@
 import * as esbuild from 'esbuild';
+import { polyfillNode } from "esbuild-plugin-polyfill-node"
 import { getLibraryPackageJson } from './files';
 import { getLibraryTsconfigPath, getModuleDistPath } from './paths';
 import { getEnv } from './env';
@@ -74,9 +75,16 @@ export class EsbuildController {
       external: ['@one-inch-community', 'lit', ...Object.keys(pkg?.peerDependencies ?? {})],
       entryNames: `[dir]/[name].esm`,
       define: {
-        '__environment__': JSON.stringify(await getEnv())
+        '__environment__': JSON.stringify(await getEnv()),
       },
-      loader: { '.ts': 'ts' }
+      loader: { '.ts': 'ts' },
+      plugins: [
+        polyfillNode({
+          polyfills: {
+            process: true
+          }
+        })
+      ]
     };
   }
 

@@ -1,10 +1,10 @@
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
+import { ref, createRef } from 'lit/directives/ref.js';
 import { consume } from '@lit/context';
-import { combineLatest, defer, map } from 'rxjs';
+import { combineLatest, defer, fromEvent, map, switchMap, tap } from 'rxjs';
 import '@one-inch-community/ui-components/icon'
-import { asyncTimeout } from '@one-inch-community/ui-components/async';
-import { observe, dispatchEvent } from '@one-inch-community/lit';
+import { observe, dispatchEvent, subscribe, appendStyle, getMobileMatchMedia } from '@one-inch-community/lit';
 import { ISwapContext } from '@one-inch-community/models';
 import { tokenPairSwitchStyle } from './token-pair-switch.style';
 import { swapContext } from '../../context';
@@ -18,6 +18,12 @@ export class TokenPairSwitchElement extends LitElement {
   @consume({ context: swapContext, subscribe: true })
   context?: ISwapContext
 
+  private readonly iconRef = createRef<HTMLElement>()
+  private readonly buttonRef = createRef()
+  private readonly mobileMedia = getMobileMatchMedia()
+
+  private isUp = false
+
   private readonly isDisabled$ = defer(() => {
     if (!this.context) throw new Error('')
     return combineLatest([
@@ -28,46 +34,76 @@ export class TokenPairSwitchElement extends LitElement {
     map(([ sourceToken, destinationToken ]) => !sourceToken || !destinationToken),
   )
 
+  protected override firstUpdated() {
+    if (!this.buttonRef.value) return
+    if (!this.mobileMedia.matches) {
+      const options = {
+        duration: 200,
+        easing: 'cubic-bezier(.1, .3, .6, 1)'
+      }
+      subscribe(this, [
+        fromEvent(this.buttonRef.value, 'mouseenter').pipe(
+          switchMap(async () => {
+            if (!this.iconRef.value || this.isUp) return
+            this.isUp = true
+            await this.iconRef.value.animate([
+              { transform: 'rotate(0deg)' },
+              { transform: 'rotate(180deg)' },
+            ], options).finished
+            appendStyle(this.iconRef.value, {
+              transform: 'rotate(180deg)'
+            })
+          })
+        ),
+        fromEvent(this.buttonRef.value, 'mouseleave').pipe(
+          switchMap(async () => {
+            if (!this.iconRef.value || !this.isUp) return
+            this.isUp = false
+            await this.iconRef.value.animate([
+              { transform: 'rotate(180deg)' },
+              { transform: 'rotate(360deg)' },
+            ], options).finished
+            appendStyle(this.iconRef.value, {
+              transform: ''
+            })
+          })
+        ),
+      ])
+    }
+  }
+
   protected override render() {
     return html`
       <button
-        @mouseover="${this.up}"
-        @mouseleave="${this.down}"
-        @click="${this.onClick}"
+        ${ref(this.buttonRef)}
+        @click="${() => this.onClick()}"
         ?disabled="${observe(this.isDisabled$, false)}"
         class="switcher"
       >
-        <inch-icon class="switcher-icon" icon="arrowDown24"></inch-icon>
+        <inch-icon ${ref(this.iconRef)} class="switcher-icon" icon="arrowDown24"></inch-icon>
       </button>
     `
   }
 
-  protected up() {
-    const icon = this.renderRoot.querySelector('inch-icon')
-    if (!icon) return
-    if (icon.classList.contains('switcher-icon-up')) return;
-    icon.classList.remove('switcher-icon-off-transition', 'switcher-icon-down')
-    icon.classList.add('switcher-icon-up')
-  }
-
-  protected async down() {
-    const icon = this.renderRoot.querySelector('inch-icon')
-    if (!icon) return
-    if (!icon.classList.contains('switcher-icon-up')) return;
-    icon.classList.add('switcher-icon-down')
-    await asyncTimeout(300)
-    icon.classList.add('switcher-icon-off-transition')
-    icon.classList.remove('switcher-icon-up', 'switcher-icon-down')
-    await asyncTimeout(50)
-    icon.classList.remove('switcher-icon-off-transition')
-  }
-
-  protected onClick() {
-    const icon = this.renderRoot.querySelector('inch-icon')
-    if (!icon) return
-    if (!icon.classList.contains('switcher-icon-up')) return;
+  protected async onClick() {
+    if (!this.iconRef.value || (!this.isUp && !this.mobileMedia.matches)) return
     this.context?.switchPair()
     dispatchEvent(this, 'switchPair', null)
+    const options = {
+      duration: 200,
+      easing: 'cubic-bezier(.1, .3, .6, 1)'
+    }
+    if (!this.mobileMedia.matches) {
+      await this.iconRef.value.animate([
+        { transform: 'rotate(180deg)' },
+        { transform: 'rotate(360deg)' },
+      ], options).finished
+      appendStyle(this.iconRef.value, {
+        transform: ''
+      })
+      this.isUp = false
+    }
+
   }
 
 }

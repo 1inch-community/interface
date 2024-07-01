@@ -44,6 +44,10 @@ export const footerStyle = css`
         transition: transform .2s, opacity .2s;
     }
     
+    .version:dir(rtl) {
+        transform: translateX(100%);
+    }
+    
     @media (hover: hover) {
         .footer-container:hover .version {
             transform: translateX(0);

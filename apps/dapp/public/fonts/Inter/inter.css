@@ -1,6 +1,6 @@
 /* Variable fonts usage:
 :root { font-family: "Inter", sans-serif; }
-@supports (font-variation-settings: normal) {
+@supports (font-variation-swap-settings: normal) {
   :root { font-family: "InterVariable", sans-serif; font-optical-sizing: auto; }
 } */
 @font-face {

@@ -15,7 +15,7 @@ export function setActiveAddress(address: Address) {
 }
 
 export function getActiveAddress(): Address | null {
-  return storage.get('activeAddress', JSON.parse)
+  return storage.get('activeAddress', String) as Address
 }
 
 export function setActiveWallet(id: string | null) {
@@ -23,7 +23,7 @@ export function setActiveWallet(id: string | null) {
 }
 
 export function getActiveWallet(): string | null {
-  return storage.get('activeWallet', JSON.parse)
+  return storage.get('activeWallet', String)
 }
 
 export function addConnectedWallet(id: string) {

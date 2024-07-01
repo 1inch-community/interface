@@ -23,9 +23,8 @@ export const options = async (): Promise<EthereumProviderOptions> => {
     chains: [ ChainId.eth ],
     optionalChains,
     events: ['chainChanged', 'accountsChanged'],
-    methods: ['eth_sendTransaction', 'eth_signTransaction', 'eth_sign', 'personal_sign'],
+    methods: ['eth_sendTransaction', 'eth_signTransaction', 'eth_sign', 'personal_sign', 'eth_signTypedData_v4'],
     optionalMethods: [
-      'eth_signTypedData_v4',
       'wallet_switchEthereumChain',
       'wallet_addEthereumChain',
       'eth_getCode',
@@ -51,6 +50,7 @@ export const options = async (): Promise<EthereumProviderOptions> => {
         '--wcm-background-color': 'var(--primary)',
         '--wcm-accent-color': 'var(--primary)',
         '--wcm-color-bg-2': 'none',
+        '--wcm-z-index': '2000',
         '--wcm-color-fg-1': 'var(--color-content-content-primary)',
       }
     }

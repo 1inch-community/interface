@@ -1,5 +1,6 @@
 import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 import '@one-inch-community/ui-components/button';
 import { consume } from '@lit/context';
 import { swapContext } from '../../context';
@@ -13,21 +14,33 @@ import {
   map, Observable,
   of,
   startWith,
-  switchMap, tap,
-  exhaustMap, withLatestFrom, Subject
+  switchMap, tap, merge,
+  withLatestFrom, Subject, shareReplay
 } from 'rxjs';
 import {
   dispatchEvent,
   getMobileMatchMediaAndSubscribe,
-  subscribe
+  subscribe, translate
 } from '@one-inch-community/lit';
-import { getAllowance, getOneInchRouterV6ContractAddress, isChainId, isNativeToken, JsonParser, storage, TokenController } from '@one-inch-community/sdk';
+import {
+  getAllowance,
+  getOneInchRouterV6ContractAddress,
+  isChainId,
+  isNativeToken,
+  isSupportPermit2,
+  JsonParser,
+  storage,
+  hasPermit,
+  getBlockEmitter,
+  CacheActivePromise
+} from '@one-inch-community/sdk';
 import { BrandColors, getThemeChange } from '@one-inch-community/ui-components/theme';
 import { swapButtonStyle } from './swap-button.style';
 import { when } from 'lit/directives/when.js';
 
 enum SwapButtonState {
   readyToSwap,
+  readyToSwapLoading,
   unsupportedChain,
   walletNotConnected,
   unselectedSourceToken,
@@ -36,9 +49,20 @@ enum SwapButtonState {
   exceedingMaximumAmount,
   rateNotExist,
   checkAllowance,
-  lowAllowance,
-  wrapNativeToken
+  lowAllowanceNeedApprove,
+  lowAllowanceNeedPermit,
+  wrapNativeToken,
+
+  permitInWallet,
+  approveInWallet
 }
+
+const showLoader = [
+  SwapButtonState.readyToSwapLoading,
+  SwapButtonState.checkAllowance,
+  SwapButtonState.permitInWallet,
+  SwapButtonState.approveInWallet,
+]
 
 @customElement(SwapButtonElement.tagName)
 export class SwapButtonElement extends LitElement {
@@ -65,21 +89,29 @@ export class SwapButtonElement extends LitElement {
   private readonly chainId$ = defer(() => this.getChainId());
   private readonly sourceTokenAmount$ = defer(() => this.getSourceTokenAmount());
   private readonly rate$ = defer(() => this.getRate());
+  private readonly block$ = this.chainId$.pipe(
+    switchMap(chainId => chainId ? getBlockEmitter(chainId) : [])
+  )
 
   private readonly updateView$ = new Subject<void>()
 
   private readonly exceedingMaximumAmount$ = combineLatest([
     this.connectedWalletAddress$,
     this.sourceToken$,
-    this.sourceTokenAmount$.pipe(startWith(0n))
+    this.sourceTokenAmount$.pipe(startWith(0n)),
+    merge(
+      this.chainId$,
+      this.block$
+    )
   ]).pipe(
     switchMap(([wallet, sourceToken, amount]) => {
-      if (!wallet || !sourceToken || amount === 0n) return of(false);
-      return TokenController.getTokenBalance(sourceToken.chainId, sourceToken.address, wallet).then(balance => {
-        if (!balance) return false;
-        return !amount || amount > BigInt(balance.amount);
+      if (!wallet || !sourceToken || amount === 0n || !this.context) return of(false);
+      return this.context.getMaxAmount().then(balance => {
+        if (balance === 0n) return true;
+        return !amount || amount > balance;
       });
-    })
+    }),
+    shareReplay({ bufferSize: 1, refCount: true })
   );
 
   private readonly calculateStatus$: Observable<SwapButtonState> = combineLatest([
@@ -90,7 +122,8 @@ export class SwapButtonElement extends LitElement {
     this.sourceTokenAmount$.pipe(startWith(0n)),
     this.chainId$,
     this.rate$.pipe(startWith(null)),
-    this.updateView$.pipe(startWith(null))
+    this.block$.pipe(startWith(null)),
+    this.updateView$.pipe(startWith(null)),
   ]).pipe(
     map( (params) => {
       const [
@@ -134,7 +167,7 @@ export class SwapButtonElement extends LitElement {
     distinctUntilChanged(),
     debounceTime(0),
     withLatestFrom(this.chainId$, this.connectedWalletAddress$, this.sourceToken$),
-    exhaustMap(async ([state, chainId, walletAddress, srcToken ]) => {
+    switchMap(async ([state, chainId, walletAddress, srcToken ]) => {
       if (state !== SwapButtonState.readyToSwap) {
         return state
       }
@@ -144,7 +177,12 @@ export class SwapButtonElement extends LitElement {
       const allowance = await getAllowance(chainId, srcToken.address, walletAddress, contract)
       const amount = await firstValueFrom(this.sourceTokenAmount$)
       if (amount && allowance < amount) {
-        return SwapButtonState.lowAllowance
+        if (isSupportPermit2(chainId)) {
+          const isHasPermit = await hasPermit(chainId, srcToken.address, walletAddress, contract)
+          if (isHasPermit) return state
+          return SwapButtonState.lowAllowanceNeedPermit
+        }
+        return SwapButtonState.lowAllowanceNeedApprove
       }
       return state
     }),
@@ -164,80 +202,116 @@ export class SwapButtonElement extends LitElement {
       ),
       this.calculateStatus$
     ]);
+    this.updateView$.next()
   }
 
   protected override render() {
     const size = this.mobileMedia.matches ? 'xl' : 'xxl';
 
     return html`
-      <inch-button class="smart-hover" @click="${(event: MouseEvent) => this.onClickSwapButton(event)}" type="${this.getButtonType()}" size="${size}" fullSize>
+      <inch-button
+        class="smart-hover"
+        @click="${(event: MouseEvent) => this.onClickSwapButton(event)}"
+        type="${this.getButtonType()}"
+        size="${size}"
+        loader="${ifDefined(this.getLoaderState())}"
+        fullSize
+      >
+        
         ${when(this.buttonState === SwapButtonState.unsupportedChain, () => html`
           <span class="off-hover">Chain ${this.chainId} not supported</span>
           <span class="on-hover">Change chain</span>
           <br>
         `)}
-        ${when(this.buttonState === SwapButtonState.readyToSwap, () => html`<span>Swap</span>`)}
-        ${when(this.buttonState === SwapButtonState.checkAllowance, () => html`<span>Check allowance</span>`)}
-        ${when(this.buttonState === SwapButtonState.wrapNativeToken, () => html`<span>Wrap ${this.srcToken?.symbol} to W${this.srcToken?.symbol} and Swap</span>`)}
-        ${when(this.buttonState === SwapButtonState.lowAllowance, () => html`<span>Low allowance</span>`)}
-        ${when(this.buttonState === SwapButtonState.walletNotConnected, () => html`<span>Connect wallet</span>`)}
-        ${when(this.buttonState === SwapButtonState.unselectedSourceToken, () => html`<span>Select source token</span>`)}
-        ${when(this.buttonState === SwapButtonState.unselectedDestinationToken, () => html`<span>Select destination token</span>`)}
-        ${when(this.buttonState === SwapButtonState.zeroAmount, () => html`<span>Enter amount to swap</span>`)}
-        ${when(this.buttonState === SwapButtonState.rateNotExist, () => html`<span>No liquidity for swap</span>`)}
+        ${when(this.buttonState === SwapButtonState.readyToSwap, () => html`<span>${translate('widgets.swap-form.swap-button.confirm-swap')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.readyToSwapLoading, () => html`<span>${translate('widgets.swap-form.swap-button.confirm-swap')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.checkAllowance, () => html`<span>${translate('widgets.swap-form.swap-button.check-allowance')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.wrapNativeToken, () => html`<span>${translate('widgets.swap-form.swap-button.native-token-not-supported')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.lowAllowanceNeedApprove, () => html`<span>${translate('widgets.swap-form.swap-button.approve-and-swap')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.lowAllowanceNeedPermit, () => html`<span>${translate('widgets.swap-form.swap-button.permit-and-swap')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.walletNotConnected, () => html`<span>${translate('widgets.swap-form.swap-button.connect-wallet')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.unselectedSourceToken, () => html`<span>${translate('widgets.swap-form.swap-button.select-source-token')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.unselectedDestinationToken, () => html`<span>${translate('widgets.swap-form.swap-button.select-destination-token')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.zeroAmount, () => html`<span>${translate('widgets.swap-form.swap-button.enter-amount-to-swap')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.rateNotExist, () => html`<span>${translate('widgets.swap-form.swap-button.no-liquidity-for-swap')}</span>`)}
         ${when(this.buttonState === SwapButtonState.exceedingMaximumAmount, () => html`
-          <span class="off-hover">Insufficient ${this.srcToken?.symbol} balance</span>
-          <span class="on-hover">Set max ${this.srcToken?.symbol}</span>
+          <span class="off-hover">${translate('widgets.swap-form.swap-button.insufficient-balance', { symbol: this.srcToken?.symbol })}</span>
+          <span class="on-hover">${translate('widgets.swap-form.swap-button.set-max', { symbol: this.srcToken?.symbol })}</span>
+          <br>
+        `)}
+        ${when(this.buttonState === SwapButtonState.permitInWallet, () => html`
+          <span class="off-hover">${translate('widgets.swap-form.swap-button.wait-wallet-response')}</span>
+          <span class="on-hover">${translate('widgets.swap-form.swap-button.permit-swap-in-wallet')}</span>
+          <br>
+        `)}
+        ${when(this.buttonState === SwapButtonState.approveInWallet, () => html`
+          <span class="off-hover">${translate('widgets.swap-form.swap-button.wait-wallet-response')}</span>
+          <span class="on-hover">${translate('widgets.swap-form.swap-button.allow-swap-in-wallet')}</span>
           <br>
         `)}
       </inch-button>
     `;
   }
 
+  @CacheActivePromise()
   private async onClickSwapButton(event: MouseEvent) {
-    if (this.buttonState === SwapButtonState.unsupportedChain) {
-      return dispatchEvent(this, 'changeChain', null)
+    if (!this.context) {
+      throw new Error('')
     }
-    if (this.buttonState === SwapButtonState.walletNotConnected) {
-      return dispatchEvent(this, 'connectWallet', null)
-    }
-    if (this.buttonState === SwapButtonState.unselectedSourceToken) {
-      return dispatchEvent(this, 'openTokenSelector', 'source', event)
-    }
-    if (this.buttonState === SwapButtonState.unselectedDestinationToken) {
-      return dispatchEvent(this, 'openTokenSelector', 'destination', event)
-    }
-    if (this.buttonState === SwapButtonState.exceedingMaximumAmount) {
-      return this.onSetMax()
-    }
-    if (this.buttonState === SwapButtonState.wrapNativeToken) {
-      const amount = await firstValueFrom(this.sourceTokenAmount$)
-      if (!amount) return
-      await this.context?.wrapNativeToken(amount)
-      await this.onSwap()
-      return
-    }
-    if (this.buttonState === SwapButtonState.lowAllowance) {
-      return
-    }
-    if (this.buttonState === SwapButtonState.readyToSwap) {
-      await this.onSwap()
-      return
+    const stateState = this.buttonState
+    try {
+      if (this.buttonState === SwapButtonState.unsupportedChain) {
+        return dispatchEvent(this, 'changeChain', null)
+      }
+      if (this.buttonState === SwapButtonState.walletNotConnected) {
+        return dispatchEvent(this, 'connectWallet', null)
+      }
+      if (this.buttonState === SwapButtonState.unselectedSourceToken) {
+        return dispatchEvent(this, 'openTokenSelector', 'source', event)
+      }
+      if (this.buttonState === SwapButtonState.unselectedDestinationToken) {
+        return dispatchEvent(this, 'openTokenSelector', 'destination', event)
+      }
+      if (this.buttonState === SwapButtonState.exceedingMaximumAmount) {
+        return await this.context.setMaxAmount()
+      }
+      if (this.buttonState === SwapButtonState.lowAllowanceNeedApprove) {
+        this.buttonState = SwapButtonState.approveInWallet
+        await this.context.getApprove()
+        this.buttonState = SwapButtonState.readyToSwap
+      }
+      if (this.buttonState === SwapButtonState.lowAllowanceNeedPermit) {
+        this.buttonState = SwapButtonState.permitInWallet
+        await this.context.getPermit()
+        this.buttonState = SwapButtonState.readyToSwap
+      }
+      if (this.buttonState === SwapButtonState.readyToSwap) {
+        this.buttonState = SwapButtonState.readyToSwapLoading
+        const snapshot = await this.context.getSnapshot()
+        if (snapshot) {
+          dispatchEvent(this, 'confirmSwap', snapshot, event)
+        }
+        this.buttonState = SwapButtonState.readyToSwap
+        this.updateView$.next()
+      }
+    } catch (error) {
+      this.buttonState = stateState
     }
   }
 
   private getButtonType() {
     if (this.buttonState === SwapButtonState.readyToSwap) return 'primary'
-    if (this.buttonState === SwapButtonState.wrapNativeToken) return 'primary'
+    // if (this.buttonState === SwapButtonState.wrapNativeToken) return 'primary'
+    if (this.buttonState === SwapButtonState.lowAllowanceNeedApprove) return 'primary'
+    if (this.buttonState === SwapButtonState.lowAllowanceNeedPermit) return 'primary'
     return 'secondary'
   }
 
-  private async onSetMax() {
-    const sourceToken = await firstValueFrom(this.sourceToken$);
-    const connectedWalletAddress = await firstValueFrom(this.connectedWalletAddress$);
-    if (!sourceToken || !connectedWalletAddress) return;
-    const balance = await TokenController.getTokenBalance(sourceToken.chainId, sourceToken.address, connectedWalletAddress);
-    this.context?.setTokenAmountByType('source', BigInt(balance?.amount ?? 0), true);
+  private getLoaderState() {
+    if (showLoader.includes(this.buttonState)) {
+      return true
+    }
+    return
   }
 
   private async onSwap() {

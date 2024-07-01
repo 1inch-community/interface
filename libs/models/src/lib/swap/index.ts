@@ -1,2 +1,5 @@
 export * from './update-control'
 export * from './swap-context'
+export * from './swap-snapshot'
+export * from './swap-settings'
+export * from './swap-context-strategy'

@@ -23,7 +23,7 @@ class Storage {
     if (!this.storage) return;
     try {
       const _key = this.key(key)
-      const strData = JSON.stringify(data)
+      const strData = typeof data !== 'string' ? JSON.stringify(data) : data
       this.storage.setItem(_key, strData)
     } catch (error) {
       console.warn(error)

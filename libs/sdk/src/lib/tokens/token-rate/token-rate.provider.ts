@@ -8,7 +8,7 @@ import {
   getWrapperNativeToken,
   isNativeToken,
 } from '../../chain';
-import { startWith, exhaustMap, Observable } from 'rxjs';
+import { startWith, Observable, switchMap } from 'rxjs';
 import { uniswapV3Adapter } from './adapters/uniswap-v3-adapter';
 import { pancakeswapV3Adapter } from './adapters/pancakeswap-v3-adapter';
 import { sushiswapV3Adapter } from './adapters/sushiswap-v3-adapter';
@@ -39,7 +39,7 @@ export class TokenRateProvider implements ITokenRateProvider {
   listenOnChainRate(chainId: ChainId, sourceToken: IToken, destinationToken: IToken): Observable<Rate | null> {
     return getBlockEmitter(chainId).pipe(
       startWith(null),
-      exhaustMap(() => this.getOnChainRate(chainId, sourceToken, destinationToken))
+      switchMap(() => this.getOnChainRate(chainId, sourceToken, destinationToken))
     )
   }
 

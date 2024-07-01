@@ -1,7 +1,9 @@
 import './app/app.element';
+import { initLocale } from '@one-inch-community/lit'
 import { themeInit, MainColors, BrandColors } from '@one-inch-community/ui-components/theme'
 
 Promise.all([
+  initLocale(),
   themeInit(MainColors.systemSync, BrandColors.community),
   import('./app/controllers/connect-wallet-controller').then(m => m.connectWalletController.init())
 ])

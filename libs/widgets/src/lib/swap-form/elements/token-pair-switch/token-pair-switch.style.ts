@@ -27,7 +27,7 @@ export const tokenPairSwitchStyle = css`
         align-items: center;
         top: -13px;
         cursor: pointer;
-        transition: color .2s;
+        will-change: transform;
     }
     
     .switcher:disabled {
@@ -41,21 +41,5 @@ export const tokenPairSwitchStyle = css`
         .switcher:not(:disabled):hover {
             color: var(--color-content-content-secondary);
         }
-    }
-
-    .switcher-icon {
-        transition: transform .2s;
-    }
-    
-    .switcher-icon-up {
-        transform: rotate(180deg);
-    }
-    
-    .switcher-icon-down {
-        transform: rotate(360deg);
-    }
-
-    .switcher-icon-off-transition {
-        transition: none;
     }
 `

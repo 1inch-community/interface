@@ -5,7 +5,7 @@ export const cardHeaderStyle = css`
 
     :host {
         display: flex;
-        height: 68px;
+        height: 60px;
         width: 100%;
         padding: 16px 16px 0;
         box-sizing: border-box;
@@ -14,10 +14,8 @@ export const cardHeaderStyle = css`
     }
     
     :host(.not-native-mode) {
-        margin-top: -16px;
-        margin-left: -16px;
-        width: calc(100% + 32px);
-        height: 60px;
+        height: 44px;
+        padding: 0;
     }
 
     .card-header-container {
@@ -60,6 +58,10 @@ export const cardHeaderStyle = css`
     
     .card-header-title__left:not(.card-header-title__and-back) {
         margin-left: 8px;
+    }
+
+    .card-header-title__left:not(.card-header-title__and-back):dir(rtl) {
+        margin-right: 8px;
     }
 
     ${mobileMediaCSS(css`

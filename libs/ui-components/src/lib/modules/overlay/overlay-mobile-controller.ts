@@ -1,7 +1,7 @@
 import { IOverlayController } from './overlay-controller.interface';
 import { html, render, TemplateResult } from 'lit';
 import { getContainer } from './overlay-container';
-import { appendStyle, getMobileMatchMediaEmitter, resizeObserver, setBrowserMetaColorColor } from '@one-inch-community/lit';
+import { appendStyle, getMobileMatchMediaEmitter, isSafari, isStandalone, resizeObserver, setBrowserMetaColorColor } from '@one-inch-community/lit';
 import { asyncFrame } from '@one-inch-community/ui-components/async';
 import { getBrowserMetaColor, applyColorBrightness, interpolateColorRange, getCssValue } from '@one-inch-community/ui-components/theme';
 import { getOverlayId } from './overlay-id-generator';
@@ -76,7 +76,8 @@ export class OverlayMobileController implements IOverlayController {
     const overlayContainer = document.createElement(ScrollViewProviderElement.tagName)
     const overlayIndex = this.activeOverlayMap.size + 1
     const offsetStep = 2
-    overlayContainer.maxHeight = (100 - (overlayIndex * offsetStep)) * window.innerHeight / 100
+    const innerHeight = (isSafari() && isStandalone()) ? window.innerHeight - 10 : window.innerHeight
+    overlayContainer.maxHeight = (100 - (overlayIndex * offsetStep)) * innerHeight / 100
     overlayContainer.setAttribute('overlay-index', overlayIndex.toString())
     appendStyle(overlayContainer, {
       position: 'fixed',
@@ -90,6 +91,11 @@ export class OverlayMobileController implements IOverlayController {
       borderTopLeftRadius: '24px',
       borderTopRightRadius: '24px',
     })
+    if (isSafari() && isStandalone()) {
+      appendStyle(overlayContainer, {
+        bottom: '10px',
+      })
+    }
     render(html`${openTarget}`, overlayContainer)
     this.container.appendChild(overlayContainer)
     return overlayContainer

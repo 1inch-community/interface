@@ -5,7 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import '@one-inch-community/ui-components/icon';
 import { ChainId, IConnectWalletController } from '@one-inch-community/models';
 import { isL2Chain } from '@one-inch-community/sdk';
-import { dispatchEvent, getMobileMatchMediaAndSubscribe } from '@one-inch-community/lit';
+import { dispatchEvent, getMobileMatchMediaAndSubscribe, isRTLCurrentLocale } from '@one-inch-community/lit';
 import { when } from 'lit/directives/when.js';
 
 type ChainViewInfo = {
@@ -39,7 +39,7 @@ export class ChainSelectorListItemElement extends LitElement {
     const iconSize = this.mobileMedia.matches ? 26 : 24
     return html`
       <div class="${classMap(classes)}" @click="${() => this.setChainId()}">
-        ${when(isL2, () => html`<inch-icon icon="l2Chain24"></inch-icon>`)}
+        ${when(isL2, () => html`<inch-icon icon="${isRTLCurrentLocale() ? 'l2ChainRTL24' : 'l2Chain24'}"></inch-icon>`)}
         <inch-icon width="${iconSize}px" height="${iconSize}px" icon="${this.info.iconName}"></inch-icon>
         <span>${this.info.name}</span>
         <inch-icon class="list-icon" icon="link16"></inch-icon>

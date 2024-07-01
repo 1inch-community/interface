@@ -1,6 +1,6 @@
 import { IOverlayController } from './overlay-controller.interface';
 import { html, render, TemplateResult } from 'lit';
-import { appendStyle } from '@one-inch-community/lit';
+import { appendStyle, isRTLCurrentLocale } from '@one-inch-community/lit';
 import { getContainer } from './overlay-container';
 import { getOverlayId } from './overlay-id-generator';
 import { fromEvent, Subscription } from 'rxjs';
@@ -48,7 +48,7 @@ export class OverlayDesktopController implements IOverlayController {
       })
     }
 
-    await this.animateEnter(overlayContainer)
+    await this.animateEnter(overlayContainer, position[3])
 
     const id = getOverlayId()
     this.activeOverlayMap.set(id, overlayContainer)
@@ -69,17 +69,20 @@ export class OverlayDesktopController implements IOverlayController {
     this.activeOverlayMap.delete(overlayId)
   }
 
-  private async getPosition(openTarget: TemplateResult | HTMLElement): Promise<[number, number, number]> {
+  private async getPosition(openTarget: TemplateResult | HTMLElement): Promise<[number, number, number, DOMRect | null]> {
     const offset = 8
     if (this.target === 'center') {
-      return [0, 0, window.innerHeight - (offset * 2)]
+      return [0, 0, window.innerHeight - (offset * 2), null]
     }
     const rect = this.target.getBoundingClientRect()
     const rectContent = await this.getRect(openTarget)
-    const left = rect.right - (rectContent.width)
+    let left = rect.right - (rectContent.width)
+    if (left <= 0) {
+      left = rect.left
+    }
     const top = rect.top + rect.height + offset
     const maxHeight = window.innerHeight - top - offset
-    return [left, top, maxHeight]
+    return [left, top, maxHeight, rect]
   }
 
   private async getRect(openTarget: TemplateResult | HTMLElement) {
@@ -167,7 +170,7 @@ export class OverlayDesktopController implements IOverlayController {
     })
   }
 
-  private async animateEnter(overlayContainer: HTMLElement) {
+  private async animateEnter(overlayContainer: HTMLElement, targetRect: DOMRect | null) {
     const options = {
       duration: 500,
       easing: 'cubic-bezier(.2, .8, .2, 1)'
@@ -190,9 +193,13 @@ export class OverlayDesktopController implements IOverlayController {
       return
     }
 
+    if (!targetRect) {
+      throw new Error('')
+    }
+
     await overlayContainer.animate([
-      {clipPath: 'circle(0 at 90% 0)', opacity: 0.3},
-      {clipPath: `circle(100%)`, opacity: 1},
+      {transform: `translate3d(${isRTLCurrentLocale() ? -5 : 5}%, -5%, 0)`, opacity: 0.3},
+      {transform: 'translate3d(0, 0, 0)', opacity: 1},
     ], options).finished
   }
 
@@ -223,8 +230,8 @@ export class OverlayDesktopController implements IOverlayController {
     }
 
     await overlayContainer.animate([
-      {clipPath: `circle(100%)`, opacity: 1},
-      {clipPath: 'circle(0 at 90% 0)', opacity: 0.3},
+      {transform: 'translate3d(0, 0, 0)', opacity: 1},
+      {transform: `translate3d(${isRTLCurrentLocale() ? -5 : 5}%, -5%, 0)`, opacity: 0},
     ],options).finished
   }
 

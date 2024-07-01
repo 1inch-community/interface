@@ -78,9 +78,14 @@ export const inputStyle = css`
         text-overflow: ellipsis;
         overflow: hidden;
     }
+
+    .token-name:dir(rtl) {
+        text-align: right;
+    }
     
     .amount-input {
         height: 48px;
+        padding: 0;
         color: var(--color-content-content-primary);
         box-sizing: border-box;
         font-size: 24px;
@@ -93,6 +98,10 @@ export const inputStyle = css`
         outline: none;
         user-select: none;
         width: 100%;
+    }
+    
+    .input-rtl {
+        text-align: left; 
     }
 
     .amount-input[type="number"]::-webkit-inner-spin-button,
@@ -114,6 +123,30 @@ export const inputStyle = css`
     
     .focus:not(.disabled) {
         box-shadow: 0 0 0 1px var(--color-background-bg-positive-hover); 
+    }
+    
+    .balance-and-max {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    
+    .loading {
+        will-change: opacity;
+        animation: stub-loader-animation 2s ease-in-out infinite;
+    }
+    
+    .input-rtl {
+        text-align: end;
+    }
+
+    @keyframes stub-loader-animation {
+        0%, 100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
+        }
     }
     
     @media (hover: hover) {

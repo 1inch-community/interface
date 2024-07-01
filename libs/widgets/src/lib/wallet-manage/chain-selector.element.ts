@@ -10,6 +10,7 @@ import { when } from 'lit/directives/when.js';
 import { OverlayController } from '@one-inch-community/ui-components/overlay';
 import { chainViewConfig } from './chain-view-config';
 import './elements/chain-selector-list'
+import { CacheActivePromise } from '@one-inch-community/sdk';
 
 
 @customElement(ChainSelectorElement.tagName)
@@ -48,12 +49,15 @@ export class ChainSelectorElement extends LitElement {
     return html`
       <inch-button @click="${() => this.onClick()}" size="l" type="primary-gray">
         <inch-icon class="${observe(this.unsupportedChainId$)}" icon="${observe(this.chainIdIconName$)}"></inch-icon>
-        ${when(!this.mobileMedia.matches, () => html`<span>${observe(this.chainIdName$)}</span>`)}
-        <inch-icon icon="chevronDown16"></inch-icon>
+        ${when(!this.mobileMedia.matches, () => html`
+          <span>${observe(this.chainIdName$)}</span>
+          <inch-icon icon="chevronDown16"></inch-icon>
+        `)}
       </inch-button>
     `;
   }
 
+  @CacheActivePromise()
   private async onClick() {
     if (this.overlay.isOpenOverlay(this.overlayId ?? 0)) {
       this.closeOverlay()

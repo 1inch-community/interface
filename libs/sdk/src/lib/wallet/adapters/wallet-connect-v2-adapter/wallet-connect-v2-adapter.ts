@@ -5,16 +5,24 @@ import {
   IProviderDataAdapterInternal,
   IWalletAdapter
 } from '@one-inch-community/models';
-import { Address, WalletClient } from 'viem';
+import {
+  Address,
+  SignTypedDataParameters,
+  SignTypedDataReturnType,
+  WalletClient,
+  WriteContractParameters,
+  WriteContractReturnType
+} from 'viem';
 import { ProviderDataAdapter } from '../../provider-data-adapter';
 import { createClientAndSyncChain } from '../create-client-and-sync-chain';
 import type { MultiConnectProvider } from './multi-connect-provider';
+import { firstValueFrom, switchMap, throwError, timer } from 'rxjs';
 
 export class WalletConnectV2Adapter implements IWalletAdapter {
 
   readonly data: IDataAdapter & IProviderDataAdapterInternal;
 
-  private provider: MultiConnectProvider | null = null
+  private provider: MultiConnectProvider | null = null;
 
   client: WalletClient | null = null;
 
@@ -64,4 +72,35 @@ export class WalletConnectV2Adapter implements IWalletAdapter {
     this.provider?.setActiveAddress(address)
   }
 
+  async writeContract(params: WriteContractParameters): Promise<WriteContractReturnType> {
+    if (!(await this.isConnected()) || !this.client) {
+      throw new Error('Wallet not connected')
+    }
+    const address = (await this.data.getActiveAddress())!
+    return await Promise.any([
+      this.client.writeContract({
+        ...params,
+        account: address,
+      }),
+      firstValueFrom(timer(60 * 1000 * 3).pipe( // 3 min
+        switchMap(() => throwError(() => new Error('wallet connect request timed out'))),
+      ))
+    ])
+  }
+
+  async signTypedData(typeData: SignTypedDataParameters): Promise<SignTypedDataReturnType> {
+    if (!(await this.isConnected()) || !this.client) {
+      throw new Error('Wallet not connected')
+    }
+    const address = (await this.data.getActiveAddress())!
+    return await Promise.race([
+      this.client.signTypedData({
+        ...typeData,
+        account: address
+      }),
+      firstValueFrom(timer(60 * 1000 * 3).pipe( // 3 min
+        switchMap(() => throwError(() => new Error('wallet connect request timed out'))),
+      ))
+    ])
+  }
 }

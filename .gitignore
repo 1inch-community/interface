@@ -3,14 +3,17 @@
 # compiled output
 dist
 dev-cert
+dev-dist
 tmp
 /out-tsc
 
 # dependencies
 node_modules
+.nx
 
 # IDEs and editors
 /.idea
+.fleet
 .project
 .classpath
 .c9/
@@ -40,4 +43,3 @@ testem.log
 Thumbs.db
 .env
 
-.nx/cache

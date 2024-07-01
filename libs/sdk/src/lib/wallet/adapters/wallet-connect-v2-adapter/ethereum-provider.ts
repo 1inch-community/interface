@@ -1,7 +1,7 @@
 import { default as WcEthereumProvider, EthereumProviderOptions } from '@walletconnect/ethereum-provider';
 import { UniversalProvider } from '@walletconnect/universal-provider';
 import Dexie, { Table } from 'dexie';
-import { ConnectOps } from '@walletconnect/ethereum-provider/dist/types/EthereumProvider';
+import type { ConnectOps } from '@walletconnect/ethereum-provider/dist/types/EthereumProvider';
 
 
 export class EthereumProvider extends WcEthereumProvider {

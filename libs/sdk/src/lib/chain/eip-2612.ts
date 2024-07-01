@@ -2,7 +2,6 @@ import { AbiFunction, Address, Hex, parseAbi, toFunctionSelector, maxUint256 } f
 import { getClient } from './chain-client';
 import { ChainId } from '@one-inch-community/models';
 import { QueueCache } from '../cache';
-import { getImplementationAddress } from './proxy-contract';
 
 type EIP712Parameter = {
   name: string
@@ -12,12 +11,12 @@ type EIP712Parameter = {
 const eipPermitAbi = 'function permit(address owner, address spender, uint value, uint deadline, uint8 v, bytes32 r, bytes32 s) external' as const
 const daiPermitAbi = 'function permit(address holder, address spender, uint256 nonce, uint256 expiry, bool allowed, uint8 v, bytes32 r, bytes32 s) external' as const
 
-const apiPermit = parseAbi([
+const apiPermit = () => parseAbi([
   eipPermitAbi,
   daiPermitAbi
 ])
 
-const abiNonce = parseAbi([
+const abiNonce = () => parseAbi([
   'function nonces(address owner) external view returns (uint)',
   'function nonce(address owner) external view returns (uint)',
   'function getNonce(address owner) external view returns (uint)',
@@ -36,10 +35,10 @@ const nameAbi = parseAbi([
   'function name() view returns (string)'
 ])
 
-const permitSelector = toFunctionSelector(apiPermit[0]);
-const permitSelectorDai = toFunctionSelector(apiPermit[0]);
-const domainSeparatorSelector = toFunctionSelector(abiDomainSeparator[0])
-const nonceSelectors = abiNonce.map(abi => toFunctionSelector(abi))
+const permitSelector = () => toFunctionSelector(apiPermit()[0]);
+const permitSelectorDai = () => toFunctionSelector(apiPermit()[0]);
+const domainSeparatorSelector = () => toFunctionSelector(abiDomainSeparator[0])
+const nonceSelectors = () => abiNonce().map(abi => toFunctionSelector(abi))
 
 async function circularViewCall<T>(chainId: ChainId, contract: Address, abiList: AbiFunction[], args: unknown[]): Promise<T> {
   const client = getClient(chainId)
@@ -59,7 +58,7 @@ async function circularViewCall<T>(chainId: ChainId, contract: Address, abiList:
 }
 
 function getNonce(chainId: ChainId, contract: Address, owner: Address) {
-  return circularViewCall<bigint>(chainId, contract, abiNonce as any as AbiFunction[], [ owner ])
+  return circularViewCall<bigint>(chainId, contract, abiNonce() as any as AbiFunction[], [ owner ])
 }
 
 function getName(chainId: ChainId, contract: Address) {
@@ -93,20 +92,20 @@ async function getCode(chainId: ChainId, contract: Address) {
 }
 
 function checkExistDomainSeparatorSelector(code: Hex) {
-  return code.includes(domainSeparatorSelector.replace('0x', '').toLowerCase())
+  return code.includes(domainSeparatorSelector().replace('0x', '').toLowerCase())
 }
 
 function checkExistNonceSelector(code: Hex) {
-  return nonceSelectors.some(selector => code.includes(selector.replace('0x', '').toLowerCase()))
+  return nonceSelectors().some(selector => code.includes(selector.replace('0x', '').toLowerCase()))
 }
 
 function checkExistPermitSelector(code: Hex) {
-  const _permitSelector = permitSelector.replace('0x', '').toLowerCase()
+  const _permitSelector = permitSelector().replace('0x', '').toLowerCase()
   return code.includes(_permitSelector) || isDaiLikePermit(code)
 }
 
 function isDaiLikePermit(code: Hex) {
-  const _permitSelectorDai = permitSelectorDai.replace('0x', '').toLowerCase()
+  const _permitSelectorDai = permitSelectorDai().replace('0x', '').toLowerCase()
   return code.includes(_permitSelectorDai)
 }
 
@@ -118,15 +117,6 @@ export async function isSupportedEIP2612(chainId: ChainId, contract: Address): P
     isSupportedEIP2612 && (isSupportedEIP2612 = checkExistPermitSelector(lowerCaseCode))
     isSupportedEIP2612 && (isSupportedEIP2612 = checkExistDomainSeparatorSelector(lowerCaseCode))
     isSupportedEIP2612 && (isSupportedEIP2612 = checkExistNonceSelector(lowerCaseCode))
-    if (!isSupportedEIP2612) {
-      const implAddress = await getImplementationAddress(chainId, contract)
-      const implCode = await getCode(chainId, implAddress);
-      const lowerCaseImplCode = implCode.toLowerCase() as Hex
-      isSupportedEIP2612 = true
-      isSupportedEIP2612 && (isSupportedEIP2612 = checkExistPermitSelector(lowerCaseImplCode))
-      isSupportedEIP2612 && (isSupportedEIP2612 = checkExistDomainSeparatorSelector(lowerCaseImplCode))
-      isSupportedEIP2612 && (isSupportedEIP2612 = checkExistNonceSelector(lowerCaseImplCode))
-    }
     return isSupportedEIP2612
   } catch (error) {
     return false
