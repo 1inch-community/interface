@@ -1,6 +1,5 @@
 import { TemplateResult } from 'lit';
 import { IconContext } from './icon-context';
-import { emptySearch } from './empty_search.svg';
 
 export type IconsRecord = {
   loader: () => Promise<TemplateResult | ((context: IconContext) => TemplateResult)>

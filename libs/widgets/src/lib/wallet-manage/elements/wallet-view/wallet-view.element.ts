@@ -116,7 +116,7 @@ export class WalletViewElement extends LitElement {
               return html`
                 <div @click="${() => this.setActiveAddress(address)}" class="wallet-view-container address-container ${async(this.isActiveAddress(address).then(state => state ? 'address-container__active' : ''))}">
                   <div class="data-container left-data">
-                    <inch-icon icon="cornerDownRight16"></inch-icon>
+                    <inch-icon class="sub-wallet-icon" icon="cornerDownRight16"></inch-icon>
                     <span>${formatHex(address, { width: this.offsetWidth })}</span>
                   </div>
                   <div class="data-container right-data">
