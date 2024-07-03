@@ -120,6 +120,7 @@ export class FavoriteTokensElement extends LitElement {
 }
 
 const itemAnimation = {
+  direction: 'horizontal' as const,
   deleteElement: async (element: HTMLElement) => {
     element.style.overflow = 'hidden';
     await element.animate([

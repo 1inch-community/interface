@@ -1,9 +1,12 @@
 import { directive, Directive, PartInfo } from 'lit/directive.js';
 import { html, render, TemplateResult } from 'lit';
+import { appendStyle } from '../append-style';
 
 type AnimationConfig = {
-  deleteElement: (element: HTMLElement) => Promise<void>
-  addedElement: (element: HTMLElement) => Promise<(element: HTMLElement) => Promise<void>>
+  direction: 'horizontal' | 'vertical' | 'horizontal-reverted' | 'vertical-reverted';
+  deleteElement: (element: HTMLElement, container: HTMLElement) => Promise<void>
+  addedElement: (element: HTMLElement, container: HTMLElement) =>
+    Promise<(element: HTMLElement, container: HTMLElement) => Promise<void>>
 }
 
 export class AnimationMap extends Directive {
@@ -24,6 +27,7 @@ export class AnimationMap extends Directive {
     config: AnimationConfig,
     templateBuilder: (value: any) => TemplateResult,
   ): TemplateResult {
+    this.applyDirection(config.direction)
     if (this.lock) {
       return html`${this.view}`
     }
@@ -76,7 +80,7 @@ export class AnimationMap extends Directive {
     const iter = async (key: string | number) => {
       const element = this.view.querySelector(`#${key}`) as HTMLElement
       if (!element) return
-      await config(element);
+      await config(element, this.view);
       element.remove();
     }
 
@@ -101,14 +105,14 @@ export class AnimationMap extends Directive {
       element.id = key.toString()
       const template = templateBuilder(item)
       render(template, element)
-      const renderReady = await config(element)
+      const renderReady = await config(element, this.view)
       const targetElement = this.view.children[(indexMap.get(key) ?? 0)]
       if (targetElement) {
         this.view.insertBefore(element, targetElement)
       } else {
         this.view.appendChild(element)
       }
-      await renderReady(element);
+      await renderReady(element, this.view);
     }
 
     for (const key of candidates) {
@@ -136,6 +140,24 @@ export class AnimationMap extends Directive {
     }
   }
 
+  applyDirection(direction: AnimationConfig['direction']) {
+    let flexDirection
+    if (direction === 'vertical') {
+      flexDirection = 'column'
+    }
+    if (direction === 'horizontal') {
+      flexDirection = 'row'
+    }
+    if (direction === 'horizontal-reverted') {
+      flexDirection = 'row-reverse'
+    }
+    if (direction === 'vertical-reverted') {
+      flexDirection = 'column-reverse'
+    }
+    appendStyle(this.view, {
+      flexDirection
+    })
+  }
 
 }
 

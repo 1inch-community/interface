@@ -5,6 +5,7 @@ import './elements/header'
 import './elements/footer'
 import './elements/swap-form'
 import { scrollbarStyle } from '@one-inch-community/ui-components/theme';
+import { NotificationsController } from '@one-inch-community/ui-components/overlay';
 
 @customElement('app-root')
 export class AppElement extends LitElement {
@@ -23,6 +24,19 @@ export class AppElement extends LitElement {
     appStyle,
     scrollbarStyle,
   ]
+
+  constructor() {
+    super();
+    const notificationsController = NotificationsController
+    let i = 0
+    setInterval(() => {
+      if (i >= 4) return
+      notificationsController.show('test notification', html`
+        <span>Test notification ${i++}</span>
+        <span>${new Date().toString()}</span>
+      `)
+    }, 1000)
+  }
 
   protected render() {
     return html`

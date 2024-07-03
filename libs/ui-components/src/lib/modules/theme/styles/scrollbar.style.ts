@@ -48,4 +48,5 @@ export const getScrollbarStyle = (hostName: string, hideScrollBar?: boolean) => 
     `: ''
     )}
 `
+
 export const scrollbarStyle = getScrollbarStyle(':host')
