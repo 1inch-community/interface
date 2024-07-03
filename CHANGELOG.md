@@ -1,3 +1,10 @@
+# [1.0.0-dev.29](https://github.com/1inch-community/interface/compare/v1.0.0-dev.28...v1.0.0-dev.29) (2024-07-03)
+
+
+### Bug Fixes
+
+* fixed card header style ([c7a5413](https://github.com/1inch-community/interface/commit/c7a541361c4a12eb26bd1a94a1a5a44ccf85218f))
+
 # [1.0.0-dev.28](https://github.com/1inch-community/interface/compare/v1.0.0-dev.27...v1.0.0-dev.28) (2024-07-01)
 
 
