@@ -1,8 +1,8 @@
 import Dexie, { Table } from 'dexie';
 import { type Address, isAddressEqual } from 'viem';
 import { IBalancesTokenRecord, ChainId, ITokenRecord, ITokenDto } from '@one-inch-community/models';
-import { QueueCache } from '../cache';
-import { nativeTokenAddress } from '../chain';
+import { nativeTokenAddress } from '@one-inch-community/sdk/chain';
+import { QueueCache } from '@one-inch-community/core/cache';
 
 const TokenPriority: Record<string, number> = {
   'native': 1000,

@@ -1,4 +1,4 @@
-import { mobileMediaCSS } from '@one-inch-community/lit';
+import { mobileMediaCSS } from '@one-inch-community/core/lit';
 import { css } from 'lit';
 
 export const chainSelectorListItemStyle = css`

@@ -2,7 +2,7 @@ import { html, LitElement } from 'lit';
 import { fusionSwapInfoMainStyle } from './fusion-swap-info-main.style';
 import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
-import { observe, dispatchEvent, translate } from '@one-inch-community/lit';
+import { observe, dispatchEvent, translate } from '@one-inch-community/core/lit';
 import { consume } from '@lit/context';
 import { swapContext } from '../../context';
 import {
@@ -15,10 +15,13 @@ import {
 } from 'rxjs';
 import { ISwapContext, Rate } from '@one-inch-community/models';
 import { formatUnits, parseUnits } from 'viem';
-import { BigMath, smartFormatNumber, formatSeconds, getSymbolFromWrapToken, isRateEqual, isTokensEqual, TokenController, smartFormatAndShorteningNumber } from '@one-inch-community/sdk';
 import "@one-inch-community/ui-components/button"
 import "@one-inch-community/ui-components/icon"
 import { when } from 'lit/directives/when.js';
+import { isRateEqual, isTokensEqual, TokenController } from '@one-inch-community/sdk/tokens';
+import { formatSeconds, smartFormatAndShorteningNumber, smartFormatNumber } from '@one-inch-community/core/formatters';
+import { getSymbolFromWrapToken } from '@one-inch-community/sdk/chain';
+import { BigMath } from '@one-inch-community/core/math';
 
 @customElement(FusionSwapInfoMainElement.tagName)
 export class FusionSwapInfoMainElement extends LitElement {

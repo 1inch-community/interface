@@ -20,7 +20,7 @@ import { when } from 'lit/directives/when.js';
 import '@one-inch-community/ui-components/card';
 import '@one-inch-community/widgets/swap-form';
 import { CacheActivePromise, isTokensEqual, storage, SwapContext, TokenController } from '@one-inch-community/sdk';
-import { appendStyle, getMobileMatchMediaAndSubscribe, observe, subscribe, vibrate } from '@one-inch-community/lit';
+import { appendStyle, getMobileMatchMediaAndSubscribe, observe, subscribe, vibrate } from '@one-inch-community/core/lit';
 import { OverlayController, OverlayMobileController } from '@one-inch-community/ui-components/overlay';
 import { SceneController, sceneLazyValue } from '@one-inch-community/ui-components/scene';
 import { BrandColors, getThemeChange } from '@one-inch-community/ui-components/theme';

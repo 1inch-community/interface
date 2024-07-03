@@ -4,8 +4,8 @@ import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import '@one-inch-community/ui-components/icon';
 import { ChainId, IConnectWalletController } from '@one-inch-community/models';
-import { isL2Chain } from '@one-inch-community/sdk';
-import { dispatchEvent, getMobileMatchMediaAndSubscribe, isRTLCurrentLocale } from '@one-inch-community/lit';
+import { isL2Chain } from '@one-inch-community/sdk/chain';
+import { dispatchEvent, getMobileMatchMediaAndSubscribe, isRTLCurrentLocale } from '@one-inch-community/core/lit';
 import { when } from 'lit/directives/when.js';
 
 type ChainViewInfo = {

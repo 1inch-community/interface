@@ -1,8 +1,8 @@
 import { ChainId, EIP1193Provider, EventMap, RequestArguments } from '@one-inch-community/models';
 import { Address, isAddressEqual } from 'viem';
 import { EventEmitter } from 'eventemitter3';
-import { storage } from '../../../utils/storage';
-import { genRandomHex } from '../../../utils/random';
+import { storage } from '../../../../../../core/src/lib/storage/storage';
+import { genRandomHex } from '../../../../../../core/src/lib/random/random';
 import { fromEvent, merge, Subscription, tap } from 'rxjs';
 import { EthereumProvider, WalletConnectStorage } from './ethereum-provider';
 

@@ -1,6 +1,6 @@
 import { fallback, http, webSocket } from 'viem';
 import { ChainId } from '@one-inch-community/models';
-import { getEnvironmentValue } from '../environment';
+import { getEnvironmentValue } from '@one-inch-community/core/environment';
 import { viemCustomHttpTransport } from './viem-custom-http-transport';
 
 export const batchConfig = {

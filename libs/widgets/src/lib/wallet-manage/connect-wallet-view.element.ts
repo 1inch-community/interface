@@ -2,11 +2,12 @@ import { html, LitElement } from 'lit';
 import { connectWalletViewStyle } from './connect-wallet-view.style';
 import { customElement, property } from 'lit/decorators.js';
 import { IConnectWalletController } from '@one-inch-community/models';
-import { observe, getMobileMatchMediaAndSubscribe } from '@one-inch-community/lit';
+import { observe, getMobileMatchMediaAndSubscribe } from '@one-inch-community/core/lit';
 import { OverlayController } from '@one-inch-community/ui-components/overlay';
 import '@one-inch-community/ui-components/button';
 import { defer, map } from 'rxjs';
-import { formatHex, CacheActivePromise } from '@one-inch-community/sdk';
+import { formatHex } from '@one-inch-community/core/formatters';
+import { CacheActivePromise } from '@one-inch-community/core/decorators';
 import './elements/wallet-view-address-balance'
 import { when } from 'lit/directives/when.js';
 import './wallet-manage.element'

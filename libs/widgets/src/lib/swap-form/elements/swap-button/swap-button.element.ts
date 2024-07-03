@@ -21,22 +21,15 @@ import {
   dispatchEvent,
   getMobileMatchMediaAndSubscribe,
   subscribe, translate
-} from '@one-inch-community/lit';
-import {
-  getAllowance,
-  getOneInchRouterV6ContractAddress,
-  isChainId,
-  isNativeToken,
-  isSupportPermit2,
-  JsonParser,
-  storage,
-  hasPermit,
-  getBlockEmitter,
-  CacheActivePromise
-} from '@one-inch-community/sdk';
+} from '@one-inch-community/core/lit';
+import { getAllowance, getBlockEmitter, getOneInchRouterV6ContractAddress, hasPermit,
+  isChainId, isNativeToken, isSupportPermit2 } from '@one-inch-community/sdk/chain'
+
 import { BrandColors, getThemeChange } from '@one-inch-community/ui-components/theme';
 import { swapButtonStyle } from './swap-button.style';
 import { when } from 'lit/directives/when.js';
+import { JsonParser, storage } from '@one-inch-community/core/storage';
+import { CacheActivePromise } from '@one-inch-community/core/decorators';
 
 enum SwapButtonState {
   readyToSwap,

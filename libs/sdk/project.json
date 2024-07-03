@@ -8,8 +8,7 @@
       "executor": "nx:run-commands",
       "options": {
         "env": {
-          "libName": "sdk",
-          "oneModuleLibrary": true
+          "libName": "sdk"
         },
         "commands": [
           "pnpm run build:lib"
@@ -21,7 +20,6 @@
       "options": {
         "env": {
           "libName": "sdk",
-          "oneModuleLibrary": true,
           "isWatch": true
         },
         "commands": [

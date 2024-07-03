@@ -11,7 +11,7 @@ import {
 import { ChainId } from '@one-inch-community/models';
 import { getClient } from './chain-client';
 import { permit2ContractAddress } from './contracts';
-import { LongTimeAsyncCache } from '../cache';
+import { LongTimeAsyncCache } from '@one-inch-community/core/cache';
 
 type PermitLongTimeCacheItem = {
   permitSingle: PermitSingle

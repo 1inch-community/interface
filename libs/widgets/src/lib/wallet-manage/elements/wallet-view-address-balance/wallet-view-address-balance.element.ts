@@ -1,10 +1,13 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Task } from '@lit/task';
-import { formatNumber, getChainById, LongTimeCache, nativeTokenAddress, TokenController } from '@one-inch-community/sdk';
 import { ChainId } from '@one-inch-community/models';
 import { Address, formatUnits } from 'viem';
 import { walletViewAddressBalanceStyle } from './wallet-view-address-balance.style';
+import { LongTimeCache } from '@one-inch-community/core/cache';
+import { getChainById, nativeTokenAddress } from '@one-inch-community/sdk/chain';
+import { TokenController } from '@one-inch-community/sdk/tokens';
+import { formatNumber } from '@one-inch-community/core/formatters';
 
 const storage = new LongTimeCache<string, string>('inch-wallet-view-address-balance', 7)
 

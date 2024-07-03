@@ -1,5 +1,5 @@
 import { ICache } from '@one-inch-community/models';
-import { storage, JsonParser } from '../utils';
+import { storage, JsonParser } from '@one-inch-community/core/storage';
 
 /**
  * Type representing the cached data with a timestamp.

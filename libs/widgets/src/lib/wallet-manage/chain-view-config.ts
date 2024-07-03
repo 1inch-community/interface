@@ -1,5 +1,6 @@
 import { ChainId } from "@one-inch-community/models"
-import { isL2Chain, isSupportFusion } from "@one-inch-community/sdk"
+import { isL2Chain } from "@one-inch-community/sdk/chain"
+import { isSupportFusion } from "@one-inch-community/sdk/swap"
 
 type ChainViewInfo = {
   name: string

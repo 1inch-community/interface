@@ -19,12 +19,12 @@ import "@one-inch-community/widgets/token-icon"
 import "@one-inch-community/ui-components/icon"
 import "@one-inch-community/ui-components/button"
 import { ISwapContext, IToken } from '@one-inch-community/models';
-import { formatNumber } from '@one-inch-community/sdk';
+import { formatNumber } from '@one-inch-community/core/formatters';
 import '../balance'
 import '../fiat-balance'
 import { inputStyle } from './input.style';
 import { swapContext } from '../../context';
-import { observe, subscribe, dispatchEvent, translate, isRTLCurrentLocale, localeChange$ } from '@one-inch-community/lit';
+import { observe, subscribe, dispatchEvent, translate, isRTLCurrentLocale, localeChange$ } from '@one-inch-community/core/lit';
 import { Address, formatUnits, parseUnits } from 'viem';
 import { when } from 'lit/directives/when.js';
 import { choose } from 'lit/directives/choose.js';

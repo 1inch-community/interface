@@ -3,10 +3,11 @@ import { customElement, property } from 'lit/decorators.js';
 import { consume } from '@lit/context';
 import { swapContext } from '../../context';
 import { ISwapContext } from '@one-inch-community/models';
-import { observe } from '@one-inch-community/lit';
+import { observe } from '@one-inch-community/core/lit';
 import { catchError, combineLatest, defer, filter, map, switchMap } from 'rxjs';
 import { formatUnits } from 'viem';
-import { smartFormatNumber, TokenController } from '@one-inch-community/sdk';
+import { TokenController } from '@one-inch-community/sdk/tokens';
+import { smartFormatNumber } from '@one-inch-community/core/formatters';
 import { fiatBalanceStyles } from './fiat-balance.styles';
 
 @customElement(FiatBalanceElement.tagName)

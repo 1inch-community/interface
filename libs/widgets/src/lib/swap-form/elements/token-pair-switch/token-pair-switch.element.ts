@@ -4,7 +4,7 @@ import { ref, createRef } from 'lit/directives/ref.js';
 import { consume } from '@lit/context';
 import { combineLatest, defer, fromEvent, map, switchMap, tap } from 'rxjs';
 import '@one-inch-community/ui-components/icon'
-import { observe, dispatchEvent, subscribe, appendStyle, getMobileMatchMedia } from '@one-inch-community/lit';
+import { observe, dispatchEvent, subscribe, appendStyle, getMobileMatchMedia } from '@one-inch-community/core/lit';
 import { ISwapContext } from '@one-inch-community/models';
 import { tokenPairSwitchStyle } from './token-pair-switch.style';
 import { swapContext } from '../../context';

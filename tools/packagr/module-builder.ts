@@ -135,7 +135,7 @@ export class ModuleBuilder {
   private async waitBuildCrossDeps() {
     const crossDepsSet = await this.dependenciesFinder.findModuleCrossDependencies(this.modulePath, this.oneModuleLibrary)
     const crossDeps = [ ...crossDepsSet ]
-    this.logger.log('wait build cross dependencies')
+    this.logger.log('wait build cross dependencies, ' + crossDeps.join(', '))
     await Promise.all(crossDeps.map(deps => this.statusController.waitReady(deps)))
     this.logger.log('build cross dependencies ready')
   }

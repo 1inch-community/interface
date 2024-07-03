@@ -2,7 +2,7 @@ import { css, html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { consume } from '@lit/context';
 import { ScrollContext, scrollContext } from './scroll-context';
-import { subscribe, resizeObserver } from '@one-inch-community/lit';
+import { subscribe, resizeObserver } from '@one-inch-community/core/lit';
 import { fromEvent, merge, tap } from 'rxjs';
 import { createRef, ref } from 'lit/directives/ref.js';
 import { scrollbarStyle } from '@one-inch-community/ui-components/theme';

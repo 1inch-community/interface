@@ -1,6 +1,6 @@
-import { ChainId } from '@one-inch-community/models';
-import { storage } from '../utils';
 import { Address } from 'viem';
+import { ChainId } from '@one-inch-community/models';
+import { storage } from '@one-inch-community/core/storage';
 
 export function setChainIdInStorage(chainId: ChainId) {
   storage.set('chainId', Number(chainId))

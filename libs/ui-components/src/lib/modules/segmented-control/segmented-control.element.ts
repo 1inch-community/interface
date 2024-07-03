@@ -3,7 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { segmentedControlContainerStyle, segmentedControlItemStyle } from './segmented-control.style';
 import { classMap } from 'lit/directives/class-map.js';
 import { map } from 'lit/directives/map.js';
-import { buildEvent, isRTLCurrentLocale, localeChange$, subscribe } from '@one-inch-community/lit';
+import { buildEvent, isRTLCurrentLocale, localeChange$, subscribe } from '@one-inch-community/core/lit';
 import { tap } from 'rxjs';
 
 type SegmentedControlSize = 'm' | 'l'
