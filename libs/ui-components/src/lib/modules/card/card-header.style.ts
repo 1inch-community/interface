@@ -69,14 +69,7 @@ export const cardHeaderStyle = css`
             font-size: 16px;
         }
         :host {
-            height: 52px;
             padding: 8px 8px 0;
-        }
-        :host(.not-native-mode) {
-            margin-top: -8px;
-            margin-left: -8px;
-            width: calc(100% + 16px);
-            height: 52px;
         }
     `)}
 
