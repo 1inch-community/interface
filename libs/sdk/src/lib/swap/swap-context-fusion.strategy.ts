@@ -1,7 +1,7 @@
 import { IConnectWalletController, ISwapContext, Rate, SwapSettings, ISwapContextStrategy, ISwapContextStrategyDataSnapshot } from '@one-inch-community/models';
 import { PairHolder } from './pair-holder';
 import { getWrapperNativeToken, isNativeToken } from '@one-inch-community/sdk/chain';
-import { OneInchDevPortalAdapter } from '@one-inch-community/core/api';
+import { OneInchDevPortalAdapter } from '@one-inch-community/sdk/api';
 import { BigMath } from '@one-inch-community/core/math';
 
 

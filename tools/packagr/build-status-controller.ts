@@ -1,7 +1,10 @@
 import { EventEmitter } from 'events';
 import { getModuleFullName, getLibraryFullName } from './names';
 
-export type BuildStatus = 'pre-build' | 'building' | 'ready'
+export enum BuildStatus {
+  preBuild, building, ready
+}
+
 
 export class BuildStatusController {
   private readonly statusMap = new Map<string, BuildStatus>()
@@ -13,7 +16,7 @@ export class BuildStatusController {
     private libName?: string
   ) {
     for (const builder of builders) {
-      this.changeStatus(builder, 'pre-build')
+      this.changeStatus(builder, BuildStatus.preBuild)
     }
   }
 
@@ -30,7 +33,7 @@ export class BuildStatusController {
 
   isReady(moduleName: string) {
     const status = this.statusMap.get(moduleName)
-    return status === 'ready'
+    return status === BuildStatus.ready
   }
 
   waitReady(moduleName: string): Promise<void> {
@@ -38,7 +41,13 @@ export class BuildStatusController {
       if (this.isReady(moduleName)) {
         resolve()
       }
-      this.emitter.once(moduleName, resolve)
+      const eventHandler = () => {
+        if (this.isReady(moduleName)) {
+          resolve()
+          this.emitter.off(moduleName, eventHandler)
+        }
+      }
+      this.emitter.on(moduleName, eventHandler)
     })
   }
 

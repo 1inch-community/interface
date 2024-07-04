@@ -40,7 +40,7 @@ import {
 } from '@one-inch-community/sdk/chain';
 import type { BlockchainProviderConnector, EIP712TypedData, HttpProviderConnector, OrderParams } from '@1inch/fusion-sdk';
 import { Address, Hex } from 'viem';
-import { OneInchDevPortalAdapter } from '@one-inch-community/core/api';
+import { OneInchDevPortalAdapter } from '@one-inch-community/sdk/api';
 import { SettingsController } from '@one-inch-community/core/settings';
 import { BigMath } from '@one-inch-community/core/math'
 import { getEnvironmentValue } from '@one-inch-community/core/environment';

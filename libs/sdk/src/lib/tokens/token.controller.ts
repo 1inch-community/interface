@@ -4,7 +4,7 @@ import { Address, formatUnits } from 'viem';
 import { averageBlockTime } from '../chain/average-block-time';
 import { TokenUsdOnChainPriceProvider } from './token-usd-on-chain-price.provider';
 import { liveQuery } from 'dexie';
-import { OneInchDevPortalAdapter } from '@one-inch-community/core/api';
+import { OneInchDevPortalAdapter } from '@one-inch-community/sdk/api';
 import { storage, JsonParser } from '@one-inch-community/core/storage';
 import { CacheActivePromise } from '@one-inch-community/core/decorators';
 import { isSupportedEIP2612 } from '@one-inch-community/sdk/chain';

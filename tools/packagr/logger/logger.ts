@@ -111,7 +111,7 @@ function makeMessage(node: LogNode): string {
 }
 
 function makeSpace(count: number) {
-  return ' '.repeat(count)
+  return ' '.repeat(count);
 }
 
 function makeLogRow(node: LogNode, deep: number) {
@@ -131,4 +131,11 @@ const render = debounce((storage: LogStorage) => {
   process.stdout.write('\x1Bc');
   process.stdout.write(snapshot);
   process.stdout.write(`\n\nPress Ctrl-C for cancel`);
-}, 10);
+}, 0);
+
+// const render = (storage: LogStorage) => {
+//   const snapshot = storage.getSnapshot();
+//   process.stdout.write('\x1Bc');
+//   process.stdout.write(snapshot);
+//   process.stdout.write(`\n\nPress Ctrl-C for cancel`);
+// };

@@ -1,6 +1,6 @@
 import { ILogger } from './logger';
 import { dirname } from 'path';
-import { BuildStatusController } from './build-status-controller';
+import { BuildStatus, BuildStatusController } from './build-status-controller';
 import { EsbuildController } from './esbuild-controller';
 import { DtsBuildController } from './dtsbuild-controller';
 import { DependenciesFinder } from './dependencies-finder';
@@ -62,15 +62,17 @@ export class ModuleBuilder {
   async build() {
     this.logger.setLoadingState(true)
     this.logger.log('start module building')
-    this.statusController.changeStatus(this.moduleName, 'building')
+    this.statusController.changeStatus(this.moduleName, BuildStatus.building)
 
     await this.waitBuildCrossDeps()
+    this.logger.log('start module esbuild building')
     await this.esbuildController.build()
+    this.logger.log('start module dts building')
     await this.dtsBuildController.build()
     await this.generatePackageJson()
 
-    this.statusController.changeStatus(this.moduleName, 'ready')
     this.logger.setLoadingState(false)
+    this.statusController.changeStatus(this.moduleName, BuildStatus.ready)
     this.logger.log('building complete')
     if (this.isWatch) {
       this.logger.log('wait changes')
@@ -86,7 +88,7 @@ export class ModuleBuilder {
   async rebuild() {
     this.logger.log('start module rebuilding')
     this.logger.setLoadingState(true)
-    this.statusController.changeStatus(this.moduleName, 'building')
+    this.statusController.changeStatus(this.moduleName, BuildStatus.building)
 
     const paths = await this.dependenciesFinder.findAllDependenciesPath(this.modulePath)
     if (paths.length) {
@@ -99,7 +101,7 @@ export class ModuleBuilder {
     await this.generatePackageJson()
 
     this.logger.setLoadingState(false)
-    this.statusController.changeStatus(this.moduleName, 'ready')
+    this.statusController.changeStatus(this.moduleName, BuildStatus.ready)
     this.logger.log('wait changes')
   }
 
@@ -135,7 +137,7 @@ export class ModuleBuilder {
   private async waitBuildCrossDeps() {
     const crossDepsSet = await this.dependenciesFinder.findModuleCrossDependencies(this.modulePath, this.oneModuleLibrary)
     const crossDeps = [ ...crossDepsSet ]
-    this.logger.log('wait build cross dependencies, ' + crossDeps.join(', '))
+    this.logger.log('wait build cross module dependencies, ' + crossDeps.join(', '))
     await Promise.all(crossDeps.map(deps => this.statusController.waitReady(deps)))
     this.logger.log('build cross dependencies ready')
   }
