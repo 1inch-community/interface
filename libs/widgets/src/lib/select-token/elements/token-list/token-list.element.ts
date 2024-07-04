@@ -7,14 +7,14 @@ import { consume } from '@lit/context';
 import { ChainId, ISelectTokenContext } from '@one-inch-community/models';
 import { selectTokenContext } from '../../context';
 import { defer, shareReplay, tap } from 'rxjs';
-import { observe, subscribe } from '@one-inch-community/lit';
+import { observe, subscribe } from '@one-inch-community/core/lit';
 import { Address } from 'viem';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import { ISceneContext, sceneContext } from '@one-inch-community/ui-components/scene';
 import '@one-inch-community/ui-components/scroll';
 import '../token-list-stub-item'
 import { when } from 'lit/directives/when.js';
-import { getChainById, isChainId } from '@one-inch-community/sdk';
+import { getChainById, isChainId } from '@one-inch-community/sdk/chain';
 
 
 @customElement(TokenListElement.tagName)

@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { headerStyle } from './header.style';
-import { changeMobileMatchMedia, getMobileMatchMedia } from '@one-inch-community/lit';
+import { changeMobileMatchMedia, getMobileMatchMedia } from '@one-inch-community/core/lit';
 import '@one-inch-community/ui-components/icon';
 import '@one-inch-community/widgets/wallet-manage';
 import { getHeaderHeight } from '../../platform/sizes';

@@ -3,14 +3,14 @@ import { customElement, property } from 'lit/decorators.js';
 import { IConnectWalletController } from '@one-inch-community/models';
 import '@one-inch-community/ui-components/button';
 import '@one-inch-community/ui-components/icon';
-import { observe, getMobileMatchMediaAndSubscribe } from '@one-inch-community/lit';
+import { observe, getMobileMatchMediaAndSubscribe } from '@one-inch-community/core/lit';
 import { chainSelectorStyle } from './chain-selector.style';
 import { defer, filter, map } from 'rxjs';
 import { when } from 'lit/directives/when.js';
 import { OverlayController } from '@one-inch-community/ui-components/overlay';
 import { chainViewConfig } from './chain-view-config';
 import './elements/chain-selector-list'
-import { CacheActivePromise } from '@one-inch-community/sdk';
+import { CacheActivePromise } from '@one-inch-community/core/decorators';
 
 
 @customElement(ChainSelectorElement.tagName)

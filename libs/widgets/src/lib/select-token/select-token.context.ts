@@ -1,5 +1,5 @@
 import { ChainId, ISelectTokenContext } from '@one-inch-community/models';
-import { TokenController } from '@one-inch-community/sdk';
+import { TokenController } from '@one-inch-community/sdk/tokens';
 import {
   ReplaySubject,
   Subject,

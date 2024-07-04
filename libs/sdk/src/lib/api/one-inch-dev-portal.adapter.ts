@@ -1,8 +1,8 @@
 import { ChainId, ITokenDto, FusionQuoteReceiveDto, GasPriceDto } from '@one-inch-community/models';
 import type { Address } from 'viem';
-import { getEnvironmentValue } from '../environment';
-import { TimeCache } from '../cache';
-import { CacheActivePromise } from './decorators';
+import { CacheActivePromise } from '@one-inch-community/core/decorators';
+import { TimeCache } from '@one-inch-community/core/cache';
+import { getEnvironmentValue } from '@one-inch-community/core/environment';
 
 const tokenPriceCache = new TimeCache<ChainId, Record<Address, string>>(10000)
 const fusionQuoteReceiveCache = new TimeCache<string, FusionQuoteReceiveDto | null>(5000)

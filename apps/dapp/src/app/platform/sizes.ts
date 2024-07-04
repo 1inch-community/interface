@@ -1,4 +1,4 @@
-import { getMobileMatchMedia } from '@one-inch-community/lit';
+import { getMobileMatchMedia } from '@one-inch-community/core/lit';
 
 export function getHeaderHeight() {
   const mobileMedia = getMobileMatchMedia()

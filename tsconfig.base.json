@@ -17,22 +17,6 @@
     "skipLibCheck": true,
     "resolveJsonModule": true,
     "skipDefaultLibCheck": true,
-    "typeRoots": [
-      "./dist/libs/models",
-      "./dist/libs/sdk",
-      "./dist/libs/lit",
-      "./dist/libs/ui-components/async",
-      "./dist/libs/ui-components/button",
-      "./dist/libs/ui-components/card",
-      "./dist/libs/ui-components/icon",
-      "./dist/libs/ui-components/lit",
-      "./dist/libs/ui-components/overlay",
-      "./dist/libs/ui-components/scene",
-      "./dist/libs/ui-components/scroll",
-      "./dist/libs/ui-components/segmented-control",
-      "./dist/libs/ui-components/theme",
-      "./node_modules/@types"
-    ],
     "plugins": [
       {
         "name": "ts-lit-plugin",
@@ -44,12 +28,10 @@
         "dist/libs/models/index",
         "dist/libs/models/*"
       ],
-      "@one-inch-community/lit": [
-        "dist/libs/lit/index",
-        "dist/libs/lit/*"
+      "@one-inch-community/core/*": [
+        "dist/libs/core/*"
       ],
-      "@one-inch-community/sdk": [
-        "dist/libs/sdk/index",
+      "@one-inch-community/sdk/*": [
         "dist/libs/sdk/*"
       ],
       "@one-inch-community/ui-components/*": [

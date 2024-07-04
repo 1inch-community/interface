@@ -58,8 +58,25 @@ export class DependenciesFinder {
     }
     const packageJson = await getProjectPackageJson()
     const resultList: string[] = []
+    const libFullName = getLibraryFullName(packageJson.name, this.libName)
     for (const moduleEntry of moduleEntries) {
-      const result = await this.findAllDependencies(moduleEntry, options, name => name.startsWith(`@${packageJson.name}/`) && ((name.split('/').length - 1) < 2))
+      const result = await this.findAllDependencies(
+        moduleEntry,
+        options,
+          name => {
+        if (!name.startsWith(`@${packageJson.name}/`)) return false
+        if (name.startsWith(libFullName)) return false
+        return true
+      },
+        name => {
+          const firstSlashIndex = name.indexOf('/');
+          const secondSlashIndex = name.indexOf('/', firstSlashIndex + 1);
+          if (secondSlashIndex === -1) {
+            return name;
+          }
+          return name.substring(0, secondSlashIndex);
+        }
+      )
       resultList.push(...result.values())
     }
     return new Set(resultList)
@@ -83,7 +100,7 @@ export class DependenciesFinder {
     return configParseResult.options;
   }
 
-  private async findAllDependencies(filePath: string, options: ts.CompilerOptions, target: string | ((name: string) => boolean)) {
+  private async findAllDependencies(filePath: string, options: ts.CompilerOptions, target: string | ((name: string) => boolean), transformer?: (value: string) => string) {
     const imports = new Set<string>();
     const moduleFiles = await findFilesByName(path.dirname(filePath), file => file.includes('.ts'));
 
@@ -95,20 +112,20 @@ export class DependenciesFinder {
         continue;
       }
       ts.forEachChild(sourceFile, node => {
-        this.findImportsInNode(node, imports, target);
+        this.findImportsInNode(node, imports, target, transformer);
       });
     }
 
     return imports;
   }
 
-  private findImportsInNode(node: ts.Node, imports: Set<string>, target: string | ((name: string) => boolean)) {
+  private findImportsInNode(node: ts.Node, imports: Set<string>, target: string | ((name: string) => boolean), transformer?: (value: string) => string) {
     if (ts.isImportDeclaration(node) && node.moduleSpecifier) {
       const specifier = node.moduleSpecifier;
       if (ts.isStringLiteral(specifier)) {
         const moduleName = specifier.text;
         if (typeof target === 'function' ? target(moduleName) : moduleName.startsWith(target)) {
-          imports.add(moduleName);
+          imports.add(transformer ? transformer(moduleName) : moduleName);
         }
       }
     }
@@ -118,7 +135,7 @@ export class DependenciesFinder {
       if (arg && ts.isStringLiteral(arg)) {
         const moduleName = arg.text;
         if (typeof target === 'function' ? target(moduleName) : moduleName.startsWith(target)) {
-          imports.add(moduleName);
+          imports.add(transformer ? transformer(moduleName) : moduleName);
         }
       }
     }

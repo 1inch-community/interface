@@ -1,6 +1,6 @@
 import { ChainId } from "@one-inch-community/models";
 import { Address, parseAbi, maxUint256 } from 'viem';
-import { BlockTimeCache } from '../cache';
+import { BlockTimeCache } from './block-time-cache';
 import { getClient } from './chain-client';
 import { isNativeToken } from './is-native-token';
 import { Observable, switchMap } from 'rxjs';

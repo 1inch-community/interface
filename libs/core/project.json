@@ -1,15 +1,14 @@
 {
-  "name": "lit",
+  "name": "core",
   "$schema": "../../node_modules/nx/schemas/project-schema.json",
-  "sourceRoot": "libs/lit/src",
+  "sourceRoot": "libs/core/src",
   "projectType": "library",
   "targets": {
     "build": {
       "executor": "nx:run-commands",
       "options": {
         "env": {
-          "libName": "lit",
-          "oneModuleLibrary": true
+          "libName": "core"
         },
         "commands": [
           "pnpm run build:lib"
@@ -20,8 +19,7 @@
       "executor": "nx:run-commands",
       "options": {
         "env": {
-          "libName": "lit",
-          "oneModuleLibrary": true,
+          "libName": "core",
           "isWatch": true
         },
         "commands": [
@@ -33,9 +31,19 @@
       "executor": "nx:run-commands",
       "options": {
         "commands": [
-          "tsc --project libs/lit/tsconfig.json --noEmit --skipLibCheck"
+          "tsc --project libs/core/tsconfig.json --noEmit --skipLibCheck"
         ]
       }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["{options.reportsDirectory}"],
+      "options": {
+        "reportsDirectory": "../../coverage/temp/sdk"
+      },
+      "dependsOn": [
+        { "projects": "models", "target": "build" }
+      ]
     }
   },
   "tags": []

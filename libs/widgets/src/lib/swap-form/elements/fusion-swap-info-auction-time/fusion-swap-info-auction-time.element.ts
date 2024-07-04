@@ -4,7 +4,7 @@ import { customElement, property } from 'lit/decorators.js';
 import '@one-inch-community/ui-components/segmented-control'
 import '@one-inch-community/ui-components/icon'
 import type { SegmentedControlItem } from '@one-inch-community/ui-components/segmented-control';
-import { dispatchEvent, appendStyle, subscribe, getMobileMatchMediaAndSubscribe } from '@one-inch-community/lit';
+import { dispatchEvent, appendStyle, subscribe, getMobileMatchMediaAndSubscribe } from '@one-inch-community/core/lit';
 import { Maskito } from '@maskito/core';
 import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import { fromEvent, tap } from 'rxjs';

@@ -1,5 +1,5 @@
 import './app/app.element';
-import { initLocale } from '@one-inch-community/lit'
+import { initLocale } from '@one-inch-community/core/lit'
 import { themeInit, MainColors, BrandColors } from '@one-inch-community/ui-components/theme'
 
 Promise.all([

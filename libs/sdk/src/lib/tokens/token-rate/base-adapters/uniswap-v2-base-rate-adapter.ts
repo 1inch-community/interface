@@ -1,8 +1,8 @@
 import { ChainId, IToken, ITokenRateSourceAdapter, Rate } from '@one-inch-community/models';
 import { Address, getAddress, isAddressEqual, parseAbi, zeroAddress } from 'viem';
-import { getClient } from '../../../chain';
-import { BigMath } from '../../../utils';
-import { LongTimeCache } from '../../../cache';
+import { getClient } from '@one-inch-community/sdk/chain';
+import { BigMath } from '@one-inch-community/core/math';
+import { LongTimeCache } from '@one-inch-community/core/cache';
 
 const FactoryContractABI = parseAbi([
   'function getPair(address tokenA, address tokenB) external view returns (address pair)'

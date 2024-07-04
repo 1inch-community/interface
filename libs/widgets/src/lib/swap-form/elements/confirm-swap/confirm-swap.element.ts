@@ -7,13 +7,14 @@ import '@one-inch-community/widgets/token-icon'
 import '@one-inch-community/ui-components/card'
 import '@one-inch-community/ui-components/button'
 import '@one-inch-community/ui-components/icon'
-import { formatSeconds, getBlockEmitter, getSymbolFromWrapToken, getWrapperNativeToken, isNativeToken,
-  isTokensEqual, smartFormatNumber, TokenController } from '@one-inch-community/sdk';
 import { formatUnits } from 'viem';
-import { async, dispatchEvent, getMobileMatchMediaAndSubscribe, observe } from '@one-inch-community/lit';
+import { async, dispatchEvent, getMobileMatchMediaAndSubscribe, observe } from '@one-inch-community/core/lit';
 import { Observable, shareReplay, switchMap } from 'rxjs';
 import { when } from 'lit/directives/when.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import { isTokensEqual, TokenController } from '@one-inch-community/sdk/tokens';
+import { formatSeconds, smartFormatNumber } from '@one-inch-community/core/formatters';
+import { getBlockEmitter, getSymbolFromWrapToken, getWrapperNativeToken, isNativeToken } from '@one-inch-community/sdk/chain';
 
 @customElement(ConfirmSwapElement.tagName)
 export class ConfirmSwapElement extends LitElement {

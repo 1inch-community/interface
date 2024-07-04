@@ -1,12 +1,14 @@
-import { OneInchDevPortalAdapter, JsonParser, storage } from '../utils';
 import { TokenSchema } from './token.schema';
 import { ChainId, ITokenRecord } from '@one-inch-community/models';
 import { Address, formatUnits } from 'viem';
 import { averageBlockTime } from '../chain/average-block-time';
 import { TokenUsdOnChainPriceProvider } from './token-usd-on-chain-price.provider';
 import { liveQuery } from 'dexie';
-import { CacheActivePromise } from '../utils/decorators';
-import { getBalances, isSupportedEIP2612 } from '../chain';
+import { OneInchDevPortalAdapter } from '@one-inch-community/sdk/api';
+import { storage, JsonParser } from '@one-inch-community/core/storage';
+import { CacheActivePromise } from '@one-inch-community/core/decorators';
+import { isSupportedEIP2612 } from '@one-inch-community/sdk/chain';
+import { getBalances } from '@one-inch-community/sdk/chain';
 
 const lastUpdateTokenDatabaseTimestampStorageKey = `last-update-token-database-timestamp-v${TokenSchema.databaseVersion}`
 const lastUpdateTokenBalanceDatabaseTimestampStorageKey = `last-update-token-balance-database-timestamp-v${TokenSchema.databaseVersion}`

@@ -1,6 +1,6 @@
 import { ISettingsController } from '@one-inch-community/models';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { JsonParser, storage } from '../utils';
+import { JsonParser, storage } from '@one-inch-community/core/storage';
 
 export class SettingsController<Value> implements ISettingsController<Value> {
   private readonly valueState$ = new BehaviorSubject<Value | null>(getPersistValue(this.name) ?? this.initValue);

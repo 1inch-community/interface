@@ -11,7 +11,7 @@ import {
   subscribe,
   getMobileMatchMediaAndSubscribe,
   translate
-} from '@one-inch-community/lit';
+} from '@one-inch-community/core/lit';
 import { Maskito } from '@maskito/core';
 import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import { fromEvent, tap } from 'rxjs';
