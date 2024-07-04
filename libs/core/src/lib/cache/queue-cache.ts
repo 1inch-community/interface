@@ -1,10 +1,5 @@
 import { ICache } from "@one-inch-community/models"
 
-interface QueueCacheRecord<Value> {
-  index: number
-  value: Value
-}
-
 
 /**
  * Represents a queue-based cache implementation.

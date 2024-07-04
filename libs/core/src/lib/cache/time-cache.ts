@@ -12,7 +12,7 @@ interface TimeCacheRecord<Value> {
  */
 export class TimeCache<Key, Value> implements ICache<Key, Value> {
   private readonly cache = new Map<Key, TimeCacheRecord<Value>>()
-  private autoCleanTimer?: any
+  private autoCleanTimer?: number
 
   constructor(private readonly ttlMs: number,
               private autoClean = false) {
@@ -86,7 +86,7 @@ export class TimeCache<Key, Value> implements ICache<Key, Value> {
       for (const key of [...this.cache.keys()]) {
         this.get(key)
       }
-    }, this.ttlMs)
+    }, this.ttlMs) as unknown as number
   }
 
 }

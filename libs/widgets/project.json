@@ -20,7 +20,7 @@
       "options": {
         "env": {
           "libName": "widgets",
-          "isWatch": true
+          "isWatch": "true"
         },
         "commands": [
           "pnpm run build:lib"

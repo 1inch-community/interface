@@ -20,7 +20,7 @@
       "options": {
         "env": {
           "libName": "core",
-          "isWatch": true
+          "isWatch": "true"
         },
         "commands": [
           "pnpm run build:lib"

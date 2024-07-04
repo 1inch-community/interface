@@ -21,8 +21,8 @@
       "options": {
         "env": {
           "libName": "models",
-          "oneModuleLibrary": true,
-          "isWatch": true
+          "oneModuleLibrary": "true",
+          "isWatch": "true"
         },
         "commands": [
           "pnpm run build:lib"
