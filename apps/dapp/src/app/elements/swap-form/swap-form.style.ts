@@ -1,5 +1,5 @@
 import { css } from 'lit';
-import { mobileMediaCSS } from '@one-inch-community/lit';
+import { mobileMediaCSS } from '@one-inch-community/core/lit';
 import { getRainbowGradient } from '@one-inch-community/ui-components/theme';
 
 export const swapFormStyle = css`

@@ -2,18 +2,18 @@ import { ChainId, IToken, ITokenRateSourceAdapter, ITokenRateProvider, Rate } fr
 import { uniswapV2Adapter } from './adapters/uniswap-v2-adapter';
 import { sushiswapV2Adapter } from './adapters/sushiswap-v2-adapter';
 import { pancakeswapV2Adapter } from './adapters/pancakeswap-v2-adapter';
-import { CacheActivePromise } from '../../utils';
 import {
   getBlockEmitter,
   getWrapperNativeToken,
   isNativeToken,
-} from '../../chain';
+} from '@one-inch-community/sdk/chain';
 import { startWith, Observable, switchMap } from 'rxjs';
 import { uniswapV3Adapter } from './adapters/uniswap-v3-adapter';
 import { pancakeswapV3Adapter } from './adapters/pancakeswap-v3-adapter';
 import { sushiswapV3Adapter } from './adapters/sushiswap-v3-adapter';
 import { spookyswapV3Adapter } from './adapters/spookyswap-v3-adapter';
-import { BlockTimeCache } from '../../cache';
+import { BlockTimeCache } from '@one-inch-community/sdk/chain';
+import { CacheActivePromise } from '@one-inch-community/core/decorators';
 
 export class TokenRateProvider implements ITokenRateProvider {
 
@@ -70,7 +70,7 @@ export class TokenRateProvider implements ITokenRateProvider {
 
 }
 
-export function buildDefaultTokenRageProvider() {
+export function buildDefaultTokenRateProvider() {
   return new TokenRateProvider([
     // v3
     uniswapV3Adapter,

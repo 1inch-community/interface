@@ -1,6 +1,6 @@
 import { ChainId, IToken } from '@one-inch-community/models';
 import { Address, formatUnits, isAddressEqual } from 'viem';
-import { buildDefaultTokenRageProvider } from './token-rate/token-rate.provider';
+import { buildDefaultTokenRateProvider } from './token-rate/token-rate.provider';
 
 const USDTAddresses: Record<ChainId, Address> = {
   [ChainId.eth]: '0xdac17f958d2ee523a2206206994597c13d831ec7',
@@ -20,7 +20,7 @@ const decimals = 6
 
 export class TokenUsdOnChainPriceProvider {
 
-  private rateProvider = buildDefaultTokenRageProvider()
+  private rateProvider = buildDefaultTokenRateProvider()
 
   async getPrice(chainId: ChainId, token: IToken): Promise<string> {
     const USDTAddress = USDTAddresses[chainId]

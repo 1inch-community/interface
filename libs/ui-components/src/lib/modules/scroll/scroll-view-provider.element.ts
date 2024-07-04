@@ -2,7 +2,7 @@ import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { ContextProvider } from '@lit/context';
 import { ScrollContext, scrollContext } from './scroll-context';
-import { appendStyle } from '@one-inch-community/lit';
+import { appendStyle } from '@one-inch-community/core/lit';
 
 
 @customElement(ScrollViewProviderElement.tagName)

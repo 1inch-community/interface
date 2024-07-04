@@ -14,7 +14,7 @@ import {
   mobileMediaCSS,
   resizeObserver,
   subscribe
-} from '@one-inch-community/lit';
+} from '@one-inch-community/core/lit';
 import { tap, merge, of, fromEvent } from 'rxjs';
 import { mainViewportContext } from './main-viewport-context';
 import { getScrollbarStyle } from '../theme/styles/scrollbar.style';

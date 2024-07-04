@@ -2,7 +2,7 @@ import { Address, parseAbi } from 'viem';
 import { ChainId } from '@one-inch-community/models';
 import { isNativeToken } from './is-native-token';
 import { getClient } from './chain-client';
-import { BlockTimeCache } from '../cache';
+import { BlockTimeCache } from './block-time-cache';
 
 const abi = parseAbi([
   'function balanceOf(address _owner) public view returns (uint256 balance)'

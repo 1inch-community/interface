@@ -5,7 +5,7 @@ import { moduleFinder, ModuleInfo } from './module-finder';
 import { generatePackageJson } from './generate-package-json';
 import { getLibraryFullName } from './names';
 import { getLibraryPackageJson, getProjectPackageJson } from './files';
-import { BuildStatusController } from './build-status-controller';
+import { BuildStatus, BuildStatusController } from './build-status-controller';
 import { DependenciesFinder } from './dependencies-finder';
 import * as fsSync from 'fs';
 const fs = fsSync.promises
@@ -34,14 +34,14 @@ export class LibraryBuilder {
   async build() {
     this.logger.log('build in progress')
     this.logger.setLoadingState(true)
-    this.statusController?.changeStatus(this.libName, 'building')
+    this.statusController?.changeStatus(this.libName, BuildStatus.building)
     const module = await moduleFinder(getLibraryRootPath(this.libName));
     await this.waitBuildCrossDeps(module)
     await this.removeDist()
     await this.terminate()
     const packageJson = await getProjectPackageJson()
     const statusController = new BuildStatusController(
-      module.map(info => info.moduleName),
+      module.length === 1 ? [''] : module.map(info => info.moduleName),
       packageJson.name,
       this.libName
     )
@@ -57,7 +57,7 @@ export class LibraryBuilder {
     ))
     await Promise.all(this.moduleBuilders.map(builder => builder.build()))
     await this.generatePackageJson()
-    this.statusController?.changeStatus(this.libName, 'ready')
+    this.statusController?.changeStatus(this.libName, BuildStatus.ready)
     this.logger.log('build complete')
     this.logger.setLoadingState(false)
   }
@@ -102,7 +102,7 @@ export class LibraryBuilder {
     }
     const crossDepsSet = await this.dependenciesFinder.findLibraryCrossDependencies(moduleInfo.map(info => info.modulePublicApiPath))
     const crossDeps = [ ...crossDepsSet ]
-    this.logger.log('wait build cross dependencies, ' + crossDeps.join(', '))
+    this.logger.log('wait build cross lib dependencies, ' + crossDeps.join(', '))
     await Promise.all(crossDeps.map(deps => this.statusController!.waitReady(deps)))
     this.logger.log('build cross dependencies ready')
   }

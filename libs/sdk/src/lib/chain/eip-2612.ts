@@ -1,7 +1,7 @@
 import { AbiFunction, Address, Hex, parseAbi, toFunctionSelector, maxUint256 } from 'viem';
 import { getClient } from './chain-client';
 import { ChainId } from '@one-inch-community/models';
-import { QueueCache } from '../cache';
+import { QueueCache } from '@one-inch-community/core/cache';
 
 type EIP712Parameter = {
   name: string

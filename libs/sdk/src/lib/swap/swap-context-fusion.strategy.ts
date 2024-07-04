@@ -1,7 +1,8 @@
 import { IConnectWalletController, ISwapContext, Rate, SwapSettings, ISwapContextStrategy, ISwapContextStrategyDataSnapshot } from '@one-inch-community/models';
 import { PairHolder } from './pair-holder';
-import { BigMath, type OneInchDevPortalAdapter } from '../utils';
-import { getWrapperNativeToken, isNativeToken } from '../chain';
+import { getWrapperNativeToken, isNativeToken } from '@one-inch-community/sdk/chain';
+import { OneInchDevPortalAdapter } from '@one-inch-community/sdk/api';
+import { BigMath } from '@one-inch-community/core/math';
 
 
 export class SwapContextFusionStrategy implements ISwapContextStrategy {

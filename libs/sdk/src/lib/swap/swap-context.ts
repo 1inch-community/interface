@@ -30,19 +30,20 @@ import {
 import { PairHolder, TokenType } from './pair-holder';
 import { SwapContextOnChainStrategy } from './swap-context-onchain.strategy';
 import { SwapContextFusionStrategy } from './swap-context-fusion.strategy';
-import { TokenController } from '../tokens';
+import { TokenController } from '@one-inch-community/sdk/tokens';
 import {
   estimateWrap, getBlockEmitter, getClient,
   getOneInchRouterV6ContractAddress, getPermit,
   getPermit2TypeData,
   isNativeToken, preparePermit2ForSwap,
   savePermit
-} from '../chain';
-import { BigMath, OneInchDevPortalAdapter } from '../utils';
-import { SettingsController } from '../settings';
-import { getEnvironmentValue } from '../environment';
+} from '@one-inch-community/sdk/chain';
 import type { BlockchainProviderConnector, EIP712TypedData, HttpProviderConnector, OrderParams } from '@1inch/fusion-sdk';
-import { Address, encodeFunctionData, Hex, parseSignature } from 'viem';
+import { Address, Hex } from 'viem';
+import { OneInchDevPortalAdapter } from '@one-inch-community/sdk/api';
+import { SettingsController } from '@one-inch-community/core/settings';
+import { BigMath } from '@one-inch-community/core/math'
+import { getEnvironmentValue } from '@one-inch-community/core/environment';
 
 
 export class SwapContext implements ISwapContext {

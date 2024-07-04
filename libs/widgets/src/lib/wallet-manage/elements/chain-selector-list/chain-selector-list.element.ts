@@ -4,7 +4,7 @@ import { customElement, property, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import '@one-inch-community/ui-components/card';
 import { ChainId, IConnectWalletController } from '@one-inch-community/models';
-import { getMobileMatchMediaAndSubscribe, subscribe } from '@one-inch-community/lit';
+import { getMobileMatchMediaAndSubscribe, subscribe } from '@one-inch-community/core/lit';
 import '@one-inch-community/ui-components/scroll';
 import '../chain-selector-list-item';
 import { tap } from 'rxjs';

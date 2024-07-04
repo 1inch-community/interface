@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "peerDependencies": {
     "@one-inch-community/models": "0.1.x",
-    "@one-inch-community/lit": "0.1.x",
+    "@one-inch-community/core/lit": "0.1.x",
     "@lit/context": "1.1.x",
     "@lit/task": "1.0.x",
     "lit": "3.1.x",

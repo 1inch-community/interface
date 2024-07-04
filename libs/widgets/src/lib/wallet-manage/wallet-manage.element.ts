@@ -6,7 +6,7 @@ import './elements/wallet-list'
 import { IConnectWalletController } from '@one-inch-community/models';
 import { ContextProvider } from '@lit/context';
 import { controllerContext } from './context';
-import { getMobileMatchMedia, changeMobileMatchMedia } from '@one-inch-community/lit';
+import { getMobileMatchMedia, changeMobileMatchMedia } from '@one-inch-community/core/lit';
 import { ifDefined } from 'lit/directives/if-defined.js';
 
 @customElement(WalletManageElement.tagName)

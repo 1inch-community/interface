@@ -1,5 +1,5 @@
 import { css } from 'lit';
-import { mobileMediaCSS, safariPWACss } from '@one-inch-community/lit';
+import { mobileMediaCSS, safariPWACss } from '@one-inch-community/core/lit';
 
 export const appStyle = css`
     

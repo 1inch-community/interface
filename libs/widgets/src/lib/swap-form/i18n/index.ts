@@ -1,4 +1,4 @@
-import { addTranslation, Locale } from '@one-inch-community/lit'
+import { addTranslation, Locale } from '@one-inch-community/core/lit'
 
 addTranslation({
   [Locale.en]: () => import('./en').then(m => m.default),

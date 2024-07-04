@@ -9,9 +9,8 @@ import '@one-inch-community/widgets/token-icon';
 import '@one-inch-community/ui-components/icon';
 import { favoriteTokensStyles } from './favorite-tokens.styles';
 import { BehaviorSubject, combineLatest, debounceTime, defer, map, shareReplay, startWith, switchMap, tap } from 'rxjs';
-import { observe, animationMap, subscribe } from '@one-inch-community/lit';
-import { TokenController } from '@one-inch-community/sdk';
-import { getScrollbarStyle } from '@one-inch-community/ui-components/theme';
+import { observe, animationMap, subscribe } from '@one-inch-community/core/lit';
+import { TokenController } from '@one-inch-community/sdk/tokens';
 import { emitSelectTokenEvent } from '../../events';
 
 @customElement(FavoriteTokensElement.tagName)

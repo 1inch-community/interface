@@ -6,8 +6,10 @@ import { swapContext } from '../../context';
 import { balanceStyles } from './balance.styles';
 import { catchError, combineLatest, defer, filter, map, startWith, switchMap } from 'rxjs';
 import { formatUnits } from 'viem';
-import { formatNumber, getBlockEmitter, TokenController } from '@one-inch-community/sdk';
-import { observe, translate } from '@one-inch-community/lit';
+import { observe, translate } from '@one-inch-community/core/lit';
+import { TokenController } from '@one-inch-community/sdk/tokens';
+import { getBlockEmitter } from '@one-inch-community/sdk/chain';
+import { formatNumber } from '@one-inch-community/core/formatters';
 
 @customElement(BalanceElement.tagName)
 export class BalanceElement extends LitElement {

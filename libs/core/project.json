@@ -1,0 +1,50 @@
+{
+  "name": "core",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/core/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "env": {
+          "libName": "core"
+        },
+        "commands": [
+          "pnpm run build:lib"
+        ]
+      }
+    },
+    "watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "env": {
+          "libName": "core",
+          "isWatch": "true"
+        },
+        "commands": [
+          "pnpm run build:lib"
+        ]
+      }
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "tsc --project libs/core/tsconfig.json --noEmit --skipLibCheck"
+        ]
+      }
+    },
+    "test": {
+      "executor": "@nx/vite:test",
+      "outputs": ["{options.reportsDirectory}"],
+      "options": {
+        "reportsDirectory": "../../coverage/temp/sdk"
+      },
+      "dependsOn": [
+        { "projects": "models", "target": "build" }
+      ]
+    }
+  },
+  "tags": []
+}

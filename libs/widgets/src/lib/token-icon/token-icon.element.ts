@@ -5,7 +5,8 @@ import type { Address } from 'viem';
 import { repositories } from './repositories';
 import { RepositoryPayload } from './repositories/repository.model';
 import { ChainId, IToken } from '@one-inch-community/models';
-import { getWrapperNativeToken, isNativeToken, TokenController } from '@one-inch-community/sdk';
+import { getWrapperNativeToken, isNativeToken } from '@one-inch-community/sdk/chain';
+import { TokenController } from '@one-inch-community/sdk/tokens';
 
 @customElement(TokenIconElement.tagName)
 export class TokenIconElement extends LitElement {

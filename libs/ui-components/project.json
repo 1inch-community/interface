@@ -20,23 +20,12 @@
       "options": {
         "env": {
           "libName": "ui-components",
-          "isWatch": true
+          "isWatch": "true"
         },
         "commands": [
           "pnpm run build:lib"
         ]
       }
-    },
-    "test": {
-      "executor": "@nx/vite:test",
-      "outputs": ["{options.reportsDirectory}"],
-      "options": {
-        "reportsDirectory": "../../coverage/temp/ui-components"
-      },
-      "dependsOn": [
-        { "projects": "models", "target": "build" },
-        { "projects": "lit", "target": "build" }
-      ]
     }
   },
   "tags": []

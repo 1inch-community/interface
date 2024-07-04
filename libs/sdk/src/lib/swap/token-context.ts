@@ -1,6 +1,6 @@
 import { distinctUntilChanged, map, Observable, shareReplay, startWith, Subject } from 'rxjs';
 import { IToken, NullableValue, TokenSnapshot } from '@one-inch-community/models';
-import { isTokensEqual } from '../tokens';
+import { isTokensEqual } from '@one-inch-community/sdk/tokens';
 
 export class TokenContext {
 

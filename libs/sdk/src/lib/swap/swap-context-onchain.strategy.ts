@@ -1,14 +1,14 @@
 import { IConnectWalletController, ISwapContextStrategy, ISwapContextStrategyDataSnapshot } from '@one-inch-community/models';
 import { PairHolder } from './pair-holder';
-import { buildDefaultTokenRageProvider } from '../tokens';
-import { BigMath } from '../utils';
+import { buildDefaultTokenRateProvider } from '@one-inch-community/sdk/tokens';
+import { BigMath } from '@one-inch-community/core/math';
 
 export class SwapContextOnChainStrategy implements ISwapContextStrategy {
 
   constructor(
     private readonly pairHolder: PairHolder,
     private readonly walletController: IConnectWalletController,
-    private readonly rateProvider = buildDefaultTokenRageProvider()
+    private readonly rateProvider = buildDefaultTokenRateProvider()
   ) {
   }
 

@@ -1,5 +1,5 @@
 import { Animation } from './animation';
-import { appendStyle, isSafari } from '@one-inch-community/lit';
+import { appendStyle, isSafari } from '@one-inch-community/core/lit';
 
 export function slideAnimation(): Animation {
   const initStyle = {

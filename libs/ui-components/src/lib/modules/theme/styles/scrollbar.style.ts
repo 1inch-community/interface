@@ -1,5 +1,5 @@
 import { css, unsafeCSS } from 'lit';
-import { mobileMediaCSS } from '@one-inch-community/lit';
+import { mobileMediaCSS } from '@one-inch-community/core/lit';
 
 export const getScrollbarStyle = (hostName: string, hideScrollBar?: boolean) => css`
     

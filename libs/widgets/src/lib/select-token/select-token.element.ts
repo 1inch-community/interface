@@ -10,7 +10,7 @@ import './elements/token-list'
 import './elements/favorite-tokens'
 import { ChainId } from '@one-inch-community/models';
 import { Address } from 'viem';
-import { subscribe } from '@one-inch-community/lit';
+import { subscribe } from '@one-inch-community/core/lit';
 import { tap } from 'rxjs';
 import { classMap } from 'lit/directives/class-map.js';
 

@@ -1,3 +1,24 @@
+# [1.0.0-dev.31](https://github.com/1inch-community/interface/compare/v1.0.0-dev.30...v1.0.0-dev.31) (2024-07-04)
+
+
+### Bug Fixes
+
+* fixed remove empty test files ([8dcd541](https://github.com/1inch-community/interface/commit/8dcd54108203eca30af2943f846d19f0203a40c0))
+
+# [1.0.0-dev.30](https://github.com/1inch-community/interface/compare/v1.0.0-dev.29...v1.0.0-dev.30) (2024-07-04)
+
+
+### Bug Fixes
+
+* builder config ([dbdf820](https://github.com/1inch-community/interface/commit/dbdf820518f16c198e7838c552485e1c7d0e99b8))
+
+# [1.0.0-dev.29](https://github.com/1inch-community/interface/compare/v1.0.0-dev.28...v1.0.0-dev.29) (2024-07-03)
+
+
+### Bug Fixes
+
+* fixed card header style ([c7a5413](https://github.com/1inch-community/interface/commit/c7a541361c4a12eb26bd1a94a1a5a44ccf85218f))
+
 # [1.0.0-dev.28](https://github.com/1inch-community/interface/compare/v1.0.0-dev.27...v1.0.0-dev.28) (2024-07-01)
 
 

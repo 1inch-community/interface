@@ -8,8 +8,7 @@
       "executor": "nx:run-commands",
       "options": {
         "env": {
-          "libName": "sdk",
-          "oneModuleLibrary": true
+          "libName": "sdk"
         },
         "commands": [
           "pnpm run build:lib"
@@ -21,23 +20,12 @@
       "options": {
         "env": {
           "libName": "sdk",
-          "oneModuleLibrary": true,
-          "isWatch": true
+          "isWatch": "true"
         },
         "commands": [
           "pnpm run build:lib"
         ]
       }
-    },
-    "test": {
-      "executor": "@nx/vite:test",
-      "outputs": ["{options.reportsDirectory}"],
-      "options": {
-        "reportsDirectory": "../../coverage/temp/sdk"
-      },
-      "dependsOn": [
-        { "projects": "models", "target": "build" }
-      ]
     }
   },
   "tags": []

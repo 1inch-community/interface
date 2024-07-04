@@ -1,6 +1,6 @@
 import { ChainId } from '@one-inch-community/models';
 import type { EthereumProviderOptions } from '@walletconnect/ethereum-provider';
-import { getEnvironmentValue } from '../../../environment';
+import { getEnvironmentValue } from '@one-inch-community/core/environment';
 
 const mobileMediaString = 'screen and (max-width: 600px)' as const
 const mobileMatchMedia = matchMedia(mobileMediaString)

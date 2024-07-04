@@ -5,9 +5,9 @@ import '@one-inch-community/ui-components/card'
 import "@one-inch-community/ui-components/icon"
 import "@one-inch-community/ui-components/button"
 import { IConnectWalletController, IToken, ISwapContext } from '@one-inch-community/models';
-import { SwapContext } from '@one-inch-community/sdk';
+import { SwapContext } from '@one-inch-community/sdk/swap';
 import { combineLatest, defer, distinctUntilChanged, map, startWith, tap } from 'rxjs';
-import { subscribe, translate } from '@one-inch-community/lit';
+import { subscribe, translate } from '@one-inch-community/core/lit';
 import { swapFromStyle } from './swap-from.style';
 import { swapContext } from './context';
 import './elements'

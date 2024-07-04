@@ -7,7 +7,7 @@ import { sceneContext, ISceneContext } from '@one-inch-community/ui-components/s
 import { consume } from '@lit/context';
 import { ISelectTokenContext } from '@one-inch-community/models';
 import { selectTokenContext } from '../../context';
-import { subscribe } from '@one-inch-community/lit';
+import { subscribe } from '@one-inch-community/core/lit';
 import { of, tap } from 'rxjs';
 import { when } from 'lit/directives/when.js';
 

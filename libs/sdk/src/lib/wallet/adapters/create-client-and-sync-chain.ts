@@ -1,6 +1,6 @@
 import { ChainId, EthereumProvider } from '@one-inch-community/models';
 import { Address, createWalletClient, custom, WalletClient } from 'viem';
-import { getChainById } from '../../chain';
+import { getChainById } from '@one-inch-community/sdk/chain';
 
 export async function createClientAndSyncChain(
   chainId: ChainId,
