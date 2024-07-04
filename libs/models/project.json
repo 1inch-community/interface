@@ -9,7 +9,7 @@
       "options": {
         "env": {
           "libName": "models",
-          "oneModuleLibrary": true
+          "oneModuleLibrary": "true"
         },
         "commands": [
           "pnpm run build:lib"
