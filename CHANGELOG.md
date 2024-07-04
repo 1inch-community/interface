@@ -1,3 +1,10 @@
+# [1.0.0-dev.31](https://github.com/1inch-community/interface/compare/v1.0.0-dev.30...v1.0.0-dev.31) (2024-07-04)
+
+
+### Bug Fixes
+
+* fixed remove empty test files ([8dcd541](https://github.com/1inch-community/interface/commit/8dcd54108203eca30af2943f846d19f0203a40c0))
+
 # [1.0.0-dev.30](https://github.com/1inch-community/interface/compare/v1.0.0-dev.29...v1.0.0-dev.30) (2024-07-04)
 
 
