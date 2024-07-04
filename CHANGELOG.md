@@ -1,3 +1,10 @@
+# [1.0.0-dev.30](https://github.com/1inch-community/interface/compare/v1.0.0-dev.29...v1.0.0-dev.30) (2024-07-04)
+
+
+### Bug Fixes
+
+* builder config ([dbdf820](https://github.com/1inch-community/interface/commit/dbdf820518f16c198e7838c552485e1c7d0e99b8))
+
 # [1.0.0-dev.29](https://github.com/1inch-community/interface/compare/v1.0.0-dev.28...v1.0.0-dev.29) (2024-07-03)
 
 
