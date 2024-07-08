@@ -37,7 +37,6 @@ export class LongTimeAsyncCache<Value, Key extends string = string> implements I
   }
 
   async get(key: Key): Promise<Value | null> {
-
     const _key = key.toLowerCase()
     const db = await getDexie<Key, Value>(this.storageKey)
     const result = await db
@@ -45,6 +44,15 @@ export class LongTimeAsyncCache<Value, Key extends string = string> implements I
       .first()
     this.cleanOldRecords().catch(console.error)
     return result?.value ?? null
+  }
+
+  async getAll() {
+    const db = await getDexie<Key, Value>(this.storageKey)
+    const result = await db
+      .filter(item => (Date.now() - item.timestamp) < (this.ttlDays * 8.64e+7))
+      .toArray()
+    this.cleanOldRecords().catch(console.error)
+    return result.map(record => record.value)
   }
 
   async has(key: Key): Promise<boolean> {

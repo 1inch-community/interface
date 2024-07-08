@@ -18,7 +18,7 @@ export class FavoriteTokensElement extends LitElement {
   static tagName = 'inch-favorite-tokens' as const;
 
   static override styles = [
-    favoriteTokensStyles,
+    favoriteTokensStyles
   ];
 
   @consume({ context: selectTokenContext })
@@ -51,36 +51,40 @@ export class FavoriteTokensElement extends LitElement {
     }),
     map((tokens: (ITokenRecord | null)[]) => {
       if (tokens.length) {
-        tokens.push(null)
+        tokens.push(null);
       }
       return html`
         <div class="favorite-container-scroll">
           <div class="favorite-container">
             ${html`${animationMap(
               tokens,
-              (token: ITokenRecord | null) => token !== null ? 't' + token.address : 'edit',
-              itemAnimation,
-              (token: ITokenRecord | null) => when(
-                token,
-                (token) => html`
-                <div class="favorite-token-item-container">
-                  <div class="remove-favorite-token" @click="${(event: UIEvent) => this.onRemoveFavoriteToken(token, event)}">
-                    <inch-icon icon="cross8"></inch-icon>
-                  </div>
-                  <inch-button size="m" type="secondary" class="favorite-token-item" @click="${(event: UIEvent) => emitSelectTokenEvent(this, token, event)}">
-                    <inch-token-icon symbol="${token.symbol}" address="${token.address}"
-                                     chainId="${token.chainId}"></inch-token-icon>
-                    <span>${token.symbol}</span>
-                  </inch-button>
-                </div>
-              `,
-                () => html`
-                <inch-button size="l" type="secondary" class="favorite-token-item edit-favorite-token-list"
-                             @click="${() => this.editAllMode$.next(!this.editAllMode$.value)}">
-                  <inch-icon icon="edit24"></inch-icon>
-                </inch-button>
-              `
-              )
+              {
+                ...itemAnimation,
+                keyExtractor: (token: ITokenRecord | null) => token !== null ? 't' + token.address : 'edit',
+                templateBuilder: (token: ITokenRecord | null) => when(
+                  token,
+                  (token) => html`
+                    <div class="favorite-token-item-container">
+                      <div class="remove-favorite-token"
+                           @click="${(event: UIEvent) => this.onRemoveFavoriteToken(token, event)}">
+                        <inch-icon icon="cross8"></inch-icon>
+                      </div>
+                      <inch-button size="m" type="secondary" class="favorite-token-item"
+                                   @click="${(event: UIEvent) => emitSelectTokenEvent(this, token, event)}">
+                        <inch-token-icon symbol="${token.symbol}" address="${token.address}"
+                                         chainId="${token.chainId}"></inch-token-icon>
+                        <span>${token.symbol}</span>
+                      </inch-button>
+                    </div>
+                  `,
+                  () => html`
+                    <inch-button size="l" type="secondary" class="favorite-token-item edit-favorite-token-list"
+                                 @click="${() => this.editAllMode$.next(!this.editAllMode$.value)}">
+                      <inch-icon icon="edit24"></inch-icon>
+                    </inch-button>
+                  `
+                )
+              }
             )}`}
           </div>
         </div>
@@ -112,8 +116,8 @@ export class FavoriteTokensElement extends LitElement {
   }
 
   private async onRemoveFavoriteToken(token: ITokenRecord, event: UIEvent) {
-    event.stopPropagation()
-    event.preventDefault()
+    event.stopPropagation();
+    event.preventDefault();
     await this.context?.setFavoriteTokenState(token.chainId, token.address, false);
   }
 }
@@ -128,7 +132,7 @@ const itemAnimation = {
     ], {
       duration: element.id === 'edit' ? 50 : 150
     }).finished;
-    element.style.overflow = ''
+    element.style.overflow = '';
   },
   addedElement: async (element: HTMLElement) => {
     element.style.overflow = 'hidden';
@@ -151,7 +155,7 @@ const itemAnimation = {
         duration: 150
       }).finished;
       element.style.transform = '';
-      element.style.overflow = ''
+      element.style.overflow = '';
     };
   }
 };

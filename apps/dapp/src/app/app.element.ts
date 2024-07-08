@@ -6,6 +6,7 @@ import './elements/footer'
 import './elements/swap-form'
 import { scrollbarStyle } from '@one-inch-community/ui-components/theme';
 import { NotificationsController } from '@one-inch-community/ui-components/overlay';
+import { asyncTimeout } from '@one-inch-community/ui-components/async';
 
 @customElement('app-root')
 export class AppElement extends LitElement {
@@ -27,15 +28,23 @@ export class AppElement extends LitElement {
 
   constructor() {
     super();
-    const notificationsController = NotificationsController
+    this.init()
+  }
+
+  private async init() {
+    const notificationsController = await NotificationsController.new()
     let i = 0
-    setInterval(() => {
-      if (i >= 4) return
-      notificationsController.show('test notification', html`
+    const loop = async () => {
+      // if (i > 2) return
+      await notificationsController.show('test notification', html`
         <span>Test notification ${i++}</span>
         <span>${new Date().toString()}</span>
       `)
-    }, 1000)
+      i++
+      await asyncTimeout(2000)
+      loop()
+    }
+    await loop()
   }
 
   protected render() {
