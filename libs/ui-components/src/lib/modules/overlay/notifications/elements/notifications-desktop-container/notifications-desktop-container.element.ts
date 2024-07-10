@@ -7,8 +7,13 @@ import { notificationsDesktopContainerStyle } from './notifications-desktop-cont
 import { getScrollbarStyle } from '@one-inch-community/ui-components/theme';
 import '@one-inch-community/ui-components/icon';
 import '@one-inch-community/ui-components/button';
-import { animationMap, appendStyle, AnimationMapController } from '@one-inch-community/core/lit';
+import {
+  animationMap,
+  appendStyle,
+  AnimationMapController,
+} from '@one-inch-community/core/lit';
 import { when } from 'lit/directives/when.js';
+import { asyncTimeout } from '@one-inch-community/ui-components/async';
 
 const animationOptions = {
   duration: 500,
@@ -111,6 +116,10 @@ export class NotificationsDesktopContainerElement extends LitElement implements 
     }
   }
 
+  onShowAll() {
+    this.fullView = true
+  }
+
   protected override render() {
     return html`
       <div class="close-button-container">
@@ -120,7 +129,7 @@ export class NotificationsDesktopContainerElement extends LitElement implements 
       </div>
       ${animationMap(
         this.getSortedNotifications(),
-        this.animationController
+        this.animationController as any
       )}
     `;
   }
@@ -129,12 +138,12 @@ export class NotificationsDesktopContainerElement extends LitElement implements 
     const result = this.notifications.sort((r1, r2) => {
       const n1 = r1[1];
       const n2 = r2[1];
-      return n1.timestamp - n2.timestamp;
+      return n2.timestamp - n1.timestamp;
     });
     if (this.fullView) {
       return result;
     }
-    return [...result.reverse().slice(0, 4), ['fullView']];
+    return [...result.slice(0, 4), ['fullView']];
   }
 
   private formatNotificationTime(timestamp: number): string {
@@ -161,11 +170,15 @@ export class NotificationsDesktopContainerElement extends LitElement implements 
 
 }
 
-class NotificationAnimationMapController implements AnimationMapController<[string, NotificationRecord]> {
+class NotificationAnimationMapController implements AnimationMapController<[string, NotificationRecord], void, void, number> {
 
   readonly direction = 'vertical';
   readonly vertical = 'notification-item';
   readonly parallelAnimationStrategy = 'parallel';
+
+  private renderElements: Map<number, HTMLElement> | null = null;
+  private removeElementsClientHeight: Map<number, number> | null = null;
+  private moveElements: Map<[number, number], HTMLElement> | null = null;
 
   constructor(private readonly element: NotificationsDesktopContainerElement) {
   }
@@ -181,7 +194,7 @@ class NotificationAnimationMapController implements AnimationMapController<[stri
   onTemplateBuilder([id, record]: [string, NotificationRecord]) {
     if (id === 'fullView') {
       return html`
-        <inch-button fullSize size="l" type="secondary">Show all</inch-button>
+        <inch-button @click="${() => this.element.onShowAll()}" class="show-all-button" fullSize size="l" type="secondary">Show all</inch-button>
       `;
     }
     return html`
@@ -204,7 +217,31 @@ class NotificationAnimationMapController implements AnimationMapController<[stri
     this.element.animationCompleteHandler();
   }
 
+  async onBeforeAnimation(container: HTMLElement, renderElements: Map<number, HTMLElement>, removeElements: Map<number, HTMLElement>, moveElements: Map<[number, number], HTMLElement>) {
+    this.renderElements = renderElements
+    this.removeElementsClientHeight = new Map<number, number>();
+    removeElements.forEach((element, index) => {
+      this.removeElementsClientHeight!.set(index, element.clientHeight)
+    })
+    this.moveElements = moveElements
+  }
+
+  async onAfterAnimation() {
+    this.renderElements = null
+    this.removeElementsClientHeight = null
+    this.moveElements = null
+  }
+
   async onBeforeRemoveAnimateItem(element: HTMLElement) {
+    if (element.id === this.onKeyExtractor(['fullView', null as any])) {
+      await Promise.all([
+        element.animate([
+          { opacity: 1 },
+          { opacity: 0 }
+        ], { ...animationOptions, duration: 150 }).finished
+      ])
+      return
+    }
     await Promise.all([
       element.animate([
         { transform: 'translateX(0)' },
@@ -219,16 +256,55 @@ class NotificationAnimationMapController implements AnimationMapController<[stri
     });
   }
 
-  async onAfterRenderAnimateItem(element: HTMLElement) {
+  async onAfterRenderAnimateItem(element: HTMLElement, index: number) {
+    const basePosition = 100
+    const startPosition = basePosition + (index * 50)
+    if (index > 50) {
+      return
+    }
     await Promise.all([
       element.animate([
-        { transform: 'translateX(110%)' },
+        { transform: `translateX(${startPosition}%)` },
         { transform: 'translateX(0)' }
-      ], animationOptions).finished
+      ], { ...animationOptions, duration: animationOptions.duration + (index * 50) }).finished
     ])
     appendStyle(element, {
       transform: ''
     });
+  }
+
+  async onBeforeMoveAnimationItem(element: HTMLElement, oldIndex: number, newIndex: number) {
+    return newIndex
+  }
+
+  async onAfterMoveAnimationItem(element: HTMLElement, newIndex: number) {
+    const offset = this.getOffsetByIndex(newIndex)
+    console.log('onAfterMoveAnimationItem', element, newIndex, offset)
+    await element.animate([
+      { transform: `translateY(${offset * -1}px)` },
+      { transform: `translateY(0)` },
+    ], animationOptions).finished
+  }
+
+  private getOffsetByIndex(index: number): number {
+    let offset: number | null = null
+    this.moveElements?.forEach((element, [ oldIndex, newIndex]) => {
+      if (index - 1 === newIndex) {
+        offset = element.clientHeight * (oldIndex > newIndex ? -1 : 1)
+      }
+    })
+    if (offset === null && this.removeElementsClientHeight) {
+      const newNode = this.renderElements?.get(0)
+      offset = newNode?.clientHeight ?? null
+    }
+    if (offset === null && this.removeElementsClientHeight) {
+      this.removeElementsClientHeight.forEach((clientHeight, removeIndex) => {
+        if (removeIndex === index) {
+          offset = clientHeight * -1
+        }
+      })
+    }
+    return offset ?? 0
   }
 
 }

@@ -35,7 +35,7 @@ export class AppElement extends LitElement {
     const notificationsController = await NotificationsController.new()
     let i = 0
     const loop = async () => {
-      // if (i > 2) return
+      if (i > 1) return
       await notificationsController.show('test notification', html`
         <span>Test notification ${i++}</span>
         <span>${new Date().toString()}</span>

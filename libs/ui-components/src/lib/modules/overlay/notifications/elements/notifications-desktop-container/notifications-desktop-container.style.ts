@@ -68,6 +68,10 @@ export const notificationsDesktopContainerStyle = css`
         color: var(--color-content-content-secondary);
         margin-left: auto;
     }
+    
+    .show-all-button {
+        pointer-events: all;
+    }
 
     @media (hover: hover) {
         .notification-container:hover {

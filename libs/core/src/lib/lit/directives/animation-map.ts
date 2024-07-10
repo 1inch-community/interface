@@ -2,34 +2,24 @@ import { directive, Directive, PartInfo } from 'lit/directive.js';
 import { html, render, TemplateResult } from 'lit';
 import { appendStyle } from '../append-style';
 
-export enum AnimationMapTransitionType {
-  render,
-  remove,
-  move
-}
-
-type AnimationMapDirection = 'horizontal' | 'vertical' | 'horizontal-reverted' | 'vertical-reverted'
+export type AnimationMapDirection = 'horizontal' | 'vertical'
 export interface AnimationMapController<Value, RenderState = void, RemoveState = void, MoveState = void> {
   readonly direction: AnimationMapDirection
   readonly parallelAnimationStrategy?: 'parallel' | 'deleteAfterAdd' | 'addAfterDelete'
   onKeyExtractor(value: Value, index: number): string
   onTemplateBuilder(value: Value, index: number): TemplateResult
 
-  transitionItem(type: AnimationMapTransitionType.render, element: HTMLElement): Promise<void>
-  transitionItem(type: AnimationMapTransitionType.remove, element: HTMLElement): Promise<void>
-  transitionItem(type: AnimationMapTransitionType.move, element: HTMLElement): Promise<void>
+  onBeforeRemoveAnimateItem(element: HTMLElement, index: number): Promise<RemoveState>
+  onAfterRemoveAnimateItem?(element: HTMLElement, index: number, previousStepState: void | RemoveState): Promise<void>
 
-  onBeforeRemoveAnimateItem(element: HTMLElement): Promise<RemoveState>
-  onAfterRemoveAnimateItem?(element: HTMLElement, previousStepState: void | RemoveState): Promise<void>
-
-  onBeforeRenderAnimateItem(element: HTMLElement): Promise<RenderState>
-  onAfterRenderAnimateItem?(element: HTMLElement, previousStepState: void | RemoveState): Promise<void>
+  onBeforeRenderAnimateItem(element: HTMLElement, index: number): Promise<RenderState>
+  onAfterRenderAnimateItem?(element: HTMLElement, index: number, previousStepState: void | RenderState): Promise<void>
 
   onBeforeMoveAnimationItem?(element: HTMLElement, oldPosition: number, newPosition: number): Promise<MoveState>
-  onAfterMoveAnimationItem?(element: HTMLElement, oldPosition: number, newPosition: number, previousStepState: void | MoveState): Promise<void>
+  onAfterMoveAnimationItem?(element: HTMLElement, previousStepState: void | MoveState): Promise<void>
 
-  onBeforeAnimation?(container: HTMLElement, renderElements: HTMLElement[], deleteElements: HTMLElement[]): Promise<void>
-  onAfterAnimation?(container: HTMLElement, renderElements: HTMLElement[], deleteElements: HTMLElement[]): Promise<void>
+  onBeforeAnimation?(container: HTMLElement, renderElements: Map<number, HTMLElement>, deleteElements: Map<number, HTMLElement>, moveElements: Map<[number, number], HTMLElement>): Promise<void>
+  onAfterAnimation?(container: HTMLElement, renderElements: Map<number, HTMLElement>, deleteElements: Map<number, HTMLElement>, moveElements: Map<[number, number], HTMLElement>): Promise<void>
 
   onAnimationStart?(): Promise<void> | void
   onAnimationComplete?(): Promise<void> | void
@@ -37,7 +27,6 @@ export interface AnimationMapController<Value, RenderState = void, RemoveState =
 
 export class AnimationMap<Value> extends Directive {
 
-  private elementKeySet = new Set<string>()
   private readonly view = document.createElement('div')
   private lock = false
 
@@ -70,67 +59,134 @@ export class AnimationMap<Value> extends Directive {
     const [ keyMap, indexMap ] = this.getKeyMapAndIndexMap(items, controller)
     const viewIndexMap = this.getIndexMapFromView()
 
-    debugger
+    const renderCandidate = this.getAllRenderCandidate(viewIndexMap, indexMap)
+    const removeCandidate = this.getAllRemoveCandidate(viewIndexMap, indexMap)
+    const moveCandidate = this.getAllMoveCandidate(viewIndexMap, indexMap)
 
-    const renderCandidate = this.getAllRenderCandidate(keyMap)
-    const removeCandidate = this.getAllRemoveCandidate(keyMap)
-    const moveCandidate = this.getAllMoveCandidate(keyMap, indexMap, viewIndexMap)
+    const renderCandidateElements = this.getAllRenderCandidateElements(renderCandidate, keyMap, controller)
+    const removeCandidateElements = this.getAllCandidateElements(removeCandidate)
+    const moveCandidateElements = this.getAllCandidateElements(moveCandidate)
+
+    const renderCandidateNodeIndexMap = new Map<number, HTMLElement>()
+    const removeCandidateNodeIndexMap = new Map<number, HTMLElement>()
+    const moveCandidateNodeIndexMap = new Map<[number, number], HTMLElement>()
+    renderCandidateElements.forEach((element, key) => {
+      renderCandidateNodeIndexMap.set(indexMap.get(key)!, element)
+    })
+    removeCandidateElements.forEach((element, key) => {
+      removeCandidateNodeIndexMap.set(viewIndexMap.get(key)!, element)
+    })
+    moveCandidateElements.forEach((element, key) => {
+      moveCandidateNodeIndexMap.set([viewIndexMap.get(key)!, indexMap.get(key)!], element)
+    })
+
+    const renderCandidateNodeEntries = [ ...renderCandidateElements.entries() ]
+    const removeCandidateNodeEntries = [ ...removeCandidateElements.entries() ]
+    const moveCandidateNodeEntries = [ ...moveCandidateElements.entries() ]
 
     await controller.onAnimationStart?.()
 
-    // const [
-    //   _,
-    //   renderResultState,
-    //   removeResultState,
-    //   moveResultState
-    // ] = await Promise.all([
-    //   controller.onBeforeAnimation?.(this.view, renderCandidateNodeList, removeCandidateNodeList),
-    //   this.transitionBeforeRenderNode(renderCandidateNodeList, controller),
-    //   this.transitionBeforeRemoveNode(removeCandidateNodeList, controller),
-    //   this.transitionBeforeMoveNode(moveCandidateNode, controller),
-    // ])
-    //
-    // this.renderNode(renderCandidateNode, indexMap)
-    // this.removeNode(removeCandidateNode)
-    // this.moveNode(moveCandidateNode)
-    //
-    // await Promise.all([
-    //   controller.onAfterAnimation?.(this.view, renderCandidateNodeList, removeCandidateNodeList),
-    //   this.transitionAfterRenderNode(renderCandidateNodeList, renderResultState, controller),
-    //   this.transitionAfterRemoveNode(removeCandidateNodeList, removeResultState, controller),
-    //   this.transitionAfterMoveNode(moveCandidateNode, moveResultState, controller),
-    // ])
+    const [
+      _,
+      renderResultState,
+      removeResultState,
+      moveResultState
+    ] = await Promise.all([
+      controller.onBeforeAnimation?.(this.view, renderCandidateNodeIndexMap, removeCandidateNodeIndexMap, moveCandidateNodeIndexMap),
+      this.executeHandlerAndReturnResultMap(renderCandidateNodeEntries, (node, key) => controller.onBeforeRenderAnimateItem(node, indexMap.get(key)!)),
+      this.executeHandlerAndReturnResultMap(removeCandidateNodeEntries, (node, key) => controller.onBeforeRemoveAnimateItem(node, viewIndexMap.get(key)!)),
+      this.executeHandlerAndReturnResultMap(moveCandidateNodeEntries, (node, key) => controller.onBeforeMoveAnimationItem?.(
+        node,
+        viewIndexMap.get(key)!,
+        indexMap.get(key)!
+      ) ?? Promise.resolve()),
+    ])
+
+    this.renderNode(renderCandidateElements, indexMap)
+    this.removeNode(removeCandidateElements)
+    this.moveNode(moveCandidateElements, viewIndexMap, indexMap)
+
+    await Promise.all([
+      this.executeHandlerAndReturnResultMap(renderCandidateNodeEntries, (node, key) => controller.onAfterRenderAnimateItem?.(node, indexMap.get(key)!, renderResultState.get(key)) ?? Promise.resolve()),
+      this.executeHandlerAndReturnResultMap(removeCandidateNodeEntries, (node, key) => controller.onAfterRemoveAnimateItem?.(node, viewIndexMap.get(key)!, removeResultState.get(key)) ?? Promise.resolve()),
+      this.executeHandlerAndReturnResultMap(moveCandidateNodeEntries, (node, key) => controller.onAfterMoveAnimationItem?.(
+        node,
+        moveResultState.get(key)
+      ) ?? Promise.resolve()),
+      controller.onAfterAnimation?.(this.view, renderCandidateNodeIndexMap, removeCandidateNodeIndexMap, moveCandidateNodeIndexMap),
+    ])
 
     await controller.onAnimationComplete?.()
   }
 
-  private async transitionBeforeRenderNode(nodeList: HTMLElement[], controller: AnimationMapController<Value>) {
-    return Promise.all(nodeList.map( node => controller.onBeforeRenderAnimateItem(node)))
+  private async executeHandlerAndReturnResultMap(nodes: [string, HTMLElement][], handler: (node: HTMLElement, key: string) => Promise<void>): Promise<Map<string, void>> {
+    const results = new Map<string, void>()
+    await Promise.all(nodes.map(async ([key, node]) => {
+      const result = await handler(node, key)
+      results.set(key, result)
+    }))
+    return results
   }
 
-  private async transitionBeforeRemoveNode(nodeList: HTMLElement[], controller: AnimationMapController<Value>) {
-    return Promise.all(nodeList.map( node => controller.onBeforeRemoveAnimateItem(node)))
+  private getAllRenderCandidate(indexMap: Map<string, number>, newIndexMap: Map<string, number>): Set<string> {
+    const candidates = new Set<string>()
+    newIndexMap.forEach((_, key) => {
+      if (!indexMap.has(key)) {
+        candidates.add(key)
+      }
+    })
+    return candidates
   }
 
-  private async transitionBeforeMoveNode(nodeMap: Map<string, [ HTMLElement, number, number ]>, controller: AnimationMapController<Value>) {
-    return Promise.all([...nodeMap.values()].map(([ node,  oldIndex, newIndex]) => controller.onBeforeMoveAnimationItem?.(node, oldIndex, newIndex)))
+  private getAllRemoveCandidate(indexMap: Map<string, number>, newIndexMap: Map<string, number>): Set<string> {
+    const candidates = new Set<string>()
+    indexMap.forEach((_, key) => {
+      if (!newIndexMap.has(key)) {
+        candidates.add(key)
+      }
+    })
+    return candidates
   }
 
-  private async transitionAfterRenderNode(nodeList: HTMLElement[], renderResultState: void[], controller: AnimationMapController<Value>) {
-    return Promise.all(nodeList.map((node, index) => controller.onAfterRenderAnimateItem?.(node, renderResultState[index])))
+  private getAllMoveCandidate(indexMap: Map<string, number>, newIndexMap: Map<string, number>): Set<string> {
+    const candidates = new Set<string>()
+    const keys = new Set<string>([ ...indexMap.keys(), ...newIndexMap.keys() ])
+    keys.forEach(key => {
+      const oldIndex = indexMap.get(key)
+      const newIndex = newIndexMap.get(key)
+      if (oldIndex === undefined || newIndex === undefined) return
+      if (oldIndex === newIndex) return
+      candidates.add(key)
+    })
+    return candidates
   }
 
-  private async transitionAfterRemoveNode(nodeList: HTMLElement[], removeResultState: void[], controller: AnimationMapController<Value>) {
-    return Promise.all(nodeList.map((node, index) => controller.onAfterRemoveAnimateItem?.(node, removeResultState[index])))
+  private getAllRenderCandidateElements(candidateSet: Set<string>, keyMap: Map<string, Value>, controller: AnimationMapController<Value>): Map<string, HTMLElement> {
+    const candidateMap = new Map<string, HTMLElement>()
+    let index = 0
+    candidateSet.forEach(key => {
+      const value = keyMap.get(key)
+      if (!value) return
+      const element = this.createItem(key)
+      const template = controller.onTemplateBuilder(value, index)
+      render(template, element)
+      candidateMap.set(key, element)
+    })
+    return candidateMap
   }
 
-  private async transitionAfterMoveNode(nodeMap: Map<string, [ HTMLElement, number, number ]>, moveResultState: void[], controller: AnimationMapController<Value>) {
-    return Promise.all([...nodeMap.values()].map(([ node,  oldIndex, newIndex], index) => controller.onAfterMoveAnimationItem?.(node, oldIndex, newIndex, moveResultState[index])))
+  private getAllCandidateElements(candidateSet: Set<string>): Map<string, HTMLElement> {
+    const candidateMap = new Map<string, HTMLElement>()
+    candidateSet.forEach(key => {
+      const element = this.view.querySelector(`#${key}`) as HTMLElement
+      if (!element) return
+      candidateMap.set(key, element);
+    })
+    return candidateMap
   }
 
-  private renderNode(nodeMap: Map<string, HTMLElement>, indexMap: Map<string, number>) {
-    nodeMap.forEach((node, key) => {
-      if (this.elementKeySet.has(key)) return
+  private renderNode(candidateElements: Map<string, HTMLElement>, indexMap: Map<string, number>) {
+    candidateElements.forEach((node, key) => {
       const index = indexMap.get(key) ?? 0
       const referenceNode = this.view.children[index]
       if (referenceNode) {
@@ -138,19 +194,24 @@ export class AnimationMap<Value> extends Directive {
       } else {
         this.view.appendChild(node)
       }
-      this.elementKeySet.add(key)
     })
   }
 
   private removeNode(nodeMap: Map<string, HTMLElement>) {
-    nodeMap.forEach((node, key) => {
+    nodeMap.forEach((node) => {
       node.remove()
-      this.elementKeySet.delete(key)
     })
   }
 
-  private moveNode(nodeMap: Map<string, [ HTMLElement, number, number ]>) {
-    nodeMap.forEach(([ node, oldIndex, newIndex ], key) => {
+  private moveNode(candidateElements: Map<string, HTMLElement>, oldIndexMap: Map<string, number>, newIndexMap: Map<string, number>) {
+    const viewIndexMap = this.getIndexMapFromView()
+    candidateElements.forEach((node, key) => {
+      const oldIndex = oldIndexMap.get(key)!
+      const newIndex = newIndexMap.get(key)!
+      const currentIndex = viewIndexMap.get(key)!
+      if (currentIndex === newIndex) {
+        return
+      }
       let referenceNode
       if (oldIndex > newIndex) {
         referenceNode = this.view.children[newIndex]
@@ -161,65 +222,6 @@ export class AnimationMap<Value> extends Directive {
       if (!referenceNode) return
       this.view.insertBefore(node, referenceNode);
     })
-  }
-
-  private getAllRenderCandidate(keyMap: Map<string, Value>): Set<string> {
-    const candidates = new Set<string>()
-    keyMap.forEach((_, key) => {
-      if (!this.elementKeySet.has(key)) {
-        candidates.add(key)
-      }
-    })
-    return candidates
-  }
-
-  private getAllRemoveCandidate(keyMap: Map<string, Value>) {
-    const candidates = new Set<string>()
-    this.elementKeySet.forEach(key => {
-      if (!keyMap.has(key)) {
-        candidates.add(key)
-      }
-    })
-    return candidates
-  }
-
-  private getAllMoveCandidate(keyMap: Map<string, Value>, indexMap: Map<string, number>, viewIndexMap: Map<string, number>): Set<string> {
-    const candidates = new Set<string>()
-    keyMap.forEach((_, key) => {
-
-    })
-    return candidates
-  }
-
-  private getAllRenderCandidateNode(renderCandidate: Map<string, Value>, controller: AnimationMapController<Value>): Map<string, HTMLElement> {
-    const node = new Map<string, HTMLElement>()
-    let index = 0
-    renderCandidate.forEach((item, key) => {
-      const container = this.createItem(key)
-      const template = controller.onTemplateBuilder(item, index++)
-      render(template, container)
-      node.set(key, container);
-    })
-    return node
-  }
-
-  private getAllRemoveCandidateNode(removeCandidate: Set<string>): Map<string, HTMLElement> {
-    const node = new Map<string, HTMLElement>()
-    removeCandidate.forEach((key) => {
-      const container = this.view.querySelector(`#${key}`) as HTMLElement
-      if (!container) return
-      node.set(key, container);
-    })
-    return node
-  }
-
-  private getAllMoveCandidateNode(moveCandidate: Map<string, [number, number]>): Map<string, [ HTMLElement, number, number ]> {
-    const node = new Map<string, [ HTMLElement, number, number ]>()
-    moveCandidate.forEach(([ oldIndex, newIndex ], key) => {
-      const container = this.view.querySelector(`#${key}`) as HTMLElement
-      node.set(key, [ container, oldIndex, newIndex ]);
-    })
-    return node
   }
 
   private getKeyMapAndIndexMap(items: Iterable<Value>, controller: AnimationMapController<Value>): [ Map<string, Value>, Map<string, number> ] {
@@ -255,7 +257,6 @@ export class AnimationMap<Value> extends Directive {
       const template = controller.onTemplateBuilder(item, index)
       render(template, element)
       this.view.appendChild(element)
-      this.elementKeySet.add(key)
       index++
     }
   }
@@ -275,12 +276,6 @@ export class AnimationMap<Value> extends Directive {
     }
     if (direction === 'horizontal') {
       flexDirection = 'row'
-    }
-    if (direction === 'horizontal-reverted') {
-      flexDirection = 'row-reverse'
-    }
-    if (direction === 'vertical-reverted') {
-      flexDirection = 'column-reverse'
     }
     appendStyle(this.view, {
       flexDirection
