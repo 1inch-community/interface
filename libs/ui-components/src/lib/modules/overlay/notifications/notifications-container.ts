@@ -7,4 +7,9 @@ export interface NotificationsContainer extends HTMLElement {
   preRender(): void | Promise<void>
   postRender(): void | Promise<void>
   preClose(): void | Promise<void>
+  closeNotification(id: string): void | Promise<void>
+  makeNotificationTemplate(record: NotificationRecord): TemplateResult
+  animationStartHandler(): void
+  animationCompleteHandler(): void
+  onShowAll(): void
 }

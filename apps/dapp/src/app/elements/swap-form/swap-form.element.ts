@@ -83,7 +83,7 @@ export class SwapFormElement extends LitElement {
         filter(Boolean),
         distinctUntilChanged(),
         skip(1),
-        tap((chainId) => this.syncTokens(chainId))
+        tap((chainId: ChainId) => this.syncTokens(chainId))
       ),
       getThemeChange().pipe(
         map(({ brandColor }) => brandColor),
@@ -328,7 +328,7 @@ export class SwapFormElement extends LitElement {
     const loader = (): HTMLElement => this.unicornLoaderRef.value!;
     const set = (position: number) => {
       if (position < 0) return;
-      let adjustedPosition;
+      let adjustedPosition: number;
 
       if (position > max) {
         if (!full) {

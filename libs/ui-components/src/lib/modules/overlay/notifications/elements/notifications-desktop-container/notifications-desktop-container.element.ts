@@ -7,13 +7,21 @@ import { notificationsDesktopContainerStyle } from './notifications-desktop-cont
 import { getScrollbarStyle } from '@one-inch-community/ui-components/theme';
 import '@one-inch-community/ui-components/icon';
 import '@one-inch-community/ui-components/button';
+import { animationMap, appendStyle, subscribe } from '@one-inch-community/core/lit';
 import {
-  animationMap,
-  appendStyle,
-  AnimationMapController,
-} from '@one-inch-community/core/lit';
-import { when } from 'lit/directives/when.js';
-import { asyncTimeout } from '@one-inch-community/ui-components/async';
+  debounceTime,
+  distinctUntilChanged,
+  filter,
+  fromEvent,
+  map,
+  merge,
+  startWith,
+  switchMap,
+  takeUntil,
+  tap,
+  timer
+} from 'rxjs';
+import { NotificationAnimationMapController } from './notification-animation-map-controller';
 
 const animationOptions = {
   duration: 500,
@@ -35,11 +43,61 @@ export class NotificationsDesktopContainerElement extends LitElement implements 
 
   @state() fullView = false;
 
+  @state() countShortView = 0
+
+  private isClose = false
+
   private animationInProgress = false;
 
   private animationStateQueue: [string, NotificationRecord][][] = [];
 
   private readonly animationController = new NotificationAnimationMapController(this);
+
+  connectedCallback() {
+    super.connectedCallback();
+    let prevDelta = 0;
+    subscribe(this, [
+      merge(
+        getInteractiveCloseStreamByScrollEvent(this),
+        getInteractiveCloseStreamByTouchEvent(this),
+      ).pipe(
+        filter(() => !this.isClose),
+        tap((delta: number) => {
+          if ((Math.abs(delta - prevDelta) > 10) && delta === 0) {
+            this.animate([
+              { transform: `translate3d(${prevDelta}px, 0, 0)` },
+              { transform: `translate3d(0, 0, 0)` }
+            ], { ...animationOptions, delay: 200 }).finished
+              .then(() => {
+                appendStyle(this, {
+                  transform: ''
+                })
+              })
+            prevDelta = delta
+            return
+          }
+          if ((delta * 100 / this.clientWidth) > 50) {
+            this.isClose = true
+            this.animate([
+              { transform: `translate3d(${delta}px, 0, 0)` },
+              { transform: `translate3d(100%, 0, 0)` }
+            ], animationOptions).finished
+              .then(() => {
+                appendStyle(this, {
+                  transform: `translate3d(100%, 0, 0)`
+                })
+                return this.controller.closeNotifications()
+              })
+            return
+          }
+          appendStyle(this, {
+            transform: `translate3d(${delta}px, 0, 0)`
+          })
+          prevDelta = delta
+        })
+      )
+    ], { requestUpdate: false })
+  }
 
   setController(controller: INotificationsController) {
     this.controller = controller;
@@ -47,11 +105,13 @@ export class NotificationsDesktopContainerElement extends LitElement implements 
 
   setAllNotifications(notifications: [string, NotificationRecord][]) {
     if (this.animationInProgress) {
-      console.log('push', this.animationStateQueue);
       this.animationStateQueue.push(notifications);
       return;
     }
     this.notifications = notifications;
+    if (!this.fullView && this.countShortView < 4) {
+      this.countShortView++
+    }
     this.requestUpdate();
   }
 
@@ -72,6 +132,7 @@ export class NotificationsDesktopContainerElement extends LitElement implements 
   }
 
   async preClose() {
+    if (this.isClose) return
     await this.animate([
       { transform: 'translateX(0)' },
       { transform: 'translateX(100%)' }
@@ -109,7 +170,6 @@ export class NotificationsDesktopContainerElement extends LitElement implements 
   animationCompleteHandler() {
     this.animationInProgress = false;
     const newState = this.animationStateQueue.shift();
-    console.log('shift', this.animationStateQueue);
     if (newState) {
       this.notifications = newState;
       this.requestUpdate();
@@ -143,7 +203,7 @@ export class NotificationsDesktopContainerElement extends LitElement implements 
     if (this.fullView) {
       return result;
     }
-    return [...result.slice(0, 4), ['fullView']];
+    return [...result.slice(0, this.countShortView), ['fullView']];
   }
 
   private formatNotificationTime(timestamp: number): string {
@@ -170,141 +230,80 @@ export class NotificationsDesktopContainerElement extends LitElement implements 
 
 }
 
-class NotificationAnimationMapController implements AnimationMapController<[string, NotificationRecord], void, void, number> {
-
-  readonly direction = 'vertical';
-  readonly vertical = 'notification-item';
-  readonly parallelAnimationStrategy = 'parallel';
-
-  private renderElements: Map<number, HTMLElement> | null = null;
-  private removeElementsClientHeight: Map<number, number> | null = null;
-  private moveElements: Map<[number, number], HTMLElement> | null = null;
-
-  constructor(private readonly element: NotificationsDesktopContainerElement) {
+function getInteractiveCloseStreamByScrollEvent(element: HTMLElement) {
+  let offsetX = 0
+  let offsetY = 0
+  let fullOverflow = false
+  const initialResistance = 50000;
+  const resistanceThreshold = 1;
+  const reset = () => {
+    offsetX = 0
+    offsetY = 0
+    fullOverflow = false
   }
-
-  onKeyExtractor([id, record]: [string, NotificationRecord]) {
-    if (id === 'fullView') {
-      return 'item-' + id;
-    }
-    const date = new Date(record.timestamp)
-    return 'item-' + id + `_${[date.getMinutes(), date.getSeconds()].join('-')}`;
-  }
-
-  onTemplateBuilder([id, record]: [string, NotificationRecord]) {
-    if (id === 'fullView') {
-      return html`
-        <inch-button @click="${() => this.element.onShowAll()}" class="show-all-button" fullSize size="l" type="secondary">Show all</inch-button>
-      `;
-    }
-    return html`
-      <div class="notification-close-container">
-        ${when(true, () => html`
-          <inch-button class="close-notification-button" @click="${() => this.element.closeNotification(id)}" size="l" type="secondary">
-            <inch-icon icon="cross8"></inch-icon>
-          </inch-button>
-        `)}
-        ${this.element.makeNotificationTemplate(record)}
-      </div>
-    `;
-  }
-
-  onAnimationStart() {
-    this.element.animationStartHandler();
-  }
-
-  onAnimationComplete() {
-    this.element.animationCompleteHandler();
-  }
-
-  async onBeforeAnimation(container: HTMLElement, renderElements: Map<number, HTMLElement>, removeElements: Map<number, HTMLElement>, moveElements: Map<[number, number], HTMLElement>) {
-    this.renderElements = renderElements
-    this.removeElementsClientHeight = new Map<number, number>();
-    removeElements.forEach((element, index) => {
-      this.removeElementsClientHeight!.set(index, element.clientHeight)
-    })
-    this.moveElements = moveElements
-  }
-
-  async onAfterAnimation() {
-    this.renderElements = null
-    this.removeElementsClientHeight = null
-    this.moveElements = null
-  }
-
-  async onBeforeRemoveAnimateItem(element: HTMLElement) {
-    if (element.id === this.onKeyExtractor(['fullView', null as any])) {
-      await Promise.all([
-        element.animate([
-          { opacity: 1 },
-          { opacity: 0 }
-        ], { ...animationOptions, duration: 150 }).finished
-      ])
-      return
-    }
-    await Promise.all([
-      element.animate([
-        { transform: 'translateX(0)' },
-        { transform: 'translateX(110%)' }
-      ], animationOptions).finished
-    ])
-  }
-
-  async onBeforeRenderAnimateItem(element: HTMLElement) {
-    appendStyle(element, {
-      transform: 'translateX(110%)'
-    });
-  }
-
-  async onAfterRenderAnimateItem(element: HTMLElement, index: number) {
-    const basePosition = 100
-    const startPosition = basePosition + (index * 50)
-    if (index > 50) {
-      return
-    }
-    await Promise.all([
-      element.animate([
-        { transform: `translateX(${startPosition}%)` },
-        { transform: 'translateX(0)' }
-      ], { ...animationOptions, duration: animationOptions.duration + (index * 50) }).finished
-    ])
-    appendStyle(element, {
-      transform: ''
-    });
-  }
-
-  async onBeforeMoveAnimationItem(element: HTMLElement, oldIndex: number, newIndex: number) {
-    return newIndex
-  }
-
-  async onAfterMoveAnimationItem(element: HTMLElement, newIndex: number) {
-    const offset = this.getOffsetByIndex(newIndex)
-    console.log('onAfterMoveAnimationItem', element, newIndex, offset)
-    await element.animate([
-      { transform: `translateY(${offset * -1}px)` },
-      { transform: `translateY(0)` },
-    ], animationOptions).finished
-  }
-
-  private getOffsetByIndex(index: number): number {
-    let offset: number | null = null
-    this.moveElements?.forEach((element, [ oldIndex, newIndex]) => {
-      if (index - 1 === newIndex) {
-        offset = element.clientHeight * (oldIndex > newIndex ? -1 : 1)
+  const applyBounceEffect = (offset: number) => {
+    if (offset < 0) {
+      const resistance = (element.clientWidth - offset) * 0.02
+      if (resistance > 12) {
+        fullOverflow = true
       }
-    })
-    if (offset === null && this.removeElementsClientHeight) {
-      const newNode = this.renderElements?.get(0)
-      offset = newNode?.clientHeight ?? null
+      return (resistanceThreshold / initialResistance) + ((offset - resistanceThreshold) / resistance)
     }
-    if (offset === null && this.removeElementsClientHeight) {
-      this.removeElementsClientHeight.forEach((clientHeight, removeIndex) => {
-        if (removeIndex === index) {
-          offset = clientHeight * -1
-        }
-      })
-    }
-    return offset ?? 0
-  }
+    return offset
+  };
+  return fromEvent<WheelEvent>(document, 'wheel').pipe(
+    filter(event => event.deltaMode === event.DOM_DELTA_PIXEL),
+    map(event => {
+      if (fullOverflow) {
+        event.stopPropagation()
+      }
+      offsetX = offsetX + event.deltaX
+      offsetY = offsetY + event.deltaY
+      if ((Math.abs(offsetX) - Math.abs(offsetY)) < 0) {
+        return 0
+      }
+      return offsetX * -1
+    }),
+    switchMap(offset => {
+      if (offset === 0) {
+        reset()
+        return [0]
+      }
+      return timer(100).pipe(
+        map(() => {
+          reset()
+          return 0
+        }),
+        startWith(applyBounceEffect(offset))
+      )
+    }),
+    distinctUntilChanged()
+  )
+}
 
+function getInteractiveCloseStreamByTouchEvent(element: HTMLElement) {
+  const end$ = fromEvent(document, 'touchend')
+  const initialResistance = 50000;
+  const resistanceThreshold = 1;
+  const applyBounceEffect = (offset: number) => {
+    if (offset < 0) {
+      const resistance = (element.clientWidth - offset) * 0.02
+      return (resistanceThreshold / initialResistance) + ((offset - resistanceThreshold) / resistance)
+    }
+    return offset
+  };
+
+  return fromEvent<TouchEvent>(element, 'touchstart').pipe(
+    switchMap(startEvent => {
+      const startPoint = startEvent.touches[0].clientX;
+      return fromEvent<TouchEvent>(document, 'touchmove').pipe(
+        map(event => event.touches[0].clientX - startPoint),
+        switchMap(offset => end$.pipe(
+          map(() => 0),
+          startWith(applyBounceEffect(offset))
+        )),
+        takeUntil(end$.pipe(debounceTime(100)))
+      )
+    })
+  )
 }
