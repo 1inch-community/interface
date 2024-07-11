@@ -9,12 +9,9 @@ export const notificationsMobileContainerStyle = css`
         flex-direction: column;
         overflow-x: hidden;
         transition: backdrop-filter .2s, background .2s;
-        padding: 8px 8px 10%;
     }
 
     :host(.show-all) {
-        backdrop-filter: blur(3px);
-        background: var(--primary-12);
         box-sizing: border-box;
         top: 0;
         right: 0;
@@ -24,6 +21,7 @@ export const notificationsMobileContainerStyle = css`
 
     .scroll-content-container {
         position: relative;
+        padding: 8px;
     }
 
     .info-view {

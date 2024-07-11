@@ -34,9 +34,9 @@ export class NotificationAnimationMapController extends NotificationAnimationMap
 
   async onAfterRenderAnimateItemTransition(element: HTMLElement, index: number, offset: number): Promise<void> {
     await element.animate([
-      { transform: `translateY(${offset * -1}%)` },
-      { transform: 'translateY(0)' }
-    ], { ...this.animationOptions, duration: this.animationOptions.duration + (index * 50) }).finished
+      { transform: `translateY(${offset * -1}%)`, zIndex: `-${index}` },
+      { transform: 'translateY(0)', zIndex: `-${index}` }
+    ], { ...this.animationOptions, duration: this.animationOptions.duration, delay: index * 200 }).finished
   }
   onAfterRenderAnimateItemSkipTransition(element: HTMLElement): void {
     appendStyle(element, {

@@ -26,7 +26,7 @@ export class NotificationsMobileContainerElement extends NotificationsBaseContai
 
   protected maxShorthandView = 1
 
-  private isClose = true
+  private isClose = false
 
   private readonly animationController = new NotificationAnimationMapController(this);
 
@@ -79,6 +79,11 @@ export class NotificationsMobileContainerElement extends NotificationsBaseContai
   override onShowAll() {
     super.onShowAll();
     this.classList.add('show-all')
+    if (!this.ref.value) return
+    appendStyle(this.ref.value, {
+      backdropFilter: 'blur(3px)',
+      background: 'var(--primary-12)'
+    })
   }
 
   private onOpenSwipe() {
@@ -96,30 +101,45 @@ export class NotificationsMobileContainerElement extends NotificationsBaseContai
       prevOffset = offset
     }
 
-    return getInteractiveCloseStreamByTouchEvent(this).pipe(
-      filter(() => !this.fullView),
+    return getInteractiveTouchEvent(this).pipe(
       tap(offset => {
-        if (!this.ref.value) return;
+        if (!this.ref.value || this.fullView || this.isClose) return;
         if ((Math.abs(offset - prevOffset) > 10) && offset === 0) {
           reset(offset).catch(console.error)
           return
         }
-        if (offset >= 20) {
-          this.onShowAll()
+        if (offset >= 15) {
+          this.fullView = true
+          this.requestUpdate()
           appendStyle(this.ref.value, {
             transform: ''
           })
+          this.ref.value.animate([
+            {
+              height: `${this.ref.value.clientHeight}px`,
+              backdropFilter: '',
+              background: ''
+            },
+            {
+              height: `100vh`,
+              backdropFilter: 'blur(3px)',
+              background: 'var(--primary-12)'
+            }
+          ], { ...animationOptions, duration: 500 }).finished.then(() => {
+            this.onShowAll()
+          })
+
           return;
         }
-        if ((offset * 100 / this.ref.value.clientHeight) < -50) {
+        if ((offset * 100 / this.ref.value.clientHeight) < -30) {
           this.isClose = true
-          this.animate([
+          this.ref.value.animate([
             { transform: `translate3d(0, ${offset}px, 0)` },
-            { transform: `translate3d(0, -100%, 0)` }
-          ], { ...animationOptions, delay: 1000 }).finished
+            { transform: `translate3d(0, -120%, 0)` }
+          ], animationOptions).finished
             .then(() => {
-              appendStyle(this, {
-                transform: `translate3d(0, -100%, 0)`
+              appendStyle(this.ref.value!, {
+                transform: `translate3d(0, -120%, 0)`
               })
               return this.controller.closeNotifications()
             })
@@ -136,7 +156,7 @@ export class NotificationsMobileContainerElement extends NotificationsBaseContai
 
 }
 
-function getInteractiveCloseStreamByTouchEvent(element: HTMLElement) {
+function getInteractiveTouchEvent(element: HTMLElement) {
   const end$ = fromEvent(document, 'touchend')
   const initialResistance = 50000;
   const resistanceThreshold = 1;
