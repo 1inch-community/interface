@@ -1,8 +1,5 @@
-import { html, LitElement } from 'lit';
-import { classMap } from 'lit/directives/class-map.js';
-import { customElement, state } from 'lit/decorators.js';
-import { NotificationsContainer } from '../../notifications-container';
-import { INotificationsController, NotificationRecord } from '../../notifications-controller.interface';
+import { html } from 'lit';
+import { customElement } from 'lit/decorators.js';
 import { notificationsDesktopContainerStyle } from './notifications-desktop-container.style';
 import { getScrollbarStyle } from '@one-inch-community/ui-components/theme';
 import '@one-inch-community/ui-components/icon';
@@ -22,6 +19,7 @@ import {
   timer
 } from 'rxjs';
 import { NotificationAnimationMapController } from './notification-animation-map-controller';
+import { NotificationsBaseContainerElement, notificationsBaseContainerStyle } from '../notifications-base-container';
 
 const animationOptions = {
   duration: 500,
@@ -29,32 +27,24 @@ const animationOptions = {
 };
 
 @customElement(NotificationsDesktopContainerElement.tagName)
-export class NotificationsDesktopContainerElement extends LitElement implements NotificationsContainer {
+export class NotificationsDesktopContainerElement extends NotificationsBaseContainerElement {
   static readonly tagName = 'inch-notifications-desktop-container';
 
   static override readonly styles = [
     getScrollbarStyle(':host', true),
+    notificationsBaseContainerStyle,
     notificationsDesktopContainerStyle
   ];
 
-  private controller!: INotificationsController;
-
-  private notifications: [string, NotificationRecord][] = [];
-
-  @state() fullView = false;
-
-  @state() countShortView = 0
-
   private isClose = false
 
-  private animationInProgress = false;
-
-  private animationStateQueue: [string, NotificationRecord][][] = [];
+  protected maxShorthandView = 4
 
   private readonly animationController = new NotificationAnimationMapController(this);
 
   connectedCallback() {
     super.connectedCallback();
+    debugger
     let prevDelta = 0;
     subscribe(this, [
       merge(
@@ -99,20 +89,9 @@ export class NotificationsDesktopContainerElement extends LitElement implements 
     ], { requestUpdate: false })
   }
 
-  setController(controller: INotificationsController) {
-    this.controller = controller;
-  }
-
-  setAllNotifications(notifications: [string, NotificationRecord][]) {
-    if (this.animationInProgress) {
-      this.animationStateQueue.push(notifications);
-      return;
-    }
-    this.notifications = notifications;
-    if (!this.fullView && this.countShortView < 4) {
-      this.countShortView++
-    }
-    this.requestUpdate();
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    debugger
   }
 
   preRender() {
@@ -142,44 +121,6 @@ export class NotificationsDesktopContainerElement extends LitElement implements 
     });
   }
 
-  async closeNotification(id: string) {
-    await this.controller.closeNotification(id)
-  }
-
-  makeNotificationTemplate(record: NotificationRecord) {
-    if (record.config.customTemplate) return html`${record.template}`;
-    const classes = {
-      'notification-container': true,
-      'error': record.config.errorStyle ?? false
-    };
-    return html`
-      <div class="${classMap(classes)}">
-        <div class="notification-title">
-          <span>${record.config.title}</span>
-          <div class="notification-time">${this.formatNotificationTime(record.timestamp)}</div>
-        </div>
-        <div class="notification-template">${record.template}</div>
-      </div>
-    `;
-  }
-
-  animationStartHandler() {
-    this.animationInProgress = true;
-  }
-
-  animationCompleteHandler() {
-    this.animationInProgress = false;
-    const newState = this.animationStateQueue.shift();
-    if (newState) {
-      this.notifications = newState;
-      this.requestUpdate();
-    }
-  }
-
-  onShowAll() {
-    this.fullView = true
-  }
-
   protected override render() {
     return html`
       <div class="close-button-container">
@@ -194,38 +135,12 @@ export class NotificationsDesktopContainerElement extends LitElement implements 
     `;
   }
 
-  private getSortedNotifications() {
-    const result = this.notifications.sort((r1, r2) => {
-      const n1 = r1[1];
-      const n2 = r2[1];
-      return n2.timestamp - n1.timestamp;
-    });
-    if (this.fullView) {
-      return result;
+  override getSortedNotifications() {
+    const result = super.getSortedNotifications()
+    if (!this.fullView) {
+      return [ ...result, ['fullView'] as any]
     }
-    return [...result.slice(0, this.countShortView), ['fullView']];
-  }
-
-  private formatNotificationTime(timestamp: number): string {
-    const date = new Date(timestamp);
-    const formatTimeValue = (value: number) => {
-      return value < 10 ? '0' + value : value;
-    };
-    const timeView = [
-      formatTimeValue(date.getHours()),
-      formatTimeValue(date.getMinutes()),
-      formatTimeValue(date.getSeconds())
-    ].join(':');
-
-    if (Date.now() - timestamp > 6 * 60 * 60 * 1000) {
-      const dateView = [
-        formatTimeValue(date.getDate()),
-        formatTimeValue(date.getMonth() + 1)
-      ].join('.');
-      return [dateView, timeView].join(' ');
-    }
-
-    return timeView;
+    return result
   }
 
 }

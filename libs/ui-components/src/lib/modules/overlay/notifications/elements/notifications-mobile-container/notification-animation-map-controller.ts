@@ -12,22 +12,15 @@ export class NotificationAnimationMapController extends NotificationAnimationMap
   }
 
   async onBeforeRemoveAnimateItem(element: HTMLElement) {
-    if (element.id === this.onKeyExtractor(['fullView', null as any])) {
-      element.animate([
-        { opacity: 1 },
-        { opacity: 0 }
-      ], { ...this.animationOptions, duration: 150 })
-      return
-    }
     await element.animate([
-      { transform: 'translateX(0)' },
-      { transform: 'translateX(110%)' }
+      { transform: 'translateY(0)' },
+      { transform: 'translateY(50px) scale(0.7)', opacity: 0 }
     ], this.animationOptions).finished
   }
 
   async onBeforeRenderAnimateItem(element: HTMLElement) {
     appendStyle(element, {
-      transform: 'translateX(110%)'
+      transform: 'translateX(-110%)'
     });
   }
 
@@ -41,8 +34,8 @@ export class NotificationAnimationMapController extends NotificationAnimationMap
 
   async onAfterRenderAnimateItemTransition(element: HTMLElement, index: number, offset: number): Promise<void> {
     await element.animate([
-      { transform: `translateX(${offset}%)` },
-      { transform: 'translateX(0)' }
+      { transform: `translateY(${offset * -1}%)` },
+      { transform: 'translateY(0)' }
     ], { ...this.animationOptions, duration: this.animationOptions.duration + (index * 50) }).finished
   }
   onAfterRenderAnimateItemSkipTransition(element: HTMLElement): void {

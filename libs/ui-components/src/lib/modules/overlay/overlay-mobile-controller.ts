@@ -87,6 +87,7 @@ export class OverlayMobileController implements IOverlayController {
       alignItems: 'flex-end',
       bottom: '0',
       left: '0',
+      zIndex: '2000',
       boxSizing: 'border-box',
       borderTopLeftRadius: '24px',
       borderTopRightRadius: '24px',

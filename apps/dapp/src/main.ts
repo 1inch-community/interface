@@ -4,7 +4,7 @@ import { themeInit, MainColors, BrandColors } from '@one-inch-community/ui-compo
 
 Promise.all([
   initLocale(),
-  themeInit(MainColors.systemSync, BrandColors.community),
+  themeInit(MainColors.systemSync, BrandColors.random),
   import('./app/controllers/connect-wallet-controller').then(m => m.connectWalletController.init())
 ])
   .then(() => {

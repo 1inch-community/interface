@@ -28,21 +28,17 @@ export class NotificationsController implements INotificationsController {
   private readonly mobileMatchMedia = getMobileMatchMedia()
 
   private readonly overlayContainer = getContainer()
-  private readonly notificationDesktopContainer: NotificationsContainer
-  private readonly notificationMobileContainer: NotificationsContainer
+
+  private activeContainer: NotificationsContainer | null = null
 
   protected constructor() {
-    this.notificationDesktopContainer = document.createElement(NotificationsDesktopContainerElement.tagName) as NotificationsContainer
-    this.notificationMobileContainer = document.createElement(NotificationsMobileContainerElement.tagName) as NotificationsContainer
-    this.notificationDesktopContainer.setController(this)
-    this.notificationMobileContainer.setController(this)
-
   }
 
   async closeNotifications(): Promise<void> {
     const container = this.getNotificationsContainer()
     await container.preClose()
     container.remove()
+    this.activeContainer = null
   }
 
   async closeNotification(id: string) {
@@ -55,7 +51,7 @@ export class NotificationsController implements INotificationsController {
     }
     const container = this.getNotificationsContainer()
     if (this.overlayContainer.contains(container)) {
-      container.setAllNotifications([ ...this.notifications.entries() ])
+      container.setAllNotifications(this.getSortedNotifications())
     } else {
       await this.renderContainer()
     }
@@ -94,7 +90,7 @@ export class NotificationsController implements INotificationsController {
     }
     const container = this.getNotificationsContainer()
     if (this.overlayContainer.contains(container)) {
-      container.setAllNotifications([ ...this.notifications.entries() ])
+      container.setAllNotifications(this.getSortedNotifications())
     } else {
       await this.renderContainer()
     }
@@ -103,17 +99,25 @@ export class NotificationsController implements INotificationsController {
 
   private async renderContainer() {
     const container = this.getNotificationsContainer()
-    container.setAllNotifications([ ...this.notifications.entries() ])
+    container.setAllNotifications(this.getSortedNotifications())
     await container.preRender()
     this.overlayContainer.appendChild(container)
     await container.postRender()
   }
 
   private getNotificationsContainer() {
-    if (this.mobileMatchMedia.matches) {
-      return this.notificationMobileContainer
+    if (this.activeContainer !== null) {
+      return this.activeContainer
     }
-    return this.notificationDesktopContainer
+    let container: NotificationsContainer
+    if (this.mobileMatchMedia.matches) {
+      container = document.createElement(NotificationsMobileContainerElement.tagName) as NotificationsContainer
+    } else {
+      container = document.createElement(NotificationsDesktopContainerElement.tagName) as NotificationsContainer
+    }
+    container.setController(this)
+    this.activeContainer = container
+    return container
   }
 
   private async cacheNotification(id: string, record: NotificationRecord) {
@@ -128,6 +132,14 @@ export class NotificationsController implements INotificationsController {
     } catch (error) {
       console.warn(error)
     }
+  }
+
+  protected getSortedNotifications() {
+    return [...this.notifications.entries()].sort((r1, r2) => {
+      const n1 = r1[1];
+      const n2 = r2[1];
+      return n2.timestamp - n1.timestamp;
+    })
   }
 
 }
