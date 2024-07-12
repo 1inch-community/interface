@@ -171,6 +171,9 @@ importers:
       vite-plugin-html:
         specifier: 3.2.2
         version: 3.2.2(vite@5.3.3(@types/node@18.19.39)(terser@5.31.0))
+      vite-plugin-preload:
+        specifier: ^0.4.0
+        version: 0.4.0(rollup@2.79.1)(vite@5.3.3(@types/node@18.19.39)(terser@5.31.0))
       vite-plugin-pwa:
         specifier: 0.20.0
         version: 0.20.0(vite@5.3.3(@types/node@18.19.39)(terser@5.31.0))(workbox-build@7.1.1)(workbox-window@7.1.0)
@@ -6111,6 +6114,11 @@ packages:
     peerDependencies:
       vite: '>=2.0.0'
 
+  vite-plugin-preload@0.4.0:
+    resolution: {integrity: sha512-c/hlZbIEMquIJoCL14sBl3ldIBBWFScdQWUURz7VUaT9xF29pDm8HC23zxZAnw4uGyP/JxdTceq+Hm3yt4hyRQ==}
+    peerDependencies:
+      vite: '>=5.0.0'
+
   vite-plugin-pwa@0.20.0:
     resolution: {integrity: sha512-/kDZyqF8KqoXRpMUQtR5Atri/7BWayW8Gp7Kz/4bfstsV6zSFTxjREbXZYL7zSuRL40HGA+o2hvUAFRmC+bL7g==}
     engines: {node: '>=16.0.0'}
@@ -9335,9 +9343,9 @@ snapshots:
       mime-types: 2.1.35
       negotiator: 0.6.3
 
-  acorn-import-assertions@1.9.0(acorn@8.11.3):
+  acorn-import-assertions@1.9.0(acorn@8.12.1):
     dependencies:
-      acorn: 8.11.3
+      acorn: 8.12.1
 
   acorn-jsx@5.3.2(acorn@8.11.3):
     dependencies:
@@ -13391,6 +13399,19 @@ snapshots:
       pathe: 0.2.0
       vite: 5.3.3(@types/node@18.19.39)(terser@5.31.0)
 
+  vite-plugin-preload@0.4.0(rollup@2.79.1)(vite@5.3.3(@types/node@18.19.39)(terser@5.31.0)):
+    dependencies:
+      '@rollup/pluginutils': 5.1.0(rollup@2.79.1)
+      jsdom: 24.1.0
+      prettier: 3.3.2
+      vite: 5.3.3(@types/node@18.19.39)(terser@5.31.0)
+    transitivePeerDependencies:
+      - bufferutil
+      - canvas
+      - rollup
+      - supports-color
+      - utf-8-validate
+
   vite-plugin-pwa@0.20.0(vite@5.3.3(@types/node@18.19.39)(terser@5.31.0))(workbox-build@7.1.1)(workbox-window@7.1.0):
     dependencies:
       debug: 4.3.4
@@ -13504,8 +13525,8 @@ snapshots:
       '@webassemblyjs/ast': 1.12.1
       '@webassemblyjs/wasm-edit': 1.12.1
       '@webassemblyjs/wasm-parser': 1.12.1
-      acorn: 8.11.3
-      acorn-import-assertions: 1.9.0(acorn@8.11.3)
+      acorn: 8.12.1
+      acorn-import-assertions: 1.9.0(acorn@8.12.1)
       browserslist: 4.23.0
       chrome-trace-event: 1.0.3
       enhanced-resolve: 5.16.1

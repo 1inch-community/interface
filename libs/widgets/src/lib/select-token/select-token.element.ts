@@ -22,12 +22,13 @@ export class SelectTokenElement extends LitElement {
 
   static override styles = selectTokenStyle
 
-  @property() tokenType?: TokenType
+  @property({ type: String }) tokenType?: TokenType
 
   @consume({ context: ApplicationContextToken })
   applicationContext!: IApplicationContext
 
   @consume({ context: SwapContextToken, subscribe: true })
+  @property({ type: Object })
   swapContext?: ISwapContext
 
   @provide({ context: selectTokenContext })

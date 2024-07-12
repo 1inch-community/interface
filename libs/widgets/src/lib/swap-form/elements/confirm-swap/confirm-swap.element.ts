@@ -15,6 +15,8 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import { isTokensEqual, TokenController } from '@one-inch-community/sdk/tokens';
 import { formatSeconds, smartFormatNumber } from '@one-inch-community/core/formatters';
 import { getBlockEmitter, getSymbolFromWrapToken, getWrapperNativeToken, isNativeToken } from '@one-inch-community/sdk/chain';
+import { consume } from '@lit/context';
+import { SwapContextToken } from '@one-inch-community/sdk/swap';
 
 @customElement(ConfirmSwapElement.tagName)
 export class ConfirmSwapElement extends LitElement {
@@ -24,7 +26,9 @@ export class ConfirmSwapElement extends LitElement {
 
   @property({ type: Object }) swapSnapshot!: SwapSnapshot<FusionQuoteReceiveDto>
 
-  @property({ type: Object, attribute: false }) swapContext?: ISwapContext
+  @consume({ context: SwapContextToken, subscribe: true })
+  @property({ type: Object, attribute: false })
+  swapContext?: ISwapContext
 
   @state() state: 'swap' | 'wrap' | null = null
 

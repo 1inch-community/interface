@@ -64,6 +64,7 @@
     "verdaccio": "5.31.1",
     "vite": "5.3.3",
     "vite-plugin-html": "3.2.2",
+    "vite-plugin-preload": "^0.4.0",
     "vite-plugin-pwa": "0.20.0",
     "vitest": "1.6.0"
   }
