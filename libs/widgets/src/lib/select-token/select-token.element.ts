@@ -1,6 +1,6 @@
-import { html, LitElement, PropertyValues } from 'lit';
+import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { ContextProvider } from '@lit/context';
+import { consume, provide } from '@lit/context';
 import '@one-inch-community/ui-components/card';
 import { selectTokenStyle } from './select-token.style';
 import { selectTokenContext } from './context';
@@ -8,11 +8,12 @@ import { SelectTokenContext } from './select-token.context';
 import './elements/search-token-input'
 import './elements/token-list'
 import './elements/favorite-tokens'
-import { ChainId } from '@one-inch-community/models';
-import { Address } from 'viem';
+import { IApplicationContext, ISelectTokenContext, ISwapContext, TokenType } from '@one-inch-community/models';
 import { subscribe } from '@one-inch-community/core/lit';
 import { tap } from 'rxjs';
 import { classMap } from 'lit/directives/class-map.js';
+import { ApplicationContextToken } from '@one-inch-community/core/application-context';
+import { SwapContextToken } from '@one-inch-community/sdk/swap';
 
 
 @customElement(SelectTokenElement.tagName)
@@ -21,13 +22,18 @@ export class SelectTokenElement extends LitElement {
 
   static override styles = selectTokenStyle
 
-  @property({ type: Number }) chainId?: ChainId
+  @property() tokenType?: TokenType
 
-  @property({ type: String }) connectedWalletAddress?: Address
+  @consume({ context: ApplicationContextToken })
+  applicationContext!: IApplicationContext
+
+  @consume({ context: SwapContextToken, subscribe: true })
+  swapContext?: ISwapContext
+
+  @provide({ context: selectTokenContext })
+  selectTokenContext!: ISelectTokenContext
 
   private isEmpty = true
-
-  readonly context = new ContextProvider(this, { context: selectTokenContext })
 
   protected override render() {
     const classes = {
@@ -54,35 +60,18 @@ export class SelectTokenElement extends LitElement {
     ])
   }
 
-  protected override updated(changedProperties: PropertyValues) {
-    let isDirty = false
-    const context = this.context.value
-    if (changedProperties.has('chainId') && this.chainId) {
-      context.setChainId(this.chainId)
-      isDirty = true
-    }
-    if (changedProperties.has('connectedWalletAddress')) {
-      context.setConnectedWalletAddress(this.connectedWalletAddress)
-      isDirty = true
-    }
-    if (isDirty) {
-      this.requestUpdate()
-    }
-  }
-
   private initContext() {
-    if (this.context.value) return
-    const { chainId, connectedWalletAddress } = this
-    if (!chainId) throw new Error('')
-    const context = new SelectTokenContext()
-    context.setChainId(chainId)
-    context.setConnectedWalletAddress(connectedWalletAddress)
-    this.context.setValue(context)
+    if (this.selectTokenContext || !this.swapContext || !this.tokenType) return
+    this.selectTokenContext = new SelectTokenContext(
+      this.tokenType,
+      this.applicationContext,
+      this.swapContext
+    )
   }
 
   private getTokenAddressList() {
-    if (!this.context.value) throw new Error('')
-    return this.context.value.tokenAddressList$
+    if (!this.selectTokenContext) throw new Error('')
+    return this.selectTokenContext.tokenAddressList$
   }
 }
 

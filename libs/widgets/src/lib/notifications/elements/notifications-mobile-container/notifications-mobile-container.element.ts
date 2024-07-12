@@ -7,7 +7,10 @@ import { NotificationAnimationMapController } from './notification-animation-map
 import { debounceTime, filter, fromEvent, map, startWith, switchMap, takeUntil, tap } from 'rxjs';
 import { when } from 'lit/directives/when.js';
 import { createRef, ref } from 'lit/directives/ref.js';
-import { getScrollbarStyle } from '@one-inch-community/ui-components/theme';
+import { getScrollbarStyle } from '@one-inch-community/core/theme';
+import { consume } from '@lit/context';
+import { ApplicationContextToken } from '@one-inch-community/core/application-context';
+import { IApplicationContext } from '@one-inch-community/models';
 
 const animationOptions = {
   duration: 500,
@@ -23,6 +26,9 @@ export class NotificationsMobileContainerElement extends NotificationsBaseContai
     notificationsBaseContainerStyle,
     notificationsMobileContainerStyle
   ];
+
+  @consume({ context: ApplicationContextToken })
+  applicationContext!: IApplicationContext
 
   protected maxShorthandView = 1
 

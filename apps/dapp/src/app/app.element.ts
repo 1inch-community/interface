@@ -4,38 +4,34 @@ import { appStyle } from './app.style';
 import './elements/header'
 import './elements/footer'
 import './elements/swap-form'
-import { scrollbarStyle } from '@one-inch-community/ui-components/theme';
-import { NotificationsController } from '@one-inch-community/ui-components/overlay';
+import '../context'
+import { scrollbarStyle } from '@one-inch-community/core/theme';
 import { asyncTimeout } from '@one-inch-community/ui-components/async';
+import { consume } from '@lit/context';
+import { IApplicationContext } from '@one-inch-community/models';
+import { ApplicationContextToken } from '@one-inch-community/core/application-context';
 
 @customElement('app-root')
 export class AppElement extends LitElement {
-
-  // protected async firstUpdated() {
-  //   const router = new Router(this.shadowRoot?.querySelector('#outlet'));
-  //   await router.setRoutes([
-  //     {
-  //       path: '/',
-  //       component: 'inch-swap-form-container',
-  //     },
-  //   ]);
-  // }
 
   static override styles = [
     appStyle,
     scrollbarStyle,
   ]
 
+  @consume({ context: ApplicationContextToken })
+  applicationContext!: IApplicationContext
+
   constructor() {
     super();
-    this.init()
+    // this.init()
   }
 
   private async init() {
-    const notificationsController = await NotificationsController.new()
+    const notificationsController = this.applicationContext.notificationsController
     let i = 0
     const loop = async () => {
-      if (i >= 1) return
+      // if (i >= 1) return
       await notificationsController.show('test notification ' + i, html`
         <span>Test notification ${i}</span>
         <span>${new Date().toString()}</span>

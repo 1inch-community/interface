@@ -10,7 +10,7 @@ import {
   BrandColors,
   themeChangeMainColor,
   themeChangeBrandColor,
-} from '@one-inch-community/ui-components/theme';
+} from '@one-inch-community/core/theme';
 import { SceneController } from '@one-inch-community/ui-components/scene';
 
 @customElement('app-components')

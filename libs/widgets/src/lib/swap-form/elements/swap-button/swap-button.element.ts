@@ -25,11 +25,12 @@ import {
 import { getAllowance, getBlockEmitter, getOneInchRouterV6ContractAddress, hasPermit,
   isChainId, isNativeToken, isSupportPermit2 } from '@one-inch-community/sdk/chain'
 
-import { BrandColors, getThemeChange } from '@one-inch-community/ui-components/theme';
+import { BrandColors, getThemeChange } from '@one-inch-community/core/theme';
 import { swapButtonStyle } from './swap-button.style';
 import { when } from 'lit/directives/when.js';
 import { JsonParser, storage } from '@one-inch-community/core/storage';
 import { CacheActivePromise } from '@one-inch-community/core/decorators';
+import { SwapContextToken } from '@one-inch-community/sdk/swap';
 
 enum SwapButtonState {
   readyToSwap,
@@ -63,7 +64,7 @@ export class SwapButtonElement extends LitElement {
 
   static override styles = swapButtonStyle;
 
-  @consume({ context: swapContext, subscribe: true })
+  @consume({ context: SwapContextToken })
   context?: ISwapContext;
 
   @state() private isRainbowTheme = false;

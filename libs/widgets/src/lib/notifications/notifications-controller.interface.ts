@@ -1,6 +1,6 @@
 import { TemplateResult } from 'lit';
 
-export interface INotificationsController {
+export interface INotificationsControllerInternal {
   closeNotifications(): Promise<void>
   closeNotification(id: string): Promise<void>
 }

@@ -1,7 +1,7 @@
 import { html } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { notificationsDesktopContainerStyle } from './notifications-desktop-container.style';
-import { getScrollbarStyle } from '@one-inch-community/ui-components/theme';
+import { getScrollbarStyle } from '@one-inch-community/core/theme';
 import '@one-inch-community/ui-components/icon';
 import '@one-inch-community/ui-components/button';
 import { animationMap, appendStyle, subscribe } from '@one-inch-community/core/lit';
@@ -44,7 +44,6 @@ export class NotificationsDesktopContainerElement extends NotificationsBaseConta
 
   connectedCallback() {
     super.connectedCallback();
-    debugger
     let prevDelta = 0;
     subscribe(this, [
       merge(
@@ -87,11 +86,6 @@ export class NotificationsDesktopContainerElement extends NotificationsBaseConta
         })
       )
     ], { requestUpdate: false })
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    debugger
   }
 
   preRender() {

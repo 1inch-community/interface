@@ -18,16 +18,16 @@ import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import "@one-inch-community/widgets/token-icon"
 import "@one-inch-community/ui-components/icon"
 import "@one-inch-community/ui-components/button"
-import { ISwapContext, IToken } from '@one-inch-community/models';
+import { ISwapContext, IToken, TokenType } from '@one-inch-community/models';
 import { formatNumber } from '@one-inch-community/core/formatters';
 import '../balance'
 import '../fiat-balance'
 import { inputStyle } from './input.style';
-import { swapContext } from '../../context';
 import { observe, subscribe, dispatchEvent, translate, isRTLCurrentLocale, localeChange$ } from '@one-inch-community/core/lit';
 import { Address, formatUnits, parseUnits } from 'viem';
 import { when } from 'lit/directives/when.js';
 import { choose } from 'lit/directives/choose.js';
+import { SwapContextToken } from '@one-inch-community/sdk/swap';
 
 @customElement(InputElement.tagName)
 export class InputElement extends LitElement {
@@ -37,13 +37,13 @@ export class InputElement extends LitElement {
 
   @property({ type: Boolean, attribute: true, reflect: true }) disabled = false
 
-  @property({ type: String, attribute: true, reflect: true }) tokenType?: 'source' | 'destination'
+  @property({ type: String, attribute: true, reflect: true }) tokenType?: TokenType
 
   @state() isFocus = false
   @state() connectedAddress: Address | null = null
   @state() setMaxInProgress = false
 
-  @consume({ context: swapContext, subscribe: true })
+  @consume({ context: SwapContextToken })
   context?: ISwapContext
 
   private token: IToken | null = null

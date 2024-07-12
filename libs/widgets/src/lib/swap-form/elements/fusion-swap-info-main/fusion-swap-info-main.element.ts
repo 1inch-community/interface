@@ -4,7 +4,6 @@ import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { observe, dispatchEvent, translate } from '@one-inch-community/core/lit';
 import { consume } from '@lit/context';
-import { swapContext } from '../../context';
 import {
   debounceTime,
   defer, distinctUntilChanged, map,
@@ -22,6 +21,7 @@ import { isRateEqual, isTokensEqual, TokenController } from '@one-inch-community
 import { formatSeconds, smartFormatAndShorteningNumber, smartFormatNumber } from '@one-inch-community/core/formatters';
 import { getSymbolFromWrapToken } from '@one-inch-community/sdk/chain';
 import { BigMath } from '@one-inch-community/core/math';
+import { SwapContextToken } from '@one-inch-community/sdk/swap';
 
 @customElement(FusionSwapInfoMainElement.tagName)
 export class FusionSwapInfoMainElement extends LitElement {
@@ -31,7 +31,7 @@ export class FusionSwapInfoMainElement extends LitElement {
 
   @property({ type: Boolean }) isOpen = false;
 
-  @consume({ context: swapContext, subscribe: true })
+  @consume({ context: SwapContextToken })
   context?: ISwapContext;
 
   readonly rate$ = defer(() => this.getContext().rate$);

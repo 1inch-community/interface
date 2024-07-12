@@ -5,7 +5,7 @@ import { ScrollContext, scrollContext } from './scroll-context';
 import { subscribe, resizeObserver } from '@one-inch-community/core/lit';
 import { fromEvent, merge, tap } from 'rxjs';
 import { createRef, ref } from 'lit/directives/ref.js';
-import { scrollbarStyle } from '@one-inch-community/ui-components/theme';
+import { scrollbarStyle } from '@one-inch-community/core/theme';
 
 @customElement(ScrollViewConsumerElement.tagName)
 export class ScrollViewConsumerElement extends LitElement {

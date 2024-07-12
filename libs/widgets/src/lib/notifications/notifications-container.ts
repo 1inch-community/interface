@@ -1,8 +1,8 @@
-import { INotificationsController, NotificationRecord } from './notifications-controller.interface';
+import { INotificationsControllerInternal, NotificationRecord } from './notifications-controller.interface';
 import { TemplateResult } from 'lit';
 
 export interface NotificationsContainer extends HTMLElement {
-  setController(controller: INotificationsController): void
+  setController(controller: INotificationsControllerInternal): void
   setAllNotifications(notifications: [string, NotificationRecord][]): void | Promise<void>
   preRender(): void | Promise<void>
   postRender(): void | Promise<void>

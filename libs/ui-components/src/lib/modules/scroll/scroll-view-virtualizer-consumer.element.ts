@@ -1,7 +1,7 @@
 import { css, html, LitElement, TemplateResult } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
-import { scrollbarStyle } from '@one-inch-community/ui-components/theme';
+import { getScrollbarStyle, scrollbarStyle } from '@one-inch-community/core/theme';
 import { createRef, ref } from 'lit/directives/ref.js';
 import { consume } from '@lit/context';
 import { ScrollContext, scrollContext } from './scroll-context';
@@ -17,7 +17,6 @@ import {
 } from '@one-inch-community/core/lit';
 import { tap, merge, of, fromEvent } from 'rxjs';
 import { mainViewportContext } from './main-viewport-context';
-import { getScrollbarStyle } from '../theme/styles/scrollbar.style';
 
 @customElement(ScrollViewVirtualizerConsumerElement.tagName)
 export class ScrollViewVirtualizerConsumerElement extends LitElement {

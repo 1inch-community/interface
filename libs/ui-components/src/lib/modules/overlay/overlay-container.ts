@@ -1,8 +1,18 @@
-const container = document.createElement('div')
-container.id = 'overlay-container'
+import { appendStyle } from '@one-inch-community/core/lit';
+
+let container: HTMLElement
+
 export function getContainer() {
-  if (!document.body.contains(container)) {
-    document.body.appendChild(container)
-  }
+  findOrCreateContainer()
   return container
+}
+
+function findOrCreateContainer() {
+  if (container) return
+  let overlayContainer = document.querySelector('#overlay-container') as HTMLElement
+  if (!overlayContainer) {
+    overlayContainer = document.createElement('div')
+    overlayContainer.id = 'overlay-container'
+  }
+  container = overlayContainer
 }

@@ -3,7 +3,7 @@ type StorageConfig = {
   storageSeparator?: string
 }
 
-class Storage {
+export class Storage {
 
   private readonly storage: globalThis.Storage | null = getStorage()
 

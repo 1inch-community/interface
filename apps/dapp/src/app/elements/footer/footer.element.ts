@@ -6,13 +6,18 @@ import { getMobileMatchMedia, changeMobileMatchMedia } from '@one-inch-community
 import { getEnvironmentValue } from '@one-inch-community/core/environment';
 import '@one-inch-community/widgets/wallet-manage';
 import { getFooterHeight } from '../../platform/sizes';
-import { connectWalletController } from '../../controllers/connect-wallet-controller';
+import { consume } from '@lit/context';
+import { ApplicationContextToken } from '@one-inch-community/core/application-context';
+import { IApplicationContext } from '@one-inch-community/models';
 
 @customElement(FooterElement.tagName)
 export class FooterElement extends LitElement {
   static tagName = 'inch-footer' as const
 
   static styles = footerStyle
+
+  @consume({ context: ApplicationContextToken })
+  applicationContext!: IApplicationContext
 
   private mobileMedia = getMobileMatchMedia()
 
@@ -44,8 +49,8 @@ export class FooterElement extends LitElement {
   private getMobileFooter() {
     return html`
       <div class="footer-container mobile-footer">
-        <inch-chain-selector .controller="${connectWalletController}"></inch-chain-selector>
-        <inch-connect-wallet-view .controller="${connectWalletController}"></inch-connect-wallet-view>
+        <inch-chain-selector .controller="${this.applicationContext.connectWalletController}"></inch-chain-selector>
+        <inch-connect-wallet-view .controller="${this.applicationContext.connectWalletController}"></inch-connect-wallet-view>
       </div>
     `
   }

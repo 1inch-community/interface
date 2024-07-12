@@ -1,7 +1,6 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { consume } from '@lit/context';
-import { swapContext } from '../../context';
 import { ISwapContext } from '@one-inch-community/models';
 import { observe } from '@one-inch-community/core/lit';
 import { catchError, combineLatest, defer, filter, map, switchMap } from 'rxjs';
@@ -9,6 +8,7 @@ import { formatUnits } from 'viem';
 import { TokenController } from '@one-inch-community/sdk/tokens';
 import { smartFormatNumber } from '@one-inch-community/core/formatters';
 import { fiatBalanceStyles } from './fiat-balance.styles';
+import { SwapContextToken } from '@one-inch-community/sdk/swap';
 
 @customElement(FiatBalanceElement.tagName)
 export class FiatBalanceElement extends LitElement {
@@ -18,7 +18,7 @@ export class FiatBalanceElement extends LitElement {
 
   @property({ type: String, attribute: true }) tokenType?: 'source' | 'destination';
 
-  @consume({ context: swapContext })
+  @consume({ context: SwapContextToken })
   context?: ISwapContext;
 
   readonly balance$ = defer(() => {

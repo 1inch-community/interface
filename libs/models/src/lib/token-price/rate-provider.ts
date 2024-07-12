@@ -1,5 +1,5 @@
 import { ChainId } from '../chain';
-import { IToken } from '../token/token';
+import { IToken } from '../token';
 import { Observable } from 'rxjs';
 import { Rate } from './rate';
 

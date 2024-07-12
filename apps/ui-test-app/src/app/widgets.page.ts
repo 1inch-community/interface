@@ -11,7 +11,7 @@ import {
   MainColors,
   themeChangeBrandColor,
   themeChangeMainColor
-} from '@one-inch-community/ui-components/theme';
+} from '@one-inch-community/core/theme';
 import { SceneController } from '@one-inch-community/ui-components/scene';
 import { connectWalletController } from './connect-wallet-controller';
 import { observe } from '@one-inch-community/core/lit';

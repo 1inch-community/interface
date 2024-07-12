@@ -5,7 +5,6 @@ import { appendStyle } from '../append-style';
 export type AnimationMapDirection = 'horizontal' | 'vertical'
 export interface AnimationMapController<Value, RenderState = void, RemoveState = void, MoveState = void> {
   readonly direction: AnimationMapDirection
-  readonly parallelAnimationStrategy?: 'parallel' | 'deleteAfterAdd' | 'addAfterDelete'
   onKeyExtractor(value: Value, index: number): string
   onTemplateBuilder(value: Value, index: number): TemplateResult
 

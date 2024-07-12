@@ -1,12 +1,14 @@
 import { html, LitElement } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { headerStyle } from './header.style';
-import { changeMobileMatchMedia, getMobileMatchMedia } from '@one-inch-community/core/lit';
+import { getMobileMatchMediaAndSubscribe } from '@one-inch-community/core/lit';
 import '@one-inch-community/ui-components/icon';
 import '@one-inch-community/widgets/wallet-manage';
 import { getHeaderHeight } from '../../platform/sizes';
 import { styleMap } from 'lit/directives/style-map.js';
-import { connectWalletController } from '../../controllers/connect-wallet-controller';
+import { consume } from '@lit/context';
+import { ApplicationContextToken } from '@one-inch-community/core/application-context';
+import { IApplicationContext } from '@one-inch-community/models';
 
 @customElement(HeaderElement.tagName)
 export class HeaderElement extends LitElement {
@@ -14,12 +16,10 @@ export class HeaderElement extends LitElement {
 
   static override styles = headerStyle
 
-  private mobileMedia = getMobileMatchMedia()
+  @consume({ context: ApplicationContextToken })
+  applicationContext!: IApplicationContext
 
-  connectedCallback() {
-    super.connectedCallback();
-    changeMobileMatchMedia(this)
-  }
+  private mobileMedia = getMobileMatchMediaAndSubscribe(this)
 
   protected render() {
     if (this.mobileMedia.matches) {
@@ -39,8 +39,8 @@ export class HeaderElement extends LitElement {
           <inch-icon icon="logoFull"></inch-icon>
         </div>
         <div class="right-content">
-          <inch-chain-selector .controller="${connectWalletController}"></inch-chain-selector>
-          <inch-connect-wallet-view .controller="${connectWalletController}"></inch-connect-wallet-view>
+          <inch-chain-selector .controller="${this.applicationContext.connectWalletController}"></inch-chain-selector>
+          <inch-connect-wallet-view .controller="${this.applicationContext.connectWalletController}"></inch-connect-wallet-view>
         </div>
       </div>
     `

@@ -1,4 +1,4 @@
-import { ChainId, ITokenDto, FusionQuoteReceiveDto, GasPriceDto } from '@one-inch-community/models';
+import { ChainId, ITokenDto, FusionQuoteReceiveDto, GasPriceDto, IOneInchDevPortalAdapter } from '@one-inch-community/models';
 import type { Address } from 'viem';
 import { CacheActivePromise } from '@one-inch-community/core/decorators';
 import { TimeCache } from '@one-inch-community/core/cache';
@@ -15,7 +15,7 @@ export type QuoteReceiveCustomPreset = {
   points: {toTokenAmount: string; delay: number}[]
 }
 
-export class OneInchDevPortalAdapter {
+export class OneInchDevPortalAdapter implements IOneInchDevPortalAdapter {
 
   private readonly host: string = getEnvironmentValue('oneInchDevPortalHost')
 

@@ -90,8 +90,8 @@ const transportMap: Record<ChainId, string[]> = {
     'https://ethereum-mainnet-archive.allthatnode.com', // archive global
     'https://ethereum-mainnet-rpc-germany.allthatnode.com', // germany
     'https://ethereum-mainnet-archive-germany.allthatnode.com', // archive germany
-    // 'https://ethereum-mainnet-rpc-korea.allthatnode.com', // korea
-    // 'https://ethereum-mainnet-archive-korea.allthatnode.com', // archive korea
+    'https://ethereum-mainnet-rpc-korea.allthatnode.com', // korea
+    'https://ethereum-mainnet-archive-korea.allthatnode.com', // archive korea
   ],
   [ChainId.bnb]: [
     'https://bsc.publicnode.com',

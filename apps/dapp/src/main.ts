@@ -1,17 +1,18 @@
-import './app/app.element';
-import { initLocale } from '@one-inch-community/core/lit'
-import { themeInit, MainColors, BrandColors } from '@one-inch-community/ui-components/theme'
+import { bootstrapApplicationContext } from './context';
+import { html, render } from 'lit';
 
 Promise.all([
-  initLocale(),
-  themeInit(MainColors.systemSync, BrandColors.random),
-  import('./app/controllers/connect-wallet-controller').then(m => m.connectWalletController.init())
-])
-  .then(() => {
-    const main = document.createElement('app-root')
-    main.id = 'app-root'
-    document.body.appendChild(main)
-  })
+  import('./app/app.element'),
+  bootstrapApplicationContext(),
+]).then(() => {
+  const template = html`
+    <global-application-context>
+      <app-root id="app-root"></app-root>
+      <div id="overlay-container"></div>
+    </global-application-context>
+  `
+  render(template, document.body)
+})
 
 import('virtual:pwa-register').then(({ registerSW }) => {
   registerSW({

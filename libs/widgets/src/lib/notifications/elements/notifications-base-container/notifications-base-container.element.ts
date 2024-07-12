@@ -1,11 +1,11 @@
 import { html, LitElement } from 'lit';
 import { NotificationsContainer } from '../../notifications-container';
-import { INotificationsController, NotificationRecord } from '../../notifications-controller.interface';
+import { INotificationsControllerInternal, NotificationRecord } from '../../notifications-controller.interface';
 import { classMap } from 'lit/directives/class-map.js';
 
 export abstract class NotificationsBaseContainerElement extends LitElement implements NotificationsContainer {
 
-  protected controller!: INotificationsController;
+  protected controller!: INotificationsControllerInternal;
   protected notifications: [string, NotificationRecord][] = [];
   protected animationInProgress = false;
   protected animationStateQueue: [string, NotificationRecord][][] = [];
@@ -18,7 +18,7 @@ export abstract class NotificationsBaseContainerElement extends LitElement imple
     super();
   }
 
-  setController(controller: INotificationsController) {
+  setController(controller: INotificationsControllerInternal) {
     this.controller = controller;
   }
 

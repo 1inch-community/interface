@@ -1,25 +1,18 @@
 import { html, TemplateResult } from 'lit';
 import { unsafeHTML} from 'lit/directives/unsafe-html.js';
-import { getContainer } from '../overlay-container';
 import {
   NotificationsDesktopContainerElement,
   NotificationsMobileContainerElement
 } from './elements'
 import { NotificationsContainer } from './notifications-container';
+import { INotificationsController } from '@one-inch-community/models';
 import { getMobileMatchMedia } from '@one-inch-community/core/lit';
 import { LongTimeAsyncCache } from '@one-inch-community/core/cache';
-import { INotificationsController, NotificationConfig, NotificationRecord } from './notifications-controller.interface';
+import { INotificationsControllerInternal, NotificationConfig, NotificationRecord } from './notifications-controller.interface';
 import { getNotificationId } from './notifications-id';
+import { getContainer } from '@one-inch-community/ui-components/overlay';
 
-export class NotificationsController implements INotificationsController {
-
-  static async new() {
-    const instance = new NotificationsController()
-    await instance.initialize()
-    return instance
-  }
-
-  // implementation
+export class NotificationsController implements INotificationsControllerInternal, INotificationsController {
 
   private readonly cache = new LongTimeAsyncCache<string>('notifications', 3);
 
@@ -27,11 +20,17 @@ export class NotificationsController implements INotificationsController {
 
   private readonly mobileMatchMedia = getMobileMatchMedia()
 
-  private readonly overlayContainer = getContainer()
-
   private activeContainer: NotificationsContainer | null = null
 
-  protected constructor() {
+  async init() {
+    const records = await this.cache.getAll()
+    for (const record of records) {
+      const notification: NotificationRecord = JSON.parse(record)
+      this.notifications.set(notification.id, {
+        ...notification,
+        template: html`${unsafeHTML(notification.template as unknown as string)}`
+      })
+    }
   }
 
   async closeNotifications(): Promise<void> {
@@ -50,21 +49,10 @@ export class NotificationsController implements INotificationsController {
       return
     }
     const container = this.getNotificationsContainer()
-    if (this.overlayContainer.contains(container)) {
+    if (getContainer().contains(container)) {
       container.setAllNotifications(this.getSortedNotifications())
     } else {
       await this.renderContainer()
-    }
-  }
-
-  private async initialize() {
-    const records = await this.cache.getAll()
-    for (const record of records) {
-      const notification: NotificationRecord = JSON.parse(record)
-      this.notifications.set(notification.id, {
-        ...notification,
-        template: html`${unsafeHTML(notification.template as unknown as string)}`
-      })
     }
   }
 
@@ -89,7 +77,7 @@ export class NotificationsController implements INotificationsController {
       await this.cacheNotification(id, record)
     }
     const container = this.getNotificationsContainer()
-    if (this.overlayContainer.contains(container)) {
+    if (getContainer().contains(container)) {
       container.setAllNotifications(this.getSortedNotifications())
     } else {
       await this.renderContainer()
@@ -101,7 +89,7 @@ export class NotificationsController implements INotificationsController {
     const container = this.getNotificationsContainer()
     container.setAllNotifications(this.getSortedNotifications())
     await container.preRender()
-    this.overlayContainer.appendChild(container)
+    getContainer().appendChild(container)
     await container.postRender()
   }
 
