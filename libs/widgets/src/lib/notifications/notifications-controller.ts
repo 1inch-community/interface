@@ -11,6 +11,7 @@ import { LongTimeAsyncCache } from '@one-inch-community/core/cache';
 import { INotificationsControllerInternal, NotificationConfig, NotificationRecord } from './notifications-controller.interface';
 import { getNotificationId } from './notifications-id';
 import { getContainer } from '@one-inch-community/ui-components/overlay';
+import { distinctUntilChanged, map, Subject } from 'rxjs';
 
 export class NotificationsController implements INotificationsControllerInternal, INotificationsController {
 
@@ -22,6 +23,13 @@ export class NotificationsController implements INotificationsControllerInternal
 
   private activeContainer: NotificationsContainer | null = null
 
+  private update$ = new Subject<void>()
+
+  readonly notificationsCount$ = this.update$.pipe(
+    map(() => this.notifications.size),
+    distinctUntilChanged()
+  )
+
   async init() {
     const records = await this.cache.getAll()
     for (const record of records) {
@@ -31,6 +39,15 @@ export class NotificationsController implements INotificationsControllerInternal
         template: html`${unsafeHTML(notification.template as unknown as string)}`
       })
     }
+    this.update$.next()
+  }
+
+  async openAllNotifications() {
+    let container = this.getNotificationsContainer()
+    container.onShowAll()
+    if (!getContainer().contains(container)) {
+      await this.renderContainer()
+    }
   }
 
   async closeNotifications(): Promise<void> {
@@ -38,6 +55,7 @@ export class NotificationsController implements INotificationsControllerInternal
     await container.preClose()
     container.remove()
     this.activeContainer = null
+    this.update$.next()
   }
 
   async closeNotification(id: string) {
@@ -54,6 +72,7 @@ export class NotificationsController implements INotificationsControllerInternal
     } else {
       await this.renderContainer()
     }
+    this.update$.next()
   }
 
   async error(title: string): Promise<string> {
@@ -82,6 +101,7 @@ export class NotificationsController implements INotificationsControllerInternal
     } else {
       await this.renderContainer()
     }
+    this.update$.next()
     return id
   }
 
@@ -91,6 +111,7 @@ export class NotificationsController implements INotificationsControllerInternal
     await container.preRender()
     getContainer().appendChild(container)
     await container.postRender()
+    this.update$.next()
   }
 
   private getNotificationsContainer() {

@@ -10,7 +10,6 @@ export const notificationsMobileContainerStyle = css`
         display: grid;
         flex-direction: column;
         overflow-x: hidden;
-        scroll-behavior: smooth;
     }
 
     .scroll-content-container {

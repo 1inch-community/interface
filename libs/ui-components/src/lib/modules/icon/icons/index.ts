@@ -1,5 +1,6 @@
 import { TemplateResult } from 'lit';
 import { IconContext } from './icon-context';
+import { bell24Svg } from './bell_24.svg';
 
 export type IconsRecord = {
   loader: () => Promise<TemplateResult | ((context: IconContext) => TemplateResult)>
@@ -26,6 +27,7 @@ export const icons: Record<string, IconsRecord> = {
   edit24: { width: '24px', height: '24px', loader: () => import('./edit_24.svg').then(m => m.edit24Svg) },
   connect24: { width: '24px', height: '24px', loader: () => import('./connect_24.svg').then(m => m.connect24Svg) },
   link24: { width: '24px', height: '24px', loader: () => import('./link_24.svg').then(m => m.link24Svg) },
+  bell24: { width: '24px', height: '24px', loader: () => import('./bell_24.svg').then(m => m.bell24Svg) },
   alert24: { width: '24px', height: '24px', loader: () => import('./alert_24.svg').then(m => m.alert24Svg) },
   l2Chain24: { width: '24px', height: '24px', loader: () => import('./l2-chain_24.svg').then(m => m.l2Chain24Svg) },
   l2ChainRTL24: { width: '24px', height: '24px', loader: () => import('./l2-chain-rtl_24.svg').then(m => m.l2Chain24Svg) },
