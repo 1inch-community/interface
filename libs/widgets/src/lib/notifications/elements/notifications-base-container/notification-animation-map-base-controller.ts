@@ -91,9 +91,7 @@ export abstract class NotificationAnimationMapBaseController implements Animatio
       reset()
       return
     }
-    const basePosition = 100
-    const startPosition = basePosition + (index * 50)
-    await this.onAfterRenderAnimateItemTransition(element, index, startPosition)
+    await this.onAfterRenderAnimateItemTransition(element, index)
     reset()
   }
 
@@ -123,7 +121,7 @@ export abstract class NotificationAnimationMapBaseController implements Animatio
   }
 
   abstract onAfterMoveAnimationItem(element: HTMLElement, newIndex: number): Promise<void>
-  abstract onAfterRenderAnimateItemTransition(element: HTMLElement, index: number, offset: number): Promise<void>
+  abstract onAfterRenderAnimateItemTransition(element: HTMLElement, index: number): Promise<void>
   abstract onAfterRenderAnimateItemSkipTransition(element: HTMLElement, index: number): void
   abstract onBeforeRenderAnimateItem(element: HTMLElement): Promise<void>
   abstract onBeforeRemoveAnimateItem(element: HTMLElement): Promise<void>

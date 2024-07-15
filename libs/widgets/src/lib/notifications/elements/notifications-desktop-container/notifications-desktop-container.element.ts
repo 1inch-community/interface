@@ -28,7 +28,7 @@ const animationOptions = {
 
 @customElement(NotificationsDesktopContainerElement.tagName)
 export class NotificationsDesktopContainerElement extends NotificationsBaseContainerElement {
-  static readonly tagName = 'inch-notifications-desktop-container';
+  static readonly tagName = 'inch-notifications-desktop-container' as const;
 
   static override readonly styles = [
     getScrollbarStyle(':host', true),
@@ -215,4 +215,10 @@ function getInteractiveCloseStreamByTouchEvent(element: HTMLElement) {
       )
     })
   )
+}
+
+declare global {
+  interface HTMLElementTagNameMap {
+    'inch-notifications-desktop-container': NotificationsDesktopContainerElement
+  }
 }
