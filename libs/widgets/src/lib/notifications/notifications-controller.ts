@@ -44,10 +44,10 @@ export class NotificationsController implements INotificationsControllerInternal
 
   async openAllNotifications() {
     let container = this.getNotificationsContainer()
-    container.onShowAll()
     if (!getContainer().contains(container)) {
       await this.renderContainer()
     }
+    container.openAll()
   }
 
   async closeNotifications(): Promise<void> {

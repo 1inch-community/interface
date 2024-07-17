@@ -32,6 +32,10 @@ export class NotificationAnimationMapController extends NotificationAnimationMap
   }
 
   async onAfterMoveAnimationItem(element: HTMLElement, newIndex: number) {
+    const rect = element.getBoundingClientRect()
+    if (rect.top > (window.innerHeight + this.topOffset)) {
+      return
+    }
     const offset = this.getOffsetByIndex(newIndex)
     await element.animate([
       { transform: `translateY(${offset * -1}px)` },

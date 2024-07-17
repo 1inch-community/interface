@@ -5,11 +5,7 @@ import './elements/header'
 import './elements/footer'
 import './elements/swap-form'
 import { scrollbarStyle } from '@one-inch-community/core/theme';
-import { asyncTimeout } from '@one-inch-community/ui-components/async';
-import { consume } from '@lit/context';
-import { IApplicationContext } from '@one-inch-community/models';
-import { ApplicationContextToken } from '@one-inch-community/core/application-context';
-import { genRandomHex, genRandomInt } from '@one-inch-community/core/random';
+
 
 @customElement('app-root')
 export class AppElement extends LitElement {
@@ -18,30 +14,6 @@ export class AppElement extends LitElement {
     appStyle,
     scrollbarStyle,
   ]
-
-  @consume({ context: ApplicationContextToken })
-  applicationContext!: IApplicationContext
-
-  protected firstUpdated() {
-    this.init()
-  }
-
-  private async init() {
-    const notificationsController = this.applicationContext.notificationsController
-    let i = 0
-    const loop = async () => {
-      if (i >= 1) return
-      await notificationsController.show('test notification ' + i, html`
-        <span>Test notification ${i}</span>
-        <span>${new Date().toString()}</span>
-        <span style="word-break: break-all;">${genRandomHex(genRandomInt(50, 300))}</span>
-      `)
-      i++
-      await asyncTimeout(2000)
-      loop()
-    }
-    await loop()
-  }
 
   protected render() {
     return html`

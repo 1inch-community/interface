@@ -2,28 +2,32 @@ import { html, render } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { notificationsMobileContainerStyle } from './notifications-mobile-container.style';
 import { NotificationsBaseContainerElement, notificationsBaseContainerStyle } from '../notifications-base-container';
-import { animationMap, appendStyle, setBrowserMetaColorColor, subscribe, transitionBrowserMetaColor } from '@one-inch-community/core/lit';
+import {
+  subscribe,
+  appendStyle,
+  animationMap,
+} from '@one-inch-community/core/lit';
 import { NotificationAnimationMapController } from './notification-animation-map-controller';
 import {
-  debounceTime, distinctUntilChanged, firstValueFrom,
-  fromEvent,
   map,
+  tap,
+  fromEvent,
   startWith,
-  switchMap, take,
+  switchMap,
   takeUntil,
-  tap
+  Observable,
+  debounceTime,
+  distinctUntilChanged,
+  Subject,
+  merge
 } from 'rxjs';
 import { createRef, ref } from 'lit/directives/ref.js';
-import {
-  blendColors,
-  getCssValue,
-  getScrollbarStyle, rgbaStrToHex,
-} from '@one-inch-community/core/theme';
+import { getScrollbarStyle } from '@one-inch-community/core/theme';
 import { consume } from '@lit/context';
 import { ApplicationContextToken } from '@one-inch-community/core/application-context';
 import { IApplicationContext } from '@one-inch-community/models';
 import { getContainer } from '@one-inch-community/ui-components/overlay';
-import './notifications-mobile-info.element'
+import './notifications-mobile-info.element';
 
 const animationOptions = {
   duration: 500,
@@ -45,64 +49,69 @@ export class NotificationsMobileContainerElement extends NotificationsBaseContai
 
   protected maxShorthandView = 1;
 
-  private isClose = false;
-
-  private openAnimationInProgress = false;
-
-  private lastOffset = 0
-
   private readonly animationController = new NotificationAnimationMapController(this);
 
-  private readonly ref = createRef<HTMLElement>();
+  private readonly touchContainerRef = createRef<HTMLElement>();
+  private readonly contentContainerRef = createRef<HTMLElement>();
+  private readonly backgroundViewRef = createRef<HTMLElement>();
 
   private upButtonElement: HTMLElement | null = null;
 
+  private hostHeight = this.clientHeight
+
   private readonly infoViewHeight: number = 48; //px
 
+  private readonly open$ = new Subject<void>()
 
-  connectedCallback() {
-    super.connectedCallback();
+  private lastOffset = 0
 
+  private closeInProgress = false
+
+  private readonly openInterpolation$ = this.open$.pipe(
+    switchMap(() => interpolateTo(10, this.infoViewHeight, 200))
+  )
+
+  protected firstUpdated() {
     subscribe(this, [
-      this.onOpenSwipe(),
-      this.onCloseSwipe(),
-      this.onShowHideUpButton()
+      this.onShowHideUpButton(),
+      this.swipeDownOnShortViewHandler()
     ], { requestUpdate: false });
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
-    this.upButtonElement?.remove()
+    this.upButtonElement?.remove();
   }
 
   protected override render() {
     return html`
-      <div ${ref(this.ref)} class="scroll-content-container">
+      <div ${ref(this.backgroundViewRef)} class="background-view"></div>
+      <div ${ref(this.touchContainerRef)} class="touch-container">
         <div class="info-view">
           <inch-notifications-mobile-info></inch-notifications-mobile-info>
         </div>
-        ${animationMap(
-          this.getSortedNotifications(),
-          this.animationController as any
-        )}
+        <div ${ref(this.contentContainerRef)} class="content-view">
+          ${animationMap(
+            this.getSortedNotifications(),
+            this.animationController as any
+          )}
+        </div>
       </div>
     `;
   }
 
-  preRender(): void | Promise<void> {
-    if (this.fullView) {
-      return
-    }
+  openAll() {
+    this.hostHeight = this.clientHeight
+    this.open$.next()
+  }
+
+  preRender(): void {
     appendStyle(this, {
       transform: 'translateY(-100%)'
     });
   }
 
   async postRender(): Promise<void> {
-    if (this.fullView) {
-      await this.onOpenFullViewFromFullCloseStateAnimation()
-      return
-    }
     await this.animate([
       { transform: `translate3d(0, -100%, 0)` },
       { transform: `translate3d(0, ${-this.infoViewHeight}px, 0)` }
@@ -113,12 +122,63 @@ export class NotificationsMobileContainerElement extends NotificationsBaseContai
   }
 
   async preClose(): Promise<void> {
-    this.lastOffset = 0
-    if (this.isClose) return;
+    this.closeInProgress = true
+    if (!this.fullView) {
+      await this.touchContainerRef.value!.animate([
+        { transform: `translate3d(0, -${this.lastOffset}px, 0)` },
+        { transform: `translate3d(0, -100%, 0)` },
+      ], { ...animationOptions, duration: 700 }).finished
+    } else {
+     await Promise.all([
+       this.contentContainerRef.value!.animate([
+         { transform: `translate3d(0, ${this.lastOffset}px, 0)` },
+         { transform: `translate3d(0, 100%, 0)` },
+       ], { duration: 1000 }).finished,
+       this.touchContainerRef.value!.animate([
+         { opacity: 1 },
+         { opacity: 0 },
+       ], { ...animationOptions, duration: 1000 }).finished,
+       this.backgroundViewRef.value!.animate([
+         getBackdropFilter('blur(3px)'),
+         getBackdropFilter('blur(0px)'),
+       ], { ...animationOptions, duration: 1000 })
+     ])
+    }
   }
 
-  override onShowAll() {
-    super.onShowAll();
+  private swipeDownOnShortViewHandler() {
+    let fullView = this.fullView
+    return merge(
+      this.openInterpolation$,
+      getInteractiveTouchEvent(this, {
+        startHandler: () => {
+          fullView = this.fullView
+          this.hostHeight = this.clientHeight
+          this.animationInProgress = true
+        },
+        endHandler: () => {
+          this.animationInProgress = false
+        }
+      })
+    ).pipe(
+      map((offset) => {
+        return this.fullView && offset < this.infoViewHeight ? this.infoViewHeight : offset
+      }),
+      tap(offset => {
+        if (!this.touchContainerRef.value || this.scrollTop > 0 || this.closeInProgress) return;
+        if (offset < 0) {
+          this.handleCloseOnShortView(offset)
+        } else {
+          this.applyBackgroundBlur(offset);
+          this.applyOffsetOnContentContainer(offset);
+          this.applyOffsetOnShowAll(offset);
+          this.applyHostHeight(offset);
+          this.handleCloseOnFullView(offset, fullView)
+        }
+        this.applyOffsetOnHost(offset);
+        this.lastOffset = offset
+      })
+    );
   }
 
   private getUpButtonTemplate() {
@@ -126,15 +186,7 @@ export class NotificationsMobileContainerElement extends NotificationsBaseContai
       <inch-button @click="${() => this.scrollToUp()}" size="l">
         <inch-icon style="transform: rotate(180deg)" icon="arrowDown24"></inch-icon>
       </inch-button>
-    `
-  }
-
-  onShowAllInternal() {
-    if (!this.animationInProgress) {
-      this.onOpenFullViewAnimation(0).catch(console.error)
-      return
-    }
-    this.onShowAll();
+    `;
   }
 
   private onShowHideUpButton() {
@@ -147,267 +199,188 @@ export class NotificationsMobileContainerElement extends NotificationsBaseContai
       debounceTime(300),
       switchMap(async (state) => {
         if (state) {
-          this.upButtonElement?.remove()
-          this.upButtonElement = document.createElement('div')
-          render(this.getUpButtonTemplate(), this.upButtonElement)
+          this.upButtonElement?.remove();
+          this.upButtonElement = document.createElement('div');
+          render(this.getUpButtonTemplate(), this.upButtonElement);
           appendStyle(this.upButtonElement, {
             position: 'fixed',
             bottom: '16px',
             right: '16px',
             zIndex: '3010',
-            transform: 'translateY(200%)',
-          })
-          getContainer().appendChild(this.upButtonElement)
+            transform: 'translateY(200%)'
+          });
+          getContainer().appendChild(this.upButtonElement);
           await this.upButtonElement?.animate([
             { transform: 'translateY(200%)' },
             { transform: 'translateY(0)' }
-          ], animationOptions).finished
-          if (this.upButtonElement === null) return
+          ], animationOptions).finished;
+          if (this.upButtonElement === null) return;
           appendStyle(this.upButtonElement, {
-            transform: '',
-          })
+            transform: ''
+          });
         } else {
           await this.upButtonElement?.animate([
             { transform: 'translateY(0)' },
-            { transform: 'translateY(200%)' },
-          ], animationOptions).finished
-          this.upButtonElement?.remove()
-          this.upButtonElement = null
+            { transform: 'translateY(200%)' }
+          ], animationOptions).finished;
+          this.upButtonElement?.remove();
+          this.upButtonElement = null;
         }
-        return []
-      })
-    )
-  }
-
-  private async onResetAnimation(offset: number, animateBlur = false) {
-    await Promise.all([
-      this.ref.value!.animate([
-        { transform: `translate3d(0, ${this.lastOffset}px, 0)` },
-        { transform: `translate3d(0, 0, 0)` }
-      ], { ...animationOptions, delay: 200 }).finished,
-      animateBlur ? this.animate([
-        { ...getBackdropFilter(`blur(${this.lastOffset * 3 / 15}px)`), },
-        { ...getBackdropFilter(`blur(0px)`), },
-      ], { ...animationOptions, delay: 200 }).finished : Promise.resolve()
-    ]);
-    appendStyle(this.ref.value!, {
-      transform: '',
-      paddingBottom: ''
-    });
-    if (animateBlur) {
-      appendStyle(this, {
-        ...getBackdropFilter('blur(3px)'),
-      });
-    }
-    this.lastOffset = offset;
-  }
-
-  private async onCloseFullViewAnimation() {
-    this.isClose = true;
-    const bgColor = getCssValue('var(--color-background-bg-body)');
-    setBrowserMetaColorColor(bgColor)
-    appendStyle(this.ref.value!, {
-      ...getBackdropFilter('blur(3px)'),
-      background: 'var(--primary-12)'
-    });
-    appendStyle(this, {
-      ...getBackdropFilter(''),
-      background: '',
-    });
-    await this.animate([
-      { transform: `translate3d(0, 0, 0)` },
-      { transform: `translate3d(0, 120%, 0)` }
-    ], { ...animationOptions, duration: 2000 }).finished
-    appendStyle(this, {
-      transform: `translate3d(0, 120%, 0)`
-    });
-    await this.controller.closeNotifications();
-  }
-
-  private async onCloseBySwipeUpAnimation() {
-    this.isClose = true;
-    appendStyle(this.ref.value!, {
-      transform: `translate3d(0, 0, 0)`,
-      paddingBottom: `0`
-    });
-    await this.animate([
-      { transform: `translate3d(0, ${this.lastOffset}px, 0)` },
-      { transform: `translate3d(0, -120%, 0)` }
-    ], animationOptions).finished
-    appendStyle(this, {
-      transform: `translate3d(0, -120%, 0)`
-    });
-    await this.controller.closeNotifications();
-  }
-
-  private async onOpenFullViewFromFullCloseStateAnimation() {
-    this.openAnimationInProgress = true;
-    appendStyle(this, {
-      ...getBackdropFilter(`blur(3px)`),
-      background: 'var(--primary-12)',
-      height: '100dvh',
-    });
-    const bgColor = getCssValue('var(--color-background-bg-body)');
-    const primary12Rgba = getCssValue('var(--primary-12)');
-    const primary12Hex = rgbaStrToHex(primary12Rgba);
-    const toColor = blendColors(bgColor, primary12Hex);
-    setBrowserMetaColorColor(toColor)
-
-
-
-    this.openAnimationInProgress = false;
-  }
-
-  private async onOpenFullViewAnimation(offset: number) {
-    this.openAnimationInProgress = true;
-    appendStyle(this.ref.value!, {
-      transform: `translate3d(0, ${offset}px, 0)`,
-      paddingBottom: '',
-      ...getBackdropFilter(`blur(3px)`),
-    });
-    appendStyle(this, {
-      ...getBackdropFilter('blur(3px)'),
-    });
-    this.requestUpdate();
-    await this.updateComplete;
-    const height = this.ref.value!.clientHeight;
-    this.onShowAllInternal();
-    const bgColor = getCssValue('var(--color-background-bg-body)');
-    const primary12Rgba = getCssValue('var(--primary-12)');
-    const primary12Hex = rgbaStrToHex(primary12Rgba);
-    const toColor = blendColors(bgColor, primary12Hex);
-    setBrowserMetaColorColor(toColor)
-    await Promise.all([
-      this.animate([
-        {
-          transform: `translate3d(0, -${this.infoViewHeight}px, 0)`,
-        },
-        {
-          transform: `translate3d(0, 0, 0)`,
-        }
-      ], { ...animationOptions, duration: 1200 }).finished,
-      this.ref.value!.animate([
-        {
-          transform: `translate3d(0, ${offset}px, 0)`,
-          height: `${height}px`,
-          background: 'var(--primary-12)'
-        },
-        {
-          transform: `translate3d(0, 0, 0)`,
-          height: '100dvh',
-          background: 'var(--primary-12)'
-        }
-      ], { ...animationOptions, duration: 1200 }).finished
-    ])
-    appendStyle(this.ref.value!, {
-      transform: ``,
-      ...getBackdropFilter(''),
-    });
-    appendStyle(this, {
-      ...getBackdropFilter(`blur(3px)`),
-      transform: ``,
-      background: 'var(--primary-12)',
-      height: '100dvh',
-    });
-    this.openAnimationInProgress = false
-    this.lastOffset = offset;
-  }
-
-  private onCloseSwipe() {
-    return getInteractiveTouchEvent(this).pipe(
-      tap(offset => {
-        if (!this.fullView || this.openAnimationInProgress || this.isClose || this.scrollTop > 0) return
-        if ((Math.abs(offset - this.lastOffset) > 10) && offset === 0) {
-          this.onResetAnimation(offset).catch(console.error);
-          return;
-        }
-        if (offset >= 15) {
-          this.onCloseFullViewAnimation().catch(console.error);
-          return;
-        }
-
-        appendStyle(this.ref.value!, {
-          transform: `translate3d(0, ${offset}px, 0)`,
-        });
-        this.lastOffset = offset;
-      })
-    )
-  }
-
-  private onOpenSwipe() {
-    return getInteractiveTouchEvent(this).pipe(
-      tap(offset => {
-        if (this.fullView || this.isClose || this.openAnimationInProgress) return;
-        if ((Math.abs(offset - this.lastOffset) > 10) && offset === 0) {
-          this.onResetAnimation(offset, true).catch(console.error);
-          return;
-        }
-        if (offset >= 15) {
-          this.onOpenFullViewAnimation(offset).catch(console.error);
-          return;
-        } else {
-          appendStyle(this, {
-            ...getBackdropFilter(`blur(${offset * 3 / 15}px)`),
-          });
-        }
-        if ((offset * 100 / this.clientHeight) < -30) {
-          this.onCloseBySwipeUpAnimation().catch(console.error)
-          return;
-        }
-
-        appendStyle(this.ref.value!, {
-          transform: `translate3d(0, ${offset}px, 0)`,
-          paddingBottom: `${offset}px`
-        });
-        this.lastOffset = offset;
+        return [];
       })
     );
   }
 
+  private applyBackgroundBlur(offset: number) {
+    if (!this.backgroundViewRef.value || this.fullView) return;
+    const max = 3
+    let blur = offset * max / this.infoViewHeight;
+    blur = blur > max ? max : blur
+    appendStyle(this.backgroundViewRef.value, {
+      ...getBackdropFilter(`blur(${blur}px)`)
+    });
+  }
+
+  private applyOffsetOnContentContainer(offset: number) {
+    if (!this.contentContainerRef.value) return;
+    const contentContainerOffset = offset - this.infoViewHeight
+    if (contentContainerOffset >= 0) {
+      appendStyle(this.contentContainerRef.value, {
+        transform: `translate3d(0, ${contentContainerOffset}px, 0)`
+      });
+    }
+  }
+
+  private applyOffsetOnShowAll(offset: number) {
+    if (offset >= this.infoViewHeight && !this.fullView) {
+      this.onShowAll()
+    }
+  }
+
+  private applyOffsetOnHost(offset: number) {
+    let hostOffset = this.infoViewHeight - offset
+    hostOffset = Math.max(hostOffset, 0)
+    appendStyle(this, {
+      transform: hostOffset === 0 ? '' : `translate3d(0, -${hostOffset}px, 0)`
+    });
+  }
+
+  private applyHostHeight(offset: number) {
+    const max = window.innerHeight
+    const min = this.hostHeight
+    let height = offset * max / this.infoViewHeight;
+    height = height > max ? max : height
+    height = height < min ? min : height
+    appendStyle(this, {
+      height: `${height}px`
+    })
+  }
+
+  private handleCloseOnShortView(offset: number) {
+    if (offset < -(this.hostHeight * 0.25)) {
+      this.controller.closeNotifications().catch(console.error)
+    }
+  }
+
+  private handleCloseOnFullView(offset: number, fullView: boolean) {
+    if (offset > (30 * window.innerHeight / 100) && fullView) {
+      this.controller.closeNotifications().catch(console.error)
+    }
+  }
+
   private scrollToUp() {
-    this.scrollTo({ top: -1, left: 0, behavior: "smooth" })
+    this.scrollTo({ top: -1, left: 0, behavior: 'smooth' });
   }
 
 }
 
-function getInteractiveTouchEvent(element: HTMLElement) {
-  const end$ = fromEvent(document, 'touchend');
-  const initialResistance = 50000;
-  const resistanceThreshold = 1;
-  const maxOffset = 30;
-  const applyBounceEffect = (offset: number) => {
-    if (offset < 0) return offset;
-    const resistance = (element.clientWidth - offset) * 0.05;
-    const result = (resistanceThreshold / initialResistance) + ((offset - resistanceThreshold) / resistance);
-    if (result < 0) return 0;
-    if (result >= maxOffset) return maxOffset;
-    return result;
-  };
+type InteractiveTouchEventConfig = {
+  bounceEffect?: () => boolean
+  startHandler?: () => void
+  endHandler?: () => void
+  maxOffset?: number
+}
 
+function getInteractiveTouchEvent(element: HTMLElement, config?: InteractiveTouchEventConfig) {
+  const end$ = fromEvent(document, 'touchend');
   return fromEvent<TouchEvent>(element, 'touchstart').pipe(
     switchMap(startEvent => {
+      config?.startHandler?.();
       const startPoint = startEvent.touches[0].clientY;
       return fromEvent<TouchEvent>(document, 'touchmove').pipe(
         map(event => event.touches[0].clientY - startPoint),
         switchMap(offset => end$.pipe(
-          map(() => 0),
-          startWith(applyBounceEffect(offset))
+          switchMap(() => {
+            config?.endHandler?.();
+            return interpolateTo(offset, 0, 500);
+          }),
+          startWith(offset)
         )),
-        takeUntil(end$.pipe(debounceTime(100)))
+        takeUntil(end$.pipe(debounceTime(600)))
       );
     })
   );
 }
 
+function cubicBezier(p1y: number, p2y: number) {
+  return (t: number) => {
+    const u = 1 - t;
+    const tt = t * t;
+    const uu = u * u;
+    const uuu = uu * u;
+    const ttt = tt * t;
+    return uuu * 0 + 3 * uu * t * p1y + 3 * u * tt * p2y + ttt * 1;
+  }
+}
+
+function cubicBezierInterpolation(p1y: number, p2y: number) {
+  const ease = cubicBezier(p1y, p2y);
+
+  return (startValue: number, endValue: number, t: number) => {
+    const bezierValue = ease(t);
+    return startValue + (endValue - startValue) * bezierValue;
+  };
+}
+
+
+const ease = cubicBezierInterpolation(0, 0.8);
+function interpolateTo(fromValue: number, toValue: number, duration: number) {
+  return new Observable<number>(subscriber => {
+    const startTime = Date.now();
+    const endTime = startTime + duration;
+    let timer: number;
+
+    const handler = () => {
+      const currentTime = Date.now();
+      const elapsedTime = currentTime - startTime;
+      const t = Math.min(elapsedTime / duration, 1); // Обеспечиваем, что t не превышает 1
+      const currentValue = ease(fromValue, toValue, t);
+      subscriber.next(currentValue);
+
+      if (currentTime < endTime) {
+        timer = requestAnimationFrame(handler);
+      } else {
+        subscriber.complete();
+      }
+    };
+
+    timer = requestAnimationFrame(handler);
+
+    return () => {
+      timer && cancelAnimationFrame(timer);
+    };
+  });
+}
+
 function getBackdropFilter(value: string) {
   return {
     backdropFilter: value,
-    '-webkit-backdrop-filter': value,
-  }
+    '-webkit-backdrop-filter': value
+  };
 }
 
 declare global {
   interface HTMLElementTagNameMap {
-    'inch-notifications-mobile-container': NotificationsMobileContainerElement
+    'inch-notifications-mobile-container': NotificationsMobileContainerElement;
   }
 }

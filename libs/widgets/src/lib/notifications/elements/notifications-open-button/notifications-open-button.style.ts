@@ -11,7 +11,7 @@ export const notificationsOpenButtonStyle = css`
         top: 0;
         right: 0;
         font-size: 8px;
-        background-color: var(--color-core-red-critical);
+        background-color: var(--color-content-content-secondary);
         border-radius: 8px;
         min-width: 10px;
         height: 12px;

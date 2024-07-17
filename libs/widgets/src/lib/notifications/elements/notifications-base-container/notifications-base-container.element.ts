@@ -47,7 +47,11 @@ export abstract class NotificationsBaseContainerElement extends LitElement imple
     }
   }
 
-  onShowAll() {
+  openAll() {
+    this.onShowAll()
+  }
+
+  protected onShowAll() {
     this.fullView = true
     this.requestUpdate()
   }

@@ -37,10 +37,12 @@ export class NotificationsOpenButtonElement extends LitElement {
 
   protected render() {
     return html`
-      <inch-button @click="${() => this.applicationContext.notificationsController.openAllNotifications()}" size="l" type="secondary-gray">
+      <inch-button @click="${() => this.applicationContext.notificationsController.openAllNotifications()}" size="l" type="primary-gray">
         <inch-icon icon="bell24"></inch-icon>
       </inch-button>
-      ${when(this.count, () => html`<span class="notification-counter">${this.count}</span>`)}
+      ${when(this.count, () => html`
+        <span class="notification-counter">${this.count}</span>
+      `)}
     `
   }
 

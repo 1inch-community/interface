@@ -11,5 +11,5 @@ export interface NotificationsContainer extends HTMLElement {
   makeNotificationTemplate(record: NotificationRecord): TemplateResult
   animationStartHandler(): void
   animationCompleteHandler(): void
-  onShowAll(): void
+  openAll(): void
 }
