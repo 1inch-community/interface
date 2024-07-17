@@ -50,9 +50,14 @@ export class FooterElement extends LitElement {
   private getMobileFooter() {
     return html`
       <div class="footer-container mobile-footer">
-        <inch-chain-selector .controller="${this.applicationContext.connectWalletController}"></inch-chain-selector>
-        <inch-notifications-open-button></inch-notifications-open-button>
-        <inch-connect-wallet-view .controller="${this.applicationContext.connectWalletController}"></inch-connect-wallet-view>
+        <div class="footer-content-container">
+          <inch-notifications-open-button></inch-notifications-open-button>
+        </div>
+        <div class="footer-content-container">
+          <inch-chain-selector .controller="${this.applicationContext.connectWalletController}"></inch-chain-selector>
+          <inch-connect-wallet-view .controller="${this.applicationContext.connectWalletController}"></inch-connect-wallet-view>
+        </div>
+      
       </div>
     `
   }

@@ -9,6 +9,7 @@ import { notificationsOpenButtonStyle } from './notifications-open-button.style'
 import { defer, tap } from 'rxjs';
 import { observe, subscribe } from '@one-inch-community/core/lit';
 import { when } from 'lit/directives/when.js';
+import { ifDefined } from 'lit/directives/if-defined.js';
 
 @customElement(NotificationsOpenButtonElement.tagName)
 export class NotificationsOpenButtonElement extends LitElement {
@@ -37,7 +38,7 @@ export class NotificationsOpenButtonElement extends LitElement {
 
   protected render() {
     return html`
-      <inch-button @click="${() => this.applicationContext.notificationsController.openAllNotifications()}" size="l" type="primary-gray">
+      <inch-button disabled="${ifDefined(this.count === 0 ? '' : undefined)}" @click="${() => this.applicationContext.notificationsController.openAllNotifications()}" size="l" type="primary-gray">
         <inch-icon icon="bell24"></inch-icon>
       </inch-button>
       ${when(this.count, () => html`

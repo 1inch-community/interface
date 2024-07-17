@@ -1,4 +1,5 @@
 import { css } from 'lit';
+import { mobileMediaCSS } from '@one-inch-community/core/lit';
 
 export const connectWalletViewStyle = css`
 
@@ -17,5 +18,13 @@ export const connectWalletViewStyle = css`
         width: 24px;
         height: 24px;
     }
+    
+    ${mobileMediaCSS(css`
+        .connect-wallet-view-container {
+            padding: 6px;
+            width: 36px;
+            height: 36px;
+        }
+    `)}
 
 `

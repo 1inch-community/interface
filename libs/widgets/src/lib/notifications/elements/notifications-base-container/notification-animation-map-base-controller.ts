@@ -38,7 +38,7 @@ export abstract class NotificationAnimationMapBaseController implements Animatio
   onTemplateBuilder([id, record]: [string, NotificationRecord]) {
     if (id === 'fullView') {
       return html`
-        <inch-button @click="${() => this.element.onShowAll()}" class="show-all-button" fullSize size="l" type="secondary">
+        <inch-button @click="${() => this.element.openAll()}" class="show-all-button" fullSize size="l" type="secondary">
           <inch-icon icon="arrowDown24"></inch-icon>
         </inch-button>
       `;

@@ -11,7 +11,7 @@ import { LongTimeAsyncCache } from '@one-inch-community/core/cache';
 import { INotificationsControllerInternal, NotificationConfig, NotificationRecord } from './notifications-controller.interface';
 import { getNotificationId } from './notifications-id';
 import { getContainer } from '@one-inch-community/ui-components/overlay';
-import { distinctUntilChanged, map, Subject } from 'rxjs';
+import { distinctUntilChanged, map, startWith, Subject } from 'rxjs';
 
 export class NotificationsController implements INotificationsControllerInternal, INotificationsController {
 
@@ -26,6 +26,7 @@ export class NotificationsController implements INotificationsControllerInternal
   private update$ = new Subject<void>()
 
   readonly notificationsCount$ = this.update$.pipe(
+    startWith(null),
     map(() => this.notifications.size),
     distinctUntilChanged()
   )
