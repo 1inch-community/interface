@@ -47,7 +47,7 @@ export class NotificationsController implements INotificationsControllerInternal
   }
 
   async openAllNotifications() {
-    let container = this.getNotificationsContainer()
+    const container = this.getNotificationsContainer()
     if (!getContainer().contains(container)) {
       await this.renderContainer()
     }

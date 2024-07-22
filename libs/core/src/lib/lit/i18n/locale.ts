@@ -1,9 +1,4 @@
-export enum Locale {
-  en = 'en',
-  ar = 'ar',
-}
-
-export type Translations = Record<string, string>
+import { Locale } from "@one-inch-community/models"
 
 const rtlLocale: Locale[] = [
   Locale.ar

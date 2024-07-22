@@ -1,5 +1,5 @@
 import type { CSSResult } from 'lit';
-import { MainColors, BrandColors } from './themes';
+import { MainColors, BrandColors } from '../../../../../models/src/lib/themes/themes';
 import { Hex } from 'viem';
 
 export const mainColorMap: Record<MainColors, () => Promise<CSSResult>> = {

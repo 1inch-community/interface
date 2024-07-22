@@ -2,7 +2,7 @@ import { brandColorStyleElement, mainColorStyleElement } from './theme-elements'
 import { fontStyle } from './styles/font.style';
 import { bodyStyle } from './styles/body.style';
 import { themeChange } from './theme-change';
-import { BrandColors, MainColors } from './themes/themes';
+import { BrandColors, MainColors } from '../../../../models/src/lib/themes/themes';
 import { scrollbarStyle } from './styles/scrollbar.style';
 import { createAndApplyStyle } from '@one-inch-community/core/lit';
 

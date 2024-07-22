@@ -1,6 +1,6 @@
 import { brandColorMap, mainColorMap } from './themes';
 import { mainColorStyleElement, brandColorStyleElement } from './theme-elements';
-import { MainColors, BrandColors } from './themes/themes';
+import { MainColors, BrandColors } from '../../../../models/src/lib/themes/themes';
 import { applyStyle, setBrowserMetaColorColor } from '@one-inch-community/core/lit';
 import { Observable, ReplaySubject } from 'rxjs';
 

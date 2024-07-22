@@ -1,4 +1,5 @@
-import { isRTL, Locale, Translations } from './locale';
+import { Locale, Translations } from '@one-inch-community/models';
+import { isRTL } from './locale';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 
 const translations = new Map<Locale, (() => Promise<Translations>)[]>()
