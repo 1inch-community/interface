@@ -116,6 +116,11 @@ export class ModuleBuilder {
     const libPackageJson = await getLibraryPackageJson(this.libName)
     const projectName = packageJson.name
     const version = packageJson.version
+    const license = packageJson.license
+    const author = packageJson.author
+    const bugs = packageJson.bugs
+    const repository = packageJson.repository
+    const homepage = packageJson.homepage
     const module = `./index.esm.js`
     const types = `./index.d.ts`
     await generatePackageJson({
@@ -131,6 +136,11 @@ export class ModuleBuilder {
           import: module,
         }
       },
+      license,
+      author,
+      bugs,
+      repository,
+      homepage,
     }, getModuleDistPath(this.libName, this.moduleName))
   }
 
