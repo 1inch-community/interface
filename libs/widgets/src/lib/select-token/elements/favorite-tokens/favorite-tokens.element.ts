@@ -146,11 +146,11 @@ class FavoriteTokensAnimationMapController implements AnimationMapController<ITo
   constructor(private readonly element: FavoriteTokensElement) {
   }
 
-  onKeyExtractor(token: ITokenRecord | null, index: number): string {
+  onKeyExtractor(token: ITokenRecord | null): string {
     return token !== null ? 't' + token.address : 'edit';
   }
 
-  onTemplateBuilder(token: ITokenRecord | null, index: number): TemplateResult {
+  onTemplateBuilder(token: ITokenRecord | null): TemplateResult {
     return when(
       token,
       (token) => html`
@@ -179,21 +179,21 @@ class FavoriteTokensAnimationMapController implements AnimationMapController<ITo
     );
   }
 
-  async onBeforeRemoveAnimateItem(element: HTMLElement, index: number): Promise<void> {
+  async onBeforeRemoveAnimateItem(element: HTMLElement): Promise<void> {
     await element.animate([
       { transform: '' },
       { transform: 'translateX(-50%) scale(.3)', opacity: 0 }
     ], animationOptions).finished
   }
 
-  async onBeforeRenderAnimateItem(element: HTMLElement, index: number): Promise<void> {
+  async onBeforeRenderAnimateItem(element: HTMLElement): Promise<void> {
     appendStyle(element, {
       transform: 'translateX(-100%)',
       opacity: '0'
     })
   }
 
-  async onAfterRenderAnimateItem?(element: HTMLElement, index: number, previousStepState: void): Promise<void> {
+  async onAfterRenderAnimateItem?(element: HTMLElement): Promise<void> {
     await element.animate([
       { transform: 'translateX(-100%) scale(.3)', opacity: 0 },
       { transform: 'translateX(0) scale(1)', opacity: 1 },
@@ -208,7 +208,7 @@ class FavoriteTokensAnimationMapController implements AnimationMapController<ITo
     if (this.renderElements.has(oldPosition)) {
       return this.renderElements.get(oldPosition)!
     }
-    let offset = this.getOffsetMoveByMoveElements(oldPosition, newPosition)
+    const offset = this.getOffsetMoveByMoveElements(oldPosition, newPosition)
 
     if (oldPosition < newPosition) {
       appendStyle(element, {

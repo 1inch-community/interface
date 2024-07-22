@@ -170,6 +170,7 @@ export class AnimationMap<Value> extends Directive {
       const template = controller.onTemplateBuilder(value, index)
       render(template, element)
       candidateMap.set(key, element)
+      index++
     })
     return candidateMap
   }
