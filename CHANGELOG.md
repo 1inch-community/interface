@@ -1,3 +1,10 @@
+# [1.0.0-dev.36](https://github.com/1inch-community/interface/compare/v1.0.0-dev.35...v1.0.0-dev.36) (2024-07-22)
+
+
+### Bug Fixes
+
+* Update dev-pipeline workflow dependencies ([a0a7cd1](https://github.com/1inch-community/interface/commit/a0a7cd18da7d9ad40d8262e45cf2d189ed087e5e))
+
 # [1.0.0-dev.35](https://github.com/1inch-community/interface/compare/v1.0.0-dev.34...v1.0.0-dev.35) (2024-07-22)
 
 
