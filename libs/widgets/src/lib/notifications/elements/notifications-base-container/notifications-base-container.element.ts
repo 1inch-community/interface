@@ -1,6 +1,8 @@
 import { html, LitElement } from 'lit';
 import { NotificationsContainer } from '../../notifications-container';
 import { INotificationsControllerInternal, NotificationRecord } from '../../notifications-controller.interface';
+import { subscribe, getMobileMatchMediaEmitter } from '@one-inch-community/core/lit';
+import { skip, switchMap } from 'rxjs';
 
 
 export abstract class NotificationsBaseContainerElement extends LitElement implements NotificationsContainer {
@@ -16,6 +18,16 @@ export abstract class NotificationsBaseContainerElement extends LitElement imple
 
   protected constructor() {
     super();
+  }
+
+  connectedCallback() {
+    super.connectedCallback();
+    subscribe(this, [
+      getMobileMatchMediaEmitter().pipe(
+        skip(1),
+        switchMap(() => this.controller.closeNotifications())
+      )
+    ], { requestUpdate: false })
   }
 
   setController(controller: INotificationsControllerInternal) {
