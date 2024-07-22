@@ -1,15 +1,15 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { consume } from '@lit/context';
-import { ISwapContext } from '@one-inch-community/models';
+import { IApplicationContext, ISwapContext } from '@one-inch-community/models';
 import { balanceStyles } from './balance.styles';
 import { catchError, combineLatest, defer, filter, map, startWith, switchMap } from 'rxjs';
 import { formatUnits } from 'viem';
 import { observe, translate } from '@one-inch-community/core/lit';
-import { TokenController } from '@one-inch-community/sdk/tokens';
 import { getBlockEmitter } from '@one-inch-community/sdk/chain';
 import { formatNumber } from '@one-inch-community/core/formatters';
 import { SwapContextToken } from '@one-inch-community/sdk/swap';
+import { ApplicationContextToken } from '@one-inch-community/core/application-context';
 
 @customElement(BalanceElement.tagName)
 export class BalanceElement extends LitElement {
@@ -21,6 +21,9 @@ export class BalanceElement extends LitElement {
 
   @consume({ context: SwapContextToken })
   context?: ISwapContext;
+
+  @consume({ context: ApplicationContextToken })
+  applicationContext!: IApplicationContext
 
   readonly balance$ = defer(() => {
     if (!this.context) throw new Error('');
@@ -38,13 +41,14 @@ export class BalanceElement extends LitElement {
     filter(([address]) => !!address),
     switchMap(([ walletAddress, token, chainId ]) => {
       if (!walletAddress || !token || !chainId) return [html`<br>`]
-      return TokenController.liveQuery(() => TokenController.getTokenBalance(chainId, token.address, walletAddress)).pipe(
-        filter(Boolean),
-        map(balanceRecord => {
-          return formatNumber(formatUnits(BigInt(balanceRecord.amount), token.decimals), 6)
-        }),
-        map(balance => this.getBalanceView(balance)),
-        catchError(() => [html`<br>`])
+      return this.applicationContext.tokenController.liveQuery(() =>
+        this.applicationContext.tokenController.getTokenBalance(chainId, token.address, walletAddress)).pipe(
+          filter(Boolean),
+          map(balanceRecord => {
+            return formatNumber(formatUnits(BigInt(balanceRecord.amount), token.decimals), 6)
+          }),
+          map(balance => this.getBalanceView(balance)),
+          catchError(() => [html`<br>`])
       )
     }),
 

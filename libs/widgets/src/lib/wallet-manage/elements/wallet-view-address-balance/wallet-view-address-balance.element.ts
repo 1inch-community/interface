@@ -1,13 +1,14 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Task } from '@lit/task';
-import { ChainId } from '@one-inch-community/models';
+import { ChainId, IApplicationContext } from '@one-inch-community/models';
 import { Address, formatUnits } from 'viem';
 import { walletViewAddressBalanceStyle } from './wallet-view-address-balance.style';
 import { LongTimeCache } from '@one-inch-community/core/cache';
 import { getChainById, nativeTokenAddress } from '@one-inch-community/sdk/chain';
-import { TokenController } from '@one-inch-community/sdk/tokens';
 import { formatNumber } from '@one-inch-community/core/formatters';
+import { consume } from '@lit/context';
+import { ApplicationContextToken } from '@one-inch-community/core/application-context';
 
 const storage = new LongTimeCache<string, string>('inch-wallet-view-address-balance', 7)
 
@@ -20,10 +21,13 @@ export class WalletViewAddressBalanceElement extends LitElement {
   @property({ type: Number }) chainId?: ChainId;
   @property({ type: String }) address?: Address;
 
+  @consume({ context: ApplicationContextToken })
+  applicationContext!: IApplicationContext
+
   private readonly task = new Task(this,
     async ([chainId, address]) => {
       if (!chainId || !address) throw new Error('')
-      const balanceRecord = await TokenController.getTokenBalance(chainId, nativeTokenAddress, address);
+      const balanceRecord = await this.applicationContext.tokenController.getTokenBalance(chainId, nativeTokenAddress, address);
       const balance = formatNumber(formatUnits(BigInt(balanceRecord?.amount ?? 0), 18), 6)
       storage.set([this.chainId, this.address].join(':'), balance)
       return balance

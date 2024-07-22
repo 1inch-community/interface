@@ -3,10 +3,14 @@ import { customElement, property } from 'lit/decorators.js';
 import { classMap } from 'lit/directives/class-map.js';
 import { tokenListItemStyle } from './token-list-item.style';
 import { Address, formatUnits, isAddressEqual } from 'viem';
-import { ChainId, IBalancesTokenRecord, ISelectTokenContext, ITokenRecord } from '@one-inch-community/models';
+import {
+  ChainId,
+  IApplicationContext,
+  IBalancesTokenRecord,
+  ISelectTokenContext, IToken,
+} from '@one-inch-community/models';
 import { Task } from '@lit/task';
 import { formatNumber } from '@one-inch-community/core/formatters';
-import { TokenController } from '@one-inch-community/sdk/tokens';
 import '@one-inch-community/widgets/token-icon';
 import '@one-inch-community/ui-components/icon';
 import '../token-list-stub-item';
@@ -14,6 +18,7 @@ import { subscribe, dispatchEvent } from '@one-inch-community/core/lit';
 import { filter, merge, Observable, switchMap, timer } from 'rxjs';
 import { consume } from '@lit/context';
 import { selectTokenContext } from '../../context';
+import { ApplicationContextToken } from '@one-inch-community/core/application-context';
 
 
 @customElement(TokenListItemElement.tagName)
@@ -29,6 +34,9 @@ export class TokenListItemElement extends LitElement {
   @consume({ context: selectTokenContext })
   context?: ISelectTokenContext;
 
+  @consume({ context: ApplicationContextToken })
+  applicationContext!: IApplicationContext
+
   private isDestroy = false;
 
   private preRenderTemplate: TemplateResult | null = null;
@@ -39,20 +47,21 @@ export class TokenListItemElement extends LitElement {
     async ([chainId, tokenAddress, walletAddress, fastUpdate]) => {
       if (fastUpdate) {
         const result = this.task.value as unknown;
-        if (result) return result as [ITokenRecord, IBalancesTokenRecord | null, number | null];
+        if (result) return result as [IToken, IBalancesTokenRecord | null, number | null, boolean];
       }
       if (!chainId || !tokenAddress) return [];
       if (this.isDestroy) throw new Error('');
-      const token = await TokenController.getToken(chainId, tokenAddress);
+      const token = await this.applicationContext.tokenController.getToken(chainId, tokenAddress);
       let balance = null;
       let balanceUsd = null;
       if (walletAddress && token) {
-        balance = await TokenController.getTokenBalance(chainId, tokenAddress, walletAddress);
-        const tokenPrice = await TokenController.getTokenUSDPrice(chainId, tokenAddress);
+        balance = await this.applicationContext.tokenController.getTokenBalance(chainId, tokenAddress, walletAddress);
+        const tokenPrice = await this.applicationContext.tokenController.getTokenUSDPrice(chainId, tokenAddress);
         const balanceFormatted = formatUnits(BigInt(balance?.amount ?? 0), token.decimals);
         balanceUsd = Number(balanceFormatted) * Number(tokenPrice);
       }
-      return [token, balance, balanceUsd] as const;
+      const isFavoriteToken = token ? (await this.applicationContext.tokenController.isFavoriteToken(chainId, token.address)) : false
+      return [token, balance, balanceUsd, isFavoriteToken] as const;
     },
     () => [this.chainId, this.tokenAddress, this.walletAddress, false as boolean] as const
   );
@@ -74,7 +83,7 @@ export class TokenListItemElement extends LitElement {
   protected override render() {
     return html`
       ${this.task.render({
-        complete: ([token, balance, balanceUsd]) => this.getTokenView(token, balance, balanceUsd),
+        complete: ([token, balance, balanceUsd, isFavoriteToken]) => this.getTokenView(token, balance, balanceUsd, isFavoriteToken),
         pending: () => {
           if (this.preRenderTemplate) return this.preRenderTemplate;
           return this.getStub();
@@ -87,11 +96,11 @@ export class TokenListItemElement extends LitElement {
     `;
   }
 
-  private getTokenView(token: ITokenRecord | null, balance: IBalancesTokenRecord | null, balanceUsd: number | null) {
+  private getTokenView(token: IToken | null, balance: IBalancesTokenRecord | null, balanceUsd: number | null, isFavoriteToken: boolean) {
     if (!token) {
       return this.getStub();
     }
-    this.isFavorite = token.isFavorite ?? false;
+    this.isFavorite = isFavoriteToken;
     let balanceFormat = '0';
     if (balance) {
       balanceFormat = formatNumber(formatUnits(BigInt(balance.amount), token.decimals), 6);
@@ -107,7 +116,7 @@ export class TokenListItemElement extends LitElement {
 
     const classes = {
       'item-container': true,
-      'is-favorite-token': token.isFavorite
+      'is-favorite-token': this.isFavorite
     };
 
     this.preRenderTemplate = html`
@@ -133,12 +142,14 @@ export class TokenListItemElement extends LitElement {
     return this.preRenderTemplate;
   }
 
-  private async onMarkFavoriteToken(event: UIEvent, token: ITokenRecord) {
+  private async onMarkFavoriteToken(event: UIEvent, token: IToken) {
     event.preventDefault();
     event.stopPropagation();
-    this.isFavorite = !token.isFavorite;
-    await this.task.run([this.chainId, this.tokenAddress, this.walletAddress, true]);
-    await this.context?.setFavoriteTokenState(token.chainId, token.address, !token.isFavorite);
+    this.isFavorite = !this.isFavorite;
+    await Promise.all([
+      this.task.run([this.chainId, this.tokenAddress, this.walletAddress, true]),
+      this.context?.setFavoriteTokenState(token.chainId, token.address, this.isFavorite)
+    ])
   }
 
   private getTokenUpdateEmitter() {

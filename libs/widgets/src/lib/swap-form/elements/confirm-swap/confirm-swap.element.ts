@@ -24,7 +24,7 @@ import {
 import { Observable, shareReplay, switchMap } from 'rxjs';
 import { when } from 'lit/directives/when.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
-import { isTokensEqual, TokenController } from '@one-inch-community/sdk/tokens';
+import { isTokensEqual } from '@one-inch-community/sdk/tokens';
 import { formatSeconds, smartFormatNumber } from '@one-inch-community/core/formatters';
 import { getBlockEmitter, getSymbolFromWrapToken, getWrapperNativeToken, isNativeToken } from '@one-inch-community/sdk/chain';
 import { consume } from '@lit/context';
@@ -125,7 +125,7 @@ export class ConfirmSwapElement extends LitElement {
 
   private async getRateView() {
     const { chainId, rate, revertedRate, sourceToken, destinationToken } = this.swapSnapshot.rate
-    const primaryToken = await TokenController.getPriorityToken(chainId, [
+    const primaryToken = await this.applicationContext.tokenController.getPriorityToken(chainId, [
       sourceToken.address,
       destinationToken.address
     ])
@@ -244,7 +244,7 @@ export class ConfirmSwapElement extends LitElement {
 
     const stream = getBlockEmitter(this.swapSnapshot.chainId).pipe(
       switchMap(async () => {
-        const usdPrice = await TokenController.getTokenUSDPrice(this.swapSnapshot.chainId, token.address)
+        const usdPrice = await this.applicationContext.tokenController.getTokenUSDPrice(this.swapSnapshot.chainId, token.address)
         const balanceFormatted = formatUnits(amount, token.decimals);
         const balanceUsd = Number(balanceFormatted) * Number(usdPrice);
         return `~$${smartFormatNumber(balanceUsd.toString(), 2)}`

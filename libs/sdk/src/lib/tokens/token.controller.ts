@@ -17,8 +17,7 @@ const lastUpdateTokenBalanceDatabaseTimestampStorageKey = `last-update-token-bal
 const tokenDatabaseTTL = 6.048e+8 as const // week
 const tokenBalanceDatabaseTTL = averageBlockTime
 
-class TokenControllerImpl implements ITokenController {
-
+export class TokenController implements ITokenController {
   private readonly schema = new TokenSchema()
   private readonly tokenUsdPriceProvider = new TokenUsdOnChainPriceProvider()
   private readonly oneInchApiAdapter = new OneInchDevPortalAdapter()
@@ -29,15 +28,16 @@ class TokenControllerImpl implements ITokenController {
    * Retrieves sorted by balances and priority token addresses.
    *
    * @param {ChainId} chainId - The ID of the chain.
+   * @param {String} [filterPattern] - pattern for find token buy name or address
    * @param {Address} [walletAddress] - The connected wallet address. (Optional)
    * @returns {Promise<Address[]>} - A promise that resolves to an array of sorted token addresses.
    */
-  async getSortedForViewTokenAddresses(chainId: ChainId, filterPattern: string, walletAddress?: Address): Promise<Address[]> {
+  async getSortedByPriorityAndBalanceTokenAddresses(chainId: ChainId, filterPattern: string, walletAddress?: Address): Promise<Address[]> {
     await this.updateTokenDatabase(chainId)
     if (walletAddress) {
       await this.updateBalanceDatabase(chainId, walletAddress)
     }
-    const result = await this.schema.getSortedForViewTokenAddresses(chainId, filterPattern, walletAddress)
+    const result = await this.schema.getSortedByPriorityAndBalanceTokenAddresses(chainId, filterPattern, walletAddress)
     if (walletAddress) {
       const prices = await this.getTokenUSDPrices(chainId, result.notZero)
       const tokens = await this.getTokenMap(chainId, result.notZero)
@@ -92,6 +92,11 @@ class TokenControllerImpl implements ITokenController {
     return await this.schema.getTokenList(chainId, addresses)
   }
 
+  async getTokenListSortedByPriority(chainId: ChainId, addresses: Address[]) {
+    const tokens = await this.getTokenList(chainId, addresses)
+    return tokens.sort((token1, token2) => token2.priority - token1.priority)
+  }
+
   async getTokenMap(chainId: ChainId, addresses: Address[]) {
     return await this.schema.getTokenMap(chainId, addresses)
   }
@@ -109,6 +114,16 @@ class TokenControllerImpl implements ITokenController {
   async getTokenUSDPrice(chainId: ChainId, tokenAddress: Address) {
     const result = await this.getTokenUSDPrices(chainId, [tokenAddress])
     return result[tokenAddress]
+  }
+
+  async isFavoriteToken(chainId: ChainId, tokenAddress: Address) {
+    const token = await this.getToken(chainId, tokenAddress)
+    return token?.isFavorite ?? false
+  }
+
+  async getTokenLogoURL(chainId: ChainId, tokenAddress: Address) {
+    const token = await this.getToken(chainId, tokenAddress)
+    return token?.logoURL ?? null
   }
 
   async getPriorityToken(chainId: ChainId, addresses: Address[]) {
@@ -234,5 +249,3 @@ class TokenControllerImpl implements ITokenController {
     return getBalances(chainId, walletAddress, tokens)
   }
 }
-
-export const TokenController = new TokenControllerImpl()

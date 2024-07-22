@@ -8,7 +8,7 @@ let GlobalApplicationContext: ApplicationContext;
 export async function bootstrapApplicationContext() {
   GlobalApplicationContext = new ApplicationContext({
     connectWalletControllerFactory: () => import('@one-inch-community/sdk/wallet').then(m => m.createConnectWalletController()),
-    tokenControllerFactory: () => import('@one-inch-community/sdk/tokens').then(m => m.TokenController),
+    tokenControllerFactory: () => import('@one-inch-community/sdk/tokens').then(m => new m.TokenController()),
     notificationsControllerFactory: () => import('@one-inch-community/widgets/notifications').then(m => new m.NotificationsController()),
     i18nControllerFactory: () => import('@one-inch-community/core/lit').then(m => new m.I18nController()),
     themesControllerFactory: () => import('@one-inch-community/core/theme').then(m => new m.ThemeController()),

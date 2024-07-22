@@ -195,7 +195,7 @@ export class TokenSchema extends Dexie {
     return result
   }
 
-  async getSortedForViewTokenAddresses(chainId: ChainId, filterPattern: string, walletAddress?: Address): Promise<{
+  async getSortedByPriorityAndBalanceTokenAddresses(chainId: ChainId, filterPattern: string, walletAddress?: Address): Promise<{
     notZero: Address[],
     zero: Address[]
   }> {

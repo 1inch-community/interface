@@ -3,7 +3,7 @@ import { customElement } from 'lit/decorators.js';
 import { when } from 'lit/directives/when.js';
 import { consume } from '@lit/context';
 import { selectTokenContext } from '../../context';
-import { ISelectTokenContext, ITokenRecord } from '@one-inch-community/models';
+import { IApplicationContext, ISelectTokenContext, IToken } from '@one-inch-community/models';
 import '@one-inch-community/ui-components/button';
 import '@one-inch-community/widgets/token-icon';
 import '@one-inch-community/ui-components/icon';
@@ -29,9 +29,9 @@ import {
   appendStyle,
   dispatchEvent
 } from '@one-inch-community/core/lit';
-import { TokenController } from '@one-inch-community/sdk/tokens';
 import { asyncFrame } from '@one-inch-community/ui-components/async';
 import { createRef, ref } from 'lit/directives/ref.js';
+import { ApplicationContextToken } from '@one-inch-community/core/application-context';
 
 const animationOptions = {
   duration: 200,
@@ -49,6 +49,9 @@ export class FavoriteTokensElement extends LitElement {
   @consume({ context: selectTokenContext })
   context?: ISelectTokenContext;
 
+  @consume({ context: ApplicationContextToken })
+  applicationContext!: IApplicationContext
+
   readonly editAllMode$ = new BehaviorSubject(false);
 
   readonly scrollContainerRef = createRef<HTMLElement>()
@@ -62,11 +65,10 @@ export class FavoriteTokensElement extends LitElement {
     debounceTime(0),
     switchMap(([tokens, chainId]) => {
       if (!chainId) return []
-      return TokenController.getTokenList(chainId, tokens)
+      return this.applicationContext.tokenController.getTokenListSortedByPriority(chainId, tokens)
     }),
-    map(tokens => tokens.sort((token1, token2) => token2.priority - token1.priority)),
     startWith([]),
-    tap(tokens => {
+    tap((tokens: IToken[]) => {
       if (tokens.length && this.classList.contains('empty')) {
         this.classList.remove('empty');
       }
@@ -81,7 +83,7 @@ export class FavoriteTokensElement extends LitElement {
         }, 300);
       }
     }),
-    map((tokens: (ITokenRecord | null)[]) => {
+    map((tokens: (IToken | null)[]) => {
       if (tokens.length) {
         tokens.push(null);
       }
@@ -127,14 +129,14 @@ export class FavoriteTokensElement extends LitElement {
     return this.context.chainId$;
   }
 
-  async onRemoveFavoriteToken(token: ITokenRecord, event: UIEvent) {
+  async onRemoveFavoriteToken(token: IToken, event: UIEvent) {
     event.stopPropagation();
     event.preventDefault();
     await this.context?.setFavoriteTokenState(token.chainId, token.address, false);
   }
 }
 
-class FavoriteTokensAnimationMapController implements AnimationMapController<ITokenRecord | null, void, void, (HTMLElement | number | null)> {
+class FavoriteTokensAnimationMapController implements AnimationMapController<IToken | null, void, void, (HTMLElement | number | null)> {
   direction: AnimationMapDirection = 'horizontal';
 
   private renderElements: Map<number, HTMLElement> = new Map();
@@ -146,11 +148,11 @@ class FavoriteTokensAnimationMapController implements AnimationMapController<ITo
   constructor(private readonly element: FavoriteTokensElement) {
   }
 
-  onKeyExtractor(token: ITokenRecord | null): string {
+  onKeyExtractor(token: IToken | null): string {
     return token !== null ? 't' + token.address : 'edit';
   }
 
-  onTemplateBuilder(token: ITokenRecord | null): TemplateResult {
+  onTemplateBuilder(token: IToken | null): TemplateResult {
     return when(
       token,
       (token) => html`

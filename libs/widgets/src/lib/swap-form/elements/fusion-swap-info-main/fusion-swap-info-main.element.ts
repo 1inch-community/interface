@@ -12,16 +12,17 @@ import {
   switchMap,
   withLatestFrom
 } from 'rxjs';
-import { ISwapContext, Rate } from '@one-inch-community/models';
+import { IApplicationContext, ISwapContext, Rate } from '@one-inch-community/models';
 import { formatUnits, parseUnits } from 'viem';
 import "@one-inch-community/ui-components/button"
 import "@one-inch-community/ui-components/icon"
 import { when } from 'lit/directives/when.js';
-import { isRateEqual, isTokensEqual, TokenController } from '@one-inch-community/sdk/tokens';
+import { isRateEqual, isTokensEqual } from '@one-inch-community/sdk/tokens';
 import { formatSeconds, smartFormatAndShorteningNumber, smartFormatNumber } from '@one-inch-community/core/formatters';
 import { getSymbolFromWrapToken } from '@one-inch-community/sdk/chain';
 import { BigMath } from '@one-inch-community/core/math';
 import { SwapContextToken } from '@one-inch-community/sdk/swap';
+import { ApplicationContextToken } from '@one-inch-community/core/application-context';
 
 @customElement(FusionSwapInfoMainElement.tagName)
 export class FusionSwapInfoMainElement extends LitElement {
@@ -33,6 +34,9 @@ export class FusionSwapInfoMainElement extends LitElement {
 
   @consume({ context: SwapContextToken })
   context?: ISwapContext;
+
+  @consume({ context: ApplicationContextToken })
+  applicationContext!: IApplicationContext
 
   readonly rate$ = defer(() => this.getContext().rate$);
   readonly minReceive$ = defer(() => this.getContext().minReceive$);
@@ -72,7 +76,7 @@ export class FusionSwapInfoMainElement extends LitElement {
     switchMap(async (rateData) => {
       if (rateData === null) return this.getLoadRateView();
       const { chainId, rate, revertedRate, sourceToken, destinationToken } = rateData
-      const primaryToken = await TokenController.getPriorityToken(chainId, [
+      const primaryToken = await this.applicationContext.tokenController.getPriorityToken(chainId, [
         sourceToken.address,
         destinationToken.address
       ])
@@ -80,7 +84,7 @@ export class FusionSwapInfoMainElement extends LitElement {
       const isRevertedRate = isTokensEqual(primaryToken, sourceToken)
       const targetRate = isRevertedRate ? revertedRate : rate
       const rateFormated = smartFormatNumber(formatUnits(targetRate, secondaryToken.decimals), 2);
-      const tokenPrice = await TokenController.getTokenUSDPrice(chainId, secondaryToken.address);
+      const tokenPrice = await this.applicationContext.tokenController.getTokenUSDPrice(chainId, secondaryToken.address);
       const rateUsd = parseUnits(tokenPrice, secondaryToken.decimals)
       const rateUsdFormated = smartFormatNumber(formatUnits(rateUsd, secondaryToken.decimals), 2);
       return html`
@@ -96,7 +100,7 @@ export class FusionSwapInfoMainElement extends LitElement {
     withLatestFrom(this.destinationToken$, this.chainId$),
     switchMap(async ([ minReceive, dstToken, chainId ]) => {
       if (!dstToken || !chainId) return html``
-      const tokenPrice = await TokenController.getTokenUSDPrice(chainId, dstToken.address);
+      const tokenPrice = await this.applicationContext.tokenController.getTokenUSDPrice(chainId, dstToken.address);
       const rateUsd = parseUnits(tokenPrice, dstToken.decimals)
       const amountUsd = BigMath.mul(
         minReceive,

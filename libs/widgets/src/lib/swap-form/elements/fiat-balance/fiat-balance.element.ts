@@ -1,14 +1,14 @@
 import { html, LitElement } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { consume } from '@lit/context';
-import { ISwapContext } from '@one-inch-community/models';
+import { IApplicationContext, ISwapContext } from '@one-inch-community/models';
 import { observe } from '@one-inch-community/core/lit';
 import { catchError, combineLatest, defer, filter, map, switchMap } from 'rxjs';
 import { formatUnits } from 'viem';
-import { TokenController } from '@one-inch-community/sdk/tokens';
 import { smartFormatNumber } from '@one-inch-community/core/formatters';
 import { fiatBalanceStyles } from './fiat-balance.styles';
 import { SwapContextToken } from '@one-inch-community/sdk/swap';
+import { ApplicationContextToken } from '@one-inch-community/core/application-context';
 
 @customElement(FiatBalanceElement.tagName)
 export class FiatBalanceElement extends LitElement {
@@ -20,6 +20,9 @@ export class FiatBalanceElement extends LitElement {
 
   @consume({ context: SwapContextToken })
   context?: ISwapContext;
+
+  @consume({ context: ApplicationContextToken })
+  applicationContext!: IApplicationContext
 
   readonly balance$ = defer(() => {
     if (!this.context) throw new Error('');
@@ -34,7 +37,8 @@ export class FiatBalanceElement extends LitElement {
     switchMap(([ walletAddress, token, chainId ]) => {
       if (!walletAddress || !token || !chainId) return [html`<br>`]
       return combineLatest([
-        TokenController.liveQuery(() => TokenController.getTokenUSDPrice(chainId, token.address)),
+        this.applicationContext.tokenController.liveQuery(() =>
+          this.applicationContext.tokenController.getTokenUSDPrice(chainId, token.address)),
         this.context!.getTokenRawAmountByType(this.tokenType!)
       ]).pipe(
         map(([ tokenPrice, amount ]) => {

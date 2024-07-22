@@ -47,7 +47,7 @@ export class SelectTokenContext implements ISelectTokenContext {
   ]).pipe(
     switchMap( ([ chainId, address, searchToken ]: [ ChainId | null, Address | null, string ]) => {
       if (chainId === null) return []
-      return this.applicationContext.tokenController.getSortedForViewTokenAddresses(chainId, searchToken, address ?? undefined)
+      return this.applicationContext.tokenController.getSortedByPriorityAndBalanceTokenAddresses(chainId, searchToken, address ?? undefined)
     }),
     tap(() => this.searchInProgress$.next(false))
   )
