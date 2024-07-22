@@ -21,7 +21,7 @@
       "@semantic-release/npm",
       {
         "npmPublish": true,
-        "pkgRoot": "dist/libs/models",
+        "pkgRoot": "./dist/libs/models",
         "registry": "https://npm.pkg.github.com/"
       }
     ],
