@@ -1,3 +1,25 @@
+# [1.0.0-dev.32](https://github.com/1inch-community/interface/compare/v1.0.0-dev.31...v1.0.0-dev.32) (2024-07-22)
+
+
+### Bug Fixes
+
+* Optimize balance element's pipe operation ([7e96ef2](https://github.com/1inch-community/interface/commit/7e96ef23256593c72e84cea9c3b96c49e78eaa42))
+* Update notification system and improve swap error handling ([22a1d24](https://github.com/1inch-community/interface/commit/22a1d24f24fb397d68502260b789a342424fa7df))
+
+
+### Features
+
+* Add mobile media match in notifications base container ([6d3c652](https://github.com/1inch-community/interface/commit/6d3c652e06269213a61c79965c1342a1aca7d97a))
+* Add new bell icon and update notification functionalities ([1bd1108](https://github.com/1inch-community/interface/commit/1bd1108f87ce7f2c9c96061f3eb08f5eb343b2e5))
+* **notifications:** added animation opening notification mobile view ([642fb38](https://github.com/1inch-community/interface/commit/642fb3814d8ee0d2544b16afb900828b8830bc34))
+* **notifications:** added notification mobile view ([103e2e4](https://github.com/1inch-community/interface/commit/103e2e450da2ecaf4f51393ad5b3a6bab90d0177))
+* **notifications:** completed implementation of notification view for the desktop view ([8af30d5](https://github.com/1inch-community/interface/commit/8af30d55cd264da75819626cb33cd9a66409eb3f))
+* **notifications:** fixed notifications view bugs ([8328d67](https://github.com/1inch-community/interface/commit/8328d6729247223431fea949c353aa525532cd11))
+* Redefine notification container behaviour and styles ([38c5ffc](https://github.com/1inch-community/interface/commit/38c5ffcdd6dd6960eb75586b9c3a1bb6542ce59d))
+* Refactor swap-form element to improve readability and performance ([b2d248a](https://github.com/1inch-community/interface/commit/b2d248a70e8c3bbe7366c8ad1abe1a55cad37f11))
+* Update interactive touch for mobile notifications ([d4dd87b](https://github.com/1inch-community/interface/commit/d4dd87b4077da4b8d773558403c7d708aa8494df))
+* Update styles and interaction logic in Wallet and Notifications modules ([acb597a](https://github.com/1inch-community/interface/commit/acb597a65b98ee0aadd21d484363dd625988760f))
+
 # [1.0.0-dev.31](https://github.com/1inch-community/interface/compare/v1.0.0-dev.30...v1.0.0-dev.31) (2024-07-04)
 
 
