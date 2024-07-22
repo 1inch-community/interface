@@ -3,8 +3,7 @@ import { customElement, state } from 'lit/decorators.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
 import '@one-inch-community/ui-components/button';
 import { consume } from '@lit/context';
-import { swapContext } from '../../context';
-import { ChainId, IApplicationContext, ISwapContext, IToken } from '@one-inch-community/models';
+import { BrandColors, ChainId, IApplicationContext, ISwapContext, IToken } from '@one-inch-community/models';
 import {
   combineLatest,
   debounceTime,
@@ -25,7 +24,7 @@ import {
 import { getAllowance, getBlockEmitter, getOneInchRouterV6ContractAddress, hasPermit,
   isChainId, isNativeToken, isSupportPermit2 } from '@one-inch-community/sdk/chain'
 
-import { BrandColors, getThemeChange } from '@one-inch-community/core/theme';
+import { getThemeChange } from '@one-inch-community/core/theme';
 import { swapButtonStyle } from './swap-button.style';
 import { when } from 'lit/directives/when.js';
 import { JsonParser, storage } from '@one-inch-community/core/storage';
