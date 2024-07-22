@@ -38,7 +38,7 @@ export class BalanceElement extends LitElement {
     filter(([address]) => !!address),
     switchMap(([ walletAddress, token, chainId ]) => {
       if (!walletAddress || !token || !chainId) return [html`<br>`]
-      return defer(() => TokenController.liveQuery(() => TokenController.getTokenBalance(chainId, token.address, walletAddress))).pipe(
+      return TokenController.liveQuery(() => TokenController.getTokenBalance(chainId, token.address, walletAddress)).pipe(
         filter(Boolean),
         map(balanceRecord => {
           return formatNumber(formatUnits(BigInt(balanceRecord.amount), token.decimals), 6)
