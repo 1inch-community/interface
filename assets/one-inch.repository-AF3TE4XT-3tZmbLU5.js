@@ -1,2 +1,0 @@
-import{C as i}from"./index.esm-BmGDGD-v.js";import"./startWith-CUA0N737.js";import"./index-DyOQYfny.js";import"./index.esm-COc-PyqV.js";var h=({address:r,chainId:n})=>new Promise((e,t)=>{if(!r||n!==i.eth)return t();const o=new Image;o.onload=()=>e(o),o.onerror=t,o.src=`https://tokens-data.1inch.io/images/${r.toLowerCase()}.png`});export{h as oneInchRepository};
-//# sourceMappingURL=one-inch.repository-AF3TE4XT-3tZmbLU5.js.map
