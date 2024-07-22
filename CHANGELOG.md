@@ -1,3 +1,13 @@
+# [1.0.0-dev.37](https://github.com/1inch-community/interface/compare/v1.0.0-dev.36...v1.0.0-dev.37) (2024-07-22)
+
+
+### Features
+
+* added meta info in package.json libs ([a4ccc52](https://github.com/1inch-community/interface/commit/a4ccc52422569600bee73dd1c5ea2da22ca754aa))
+* added npm lib release for test ([eec503c](https://github.com/1inch-community/interface/commit/eec503cd3d57dca017460f88f3d506228bd43989))
+* added npm lib release for test 2 ([6826616](https://github.com/1inch-community/interface/commit/6826616eb7de0c9f2c1e45af7f4ea99341fb2256))
+* added npm lib release for test 3 ([117e0cd](https://github.com/1inch-community/interface/commit/117e0cd1d23e534b57393e8b5a81717350c1f0c3))
+
 # [1.0.0-dev.36](https://github.com/1inch-community/interface/compare/v1.0.0-dev.35...v1.0.0-dev.36) (2024-07-22)
 
 
