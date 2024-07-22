@@ -3,7 +3,7 @@ import { html, render, TemplateResult } from 'lit';
 import { getContainer } from './overlay-container';
 import { appendStyle, getMobileMatchMediaEmitter, isSafari, isStandalone, resizeObserver, setBrowserMetaColorColor } from '@one-inch-community/core/lit';
 import { asyncFrame } from '@one-inch-community/ui-components/async';
-import { getBrowserMetaColor, applyColorBrightness, interpolateColorRange, getCssValue } from '@one-inch-community/ui-components/theme';
+import { getBrowserMetaColor, applyColorBrightness, interpolateColorRange, getCssValue } from '@one-inch-community/core/theme';
 import { getOverlayId } from './overlay-id-generator';
 import {
   fromEvent,
@@ -87,6 +87,7 @@ export class OverlayMobileController implements IOverlayController {
       alignItems: 'flex-end',
       bottom: '0',
       left: '0',
+      zIndex: '2000',
       boxSizing: 'border-box',
       borderTopLeftRadius: '24px',
       borderTopRightRadius: '24px',

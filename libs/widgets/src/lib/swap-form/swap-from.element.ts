@@ -1,17 +1,16 @@
-import { html, LitElement, PropertyValues } from 'lit';
-import { ContextProvider } from '@lit/context';
-import { customElement, property } from 'lit/decorators.js';
+import { html, LitElement } from 'lit';
+import { consume } from '@lit/context';
+import { customElement } from 'lit/decorators.js';
 import '@one-inch-community/ui-components/card'
 import "@one-inch-community/ui-components/icon"
 import "@one-inch-community/ui-components/button"
-import { IConnectWalletController, IToken, ISwapContext } from '@one-inch-community/models';
-import { SwapContext } from '@one-inch-community/sdk/swap';
-import { combineLatest, defer, distinctUntilChanged, map, startWith, tap } from 'rxjs';
-import { subscribe, translate } from '@one-inch-community/core/lit';
+import { ApplicationContextToken } from '@one-inch-community/core/application-context';
+import { ISwapContext, IApplicationContext } from '@one-inch-community/models';
+import { SwapContextToken } from '@one-inch-community/sdk/swap';
+import { combineLatest, defer, distinctUntilChanged, map, startWith } from 'rxjs';
+import { observe, translate } from '@one-inch-community/core/lit';
 import { swapFromStyle } from './swap-from.style';
-import { swapContext } from './context';
 import './elements'
-import { when } from 'lit/directives/when.js';
 
 @customElement(SwapFromElement.tagName)
 export class SwapFromElement extends LitElement {
@@ -21,60 +20,29 @@ export class SwapFromElement extends LitElement {
 
   static lastFusionRenderIsEmptyState = true
 
-  @property({ type: Object, attribute: false }) srcToken: IToken | null = null
+  @consume({ context: ApplicationContextToken })
+  applicationContext!: IApplicationContext
 
-  @property({ type: Object, attribute: false }) dstToken: IToken | null = null
-
-  @property({ type: Object, attribute: false }) walletController?: IConnectWalletController
-
-  @property({ type: Object, attribute: false }) swapContext?: ISwapContext
-
-  readonly context = new ContextProvider(this, { context: swapContext })
+  @consume({ context: SwapContextToken, subscribe: true })
+  swapContext?: ISwapContext
 
   private readonly fusionView$ = combineLatest([
     defer(() => this.getWalletController().data.activeAddress$),
-    defer(() => this.getContext().getTokenByType('source')),
-    defer(() => this.getContext().getTokenByType('destination'))
+    defer(() => this.swapContext!.getTokenByType('source')),
+    defer(() => this.swapContext!.getTokenByType('destination'))
   ]).pipe(
     map(([address, sourceToken, destinationToken ]) => !address || !sourceToken || !destinationToken),
     startWith(SwapFromElement.lastFusionRenderIsEmptyState),
     distinctUntilChanged(),
-    tap((isEmpty) => {
+    map((isEmpty) => {
       SwapFromElement.lastFusionRenderIsEmptyState = isEmpty
+      if (isEmpty) return html``
+      return html`<inch-fusion-swap-info></inch-fusion-swap-info>`
     })
   )
 
-  override connectedCallback() {
-    super.connectedCallback();
-    subscribe(this, [
-      this.fusionView$
-    ])
-  }
-
-  override disconnectedCallback() {
-    super.disconnectedCallback();
-    if (this.swapContext) {
-      return
-    }
-    this.context.value?.destroy()
-  }
-
-  protected override updated(changedProperties: PropertyValues) {
-    const context = this.getContext()
-    if (changedProperties.has('srcToken') || changedProperties.has('dstToken')) {
-      context.setPair({
-        srcToken: this.srcToken,
-        dstToken: this.dstToken,
-      })
-      this.requestUpdate()
-    }
-  }
-
   protected override render() {
-    if (!this.context.value) {
-      this.getContext()
-    }
-
+    if (!this.swapContext) return
     return html`
       <div class="swap-form-container">
         <inch-card-header headerText="${translate('widgets.swap-form.header.swap')}" headerTextPosition="left">
@@ -86,39 +54,16 @@ export class SwapFromElement extends LitElement {
           <inch-swap-form-input disabled tokenType="destination"></inch-swap-form-input>
         </div>
         
-        ${when(!SwapFromElement.lastFusionRenderIsEmptyState, () => html`<inch-fusion-swap-info></inch-fusion-swap-info>`)}
+        ${observe(this.fusionView$)}
         
         <inch-swap-button></inch-swap-button>
       </div>
     `
   }
 
-  private getFusionInfoView(isEmpty: boolean) {
-    if (isEmpty) return html``
-    return html`<inch-fusion-swap-info></inch-fusion-swap-info>`
-  }
-
   private getWalletController() {
-    if (!this.walletController) throw new Error('')
-    return this.walletController
-  }
-
-  private getContext() {
-    if (!this.context.value) {
-      if (this.swapContext) {
-        this.context.setValue(this.swapContext);
-        return this.swapContext
-      }
-      const context = new SwapContext(
-        this.getWalletController()
-      )
-      context.setPair({
-        srcToken: this.srcToken,
-        dstToken: this.dstToken,
-      })
-      this.context.setValue(context);
-    }
-    return this.context.value
+    if (!this.applicationContext.connectWalletController) throw new Error('')
+    return this.applicationContext.connectWalletController
   }
 }
 

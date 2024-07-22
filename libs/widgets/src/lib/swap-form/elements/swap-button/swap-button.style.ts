@@ -1,5 +1,5 @@
 import { mobileMediaCSS } from "@one-inch-community/core/lit";
-import { getRainbowGradient } from "@one-inch-community/ui-components/theme";
+import { getRainbowGradient } from "@one-inch-community/core/theme";
 import { css } from "lit";
 
 export const swapButtonStyle = css`

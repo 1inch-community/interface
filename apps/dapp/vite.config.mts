@@ -4,6 +4,7 @@ import { createHtmlPlugin } from 'vite-plugin-html';
 import minifyHTML from 'rollup-plugin-minify-html-literals'
 import { defaultShouldMinify } from 'minify-html-literals'
 import basicSsl from '@vitejs/plugin-basic-ssl'
+import preload from "vite-plugin-preload"
 import { VitePWA } from 'vite-plugin-pwa';
 import { manifest } from './manifest.mjs';
 
@@ -79,6 +80,9 @@ export default defineConfig(({ mode }) => {
       //     '1inch.local'
       //   ]
       // }),
+      preload({
+        mode: 'prefetch'
+      }),
       isProduction ? (minifyHTML as any).default({ options: { shouldMinify } }) : null,
       createHtmlPlugin({
         inject: {

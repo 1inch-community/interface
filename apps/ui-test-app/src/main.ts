@@ -1,5 +1,5 @@
 import './app/app.element';
-import { themeInit } from '@one-inch-community/ui-components/theme'
+import { themeInit } from '@one-inch-community/core/theme'
 import { connectWalletController } from './app/connect-wallet-controller';
 
 Promise.all([

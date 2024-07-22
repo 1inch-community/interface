@@ -4,7 +4,7 @@ import { ifDefined } from 'lit/directives/if-defined.js';
 import '@one-inch-community/ui-components/button';
 import { consume } from '@lit/context';
 import { swapContext } from '../../context';
-import { ChainId, ISwapContext, IToken } from '@one-inch-community/models';
+import { ChainId, IApplicationContext, ISwapContext, IToken } from '@one-inch-community/models';
 import {
   combineLatest,
   debounceTime,
@@ -25,11 +25,13 @@ import {
 import { getAllowance, getBlockEmitter, getOneInchRouterV6ContractAddress, hasPermit,
   isChainId, isNativeToken, isSupportPermit2 } from '@one-inch-community/sdk/chain'
 
-import { BrandColors, getThemeChange } from '@one-inch-community/ui-components/theme';
+import { BrandColors, getThemeChange } from '@one-inch-community/core/theme';
 import { swapButtonStyle } from './swap-button.style';
 import { when } from 'lit/directives/when.js';
 import { JsonParser, storage } from '@one-inch-community/core/storage';
 import { CacheActivePromise } from '@one-inch-community/core/decorators';
+import { SwapContextToken } from '@one-inch-community/sdk/swap';
+import { ApplicationContextToken } from '@one-inch-community/core/application-context';
 
 enum SwapButtonState {
   readyToSwap,
@@ -63,8 +65,11 @@ export class SwapButtonElement extends LitElement {
 
   static override styles = swapButtonStyle;
 
-  @consume({ context: swapContext, subscribe: true })
+  @consume({ context: SwapContextToken })
   context?: ISwapContext;
+
+  @consume({ context: ApplicationContextToken })
+  applicationContext!: IApplicationContext
 
   @state() private isRainbowTheme = false;
 
@@ -95,7 +100,7 @@ export class SwapButtonElement extends LitElement {
     merge(
       this.chainId$,
       this.block$
-    )
+    ).pipe(startWith(null))
   ]).pipe(
     switchMap(([wallet, sourceToken, amount]) => {
       if (!wallet || !sourceToken || amount === 0n || !this.context) return of(false);
@@ -118,7 +123,7 @@ export class SwapButtonElement extends LitElement {
     this.block$.pipe(startWith(null)),
     this.updateView$.pipe(startWith(null)),
   ]).pipe(
-    map( (params) => {
+    map((params) => {
       const [
         walletAddress,
         srcToken,
@@ -193,6 +198,9 @@ export class SwapButtonElement extends LitElement {
         distinctUntilChanged(),
         tap(color => this.isRainbowTheme = color === BrandColors.rainbow)
       ),
+      this.sourceToken$.pipe(
+        tap(token => this.srcToken = token)
+      ),
       this.calculateStatus$
     ]);
     this.updateView$.next()
@@ -200,7 +208,6 @@ export class SwapButtonElement extends LitElement {
 
   protected override render() {
     const size = this.mobileMedia.matches ? 'xl' : 'xxl';
-
     return html`
       <inch-button
         class="smart-hover"
@@ -277,6 +284,11 @@ export class SwapButtonElement extends LitElement {
         this.buttonState = SwapButtonState.permitInWallet
         await this.context.getPermit()
         this.buttonState = SwapButtonState.readyToSwap
+      }
+      if (this.buttonState === SwapButtonState.wrapNativeToken) {
+        await this.applicationContext.notificationsController.warning(
+          html`${translate('widgets.swap-form.swap-button.native-token-not-supported')}`,
+        )
       }
       if (this.buttonState === SwapButtonState.readyToSwap) {
         this.buttonState = SwapButtonState.readyToSwapLoading

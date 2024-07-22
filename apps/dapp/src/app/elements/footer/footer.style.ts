@@ -48,6 +48,11 @@ export const footerStyle = css`
         transform: translateX(100%);
     }
     
+    .footer-content-container {
+        display: flex;
+        gap: 8px;
+    }
+    
     @media (hover: hover) {
         .footer-container:hover .version {
             transform: translateX(0);

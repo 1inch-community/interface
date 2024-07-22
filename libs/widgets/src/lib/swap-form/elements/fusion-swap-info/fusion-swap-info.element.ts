@@ -9,7 +9,7 @@ import '../fusion-swap-info-auction-time';
 import '../fusion-swap-info-main';
 import { SceneController, shiftAnimation } from '@one-inch-community/ui-components/scene';
 import { consume } from '@lit/context';
-import { swapContext } from '../../context';
+import { SwapContextToken } from '@one-inch-community/sdk/swap';
 
 @customElement(FusionSwapInfoElement.tagName)
 export class FusionSwapInfoElement extends LitElement {
@@ -20,7 +20,7 @@ export class FusionSwapInfoElement extends LitElement {
     SceneController.styles()
   ];
 
-  @consume({ context: swapContext })
+  @consume({ context: SwapContextToken })
   context?: ISwapContext;
 
   private isOpenFusionInfo = false;

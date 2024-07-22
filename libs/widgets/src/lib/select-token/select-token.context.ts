@@ -1,7 +1,12 @@
-import { ChainId, ISelectTokenContext } from '@one-inch-community/models';
-import { TokenController } from '@one-inch-community/sdk/tokens';
 import {
-  ReplaySubject,
+  ChainId,
+  IApplicationContext,
+  ISelectTokenContext,
+  ISwapContext,
+  IToken,
+  TokenType
+} from '@one-inch-community/models';
+import {
   Subject,
   BehaviorSubject,
   combineLatest,
@@ -9,20 +14,26 @@ import {
   mergeMap,
   tap,
   startWith,
-  debounceTime, distinctUntilChanged
+  debounceTime, distinctUntilChanged, Observable, defer
 } from 'rxjs';
 import { type Address } from 'viem';
 
 export class SelectTokenContext implements ISelectTokenContext {
 
-  readonly chainId$: Subject<ChainId> = new ReplaySubject(1);
-  readonly connectedWalletAddress$: Subject<Address | null> = new BehaviorSubject<Address | null>(null);
+  readonly chainId$: Observable<ChainId | null> = defer(() => this.applicationContext.connectWalletController.data.chainId$);
+  readonly connectedWalletAddress$: Observable<Address | null> = defer(() => this.applicationContext.connectWalletController.data.activeAddress$);
   readonly searchToken$: BehaviorSubject<string> = new BehaviorSubject<string>('');
   readonly changeFavoriteTokenState$: Subject<[ChainId, Address]> = new Subject()
   readonly searchInProgress$: Subject<boolean> = new BehaviorSubject(false)
 
+
+
   readonly favoriteTokens$ = this.chainId$.pipe(
-    mergeMap(chainId => TokenController.liveQuery( () => TokenController.getAllFavoriteTokenAddresses(chainId))),
+    mergeMap(chainId => {
+      if (chainId === null) return []
+      return this.applicationContext.tokenController.liveQuery( () =>
+        this.applicationContext.tokenController.getAllFavoriteTokenAddresses(chainId))
+    }),
   )
 
   readonly tokenAddressList$ = combineLatest([
@@ -34,20 +45,22 @@ export class SelectTokenContext implements ISelectTokenContext {
       distinctUntilChanged()
     )
   ]).pipe(
-    switchMap( ([ chainId, address, searchToken ]: [ ChainId, Address | null, string ]) => TokenController.getSortedForViewTokenAddresses(chainId, searchToken, address ?? undefined)),
+    switchMap( ([ chainId, address, searchToken ]: [ ChainId | null, Address | null, string ]) => {
+      if (chainId === null) return []
+      return this.applicationContext.tokenController.getSortedForViewTokenAddresses(chainId, searchToken, address ?? undefined)
+    }),
     tap(() => this.searchInProgress$.next(false))
   )
 
-  setChainId(chainId: ChainId): void {
-    this.chainId$.next(chainId)
-  }
-
-  setConnectedWalletAddress(address?: Address | undefined): void {
-    this.connectedWalletAddress$.next(address ?? null)
+  constructor(
+    private readonly tokenType: TokenType,
+    private readonly applicationContext: IApplicationContext,
+    private readonly swapContext: ISwapContext
+  ) {
   }
 
   async setFavoriteTokenState(chainId: ChainId, address: Address, state: boolean): Promise<void> {
-    await TokenController.setFavoriteState(chainId, address, state)
+    await this.applicationContext.tokenController.setFavoriteState(chainId, address, state)
     this.changeFavoriteTokenState$.next([ chainId, address ])
   }
 
@@ -58,5 +71,9 @@ export class SelectTokenContext implements ISelectTokenContext {
 
   getSearchTokenValue() {
     return this.searchToken$.value
+  }
+
+  onSelectToken(token: IToken) {
+    this.swapContext.setToken(this.tokenType, token)
   }
 }

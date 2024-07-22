@@ -8,7 +8,10 @@ import {
   TokenSnapshot,
   SwapSettings,
   SettingsValue,
-  ISwapContextStrategyDataSnapshot, ChainId, FusionQuoteReceiveDto
+  ISwapContextStrategyDataSnapshot,
+  ChainId,
+  FusionQuoteReceiveDto,
+  TokenType, IApplicationContext
 } from '@one-inch-community/models';
 import {
   defer,
@@ -25,12 +28,11 @@ import {
   of,
   startWith,
   shareReplay,
-  BehaviorSubject, firstValueFrom, Subject
+  BehaviorSubject, firstValueFrom, Subject, subscribeOn, asyncScheduler
 } from 'rxjs';
-import { PairHolder, TokenType } from './pair-holder';
+import { PairHolder } from './pair-holder';
 import { SwapContextOnChainStrategy } from './swap-context-onchain.strategy';
 import { SwapContextFusionStrategy } from './swap-context-fusion.strategy';
-import { TokenController } from '@one-inch-community/sdk/tokens';
 import {
   estimateWrap, getBlockEmitter, getClient,
   getOneInchRouterV6ContractAddress, getPermit,
@@ -48,9 +50,10 @@ import { getEnvironmentValue } from '@one-inch-community/core/environment';
 
 export class SwapContext implements ISwapContext {
 
-  private readonly pairHolder = new PairHolder();
+  private readonly pairHolder = new PairHolder(this.applicationContext);
   private readonly subscription = new Subscription();
   private readonly oneInchApiAdapter = new OneInchDevPortalAdapter();
+  private readonly walletController = this.applicationContext.connectWalletController
 
   private readonly settings: SwapSettings = {
     slippage: new SettingsController('slippage'),
@@ -58,7 +61,7 @@ export class SwapContext implements ISwapContext {
   };
 
   private readonly contextStrategy = {
-    onChain: new SwapContextOnChainStrategy(this.pairHolder, this.walletController),
+    onChain: new SwapContextOnChainStrategy(this.pairHolder, this.walletController, this.applicationContext.tokenRateProvider),
     fusion: new SwapContextFusionStrategy(this, this.pairHolder, this.walletController, this.settings, this.oneInchApiAdapter)
   };
 
@@ -147,15 +150,21 @@ export class SwapContext implements ISwapContext {
   );
 
   constructor(
-    private readonly walletController: IConnectWalletController
+    private readonly applicationContext: IApplicationContext
   ) {
+  }
+
+  init() {
+    this.pairHolder.init()
+
     this.subscription.add(
       merge(
         this.destinationTokenAmount$.pipe(
           distinctUntilChanged(),
           tap(amount => {
             this.setTokenAmountByType('destination', amount);
-          })
+          }),
+          subscribeOn(asyncScheduler)
         )
       ).subscribe()
     );
@@ -207,11 +216,16 @@ export class SwapContext implements ISwapContext {
   }
 
   destroy() {
+    this.pairHolder.destroy()
     this.subscription.unsubscribe();
   }
 
   setPair(pair: NullableValue<Pair>): void {
     this.pairHolder.setPair(pair);
+  }
+
+  setToken(tokenType: TokenType, token: IToken) {
+    this.pairHolder.setToken(token, tokenType)
   }
 
   switchPair() {
@@ -246,7 +260,7 @@ export class SwapContext implements ISwapContext {
     } = swapSnapshot
     const walletAddress = await this.walletController.data.getActiveAddress()
     if (walletAddress === null) {
-      throw new Error('')
+      throw new Error('Wallet not connected')
     }
     if (!rawResponseData) {
       throw new Error('')
@@ -286,7 +300,7 @@ export class SwapContext implements ISwapContext {
     const sourceToken = snapshot.token;
     const connectedWalletAddress = await this.walletController.data.getActiveAddress();
     if (!sourceToken || !connectedWalletAddress) return 0n;
-    const balance = await TokenController.getTokenBalance(sourceToken.chainId, sourceToken.address, connectedWalletAddress);
+    const balance = await this.applicationContext.tokenController.getTokenBalance(sourceToken.chainId, sourceToken.address, connectedWalletAddress);
     let amount = BigInt(balance?.amount ?? 0);
     if (isNativeToken(sourceToken.address)) {
       const chainId = await this.walletController.data.getChainId();

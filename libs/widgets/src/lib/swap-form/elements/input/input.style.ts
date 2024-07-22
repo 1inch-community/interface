@@ -24,7 +24,7 @@ export const inputStyle = css`
         display: flex;
         flex-direction: column;
         justify-content: space-between;
-        height: fit-content;
+        height: 100%;
     }
     
     .input-title {

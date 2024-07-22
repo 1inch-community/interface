@@ -2,7 +2,6 @@ import { ReactiveController, ReactiveControllerHost } from 'lit';
 import { combineLatest, debounceTime, Observable, OperatorFunction, Subscription } from 'rxjs';
 
 type SubscribeReactiveControllerConfig = {
-  debounceTimeMs?: number
   requestUpdate?: boolean
 }
 
@@ -29,10 +28,7 @@ class SubscribeReactiveController implements ReactiveController {
 
   private subscribe() {
     const observable: Observable<unknown> = combineLatest(Array.isArray(this.observers) ? this.observers : [this.observers])
-    const pipes: OperatorFunction<any, any>[] = []
-    if (this.config.debounceTimeMs) pipes.push(debounceTime(this.config.debounceTimeMs))
     this.subscription = observable
-      .pipe(...pipes as [])
       .subscribe(() => {
         if (!this.config.requestUpdate) return
         this.host.requestUpdate()

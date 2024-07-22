@@ -7,7 +7,7 @@ import '@one-inch-community/ui-components/icon'
 import { observe, dispatchEvent, subscribe, appendStyle, getMobileMatchMedia } from '@one-inch-community/core/lit';
 import { ISwapContext } from '@one-inch-community/models';
 import { tokenPairSwitchStyle } from './token-pair-switch.style';
-import { swapContext } from '../../context';
+import { SwapContextToken } from '@one-inch-community/sdk/swap';
 
 @customElement(TokenPairSwitchElement.tagName)
 export class TokenPairSwitchElement extends LitElement {
@@ -15,7 +15,7 @@ export class TokenPairSwitchElement extends LitElement {
 
   static override styles = tokenPairSwitchStyle
 
-  @consume({ context: swapContext, subscribe: true })
+  @consume({ context: SwapContextToken })
   context?: ISwapContext
 
   private readonly iconRef = createRef<HTMLElement>()
@@ -88,7 +88,6 @@ export class TokenPairSwitchElement extends LitElement {
   protected async onClick() {
     if (!this.iconRef.value || (!this.isUp && !this.mobileMedia.matches)) return
     this.context?.switchPair()
-    dispatchEvent(this, 'switchPair', null)
     const options = {
       duration: 200,
       easing: 'cubic-bezier(.1, .3, .6, 1)'

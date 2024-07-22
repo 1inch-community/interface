@@ -4,11 +4,11 @@ import { Observable } from 'rxjs';
 import { EIP6963ProviderInfo } from './provider';
 import { IDataAdapter, IGlobalDataAdapter } from './data-adapter';
 import type { Address, SignTypedDataParameters, WriteContractParameters, WriteContractReturnType, SignTypedDataReturnType } from 'viem';
+import { InitializingEntity } from '../base';
 
-export interface IConnectWalletController {
+export interface IConnectWalletController extends InitializingEntity {
   readonly data: IDataAdapter & IGlobalDataAdapter;
   readonly isConnected: boolean;
-  init(): Promise<void>
   getSupportedWallets(): Promise<EIP6963ProviderInfo[]>
   connect(info: EIP6963ProviderInfo): Promise<boolean>
   addConnection(info: EIP6963ProviderInfo): Promise<boolean>

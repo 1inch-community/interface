@@ -29,8 +29,78 @@ function hexToRgb(hex: string) {
   return [r, g, b];
 }
 
-function rgbToHex(r: number, g: number, b: number) {
+function hexToRgba(hex: string) {
+  let r = 0, g = 0, b = 0, a = 1;
+
+  // 3 or 4 digit hex
+  if (hex.length == 4 || hex.length == 5) {
+    r = parseInt(hex[1] + hex[1], 16);
+    g = parseInt(hex[2] + hex[2], 16);
+    b = parseInt(hex[3] + hex[3], 16);
+    if (hex.length == 5) {
+      a = parseInt(hex[4] + hex[4], 16) / 255;
+    }
+  }
+  // 6 or 8 digit hex
+  else if (hex.length == 7 || hex.length == 9) {
+    r = parseInt(hex[1] + hex[2], 16);
+    g = parseInt(hex[3] + hex[4], 16);
+    b = parseInt(hex[5] + hex[6], 16);
+    if (hex.length == 9) {
+      a = parseInt(hex[7] + hex[8], 16) / 255;
+    }
+  }
+  return [r, g, b, a];
+}
+
+export function rgbToHex(r: number, g: number, b: number) {
   return "#" + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+}
+
+function rgbaToHex(r: number, g: number, b: number, a: number) {
+  const hexR = r.toString(16).padStart(2, '0');
+  const hexG = g.toString(16).padStart(2, '0');
+  const hexB = b.toString(16).padStart(2, '0');
+  const hexA = a.toString(16).padStart(2, '0');
+  return `#${hexR}${hexG}${hexB}${hexA}`;
+}
+
+export function rgbaStrToHex(rgbaString: string): string {
+  const result = rgbaString.match(/\d+(\.\d+)?/g);
+  if (result === null || result.length !== 4) {
+    throw new Error('Invalid rgba string');
+  }
+
+  const r = parseInt(result[0]);
+  const g = parseInt(result[1]);
+  const b = parseInt(result[2]);
+  const a = Math.round(parseFloat(result[3]) * 255);
+
+  return rgbaToHex(r, g, b, a);
+}
+
+export function rgbStrToHex(rgbaString: string): string {
+  const parts = rgbaString.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*(\d+)%?)?\)/);
+  if (!parts) {
+    throw new Error('Invalid rgba format.');
+  }
+  const r = parseInt(parts[1]);
+  const g = parseInt(parts[2]);
+  const b = parseInt(parts[3]);
+
+  return rgbToHex(r, g, b);
+}
+
+export function blendColors(baseColor: string, overlayColor: string) {
+  const base = hexToRgba(baseColor + 'ff');
+  const overlay = hexToRgba(overlayColor);
+
+  const r = Math.round((1 - overlay[3]) * base[0] + overlay[3] * overlay[0]);
+  const g = Math.round((1 - overlay[3]) * base[1] + overlay[3] * overlay[1]);
+  const b = Math.round((1 - overlay[3]) * base[2] + overlay[3] * overlay[2]);
+  const a = base[3];
+
+  return rgbaToHex(r, g, b, a);
 }
 
 function interpolate(start: number, end: number, fraction: number) {
@@ -77,7 +147,7 @@ export function interpolateColorRange(startColorHex: string, endColorHex: string
 
 export function hexToRGBA(hex: string, alfa = 100): CSSResult {
   const [ r, g, b ] = hexToRgb(hex)
-  return unsafeCSS(`rgba(${r}, ${g}, ${b}, ${alfa}%)`);
+  return unsafeCSS(`rgba(${r}, ${g}, ${b}, 0.${alfa})`);
 }
 
 export function transformColor(hex: string): CSSResult {

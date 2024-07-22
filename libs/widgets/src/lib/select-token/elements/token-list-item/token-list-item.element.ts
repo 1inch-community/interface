@@ -10,11 +10,10 @@ import { TokenController } from '@one-inch-community/sdk/tokens';
 import '@one-inch-community/widgets/token-icon';
 import '@one-inch-community/ui-components/icon';
 import '../token-list-stub-item';
-import { subscribe } from '@one-inch-community/core/lit';
+import { subscribe, dispatchEvent } from '@one-inch-community/core/lit';
 import { filter, merge, Observable, switchMap, timer } from 'rxjs';
 import { consume } from '@lit/context';
 import { selectTokenContext } from '../../context';
-import { emitSelectTokenEvent } from '../../events';
 
 
 @customElement(TokenListItemElement.tagName)
@@ -112,7 +111,10 @@ export class TokenListItemElement extends LitElement {
     };
 
     this.preRenderTemplate = html`
-      <div class="${classMap(classes)}" @click="${(event: UIEvent) => emitSelectTokenEvent(this, token, event)}">
+      <div class="${classMap(classes)}" @click="${(event: UIEvent) => {
+        this.context?.onSelectToken(token)
+        dispatchEvent(this, 'backCard', null)
+      }}">
         <inch-token-icon symbol="${token.symbol}" address="${token.address}" chainId="${token.chainId}"
                          size="40"></inch-token-icon>
         <div class="name-and-balance">

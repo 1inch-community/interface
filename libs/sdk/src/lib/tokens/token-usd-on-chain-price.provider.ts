@@ -1,6 +1,6 @@
 import { ChainId, IToken } from '@one-inch-community/models';
 import { Address, formatUnits, isAddressEqual } from 'viem';
-import { buildDefaultTokenRateProvider } from './token-rate/token-rate.provider';
+import { buildDefaultTokenRateProvider } from './token-rate';
 
 const USDTAddresses: Record<ChainId, Address> = {
   [ChainId.eth]: '0xdac17f958d2ee523a2206206994597c13d831ec7',

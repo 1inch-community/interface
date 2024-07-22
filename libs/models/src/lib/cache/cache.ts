@@ -11,6 +11,7 @@ export interface ICacheAsync<Key, Value> {
   set(key: Key, value: Value): Promise<void>
   get(key: Key): Promise<Value | null>
   has(key: Key): Promise<boolean>
+  getAll(): Promise<Value[] | null>
   delete(key: Key): Promise<boolean>
   clear(): Promise<void>
   size(): Promise<number>

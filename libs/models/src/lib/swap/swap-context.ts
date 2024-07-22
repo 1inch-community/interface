@@ -23,6 +23,7 @@ export interface ISwapContext {
   readonly loading$: Observable<boolean>
   destroy(): void
   setPair(pair: NullableValue<Pair>): void
+  setToken(tokenType: TokenType, token: IToken): void
   switchPair(): void
   getTokenByType(type: 'source' | 'destination'): Observable<IToken | null>
   getTokenAmountByType(type: 'source' | 'destination'): Observable<bigint | null>
@@ -39,7 +40,9 @@ export interface ISwapContext {
 }
 
 export type Pair = {
-  srcToken: IToken
-  dstToken: IToken
+  source: IToken
+  destination: IToken
 }
+
+export type TokenType = keyof Pair
 
