@@ -1,6 +1,5 @@
 import type { CSSResult } from 'lit';
-import { MainColors, BrandColors } from '../../../../../models/src/lib/themes/themes';
-import { Hex } from 'viem';
+import { BrandColors, MainColors } from '@one-inch-community/models';
 
 export const mainColorMap: Record<MainColors, () => Promise<CSSResult>> = {
   [MainColors.systemSync]: () => getSystemTheme(),

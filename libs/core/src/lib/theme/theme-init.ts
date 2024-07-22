@@ -2,9 +2,9 @@ import { brandColorStyleElement, mainColorStyleElement } from './theme-elements'
 import { fontStyle } from './styles/font.style';
 import { bodyStyle } from './styles/body.style';
 import { themeChange } from './theme-change';
-import { BrandColors, MainColors } from '../../../../models/src/lib/themes/themes';
 import { scrollbarStyle } from './styles/scrollbar.style';
 import { createAndApplyStyle } from '@one-inch-community/core/lit';
+import { BrandColors, MainColors } from '@one-inch-community/models';
 
 export async function themeInit(
   mainColorName: MainColors = MainColors.light,

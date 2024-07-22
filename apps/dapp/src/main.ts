@@ -16,7 +16,10 @@ Promise.all([
 
 import('virtual:pwa-register').then(({ registerSW }) => {
   registerSW({
-    onRegisteredSW: (_, worker: ServiceWorkerRegistration) => worker.update(),
+    onRegisteredSW: async (_, worker: ServiceWorkerRegistration) => {
+      console.log('worker updated')
+      await worker.update()
+    },
     onNeedRefresh: () => console.log('update ready'),
     onOfflineReady: () => console.log('offline ready'),
   })

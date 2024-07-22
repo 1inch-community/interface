@@ -1,4 +1,3 @@
-
 export interface IStorageController {
   set<T>(key: string, data: T): void
   get<T>(key: string, parser: ((value: string) => T)): T | null

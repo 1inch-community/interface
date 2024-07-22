@@ -7,7 +7,7 @@ import { initUpdater } from './updater';
 import * as dotenv from 'dotenv'
 dotenv.config()
 
-const store: Store<Record<string, unknown>> = new Store()
+const store: any = new Store()
 
 async function createWindow() {
   const { width, height, x, y } = store.get('windowBounds') ?? {}

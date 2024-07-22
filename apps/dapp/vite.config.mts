@@ -95,6 +95,8 @@ export default defineConfig(({ mode }) => {
         registerType: 'autoUpdate',
         manifest: manifest(baseHref),
         workbox: {
+          skipWaiting: true,
+          clientsClaim: true,
           disableDevLogs: true,
           runtimeCaching: [
             {
