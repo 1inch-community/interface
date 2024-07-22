@@ -1,3 +1,10 @@
+# [1.0.0-dev.34](https://github.com/1inch-community/interface/compare/v1.0.0-dev.33...v1.0.0-dev.34) (2024-07-22)
+
+
+### Features
+
+* Refactor TokenController and application context usage ([102d44d](https://github.com/1inch-community/interface/commit/102d44d18873a89b55562ae817451f7115a27342))
+
 # [1.0.0-dev.33](https://github.com/1inch-community/interface/compare/v1.0.0-dev.32...v1.0.0-dev.33) (2024-07-22)
 
 
