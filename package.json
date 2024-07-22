@@ -7,6 +7,20 @@
     "postinstall": "nx run one-inch-community:postinstall",
     "build:lib": "ts-node --project ./tools/packagr/tsconfig.json tools/packagr/main.ts"
   },
+  "homepage": "https://github.com/1inch-community/interface",
+  "author": {
+    "name": "Denis Kotsyuba",
+    "email": "kocubads96@gmail.com",
+    "url": "https://www.linkedin.com/in/denis-k-03a09419b/"
+  },
+  "bugs": {
+    "url": "https://github.com/1inch-community/interface/issues",
+    "email": "kocubads96@gmail.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/1inch-community/interface.git"
+  },
   "dependencies": {
     "@1inch/fusion-sdk": "2.1.5-rc.2",
     "@lit-labs/virtualizer": "2.0.13",

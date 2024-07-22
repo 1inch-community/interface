@@ -7,6 +7,11 @@ const fs = fsSync.promises
 type PackageJson = {
   version: string
   name: string
+  license: string,
+  homepage: string,
+  author: object,
+  bugs: object,
+  repository: object,
   peerDependencies: object
 }
 

@@ -80,11 +80,21 @@ export class LibraryBuilder {
     const libPackageJson = await getLibraryPackageJson(this.libName)
     const projectName = packageJson.name
     const version = packageJson.version
+    const license = packageJson.license
+    const author = packageJson.author
+    const bugs = packageJson.bugs
+    const repository = packageJson.repository
+    const homepage = packageJson.homepage
     await generatePackageJson({
       name: getLibraryFullName(projectName, this.libName),
       version: version,
       type: "module",
       peerDependencies: libPackageJson?.peerDependencies ?? {},
+      license,
+      author,
+      bugs,
+      repository,
+      homepage,
       exports
     }, getLibraryDistPath(this.libName))
   }
