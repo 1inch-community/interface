@@ -2,7 +2,7 @@ import { html, LitElement } from 'lit';
 import { customElement, state } from 'lit/decorators.js';
 import { consume } from '@lit/context';
 import { SwapContextToken } from '@one-inch-community/sdk/swap';
-import { IApplicationContext, ISwapContext, TokenType } from '@one-inch-community/models';
+import { BrandColors, IApplicationContext, ISwapContext, TokenType } from '@one-inch-community/models';
 import { ApplicationContextToken } from '@one-inch-community/core/application-context';
 import { swapFormStyle } from './swap-form.style';
 import { SceneController } from '@one-inch-community/ui-components/scene';
@@ -13,7 +13,7 @@ import '@one-inch-community/ui-components/card';
 import '@one-inch-community/widgets/swap-form';
 import { OverlayMobileController } from '@one-inch-community/ui-components/overlay';
 import { subscribe } from '@one-inch-community/core/lit';
-import { BrandColors, getThemeChange } from '@one-inch-community/core/theme';
+import { getThemeChange } from '@one-inch-community/core/theme';
 import { distinctUntilChanged, map, tap } from 'rxjs';
 import { unicornTouchUpdate } from './unicorn-updater';
 
