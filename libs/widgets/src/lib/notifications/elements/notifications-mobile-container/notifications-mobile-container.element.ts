@@ -100,6 +100,14 @@ export class NotificationsMobileContainerElement extends NotificationsBaseContai
     `;
   }
 
+  async closeNotification(id: string) {
+    if (this.fullView) {
+      await this.controller.closeNotification(id)
+      return
+    }
+    await this.controller.closeNotifications()
+  }
+
   openAll() {
     this.hostHeight = this.clientHeight
     this.open$.next()
@@ -125,7 +133,7 @@ export class NotificationsMobileContainerElement extends NotificationsBaseContai
     this.closeInProgress = true
     if (!this.fullView) {
       await this.touchContainerRef.value!.animate([
-        { transform: `translate3d(0, -${this.lastOffset}px, 0)` },
+        { transform: `translate3d(0, ${this.lastOffset * -1}px, 0)` },
         { transform: `translate3d(0, -100%, 0)` },
       ], { ...animationOptions, duration: 700 }).finished
     } else {
@@ -154,10 +162,10 @@ export class NotificationsMobileContainerElement extends NotificationsBaseContai
         startHandler: () => {
           fullView = this.fullView
           this.hostHeight = this.clientHeight
-          this.animationInProgress = true
+          this.animationStartHandler()
         },
         endHandler: () => {
-          this.animationInProgress = false
+          this.animationCompleteHandler()
         }
       })
     ).pipe(

@@ -19,19 +19,6 @@ export const notificationsBaseContainerStyle = css`
         transform: scale(0);
         transition: transform .2s;
     }
-
-    .notification-container {
-        pointer-events: all;
-        color: var(--color-content-content-primary);
-        background-color: var(--color-background-bg-primary);
-        border-radius: 8px;
-        padding: 8px;
-        box-sizing: border-box;
-        width: 100%;
-        min-height: 50px;
-        border: 1px solid var(--primary-12);
-        transition: border .2s;
-    }
     
     .notification-title {
         font-size: 16px;
@@ -47,6 +34,11 @@ export const notificationsBaseContainerStyle = css`
         font-size: 11px;
         color: var(--color-content-content-secondary);
         margin-left: auto;
+    }
+
+    .notification-time:dir(rtl) {
+        margin-left: 0;
+        margin-right: auto;
     }
     
     .show-all-button {

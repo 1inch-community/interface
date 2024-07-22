@@ -86,7 +86,7 @@ export class UniversalBrowserExtensionAdapter implements IWalletAdapter {
       })
     } catch (error: any) {
       if (isUserRejectError(error as WalletError)) {
-        throw new error
+        throw error
       }
       console.log(error)
     }

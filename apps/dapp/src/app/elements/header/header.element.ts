@@ -4,6 +4,7 @@ import { headerStyle } from './header.style';
 import { getMobileMatchMediaAndSubscribe } from '@one-inch-community/core/lit';
 import '@one-inch-community/ui-components/icon';
 import '@one-inch-community/widgets/wallet-manage';
+import '@one-inch-community/widgets/notifications'
 import { getHeaderHeight } from '../../platform/sizes';
 import { styleMap } from 'lit/directives/style-map.js';
 import { consume } from '@lit/context';
@@ -41,6 +42,7 @@ export class HeaderElement extends LitElement {
         <div class="right-content">
           <inch-chain-selector .controller="${this.applicationContext.connectWalletController}"></inch-chain-selector>
           <inch-connect-wallet-view .controller="${this.applicationContext.connectWalletController}"></inch-connect-wallet-view>
+          <inch-notifications-open-button></inch-notifications-open-button>
         </div>
       </div>
     `

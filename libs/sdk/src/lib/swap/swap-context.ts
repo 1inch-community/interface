@@ -260,7 +260,7 @@ export class SwapContext implements ISwapContext {
     } = swapSnapshot
     const walletAddress = await this.walletController.data.getActiveAddress()
     if (walletAddress === null) {
-      throw new Error('')
+      throw new Error('Wallet not connected')
     }
     if (!rawResponseData) {
       throw new Error('')

@@ -22,4 +22,6 @@ export default {
   'widgets.swap-form.swap-button.wait-wallet-response': 'Wait wallet response',
   'widgets.swap-form.swap-button.permit-swap-in-wallet': 'Permit swap in wallet',
   'widgets.swap-form.swap-button.allow-swap-in-wallet': 'Allow swap in wallet',
+  'widgets.swap-form.swap-button.wallet-rejected': 'Wallet rejected request',
+  'widgets.swap-form.swap-button.swap-error-message': 'Swap error',
 }

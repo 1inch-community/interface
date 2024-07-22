@@ -1,10 +1,9 @@
-import { AnimationMapController, appendStyle } from '@one-inch-community/core/lit';
-import '@one-inch-community/ui-components/icon';
-import '@one-inch-community/ui-components/button';
+import { AnimationMapController } from '@one-inch-community/core/lit';
+
 import { NotificationRecord } from '../../notifications-controller.interface';
 import { html } from 'lit';
-import { when } from 'lit/directives/when.js';
 import { NotificationsContainer } from '../../notifications-container';
+import '../notification-view'
 
 const animationOptions = {
   duration: 500,
@@ -15,7 +14,6 @@ export abstract class NotificationAnimationMapBaseController implements Animatio
 
   readonly direction = 'vertical';
   readonly vertical = 'notification-item';
-  readonly parallelAnimationStrategy = 'parallel';
 
   protected renderElements: Map<number, HTMLElement> | null = null;
   protected removeElementsClientHeight: Map<number, number> | null = null;
@@ -44,14 +42,9 @@ export abstract class NotificationAnimationMapBaseController implements Animatio
       `;
     }
     return html`
-      <div class="notification-close-container">
-        ${when(true, () => html`
-          <inch-button class="close-notification-button" @click="${() => this.element.closeNotification(id)}" size="l" type="secondary">
-            <inch-icon icon="cross8"></inch-icon>
-          </inch-button>
-        `)}
+      <inch-notification-view .config="${record.config}" @closeNotification="${() => this.element.closeNotification(id)}">
         ${this.element.makeNotificationTemplate(record)}
-      </div>
+      </inch-notification-view>
     `;
   }
 

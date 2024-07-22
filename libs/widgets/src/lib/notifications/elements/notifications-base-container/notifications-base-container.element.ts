@@ -1,7 +1,7 @@
 import { html, LitElement } from 'lit';
 import { NotificationsContainer } from '../../notifications-container';
 import { INotificationsControllerInternal, NotificationRecord } from '../../notifications-controller.interface';
-import { classMap } from 'lit/directives/class-map.js';
+
 
 export abstract class NotificationsBaseContainerElement extends LitElement implements NotificationsContainer {
 
@@ -61,19 +61,14 @@ export abstract class NotificationsBaseContainerElement extends LitElement imple
   }
 
   makeNotificationTemplate(record: NotificationRecord) {
-    if (record.config.customTemplate) return html`${record.template}`;
-    const classes = {
-      'notification-container': true,
-      'error': record.config.errorStyle ?? false
-    };
+    const template = html`${record.element}`
+    if (record.config.customTemplate) return html`${template}`
     return html`
-      <div class="${classMap(classes)}">
-        <div class="notification-title">
-          <span>${record.config.title}</span>
-          <div class="notification-time">${this.formatNotificationTime(record.timestamp)}</div>
-        </div>
-        <div class="notification-template">${record.template}</div>
+      <div class="notification-title">
+        <span>${record.config.title}</span>
+        <div class="notification-time">${this.formatNotificationTime(record.timestamp)}</div>
       </div>
+      <div class="notification-template">${template}</div>
     `;
   }
 

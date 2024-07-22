@@ -2,13 +2,25 @@ import { html, LitElement, TemplateResult } from 'lit';
 import { customElement, property, state } from 'lit/decorators.js';
 import { choose } from 'lit/directives/choose.js';
 import { confirmSwapStyle } from './confirm-swap.style';
-import { ISwapContext, IToken, SwapSnapshot, FusionQuoteReceiveDto } from '@one-inch-community/models';
+import {
+  ISwapContext,
+  IToken,
+  SwapSnapshot,
+  FusionQuoteReceiveDto,
+  IApplicationContext
+} from '@one-inch-community/models';
 import '@one-inch-community/widgets/token-icon'
 import '@one-inch-community/ui-components/card'
 import '@one-inch-community/ui-components/button'
 import '@one-inch-community/ui-components/icon'
-import { formatUnits } from 'viem';
-import { async, dispatchEvent, getMobileMatchMediaAndSubscribe, observe } from '@one-inch-community/core/lit';
+import { formatUnits, UserRejectedRequestError } from 'viem';
+import {
+  async,
+  dispatchEvent,
+  getMobileMatchMediaAndSubscribe,
+  observe,
+  translate
+} from '@one-inch-community/core/lit';
 import { Observable, shareReplay, switchMap } from 'rxjs';
 import { when } from 'lit/directives/when.js';
 import { ifDefined } from 'lit/directives/if-defined.js';
@@ -17,6 +29,7 @@ import { formatSeconds, smartFormatNumber } from '@one-inch-community/core/forma
 import { getBlockEmitter, getSymbolFromWrapToken, getWrapperNativeToken, isNativeToken } from '@one-inch-community/sdk/chain';
 import { consume } from '@lit/context';
 import { SwapContextToken } from '@one-inch-community/sdk/swap';
+import { ApplicationContextToken } from '@one-inch-community/core/application-context';
 
 @customElement(ConfirmSwapElement.tagName)
 export class ConfirmSwapElement extends LitElement {
@@ -25,6 +38,9 @@ export class ConfirmSwapElement extends LitElement {
   static override readonly styles = confirmSwapStyle
 
   @property({ type: Object }) swapSnapshot!: SwapSnapshot<FusionQuoteReceiveDto>
+
+  @consume({ context: ApplicationContextToken })
+  applicationContext!: IApplicationContext
 
   @consume({ context: SwapContextToken, subscribe: true })
   @property({ type: Object, attribute: false })
@@ -69,8 +85,12 @@ export class ConfirmSwapElement extends LitElement {
       this.swapInProgress = true
       await this.swapContext?.fusionSwap(this.swapSnapshot)
       dispatchEvent(this, 'backCard', null)
-    } catch (error) {
-      //
+    } catch (error: any) {
+      const errorText = parseError(error)
+      await this.applicationContext.notificationsController.error(
+        html`${translate(errorText)}`
+      )
+      console.error(error)
     }
     this.swapInProgress = false
   }
@@ -235,6 +255,13 @@ export class ConfirmSwapElement extends LitElement {
     return stream
   }
 
+}
+
+function parseError(error: Error): string {
+  if (error instanceof UserRejectedRequestError) {
+    return 'widgets.swap-form.swap-button.wallet-rejected'
+  }
+  return 'widgets.swap-form.swap-button.swap-error-message'
 }
 
 declare global {
