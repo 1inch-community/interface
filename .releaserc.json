@@ -12,16 +12,18 @@
     "@semantic-release/release-notes-generator",
     "@semantic-release/changelog",
     [
-      "@semantic-release/npm",
-      {
-        "npmPublish": false
-      }
-    ],
-    [
       "@semantic-release/exec",
         {
           "prepareCmd": "sh tools/scripts/publish.sh ${nextRelease.version}"
         }
+    ],
+    [
+      "@semantic-release/npm",
+      {
+        "npmPublish": true,
+        "pkgRoot": "dist/libs/models",
+        "registry": "https://npm.pkg.github.com/"
+      }
     ],
     [
       "@semantic-release/github",
