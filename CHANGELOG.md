@@ -1,3 +1,15 @@
+# [1.0.0-dev.35](https://github.com/1inch-community/interface/compare/v1.0.0-dev.34...v1.0.0-dev.35) (2024-07-22)
+
+
+### Bug Fixes
+
+* Refactor import of BrandColors in swap-form elements ([116180f](https://github.com/1inch-community/interface/commit/116180ff48196e5abaf3af9250f90b56425648ab))
+
+
+### Features
+
+* Refactor code for better imports and update service worker registration ([1259c0f](https://github.com/1inch-community/interface/commit/1259c0f9744c07f5a38e2909dd7b3a89c82124b1))
+
 # [1.0.0-dev.34](https://github.com/1inch-community/interface/compare/v1.0.0-dev.33...v1.0.0-dev.34) (2024-07-22)
 
 
