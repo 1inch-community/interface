@@ -1,3 +1,11 @@
+# [1.0.0-dev.33](https://github.com/1inch-community/interface/compare/v1.0.0-dev.32...v1.0.0-dev.33) (2024-07-22)
+
+
+### Bug Fixes
+
+* fixed build ([411c4bc](https://github.com/1inch-community/interface/commit/411c4bc42baaee960ec422d72c818a6bdd750535))
+* fixed lint ([f86799c](https://github.com/1inch-community/interface/commit/f86799ce893f01a7837e9be338a1e7bfd0fcbf67))
+
 # [1.0.0-dev.32](https://github.com/1inch-community/interface/compare/v1.0.0-dev.31...v1.0.0-dev.32) (2024-07-22)
 
 
