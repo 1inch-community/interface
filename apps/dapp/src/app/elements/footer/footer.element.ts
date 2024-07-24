@@ -10,6 +10,10 @@ import { ApplicationContextToken } from '@one-inch-community/core/application-co
 import { IApplicationContext } from '@one-inch-community/models';
 import '@one-inch-community/widgets/wallet-manage';
 import '@one-inch-community/widgets/notifications'
+import { OverlayMobileController } from '@one-inch-community/ui-components/overlay';
+
+import('@one-inch-community/ui-components/card');
+import('../settings');
 
 @customElement(FooterElement.tagName)
 export class FooterElement extends LitElement {
@@ -21,6 +25,8 @@ export class FooterElement extends LitElement {
   applicationContext!: IApplicationContext
 
   private mobileMedia = getMobileMatchMedia()
+
+  private readonly mobileOverlay = new OverlayMobileController('app-root');
 
   connectedCallback() {
     super.connectedCallback();
@@ -50,16 +56,28 @@ export class FooterElement extends LitElement {
   private getMobileFooter() {
     return html`
       <div class="footer-container mobile-footer">
-        <div class="footer-content-container">
-          <inch-notifications-open-button></inch-notifications-open-button>
-        </div>
-        <div class="footer-content-container">
-          <inch-chain-selector .controller="${this.applicationContext.connectWalletController}"></inch-chain-selector>
-          <inch-connect-wallet-view .controller="${this.applicationContext.connectWalletController}"></inch-connect-wallet-view>
-        </div>
+
+        <inch-chain-selector .controller="${this.applicationContext.connectWalletController}"></inch-chain-selector>
+        <inch-connect-wallet-view .controller="${this.applicationContext.connectWalletController}"></inch-connect-wallet-view>
+        
+        <inch-notifications-open-button></inch-notifications-open-button>
+
+        <inch-button @click="${() => this.onOpenSettings()}" type="primary-gray" size="l">
+          <inch-icon icon="settings24"></inch-icon>
+        </inch-button>
       
       </div>
     `
+  }
+
+  private async onOpenSettings() {
+    const id = await this.mobileOverlay.open(html`
+      <inch-card forMobileView>
+        <inch-settings
+          @closeSettings="${() => this.mobileOverlay.close(id)}"
+        ></inch-settings>
+      </inch-card>
+    `)
   }
 }
 

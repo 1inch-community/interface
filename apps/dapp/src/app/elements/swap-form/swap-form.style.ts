@@ -35,6 +35,20 @@ export const swapFormStyle = css`
         z-index: 2;
     }
 
+    .shadow-container:after, .shadow-container:before {
+        content: '';
+        width: 0;
+        height: 0;
+        position: absolute;
+        left: -1px;
+        top: -1px;
+        border-radius: 24px;
+        background-size: 0;
+        z-index: -1;
+        will-change: background, width, height, left, top, background-position;
+        transition: background .2s, width .2s, height .2s, background-size .2s;
+    }
+
     .shadow-container-rainbow {
         box-shadow: none;
         position: relative;
@@ -42,17 +56,11 @@ export const swapFormStyle = css`
 
     .shadow-container-rainbow:after, .shadow-container-rainbow:before {
         content: '';
-        position: absolute;
         width: calc(100% + 2px);
         height: calc(100% + 2px);
-        left: -1px;
-        top: -1px;
-        border-radius: 24px;
         background: ${getRainbowGradient()};
         background-size: 2000%;
         animation: bg-rainbow 90s cubic-bezier(0.4, 0, 1, 1) infinite;
-        z-index: -1;
-        will-change: background, width, height, left, top, background-position;
     }
 
     .shadow-container-rainbow:after {

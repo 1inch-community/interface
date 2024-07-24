@@ -3,7 +3,7 @@ import { customElement, property } from 'lit/decorators.js';
 import { segmentedControlContainerStyle, segmentedControlItemStyle } from './segmented-control.style';
 import { classMap } from 'lit/directives/class-map.js';
 import { map } from 'lit/directives/map.js';
-import { buildEvent, isRTLCurrentLocale, localeChange$, subscribe } from '@one-inch-community/core/lit';
+import { buildEvent, isRTLCurrentLocale, localeChange$, resizeObserver, subscribe } from '@one-inch-community/core/lit';
 import { tap } from 'rxjs';
 
 type SegmentedControlSize = 'm' | 'l'
@@ -53,7 +53,12 @@ export class SegmentedControlElement extends LitElement {
     this.caretRef?.classList.add('caret-transition')
     this.requestUpdate()
     subscribe(this, [
-      localeChange$.pipe(tap(() => this.updated()))
+      localeChange$.pipe(
+        tap(() => this.updated())
+      ),
+      resizeObserver(this.parentElement!).pipe(
+        tap(() => this.updated())
+      )
     ])
   }
 

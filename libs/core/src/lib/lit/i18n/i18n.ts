@@ -2,9 +2,9 @@ import { Locale, Translations } from '@one-inch-community/models';
 import { isRTL } from './locale';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 
+export const defaultLocaleCode: Locale = Locale.en
 const translations = new Map<Locale, (() => Promise<Translations>)[]>()
 const currentTranslations$ = new BehaviorSubject<Translations | null>(null)
-const defaultLocaleCode: Locale = Locale.en
 let defaultTranslations!: Translations
 let currentLocaleCode: Locale = Locale.en
 

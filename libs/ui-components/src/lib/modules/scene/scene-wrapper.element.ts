@@ -13,7 +13,6 @@ export class SceneWrapperElement extends LitElement {
           background-color: var(--scene-background-color);
           will-change: transform;
           transform: translate3d(0, 0, 0);
-          padding: 1px;
           height: fit-content;
           box-sizing: border-box;
           position: relative;

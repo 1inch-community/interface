@@ -151,7 +151,7 @@ export const inputStyle = css`
     
     @media (hover: hover) {
         .input-container:not(.disabled):hover {
-            box-shadow: 0 0 0 1px var(--color-background-bg-positive-hover);
+            box-shadow: inset 0 0 0 1px var(--color-background-bg-positive-hover);
         }
         .symbol-container:hover {
             background-color: var(--color-background-bg-positive-hover);

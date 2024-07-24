@@ -129,7 +129,7 @@ export default defineConfig(({ mode }) => {
             },
             {
               urlPattern: /.*\.svg-.*\.js(\?.*)?$/,
-              handler: 'CacheFirst',
+              handler: isProduction ? 'CacheFirst' : 'StaleWhileRevalidate',
               options: {
                 cacheName: 'js-svg-templates',
                 expiration: {

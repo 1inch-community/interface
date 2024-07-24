@@ -1,6 +1,6 @@
 import { brandColorMap, mainColorMap } from './themes';
 import { mainColorStyleElement, brandColorStyleElement } from './theme-elements';
-import { applyStyle, setBrowserMetaColorColor } from '@one-inch-community/core/lit';
+import { applyStyle, createAndAppendInHeaderElement } from '@one-inch-community/core/lit';
 import { Observable, ReplaySubject } from 'rxjs';
 import { BrandColors, MainColors } from '@one-inch-community/models';
 
@@ -19,11 +19,31 @@ const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
 
 const changeAppTheme$ = new ReplaySubject<{mainColor: MainColors, brandColor: BrandColors}>(1)
 
+let metaColorFilter: ((currentColor: string, isDarkTheme: boolean) => string) | null = null
+
 export function getBrowserMetaColor() {
   if (mediaQuery.matches) {
     return browserMetaColors[MainColors.dark]();
   }
   return browserMetaColors[MainColors.light]();
+}
+
+export function setBrowserMetaColorFilter(filter: typeof metaColorFilter) {
+  metaColorFilter = filter
+  setBrowserMetaColorColor(browserMetaColors[currentMainColor]())
+}
+
+function setBrowserMetaColorColor(color: string) {
+  const themeMetaElement = document.head.querySelector('#theme-color') as HTMLMetaElement
+  if (!themeMetaElement) {
+    createAndAppendInHeaderElement('meta', (meta) => {
+      meta.id = 'theme-color';
+      meta.name = 'theme-color';
+      meta.content = metaColorFilter ? metaColorFilter(color, isDarkTheme(currentMainColor)) : color
+    })
+    return
+  }
+  themeMetaElement.content = metaColorFilter ? metaColorFilter(color, isDarkTheme(currentMainColor)) : color
 }
 
 export async function themeChangeMainColor(mainColorName: MainColors, event?: MouseEvent) {
@@ -65,7 +85,7 @@ export async function themeChange(
     document.documentElement.setAttribute('brand-color', BrandColors[brandColorName])
     changeAppTheme$.next({ mainColor: mainColorName, brandColor: brandColorName })
   }
-  if (event && ('startViewTransition' in document)) {
+  if (event && ('startViewTransition' in document) && isDarkTheme(currentMainColor) !== isDarkTheme(mainColorName)) {
     const x = event.clientX;
     const y = event.clientY;
     const right = window.innerWidth - y;
@@ -73,12 +93,12 @@ export async function themeChange(
     const maxRadius = Math.hypot(
       Math.max(y, right),
       Math.max(x, bottom),
-    );
+    ) + 100;
 
     (document as any).startViewTransition(() => {
       changeTheme()
     }).ready.then(() => {
-      document.documentElement.animate(
+      return document.documentElement.animate(
         {
           clipPath: [
             `circle(0px at ${x}px ${y}px)`,
@@ -90,7 +110,7 @@ export async function themeChange(
           easing: 'ease-in-out',
           pseudoElement: '::view-transition-new(root)',
         }
-      );
+      ).finished;
     });
     return
   }

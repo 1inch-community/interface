@@ -7,9 +7,9 @@ import { appendStyle } from '@one-inch-community/core/lit';
 import { asyncFrame } from '../async/async-frame';
 import { ScrollViewProviderElement } from '@one-inch-community/ui-components/scroll';
 
-type RenderConfig<T extends string> = Record<T, () => TemplateResult>
+export type RenderConfig<T extends string> = Record<T, () => TemplateResult>
 
-type SceneConfig<T extends string> = Record<T, SceneConfigItem>
+export type SceneConfig<T extends string> = Record<T, SceneConfigItem>
 
 interface SceneConfigItem {
   minWidth?: number | string;
@@ -30,6 +30,10 @@ export class SceneController<T extends string, U extends T> {
   private readonly sceneContainer = buildSceneContainer();
 
   private transitionInProgress = false;
+
+  get activeScene() {
+    return this.sceneStack[this.sceneStack.length - 1];
+  }
 
   constructor(private readonly rootSceneName: U,
               private readonly config: SceneConfig<T>,
@@ -52,7 +56,8 @@ export class SceneController<T extends string, U extends T> {
       }
       const sceneWrapper = this.buildSceneWrapper(sceneFactory(), sceneName);
       this.clearContainer();
-      this.sceneContainerAppendChild(sceneName, sceneWrapper);
+      this.sceneContainerAppendChild(sceneWrapper);
+      this.applySceneConfigBySceneName(sceneName)
     }
     return html`${this.sceneContainer}`;
   }
@@ -104,16 +109,21 @@ export class SceneController<T extends string, U extends T> {
       isBack ? upScene.animationOutStart() : upScene.animationInStart();
       isBack ? downScene.animationOutStart() : downScene.animationInStart();
 
-      this.sceneContainerAppendChild(sceneName, nextSceneWrapper);
+      this.sceneContainerAppendChild(nextSceneWrapper);
       await asyncFrame()
       const nextSceneWrapperRect = nextSceneWrapper.getBoundingClientRect();
       const currentSceneWrapperRect = currentSceneWrapper.getBoundingClientRect();
       await this.animation.preparation(upScene, downScene, isBack ?? false);
+      if (nextSceneWrapperRect.height > currentSceneWrapperRect.height) {
+        this.applySceneConfigBySceneName(sceneName)
+      }
       await Promise.all([
         this.animation.transition(upScene, downScene, isBack ?? false),
         this.resizeContainer(nextSceneWrapperRect, currentSceneWrapperRect)
       ]);
-
+      if (nextSceneWrapperRect.height < currentSceneWrapperRect.height) {
+        this.applySceneConfigBySceneName(sceneName)
+      }
       appendStyle(this.sceneContainer, {
         width: '',
         height: ''
@@ -147,13 +157,16 @@ export class SceneController<T extends string, U extends T> {
     return sceneWrapper;
   }
 
-  private sceneContainerAppendChild(sceneName: T, sceneWrapper: HTMLElement) {
+  private sceneContainerAppendChild(sceneWrapper: HTMLElement) {
     this.sceneContainer.appendChild(sceneWrapper);
-    const config = this.config[sceneName];
-    this.applySceneConfig(config);
   }
 
-  private applySceneConfig(config: SceneConfigItem) {
+  private applySceneConfigBySceneName(sceneName: T) {
+    const config = this.config[sceneName];
+    this.applySceneSizes(config);
+  }
+
+  private applySceneSizes(config: SceneConfigItem) {
     const formatValue = (value?: number | string) => {
       if (!value) return '';
       return (typeof value === 'number') ? `${value}px` : value;
@@ -168,18 +181,24 @@ export class SceneController<T extends string, U extends T> {
   }
 
   private async resizeContainer(nextRect: DOMRect, currentRect: DOMRect) {
+    const fromKeyframe: Record<string, string> = {
+      height: `${currentRect.height}px`,
+      width: `${currentRect.width}px`
+    }
+    const toKeyframe: Record<string, string> = {
+      height: `${nextRect.height}px`,
+      width: `${nextRect.width}px`
+    }
+    appendStyle(this.sceneContainer, fromKeyframe);
     await this.sceneContainer.animate([
-      { height: `${currentRect.height}px`, width: `${currentRect.width}px` },
-      { height: `${nextRect.height}px`, width: `${nextRect.width}px` }
+      fromKeyframe,
+      toKeyframe
     ], {
-      duration: 200,
+      duration: 500,
       easing: 'cubic-bezier(.2, .8, .2, 1)'
     }).finished;
 
-    appendStyle(this.sceneContainer, {
-      width: `${nextRect.width}px`,
-      height: `${nextRect.height}px`
-    });
+    appendStyle(this.sceneContainer, toKeyframe);
   }
 }
 

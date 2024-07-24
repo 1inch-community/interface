@@ -10,7 +10,7 @@ export function shiftAnimation(): Animation {
     right: '0',
     zIndex: '9',
     backfaceVisibility: 'hidden',
-    height: isSafari() ? '100%' : ''
+    height: isSafari() ? '110%' : ''
   }
   const resetStyle = {
     position: '',
@@ -34,26 +34,26 @@ export function shiftAnimation(): Animation {
       appendStyle(upLayer, {
         ...initStyle,
         zIndex: '9',
-        transform: isBack ? 'translate3d(0, 0, 0)' : 'translate3d(100%, 0, 0)'
+        transform: isBack ? 'translate3d(0, 0, 0)' : 'translate3d(110%, 0, 0)'
       })
       appendStyle(downLayer, {
         ...initStyle,
         zIndex: '8',
-        transform: isBack ? 'translate3d(-100%, 0, 0)' : 'translate3d(0, 0, 0)',
+        transform: isBack ? 'translate3d(-110%, 0, 0)' : 'translate3d(0, 0, 0)',
       })
     },
     transition: async (upLayer: HTMLElement, downLayer: HTMLElement, isBack: boolean) => {
       await Promise.all([
         upLayer.animate([
-          { transform: isBack ? 'translate3d(0, 0, 0)' : 'translate3d(100%, 0, 0)' },
-          { transform: isBack ? 'translate3d(100%, 0, 0)' : 'translate3d(0, 0, 0)' },
+          { transform: isBack ? 'translate3d(0, 0, 0)' : 'translate3d(110%, 0, 0)' },
+          { transform: isBack ? 'translate3d(110%, 0, 0)' : 'translate3d(0, 0, 0)' },
         ], animationConfig),
         downLayer.animate([
           {
-            transform: isBack ? 'translate3d(-100%, 0, 0)' : 'translate3d(0, 0, 0)',
+            transform: isBack ? 'translate3d(-110%, 0, 0)' : 'translate3d(0, 0, 0)',
           },
           {
-            transform: isBack ? 'translate3d(0, 0, 0)' : 'translate3d(-100%, 0, 0)',
+            transform: isBack ? 'translate3d(0, 0, 0)' : 'translate3d(-110%, 0, 0)',
           },
         ], animationConfig).finished
       ])

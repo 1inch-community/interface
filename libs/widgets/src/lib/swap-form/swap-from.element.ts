@@ -45,7 +45,11 @@ export class SwapFromElement extends LitElement {
     if (!this.swapContext) return
     return html`
       <div class="swap-form-container">
-        <inch-card-header headerText="${translate('widgets.swap-form.header.swap')}" headerTextPosition="left">
+        <inch-card-header
+          headerText="${translate('widgets.swap-form.header.swap')}"
+          headerTextPosition="left"
+        >
+          <slot name="header" slot="right-container"></slot>
         </inch-card-header>
         
         <div class="input-container">

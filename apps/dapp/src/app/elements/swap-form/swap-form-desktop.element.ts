@@ -11,6 +11,7 @@ import { OverlayController } from '@one-inch-community/ui-components/overlay';
 import { swapFormStyle } from './swap-form.style';
 
 import '@one-inch-community/ui-components/card';
+import '@one-inch-community/ui-components/button';
 import '@one-inch-community/widgets/swap-form';
 import { subscribe } from '@one-inch-community/core/lit';
 import { getThemeChange } from '@one-inch-community/core/theme';
@@ -19,6 +20,7 @@ import { distinctUntilChanged, map, tap } from 'rxjs';
 import('@one-inch-community/widgets/wallet-manage');
 import('@one-inch-community/widgets/select-token');
 import('@one-inch-community/ui-components/icon');
+import('../settings');
 
 @customElement(SwapFormDesktopElement.tagName)
 export class SwapFormDesktopElement extends LitElement {
@@ -46,7 +48,8 @@ export class SwapFormDesktopElement extends LitElement {
   private readonly desktopScene = new SceneController('swapForm', {
     swapForm: { minWidth: 556, maxWidth: 556, maxHeight: 625, lazyRender: true },
     selectToken: { minWidth: 556, maxWidth: 556, maxHeight: 680 },
-    confirmSwap: { minWidth: 556, maxWidth: 556, maxHeight: 680 }
+    confirmSwap: { minWidth: 556, maxWidth: 556, maxHeight: 680 },
+    settings: { minWidth: 556, maxWidth: 556, maxHeight: 300, lazyRender: true },
   });
 
   protected firstUpdated() {
@@ -74,7 +77,13 @@ export class SwapFormDesktopElement extends LitElement {
                 @changeChain="${() => this.onOpenChangeChainView()}"
                 @openTokenSelector="${(event: CustomEvent) => this.onOpenSelectToken(event)}"
                 @connectWallet="${() => this.onOpenConnectWalletView()}"
-              ></inch-swap-form>
+              >
+                <div slot="header">
+                  <inch-button @click="${() => this.desktopScene.nextTo('settings')}" type="tertiary-gray" size="l">
+                    <inch-icon icon="settings24"></inch-icon>
+                  </inch-button>
+                </div>
+              </inch-swap-form>
             `,
             selectToken: () => html`
               <inch-select-token
@@ -86,11 +95,16 @@ export class SwapFormDesktopElement extends LitElement {
               <inch-confirm-swap
                 .swapSnapshot="${swapSnapshot as any}"
                 @backCard="${async () => {
-              await this.desktopScene.back();
-              this.swapSnapshot = null;
-            }}"
+                  await this.desktopScene.back();
+                  this.swapSnapshot = null;
+                }}"
               ></inch-confirm-swap>
-            `)
+            `),
+            settings: () => html`
+              <inch-settings
+                @closeSettings="${() => this.desktopScene.back()}"
+              ></inch-settings>
+            `
           })}
         </inch-card>
       </div>

@@ -1,9 +1,9 @@
 import { IOverlayController } from './overlay-controller.interface';
 import { html, render, TemplateResult } from 'lit';
 import { getContainer } from './overlay-container';
-import { appendStyle, getMobileMatchMediaEmitter, isSafari, isStandalone, resizeObserver, setBrowserMetaColorColor } from '@one-inch-community/core/lit';
+import { appendStyle, getMobileMatchMediaEmitter, isSafari, isStandalone, resizeObserver } from '@one-inch-community/core/lit';
 import { asyncFrame } from '@one-inch-community/ui-components/async';
-import { getBrowserMetaColor, applyColorBrightness, interpolateColorRange, getCssValue } from '@one-inch-community/core/theme';
+import { getBrowserMetaColor, applyColorBrightness, interpolateColorRange, getCssValue, setBrowserMetaColorFilter } from '@one-inch-community/core/theme';
 import { getOverlayId } from './overlay-id-generator';
 import {
   fromEvent,
@@ -70,6 +70,7 @@ export class OverlayMobileController implements IOverlayController {
     this.unsubscribeOnResize(overlayId)
     overlayContainer.remove()
     this.activeOverlayMap.delete(overlayId)
+    setBrowserMetaColorFilter(null)
   }
 
   private createOverlayContainer(openTarget: TemplateResult | HTMLElement) {
@@ -335,11 +336,12 @@ export class OverlayMobileController implements IOverlayController {
   }
 
   private changeBrowserMetaColor(halfView: boolean, isBack: boolean) {
-    let color = getBrowserMetaColor()
-    if (halfView && !isBack) {
-      color = applyColorBrightness(color, parseFloat(this.brightnessHalfView))
-    }
-    setBrowserMetaColorColor(color)
+    setBrowserMetaColorFilter((color: string, isDarkTheme: boolean) => {
+      if (halfView && !isBack) {
+        return applyColorBrightness(color, parseFloat(this.brightnessHalfView))
+      }
+      return color
+    })
   }
 
   private resetRootNodeStyle(rootNode: HTMLElement) {

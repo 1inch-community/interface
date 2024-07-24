@@ -1,6 +1,14 @@
 import { TemplateResult } from 'lit';
 import { IconContext } from './icon-context';
 import { bell24Svg } from './bell_24.svg';
+import { settings24Svg } from './settings_24.svg';
+import { fusion24Svg } from './fusion_24.svg';
+import { globe24Svg } from './globe_24.svg';
+import { image24Svg } from './image_24.svg';
+import { sun24Svg } from './sun_24.svg';
+import { moon24Svg } from './moon_24.svg';
+import { command24Svg } from './command_24.svg';
+import { wallet24Svg } from './wallet_24.svg';
 
 export type IconsRecord = {
   loader: () => Promise<TemplateResult | ((context: IconContext) => TemplateResult)>
@@ -16,7 +24,7 @@ export const icons: Record<string, IconsRecord> = {
   cornerDownRight16: { width: '16px', height: '16px', loader: () => import('./corner-down-right_16.svg').then(m => m.cornerDownRight16Svg) },
   chevronDown16: { width: '16px', height: '16px', loader: () => import('./chevron-down_16.svg').then(m => m.chevronDown16Svg) },
   arrowDown16: { width: '16px', height: '16px', loader: () => import('./arrow-down_16.svg').then(m => m.arrowDown16Svg) },
-  fusion16: { width: '16px', height: '16px', loader: () => import('./fusion_16').then(m => m.fusion16Svg) },
+  fusion16: { width: '16px', height: '16px', loader: () => import('./fusion_16.svg').then(m => m.fusion16Svg) },
   link16: { width: '16px', height: '16px', loader: () => import('./link_16.svg').then(m => m.link16Svg) },
   plusCircle16: { width: '16px', height: '16px', loader: () => import('./plus-circle_16.svg').then(m => m.plusCircle16Svg) },
   circle24: { width: '24px', height: '24px', loader: () => import('./circle_24.svg').then(m => m.circle24Svg) },
@@ -31,6 +39,14 @@ export const icons: Record<string, IconsRecord> = {
   alert24: { width: '24px', height: '24px', loader: () => import('./alert_24.svg').then(m => m.alert24Svg) },
   l2Chain24: { width: '24px', height: '24px', loader: () => import('./l2-chain_24.svg').then(m => m.l2Chain24Svg) },
   l2ChainRTL24: { width: '24px', height: '24px', loader: () => import('./l2-chain-rtl_24.svg').then(m => m.l2Chain24Svg) },
+  settings24: { width: '24px', height: '24px', loader: () => import('./settings_24.svg').then(m => m.settings24Svg) },
+  fusion24: { width: '24px', height: '24px', loader: () => import('./fusion_24.svg').then(m => m.fusion24Svg) },
+  globe24: { width: '24px', height: '24px', loader: () => import('./globe_24.svg').then(m => m.globe24Svg) },
+  image24: { width: '24px', height: '24px', loader: () => import('./image_24.svg').then(m => m.image24Svg) },
+  sun24: { width: '24px', height: '24px', loader: () => import('./sun_24.svg').then(m => m.sun24Svg) },
+  moon24: { width: '24px', height: '24px', loader: () => import('./moon_24.svg').then(m => m.moon24Svg) },
+  command24: { width: '24px', height: '24px', loader: () => import('./command_24.svg').then(m => m.command24Svg) },
+  wallet24: { width: '24px', height: '24px', loader: () => import('./wallet_24.svg').then(m => m.wallet24Svg) },
   authRefresh36: { width: '36px', height: '36px', loader: () => import('./auth-refresh_36.svg').then(m => m.authRefresh36Svg) },
   logoFull: { width: '102px', height: '40px', loader: () => import('./logo-full.svg').then(m => m.logoFullSvg) },
   unicornRun: { width: '38px', height: '24px', loader: () => import('./unicorn_run.svg').then(m => m.unicornRunSvg) },

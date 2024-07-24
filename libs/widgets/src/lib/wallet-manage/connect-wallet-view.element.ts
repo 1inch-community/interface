@@ -5,6 +5,7 @@ import { IConnectWalletController } from '@one-inch-community/models';
 import { observe, getMobileMatchMediaAndSubscribe } from '@one-inch-community/core/lit';
 import { OverlayController } from '@one-inch-community/ui-components/overlay';
 import '@one-inch-community/ui-components/button';
+import '@one-inch-community/ui-components/icon';
 import { defer, map } from 'rxjs';
 import { formatHex } from '@one-inch-community/core/formatters';
 import { CacheActivePromise } from '@one-inch-community/core/decorators';
@@ -64,7 +65,16 @@ export class ConnectWalletViewElement extends LitElement {
 
   private getConnectWalletButton() {
     return html`
-      <inch-button @click="${() => this.onOpenConnectView()}" type="secondary" >Connect wallet</inch-button>
+      <inch-button
+        @click="${() => this.onOpenConnectView()}"
+        type="${this.mobileMatchMedia.matches ? 'primary-gray' : 'secondary'}"
+        size="${this.mobileMatchMedia.matches ? 'l' : 'xl'}"
+      >
+        ${when(this.mobileMatchMedia.matches,
+          () => html`<inch-icon icon="wallet24"></inch-icon>`,
+          () => html`<span>Connect wallet</span>`
+        )}
+      </inch-button>
     `
   }
 
