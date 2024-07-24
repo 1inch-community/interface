@@ -1,3 +1,10 @@
+# [1.0.0-dev.38](https://github.com/1inch-community/interface/compare/v1.0.0-dev.37...v1.0.0-dev.38) (2024-07-24)
+
+
+### Features
+
+* Add settings functionality and related icons ([97fb008](https://github.com/1inch-community/interface/commit/97fb008e1a544323167e5b46ba41468aebb6ce71))
+
 # [1.0.0-dev.37](https://github.com/1inch-community/interface/compare/v1.0.0-dev.36...v1.0.0-dev.37) (2024-07-22)
 
 
