@@ -42,7 +42,7 @@ export abstract class NotificationAnimationMapBaseController implements Animatio
       `;
     }
     return html`
-      <inch-notification-view .config="${record.config}" @closeNotification="${() => this.element.closeNotification(id)}">
+      <inch-notification-view timestamp="${record.timestamp}" .config="${record.config}" @closeNotification="${() => this.element.closeNotification(id)}">
         ${this.element.makeNotificationTemplate(record)}
       </inch-notification-view>
     `;

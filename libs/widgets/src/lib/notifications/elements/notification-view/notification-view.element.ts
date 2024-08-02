@@ -15,6 +15,7 @@ export class NotificationViewElement extends LitElement {
   static override styles = notificationViewStyle
 
   @property({ type: Object }) config?: NotificationConfig
+  @property({ type: Number }) timestamp?: number
 
   private isClose = false
 
@@ -37,6 +38,10 @@ export class NotificationViewElement extends LitElement {
           <inch-button class="close-notification-button" @click="${() => dispatchEvent(this, 'closeNotification', null)}" size="l" type="secondary">
             <inch-icon icon="cross8"></inch-icon>
           </inch-button>
+        </div>
+        <div class="notification-title">
+          <span>${this.config?.title}</span>
+          <div class="notification-time">${this.formatNotificationTime(this.timestamp!)}</div>
         </div>
         <slot></slot>
       </div>
@@ -89,6 +94,29 @@ export class NotificationViewElement extends LitElement {
     appendStyle(this, {
       transform: `translate3d(${lastPosition * 10}px, 0, 0)`,
     })
+  }
+
+
+  private formatNotificationTime(timestamp: number): string {
+    const date = new Date(timestamp);
+    const formatTimeValue = (value: number) => {
+      return value < 10 ? '0' + value : value;
+    };
+    const timeView = [
+      formatTimeValue(date.getHours()),
+      formatTimeValue(date.getMinutes()),
+      formatTimeValue(date.getSeconds())
+    ].join(':');
+
+    if (Date.now() - timestamp > 6 * 60 * 60 * 1000) {
+      const dateView = [
+        formatTimeValue(date.getDate()),
+        formatTimeValue(date.getMonth() + 1)
+      ].join('.');
+      return [dateView, timeView].join(' ');
+    }
+
+    return timeView;
   }
 }
 

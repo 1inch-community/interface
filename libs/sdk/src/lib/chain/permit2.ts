@@ -133,7 +133,7 @@ export async function preparePermit2ForSwap(chainId: ChainId, owner: Address, pe
   const permitCallParams = cutSelector(permitCallFull)
   const token = permitSingle.details.token
   const spender = permitSingle.spender
-  return  decompressPermit(compressPermit(permitCallParams), token, owner, spender)
+  return decompressPermit(compressPermit(permitCallParams), token, owner, spender)
 }
 
 function computeYParityAndS(s: string, yParity: number): string {

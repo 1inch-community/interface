@@ -20,25 +20,8 @@ export const notificationsBaseContainerStyle = css`
         transition: transform .2s;
     }
     
-    .notification-title {
-        font-size: 16px;
-        padding-bottom: 4px;
-        display: flex;
-    }
-    
     .notification-template {
         font-size: 14px;
-    }
-    
-    .notification-time {
-        font-size: 11px;
-        color: var(--color-content-content-secondary);
-        margin-left: auto;
-    }
-
-    .notification-time:dir(rtl) {
-        margin-left: 0;
-        margin-right: auto;
     }
     
     .show-all-button {

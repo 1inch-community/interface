@@ -76,34 +76,8 @@ export abstract class NotificationsBaseContainerElement extends LitElement imple
     const template = html`${record.element}`
     if (record.config.customTemplate) return html`${template}`
     return html`
-      <div class="notification-title">
-        <span>${record.config.title}</span>
-        <div class="notification-time">${this.formatNotificationTime(record.timestamp)}</div>
-      </div>
       <div class="notification-template">${template}</div>
     `;
-  }
-
-  private formatNotificationTime(timestamp: number): string {
-    const date = new Date(timestamp);
-    const formatTimeValue = (value: number) => {
-      return value < 10 ? '0' + value : value;
-    };
-    const timeView = [
-      formatTimeValue(date.getHours()),
-      formatTimeValue(date.getMinutes()),
-      formatTimeValue(date.getSeconds())
-    ].join(':');
-
-    if (Date.now() - timestamp > 6 * 60 * 60 * 1000) {
-      const dateView = [
-        formatTimeValue(date.getDate()),
-        formatTimeValue(date.getMonth() + 1)
-      ].join('.');
-      return [dateView, timeView].join(' ');
-    }
-
-    return timeView;
   }
 
   protected getSortedNotifications() {

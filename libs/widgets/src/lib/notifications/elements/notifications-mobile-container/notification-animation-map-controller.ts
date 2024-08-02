@@ -15,7 +15,11 @@ export class NotificationAnimationMapController extends NotificationAnimationMap
 
   onTemplateBuilder([id, record]: [string, NotificationRecord]) {
     return html`
-      <inch-notification-view .config="${record.config}" @closeNotification="${() => this.element.closeNotification(id)}">
+      <inch-notification-view
+        timestamp="${record.timestamp}"
+        .config="${record.config}"
+        @closeNotification="${() => this.element.closeNotification(id)}"
+      >
         ${this.element.makeNotificationTemplate(record)}
       </inch-notification-view>
     `;

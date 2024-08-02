@@ -8,6 +8,7 @@ export default {
   'widgets.swap-form.fusion-info.min-receive': 'Minimum receive',
   'widgets.swap-form.fusion-info.net-fee': 'Network Fee',
   'widgets.swap-form.swap-button.confirm-swap': 'Confirm swap',
+  'widgets.swap-form.swap-button.update-swap-data': 'Finding swap path',
   'widgets.swap-form.swap-button.check-allowance': 'Check allowance',
   'widgets.swap-form.swap-button.native-token-not-supported': 'Native token not supported now',
   'widgets.swap-form.swap-button.approve-and-swap': 'Approve and Swap',
@@ -24,4 +25,5 @@ export default {
   'widgets.swap-form.swap-button.allow-swap-in-wallet': 'Allow swap in wallet',
   'widgets.swap-form.swap-button.wallet-rejected': 'Wallet rejected request',
   'widgets.swap-form.swap-button.swap-error-message': 'Swap error',
+  'widgets.swap-form.swap-button.waiting-approve-transaction': 'Waiting token approve',
 }

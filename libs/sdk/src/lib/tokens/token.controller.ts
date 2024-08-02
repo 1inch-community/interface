@@ -1,10 +1,15 @@
 import { TokenSchema } from './token.schema';
-import { ChainId, ITokenRecord, ITokenController } from '@one-inch-community/models';
+import {
+  ChainId,
+  ITokenRecord,
+  ITokenController,
+  IApplicationContext,
+  IOneInchDevPortalAdapter
+} from '@one-inch-community/models';
 import { Address, formatUnits } from 'viem';
 import { averageBlockTime } from '../chain/average-block-time';
 import { TokenUsdOnChainPriceProvider } from './token-usd-on-chain-price.provider';
 import { liveQuery } from 'dexie';
-import { OneInchDevPortalAdapter } from '@one-inch-community/sdk/api';
 import { storage, JsonParser } from '@one-inch-community/core/storage';
 import { CacheActivePromise } from '@one-inch-community/core/decorators';
 import { isSupportedEIP2612 } from '@one-inch-community/sdk/chain';
@@ -18,11 +23,18 @@ const tokenDatabaseTTL = 6.048e+8 as const // week
 const tokenBalanceDatabaseTTL = averageBlockTime
 
 export class TokenController implements ITokenController {
+  private context!: IApplicationContext
+  private oneInchApiAdapter!: IOneInchDevPortalAdapter
   private readonly schema = new TokenSchema()
   private readonly tokenUsdPriceProvider = new TokenUsdOnChainPriceProvider()
-  private readonly oneInchApiAdapter = new OneInchDevPortalAdapter()
   private lastUpdateTokenDatabaseTimestampStorage = storage.get<Record<ChainId, number>>(lastUpdateTokenDatabaseTimestampStorageKey, JsonParser)
   private lastUpdateTokenBalanceDatabaseTimestampStorage = storage.get<Record<string, number>>(lastUpdateTokenBalanceDatabaseTimestampStorageKey, JsonParser)
+
+  async init(context: IApplicationContext): Promise<void> {
+    this.context = context
+    this.oneInchApiAdapter = context.oneInchDevPortalAdapter
+    await this.schema.init()
+  }
 
   /**
    * Retrieves sorted by balances and priority token addresses.

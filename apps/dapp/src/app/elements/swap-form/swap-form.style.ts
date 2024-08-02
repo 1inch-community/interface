@@ -73,6 +73,7 @@ export const swapFormStyle = css`
             height: calc(100% + 2px);
             left: -1px;
             top: -1px;
+            background-size: 2000%;
             background-position: 0 0;
         }
         50% {
@@ -88,6 +89,7 @@ export const swapFormStyle = css`
             height: calc(100% + 2px);
             left: -1px;
             top: -1px;
+            background-size: 2000%;
             background-position: 0 0;
         }
     }

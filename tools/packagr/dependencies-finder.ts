@@ -64,10 +64,10 @@ export class DependenciesFinder {
         moduleEntry,
         options,
           name => {
-        if (!name.startsWith(`@${packageJson.name}/`)) return false
-        if (name.startsWith(libFullName)) return false
-        return true
-      },
+          if (!name.startsWith(`@${packageJson.name}/`)) return false
+          if (name.startsWith(libFullName)) return false
+          return true
+        },
         name => {
           const firstSlashIndex = name.indexOf('/');
           const secondSlashIndex = name.indexOf('/', firstSlashIndex + 1);

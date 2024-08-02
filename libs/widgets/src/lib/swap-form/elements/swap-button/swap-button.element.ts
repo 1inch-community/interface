@@ -22,7 +22,8 @@ import {
   subscribe, translate
 } from '@one-inch-community/core/lit';
 import { getAllowance, getBlockEmitter, getOneInchRouterV6ContractAddress, hasPermit,
-  isChainId, isNativeToken, isSupportPermit2 } from '@one-inch-community/sdk/chain'
+  isChainId, isNativeToken, isSupportPermit2,
+  waitTransaction} from '@one-inch-community/sdk/chain'
 
 import { getThemeChange } from '@one-inch-community/core/theme';
 import { swapButtonStyle } from './swap-button.style';
@@ -31,6 +32,7 @@ import { JsonParser, storage } from '@one-inch-community/core/storage';
 import { CacheActivePromise } from '@one-inch-community/core/decorators';
 import { SwapContextToken } from '@one-inch-community/sdk/swap';
 import { ApplicationContextToken } from '@one-inch-community/core/application-context';
+import { isTokensEqual } from '@one-inch-community/sdk/tokens';
 
 enum SwapButtonState {
   readyToSwap,
@@ -46,6 +48,9 @@ enum SwapButtonState {
   lowAllowanceNeedApprove,
   lowAllowanceNeedPermit,
   wrapNativeToken,
+  updateSwapData,
+
+  waitingApproveTransaction,
 
   permitInWallet,
   approveInWallet
@@ -56,6 +61,7 @@ const showLoader = [
   SwapButtonState.checkAllowance,
   SwapButtonState.permitInWallet,
   SwapButtonState.approveInWallet,
+  SwapButtonState.updateSwapData,
 ]
 
 @customElement(SwapButtonElement.tagName)
@@ -78,6 +84,8 @@ export class SwapButtonElement extends LitElement {
 
   @state() private srcToken: IToken | null = null;
 
+  private lastPermitCheckToken: IToken | null = null;
+
   private readonly mobileMedia = getMobileMatchMediaAndSubscribe(this);
 
   private readonly connectedWalletAddress$ = defer(() => this.getConnectedWalletAddress());
@@ -86,6 +94,7 @@ export class SwapButtonElement extends LitElement {
   private readonly chainId$ = defer(() => this.getChainId());
   private readonly sourceTokenAmount$ = defer(() => this.getSourceTokenAmount());
   private readonly rate$ = defer(() => this.getRate());
+  private readonly loading$ = defer(() => this.getLoading());
   private readonly block$ = this.chainId$.pipe(
     switchMap(chainId => chainId ? getBlockEmitter(chainId) : [])
   )
@@ -119,10 +128,15 @@ export class SwapButtonElement extends LitElement {
     this.sourceTokenAmount$.pipe(startWith(0n)),
     this.chainId$,
     this.rate$.pipe(startWith(null)),
-    this.block$.pipe(startWith(null)),
-    this.updateView$.pipe(startWith(null)),
+    this.loading$,
+
+    // update status streams
+    merge(
+      this.block$,
+      this.updateView$
+    ).pipe(startWith(null)),
   ]).pipe(
-    map((params) => {
+    map((params, index) => {
       const [
         walletAddress,
         srcToken,
@@ -130,7 +144,8 @@ export class SwapButtonElement extends LitElement {
         exceedingMaximumAmount,
         amount,
         chainId,
-        rate
+        rate,
+        loading
       ] = params
       this.chainId = chainId
       this.srcToken = srcToken
@@ -153,11 +168,18 @@ export class SwapButtonElement extends LitElement {
       if (exceedingMaximumAmount) {
         return SwapButtonState.exceedingMaximumAmount
       }
+      if (loading && (index === 0 || rate === null)) {
+        return SwapButtonState.updateSwapData
+      }
       if (rate === null) {
         return SwapButtonState.rateNotExist
       }
       if (isNativeToken(srcToken.address)) {
         return SwapButtonState.wrapNativeToken
+      }
+      if (this.isNeedCheckAllowance()) {
+        this.lastPermitCheckToken = srcToken
+        return SwapButtonState.checkAllowance
       }
       return SwapButtonState.readyToSwap
     }),
@@ -222,6 +244,8 @@ export class SwapButtonElement extends LitElement {
           <span class="on-hover">Change chain</span>
           <br>
         `)}
+        ${when(this.buttonState === SwapButtonState.updateSwapData, () => html`<span>${translate('widgets.swap-form.swap-button.update-swap-data')}</span>`)}
+        ${when(this.buttonState === SwapButtonState.waitingApproveTransaction, () => html`<span>${translate('widgets.swap-form.swap-button.waiting-approve-transaction')}</span>`)}
         ${when(this.buttonState === SwapButtonState.readyToSwap, () => html`<span>${translate('widgets.swap-form.swap-button.confirm-swap')}</span>`)}
         ${when(this.buttonState === SwapButtonState.readyToSwapLoading, () => html`<span>${translate('widgets.swap-form.swap-button.confirm-swap')}</span>`)}
         ${when(this.buttonState === SwapButtonState.checkAllowance, () => html`<span>${translate('widgets.swap-form.swap-button.check-allowance')}</span>`)}
@@ -275,8 +299,11 @@ export class SwapButtonElement extends LitElement {
         return await this.context.setMaxAmount()
       }
       if (this.buttonState === SwapButtonState.lowAllowanceNeedApprove) {
+        if (this.chainId === null) throw new Error('')
         this.buttonState = SwapButtonState.approveInWallet
-        await this.context.getApprove()
+        const hash = await this.context.getApprove()
+        this.buttonState = SwapButtonState.waitingApproveTransaction
+        await waitTransaction(this.chainId, hash)
         this.buttonState = SwapButtonState.readyToSwap
       }
       if (this.buttonState === SwapButtonState.lowAllowanceNeedPermit) {
@@ -350,6 +377,17 @@ export class SwapButtonElement extends LitElement {
   private getRate() {
     if (!this.context) throw new Error('');
     return this.context.rate$;
+  }
+
+  private getLoading() {
+    if (!this.context) throw new Error('');
+    return this.context.loading$;
+  }
+
+  private isNeedCheckAllowance() {
+    if (this.lastPermitCheckToken === null) return true
+    return this.srcToken !== null
+      && !isTokensEqual(this.srcToken, this.lastPermitCheckToken)
   }
 }
 

@@ -1,4 +1,4 @@
-import { type Address } from 'viem';
+import { type Address, Hash } from 'viem';
 import { type Observable } from 'rxjs';
 import { ChainId } from '../chain';
 import { IToken } from '../token';
@@ -30,12 +30,12 @@ export interface ISwapContext {
   getTokenRawAmountByType(type: 'source' | 'destination'): Observable<bigint | null>
   setTokenAmountByType(type: 'source' | 'destination', value: bigint, markDirty?: boolean): void
   getSettingsController<V extends keyof SwapSettings>(name: V): SwapSettings[V]
-  fusionSwap(swapSnapshot: SwapSnapshot<FusionQuoteReceiveDto | null>): Promise<void>
+  swap(swapSnapshot: SwapSnapshot): Promise<Hash>
   wrapNativeToken(amount: bigint): Promise<void>
   getSnapshot(): Promise<SwapSnapshot>
   getMaxAmount(): Promise<bigint>
   setMaxAmount(): Promise<void>
-  getApprove(): Promise<void>
+  getApprove(): Promise<Hash>
   getPermit(): Promise<void>
 }
 

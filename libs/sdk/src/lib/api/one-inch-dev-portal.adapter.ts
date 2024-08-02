@@ -1,15 +1,17 @@
 import {
   ChainId,
-  ITokenDto,
   FusionQuoteReceiveDto,
   GasPriceDto,
+  IApplicationContext,
   IOneInchDevPortalAdapter,
+  ITokenDto,
   QuoteReceiveCustomPreset
 } from '@one-inch-community/models';
-import type { Address } from 'viem';
+import type { Address, Hash } from 'viem';
 import { CacheActivePromise } from '@one-inch-community/core/decorators';
 import { TimeCache } from '@one-inch-community/core/cache';
 import { getEnvironmentValue } from '@one-inch-community/core/environment';
+import { buildFusionSdk } from './fusion-sdk';
 
 const tokenPriceCache = new TimeCache<ChainId, Record<Address, string>>(10000)
 const fusionQuoteReceiveCache = new TimeCache<string, FusionQuoteReceiveDto | null>(5000)
@@ -18,6 +20,11 @@ const gasPriceCache = new TimeCache<ChainId, GasPriceDto>(5000)
 export class OneInchDevPortalAdapter implements IOneInchDevPortalAdapter {
 
   private readonly host: string = getEnvironmentValue('oneInchDevPortalHost')
+  private context!: IApplicationContext
+
+  async init(context: IApplicationContext): Promise<void> {
+    this.context = context
+  }
 
   @CacheActivePromise()
   async getWhiteListedTokens(chainId: ChainId): Promise<ITokenDto[]> {
@@ -108,5 +115,11 @@ export class OneInchDevPortalAdapter implements IOneInchDevPortalAdapter {
     const result = await response.json();
     gasPriceCache.set(chainId, result)
     return result
+  }
+
+  @CacheActivePromise()
+  async getFusionOrderStatus(chainId: ChainId, orderHash: Hash) {
+    const sdk = await buildFusionSdk(chainId, this.context.connectWalletController)
+    return await sdk.getOrderStatus(orderHash)
   }
 }

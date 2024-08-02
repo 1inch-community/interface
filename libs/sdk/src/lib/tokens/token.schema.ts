@@ -1,4 +1,4 @@
-import Dexie, { Table } from 'dexie';
+import type { Table } from 'dexie';
 import { type Address, isAddressEqual } from 'viem';
 import { IBalancesTokenRecord, ChainId, ITokenRecord, ITokenDto } from '@one-inch-community/models';
 import { nativeTokenAddress } from '@one-inch-community/sdk/chain';
@@ -19,18 +19,33 @@ const TokenPriority: Record<string, number> = {
   'tokens': 0
 };
 
-export class TokenSchema extends Dexie {
+interface TokenSchemaDatabase {
+  readonly tokens: Table<ITokenRecord, string>;
+  readonly balances: Table<IBalancesTokenRecord, string>;
+}
+
+export class TokenSchema {
 
   static databaseVersion = 4;
 
-  private tokens!: Table<ITokenRecord, string>;
-  private balances!: Table<IBalancesTokenRecord, string>;
+  private database?: TokenSchemaDatabase
+
+  private get tokens() {
+    if (!this.database) throw new Error('token database not init')
+    return this.database.tokens
+  };
+
+  private get balances() {
+    if (!this.database) throw new Error('token database not init')
+    return this.database.balances
+  };
 
   private readonly tokenCache = new QueueCache<string, ITokenRecord>(50)
 
-  constructor() {
-    super('one-inch-token');
-    this.version(TokenSchema.databaseVersion).stores({
+  async init() {
+    const Dexie = await import('dexie').then(m => m.Dexie)
+    const db = new Dexie('one-inch-token')
+    db.version(TokenSchema.databaseVersion).stores({
       tokens: [
         'id', // 'chainId:address'
         'address',
@@ -52,6 +67,7 @@ export class TokenSchema extends Dexie {
         'amount'
       ].join(', '),
     });
+    this.database = db as any as TokenSchemaDatabase
   }
 
   async getToken(chainId: ChainId, address: Address): Promise<ITokenRecord | null> {

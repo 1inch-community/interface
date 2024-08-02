@@ -21,6 +21,23 @@ export const notificationViewStyle = css`
         border: 1px solid var(--border-color);
         transition: border .2s;
     }
+
+    .notification-title {
+        font-size: 16px;
+        padding-bottom: 4px;
+        display: flex;
+    }
+
+    .notification-time {
+        font-size: 11px;
+        color: var(--color-content-content-secondary);
+        margin-left: auto;
+    }
+
+    .notification-time:dir(rtl) {
+        margin-left: 0;
+        margin-right: auto;
+    }
     
     .error {
         --border-color: var(--color-background-bg-critical);

@@ -10,6 +10,7 @@ import {
   IApplicationContext
 } from '@one-inch-community/models';
 import '@one-inch-community/widgets/token-icon'
+import '@one-inch-community/widgets/notifications'
 import '@one-inch-community/ui-components/card'
 import '@one-inch-community/ui-components/button'
 import '@one-inch-community/ui-components/icon'
@@ -83,8 +84,15 @@ export class ConfirmSwapElement extends LitElement {
     if (this.swapInProgress) return
     try {
       this.swapInProgress = true
-      await this.swapContext?.fusionSwap(this.swapSnapshot)
+      const hash = await this.swapContext?.swap(this.swapSnapshot)
       dispatchEvent(this, 'backCard', null)
+      if (hash) {
+        await this.applicationContext.notificationsController.show(
+          'Swap status',
+          html`<inch-notification-fusion-swap-view orderHash="${hash}"></inch-notification-fusion-swap-view>`,
+          { pinned: true }
+        )
+      }
     } catch (error: any) {
       const errorText = parseError(error)
       await this.applicationContext.notificationsController.error(
