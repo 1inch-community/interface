@@ -8,4 +8,5 @@ export default {
   'widgets.notifications.fusion-swap-view.status.invalid-signature': 'Filled',
   'widgets.notifications.fusion-swap-view.status.expired': 'Expired',
   'widgets.notifications.fusion-swap-view.status.cancelled': 'Cancelled',
+  'widgets.notifications.fusion-swap-view.control.cancel': 'Cancel',
 }

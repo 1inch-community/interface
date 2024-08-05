@@ -49,7 +49,7 @@ export class SwapFormDesktopElement extends LitElement {
     swapForm: { minWidth: 556, maxWidth: 556, maxHeight: 625, lazyRender: true },
     selectToken: { minWidth: 556, maxWidth: 556, maxHeight: 680 },
     confirmSwap: { minWidth: 556, maxWidth: 556, maxHeight: 680 },
-    settings: { minWidth: 556, maxWidth: 556, maxHeight: 300, lazyRender: true },
+    settings: { minWidth: 556, maxWidth: 556, maxHeight: 900, lazyRender: true },
   });
 
   protected firstUpdated() {

@@ -12,6 +12,7 @@ import { CacheActivePromise } from '@one-inch-community/core/decorators';
 import { TimeCache } from '@one-inch-community/core/cache';
 import { getEnvironmentValue } from '@one-inch-community/core/environment';
 import { buildFusionSdk } from './fusion-sdk';
+import { cancelFusionOrder } from '@one-inch-community/sdk/chain';
 
 const tokenPriceCache = new TimeCache<ChainId, Record<Address, string>>(10000)
 const fusionQuoteReceiveCache = new TimeCache<string, FusionQuoteReceiveDto | null>(5000)
@@ -121,5 +122,14 @@ export class OneInchDevPortalAdapter implements IOneInchDevPortalAdapter {
   async getFusionOrderStatus(chainId: ChainId, orderHash: Hash) {
     const sdk = await buildFusionSdk(chainId, this.context.connectWalletController)
     return await sdk.getOrderStatus(orderHash)
+  }
+
+  @CacheActivePromise()
+  async cancelFusionOrder(chainId: ChainId, orderHash: Hash) {
+    const status = await this.getFusionOrderStatus(chainId, orderHash)
+    const wallet = await this.context.connectWalletController.data.getActiveAddress()
+    if (!wallet) throw new Error('')
+    const result = await cancelFusionOrder(chainId, wallet, status.order.makerTraits, orderHash)
+    return this.context.connectWalletController.writeContract(result.request)
   }
 }

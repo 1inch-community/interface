@@ -6,6 +6,7 @@ export const notificationFusionSwapViewStyles = css`
         display: flex;
         gap: 8px;
         align-items: center;
+        min-height: 38px;
     }
 
     .loader {
@@ -32,6 +33,7 @@ export const notificationFusionSwapViewStyles = css`
         display: flex;
         align-items: center;
         gap: 8px;
+        width: 100%;
     }
     
     .token-icon-container {
@@ -39,6 +41,7 @@ export const notificationFusionSwapViewStyles = css`
         position: relative;
         height: 34px;
         width: 34px;
+        min-width: 34px;
     }
     
     .source-token-icon {
@@ -101,5 +104,18 @@ export const notificationFusionSwapViewStyles = css`
     .status-view__invalid-signature,
     .status-view__false-predicate {
         background-color: var(--color-background-bg-critical);
+    }
+    
+    .cancel-button {
+        margin-left: auto;
+    }
+
+    .cancel-button:dir(rtl) {
+        margin-left: 0;
+        margin-right: auto;
+    }
+    
+    .swap-info-container {
+        width: 100%;
     }
 `

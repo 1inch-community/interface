@@ -62,6 +62,7 @@ const showLoader = [
   SwapButtonState.permitInWallet,
   SwapButtonState.approveInWallet,
   SwapButtonState.updateSwapData,
+  SwapButtonState.waitingApproveTransaction,
 ]
 
 @customElement(SwapButtonElement.tagName)

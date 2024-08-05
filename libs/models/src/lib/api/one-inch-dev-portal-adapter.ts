@@ -26,4 +26,5 @@ export interface IOneInchDevPortalAdapter extends InitializingEntity {
   getTokenPrices(chainId: ChainId): Promise<Record<Address, string>>
   getBalancesByWalletAddress(chainId: ChainId, walletAddress: Address): Promise<Record<Address, string>>
   getFusionOrderStatus(chainId: ChainId, orderHash: Hash): Promise<OrderStatusResponse>
+  cancelFusionOrder(chainId: ChainId, orderHash: Hash): Promise<Hash>
 }

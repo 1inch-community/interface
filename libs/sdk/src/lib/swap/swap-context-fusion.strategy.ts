@@ -70,10 +70,10 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy<FusionQuo
       const preset = rawResponseData.presets[rawResponseData.recommended_preset]
       const auctionEndAmount = (slippageType !== 'auto' ?
         destinationTokenAmount - BigMath.calculatePercentage(destinationTokenAmount, slippageValue ?? rawResponseData.autoK) :
-        BigInt(preset.auctionEndAmount)) * 2n
+        BigInt(preset.auctionEndAmount))
 
       const auctionDuration = auctionTimeType !== 'auto' ? auctionTimeValue ?? preset.auctionDuration : preset.auctionDuration
-      const auctionStartAmount = (BigInt(preset.auctionStartAmount) * 2n).toString()
+      const auctionStartAmount = preset.auctionStartAmount
 
       const getToTokenAmount = (coefficient: number) => {
         let rate = coefficient - preset.gasCost.gasBumpEstimate
@@ -87,8 +87,8 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy<FusionQuo
       }
       orderParams.customPreset = {
         auctionDuration,
-        auctionStartAmount,
-        auctionEndAmount: auctionEndAmount.toString(),
+        auctionStartAmount: (BigInt(auctionStartAmount) * 2n).toString(),
+        auctionEndAmount: (auctionEndAmount * 2n).toString(),
         // points: [
         //   ...preset.points.map((point, index) => ({
         //       delay: getDelay(point.delay),

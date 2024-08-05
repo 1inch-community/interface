@@ -17,6 +17,7 @@ import { tap } from 'rxjs';
 
 import("@one-inch-community/widgets/token-icon")
 import("@one-inch-community/ui-components/timer")
+import("@one-inch-community/ui-components/button")
 
 type TaskResult = [
   OrderStatusResponse,
@@ -76,6 +77,13 @@ export class NotificationFusionSwapViewElement extends LitElement {
     () => [ this.orderHash ] as const
   )
 
+  connectedCallback() {
+    super.connectedCallback();
+    if (this.chainId) {
+      this.startUpdate(this.chainId)
+    }
+  }
+
   protected render() {
     return this.task.render({
       complete: ([ status, sourceToken, destinationToken ]) => this.onCompleteView(
@@ -107,7 +115,7 @@ export class NotificationFusionSwapViewElement extends LitElement {
             .chainId="${chainId}"
           ></inch-token-icon>
         </div>
-        <div>
+        <div class="swap-info-container">
           <div class="amount-status-view">
             ${smartFormatNumber(formatUnits(sourceTokenAmount, sourceToken.decimals), 2)}
             <span class="symbol-view">${sourceToken?.symbol}</span>
@@ -124,6 +132,7 @@ export class NotificationFusionSwapViewElement extends LitElement {
   }
 
   private onPendingView() {
+    if (this.task.value) return this.onCompleteView(...this.task.value)
     return html`
       <div class="loading-view">
         <div class="loader"></div>
@@ -161,14 +170,19 @@ export class NotificationFusionSwapViewElement extends LitElement {
       ['status-view__' + statusText]: true
     }
     const expirationTime = (status.auctionStartDate + status.auctionDuration) * 1000
-    // const statusText = status.status
     return html`
       <div class="status-container">
         <div class="${classMap(classes)}">
           ${translate(`widgets.notifications.fusion-swap-view.status.${statusText}`)}
         </div>
         ${when(statusText === OrderStatus.Pending || statusText === OrderStatus.PartiallyFilled, () => html`
-         <span><inch-timer expirationTime="${expirationTime}"></inch-timer></span>
+          <span><inch-timer expirationTime="${expirationTime}"></inch-timer></span>
+          <inch-button
+            class="cancel-button"
+            size="s"
+            type="secondary-critical"
+            @click="${() => this.applicationContext.oneInchDevPortalAdapter.cancelFusionOrder(this.chainId!, this.orderHash!)}"
+          >${translate('widgets.notifications.fusion-swap-view.control.cancel')}</inch-button>
         `)}
       </div>
     `

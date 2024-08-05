@@ -13,15 +13,15 @@ export function getTransport(chainId: ChainId) {
   const wsTransports = transportWSMap[chainId];
 
   const transport = [
+    ...httpTransports.map(rpc => http(rpc, {
+      batch: batchConfig
+    })),
     ...wsTransports.map(rpc => webSocket(rpc, {
       reconnect: {
         attempts: 5,
         delay: 5_000
       }
     })),
-    ...httpTransports.map(rpc => http(rpc, {
-      batch: batchConfig
-    }))
   ]
 
   const infuraRpc = getInfuraRpc(chainId)
@@ -107,7 +107,7 @@ const transportMap: Record<ChainId, string[]> = {
     'https://polygon-rpc.com',
     'https://polygon-pokt.nodies.app',
     'https://polygon-heimdall-rpc.publicnode.com:443',
-    'https://endpoints.omniatech.io/v1/matic/mainnet/public',
+    // 'https://endpoints.omniatech.io/v1/matic/mainnet/public',
     'https://polygon-bor.publicnode.com',
     'https://polygon.drpc.org',
     'https://polygon.meowrpc.com',
