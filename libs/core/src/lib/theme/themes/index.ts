@@ -12,7 +12,7 @@ export const mainColorMap: Record<MainColors, () => Promise<CSSResult>> = {
 export const brandColorMap: Record<BrandColors, () => Promise<CSSResult>> = {
   [BrandColors.community]: () => import('./brand-color-schemes/community.style').then(m => m.communityStyle),
   [BrandColors.rainbow]: () => import('./brand-color-schemes/rainbow.style').then(m => m.rainbowStyle),
-  [BrandColors.random]: () => import('./brand-color-schemes/random.style').then(m => m.randomStyle),
+  [BrandColors.random]: () => import('./brand-color-schemes/random.style').then(m => m.randomStyle()),
   [BrandColors.orange]: () => import('./brand-color-schemes/orange.style').then(m => m.orangeStyle),
   [BrandColors.violet]: () => import('./brand-color-schemes/violet.style').then(m => m.violetStyle),
 }

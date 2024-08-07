@@ -12,3 +12,7 @@ export * from './average-block-time'
 export * from './wrapper-native-token-map'
 export * from './contracts'
 export * from './block-time-cache'
+export * from './wait-transaction'
+export * from './get-approve'
+export * from './cancel-fusion-order'
+

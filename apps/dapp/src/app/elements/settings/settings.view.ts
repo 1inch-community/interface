@@ -91,6 +91,9 @@ export function getLocalizationSettingsView(scene: SceneController<string, strin
       <div class="settings-view-container">
         ${getLocalizationSettingsViewItem('English', Locale.en, applicationContext)}
         ${getLocalizationSettingsViewItem('العربية', Locale.ar, applicationContext)}
+        ${getLocalizationSettingsViewItem('Deutsch', Locale.de, applicationContext)}
+        ${getLocalizationSettingsViewItem('français', Locale.fr, applicationContext)}
+        ${getLocalizationSettingsViewItem('Español', Locale.es, applicationContext)}
       </div>
     </div>
   `

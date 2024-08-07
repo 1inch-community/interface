@@ -6,6 +6,7 @@ import { Ii18nController } from '../i18n';
 import { IThemesController } from '../themes';
 import { IStorageController } from '../storage';
 import { ITokenRateProvider } from '../token-price';
+import { IOneInchDevPortalAdapter } from '../api';
 
 export interface IApplicationContext {
   readonly connectWalletController: IConnectWalletController
@@ -15,6 +16,7 @@ export interface IApplicationContext {
   readonly i18nController: Ii18nController
   readonly themesController: IThemesController
   readonly storageController: IStorageController
+  readonly oneInchDevPortalAdapter: IOneInchDevPortalAdapter
 
   makeSwapContext(): Promise<ISwapContext>
 }

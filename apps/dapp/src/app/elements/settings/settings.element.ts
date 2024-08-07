@@ -5,8 +5,11 @@ import { SceneController, shiftAnimation } from '@one-inch-community/ui-componen
 import { getLocalizationSettingsView, getMainSettingsView, getPersonalizationSettingsView } from './settings.view';
 import { consume } from '@lit/context';
 import { ApplicationContextToken } from '@one-inch-community/core/application-context';
-import { IApplicationContext } from '@one-inch-community/models';
+import { IApplicationContext, Locale } from '@one-inch-community/models';
 import { getMobileMatchMediaAndSubscribe } from '@one-inch-community/core/lit';
+
+const localeCount = Object.keys(Locale).length
+const localizationHeight = 44 + 8 + (localeCount * 64)
 
 @customElement(Settings.tagName)
 export class Settings extends LitElement {
@@ -22,7 +25,7 @@ export class Settings extends LitElement {
   private readonly scene = new SceneController('main', {
     main: { minWidth: this.getWidth(), maxWidth: this.getWidth(), maxHeight: 180, minHeight: 180 },
     personalization: { minWidth: this.getWidth(), maxWidth: this.getWidth(), maxHeight: 240, minHeight: 240 },
-    localization: { minWidth: this.getWidth(), maxWidth: this.getWidth(), maxHeight: 180, minHeight: 180 }
+    localization: { minWidth: this.getWidth(), maxWidth: this.getWidth(), maxHeight: localizationHeight, minHeight: localizationHeight }
   }, shiftAnimation())
 
   protected render() {

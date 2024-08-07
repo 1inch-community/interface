@@ -4,7 +4,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { buttonLoaderStyle, buttonSizeStyle, buttonStyle, buttonTypeStyle } from './button.style';
 import { vibrate } from '@one-inch-community/core/lit';
 
-type ButtonSize = 'xs' | 'm' | 'l' | 'xl' | 'xxl'
+type ButtonSize = 'xs' | 's' | 'm' | 'l' | 'xl' | 'xxl'
 type ButtonType =
   | 'primary'
   | 'primary-critical'

@@ -22,4 +22,6 @@ export interface FusionPresetDto {
   points: {delay: number, coefficient: number}[]
   startAuctionIn: number
   tokenFee: string
+  startAmount: string
+  gasCost: { gasBumpEstimate: number, gasPriceEstimate: string }
 }

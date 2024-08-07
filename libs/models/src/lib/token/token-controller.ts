@@ -3,8 +3,9 @@ import { IToken } from './token';
 import { ChainId } from '../chain';
 import { IBalancesTokenRecord } from '../database';
 import { Observable } from 'rxjs';
+import { InitializingEntity } from '../base';
 
-export interface ITokenController {
+export interface ITokenController extends InitializingEntity {
   getSortedByPriorityAndBalanceTokenAddresses(chainId: ChainId, filterPattern: string, walletAddress?: Address): Promise<Address[]>
   getToken(chainId: ChainId, address: Address): Promise<IToken | null>
   getTokenLogoURL(chainId: ChainId, address: Address): Promise<string | null>

@@ -146,7 +146,6 @@ export const fusionSwapInfoMainStyle = css`
         font-weight: 500;
         line-height: 24px;
         cursor: pointer;
-        transition: color .2s;
     }
     
     .row-title {
@@ -167,7 +166,7 @@ export const fusionSwapInfoMainStyle = css`
         font-style: normal;
         font-weight: 400;
         line-height: 24px;
-        transition: opacity .2s, transform .2s;
+        transition: opacity .2s, transform .2s, color .2s;
         will-change: opacity;
     }
     

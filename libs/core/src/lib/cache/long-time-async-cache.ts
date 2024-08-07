@@ -1,5 +1,4 @@
-import { ICacheAsync } from '@one-inch-community/models';
-import type Dexie from 'dexie';
+import type { ICacheAsync } from '@one-inch-community/models';
 import type { Table } from 'dexie';
 
 type LongTimeCacheData<Key, Value> = {
@@ -10,11 +9,9 @@ type LongTimeCacheData<Key, Value> = {
 
 const version = 1
 
-let db: Dexie
 async function getDexie<Key, Value>(storageKey: string): Promise<Table<LongTimeCacheData<Key, Value>, Key>> {
-  if (db) return Reflect.get(db, 'cache')
   const Dexie = await import('dexie').then(m => m.Dexie)
-  db = new Dexie('one-inch-long-time-async-cache_' + storageKey)
+  const db = new Dexie('one-inch-long-time-async-cache_' + storageKey)
   db.version(version).stores({
     cache: [
       'key',
@@ -27,18 +24,20 @@ async function getDexie<Key, Value>(storageKey: string): Promise<Table<LongTimeC
 
 export class LongTimeAsyncCache<Value, Key extends string = string> implements ICacheAsync<Key, Value> {
 
+  private storage?: Table<LongTimeCacheData<Key, Value>, Key>
+
   constructor(private readonly storageKey: string, private readonly ttlDays: number) {
   }
 
   async set(key: Key, value: Value): Promise<void> {
-    const db = await getDexie(this.storageKey)
-    await db.put({ key: key.toLowerCase(), value, timestamp: Date.now() })
+    const db = await this.getDexie(this.storageKey)
+    await db.put({ key: key.toLowerCase() as Key, value, timestamp: Date.now() })
     this.cleanOldRecords().catch(console.error)
   }
 
   async get(key: Key): Promise<Value | null> {
     const _key = key.toLowerCase()
-    const db = await getDexie<Key, Value>(this.storageKey)
+    const db = await this.getDexie(this.storageKey)
     const result = await db
       .filter(item => (Date.now() - item.timestamp) < (this.ttlDays * 8.64e+7) && item.key === _key)
       .first()
@@ -47,7 +46,7 @@ export class LongTimeAsyncCache<Value, Key extends string = string> implements I
   }
 
   async getAll() {
-    const db = await getDexie<Key, Value>(this.storageKey)
+    const db = await this.getDexie(this.storageKey)
     const result = await db
       .filter(item => (Date.now() - item.timestamp) < (this.ttlDays * 8.64e+7))
       .toArray()
@@ -62,7 +61,7 @@ export class LongTimeAsyncCache<Value, Key extends string = string> implements I
 
   async delete(key: Key): Promise<boolean> {
     try {
-      const db = await getDexie<Key, Value>(this.storageKey)
+      const db = await this.getDexie(this.storageKey)
       await db.delete(key)
       this.cleanOldRecords().catch(console.error)
       return true
@@ -72,18 +71,26 @@ export class LongTimeAsyncCache<Value, Key extends string = string> implements I
   }
 
   async clear(): Promise<void> {
-    const db = await getDexie<Key, Value>(this.storageKey)
+    const db = await this.getDexie(this.storageKey)
     db.clear()
   }
 
   async size(): Promise<number> {
     await this.cleanOldRecords().catch(console.error)
-    const db = await getDexie<Key, Value>(this.storageKey)
+    const db = await this.getDexie(this.storageKey)
     return db.count()
   }
 
   private async cleanOldRecords() {
-    const db = await getDexie<Key, Value>(this.storageKey)
+    const db = await this.getDexie(this.storageKey)
     await db.where('timestamp').below(Date.now() - (this.ttlDays * 8.64e+7)).delete();
+  }
+
+  private async getDexie(storageKey: string): Promise<Table<LongTimeCacheData<Key, Value>, Key>> {
+    if (this.storage !== undefined) {
+      return this.storage as any
+    }
+    this.storage = await getDexie<Key, Value>(storageKey) as any
+    return this.storage as any
   }
 }

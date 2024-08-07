@@ -1,6 +1,8 @@
-import type { Address } from 'viem';
+import type { Address, Hash } from 'viem';
 import { ChainId } from '../chain';
 import { FusionQuoteReceiveDto, GasPriceDto, ITokenDto } from '../dto';
+import { InitializingEntity } from '../base';
+import type { OrderStatusResponse } from '@1inch/fusion-sdk';
 
 export type QuoteReceiveCustomPreset = {
   auctionDuration: number
@@ -9,7 +11,7 @@ export type QuoteReceiveCustomPreset = {
   points: {toTokenAmount: string; delay: number}[]
 }
 
-export interface IOneInchDevPortalAdapter {
+export interface IOneInchDevPortalAdapter extends InitializingEntity {
   getWhiteListedTokens(chainId: ChainId): Promise<ITokenDto[]>
   getGasPrice(chainId: ChainId): Promise<GasPriceDto | null>
   getFusionQuoteReceive(
@@ -23,4 +25,6 @@ export interface IOneInchDevPortalAdapter {
   ): Promise<FusionQuoteReceiveDto | null>
   getTokenPrices(chainId: ChainId): Promise<Record<Address, string>>
   getBalancesByWalletAddress(chainId: ChainId, walletAddress: Address): Promise<Record<Address, string>>
+  getFusionOrderStatus(chainId: ChainId, orderHash: Hash): Promise<OrderStatusResponse>
+  cancelFusionOrder(chainId: ChainId, orderHash: Hash): Promise<Hash>
 }

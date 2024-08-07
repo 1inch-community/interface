@@ -6,68 +6,68 @@ import { getLibraryFullName } from './names';
 import { findFilesByName, getProjectPackageJson } from './files';
 import { ILogger } from './logger';
 
-const fs = fsSync.promises
+const fs = fsSync.promises;
 
 export class DependenciesFinder {
 
   constructor(
     private readonly logger: ILogger,
-    private readonly libName: string,
+    private readonly libName: string
   ) {
   }
 
   async findModuleCrossDependencies(moduleEntry: string, oneModuleLibrary: boolean): Promise<Set<string>> {
     if (oneModuleLibrary) {
-      return new Set<string>()
+      return new Set<string>();
     }
-    this.logger.log('find cross dependencies in progress')
-    const tsconfigPath = getLibraryTsconfigPath(this.libName)
-    const options = await this.readConfigFile(tsconfigPath)
+    this.logger.log('find cross dependencies in progress');
+    const tsconfigPath = getLibraryTsconfigPath(this.libName);
+    const options = await this.readConfigFile(tsconfigPath);
     if (!options) {
-      return new Set<string>()
+      return new Set<string>();
     }
-    const packageJson = await getProjectPackageJson()
-    const libName = getLibraryFullName(packageJson.name, this.libName)
-    const result = await this.findAllDependencies(moduleEntry, options, libName)
-    this.logger.log('find cross dependencies ready')
-    return result
+    const packageJson = await getProjectPackageJson();
+    const libName = getLibraryFullName(packageJson.name, this.libName);
+    const result = await this.findAllDependencies(moduleEntry, options, libName);
+    this.logger.log('find cross dependencies ready');
+    return result;
   }
 
   async findAllDependenciesPath(moduleEntry: string): Promise<string[]> {
-    const tsconfigPath = getLibraryTsconfigPath(this.libName)
-    const options = await this.readConfigFile(tsconfigPath)
+    const tsconfigPath = getLibraryTsconfigPath(this.libName);
+    const options = await this.readConfigFile(tsconfigPath);
     if (!options) {
-      return []
+      return [];
     }
-    const packageJson = await getProjectPackageJson()
-    const resultSer = await this.findAllDependencies(moduleEntry, options, `@${packageJson.name}/`)
-    const result: string[] = []
+    const packageJson = await getProjectPackageJson();
+    const resultSer = await this.findAllDependencies(moduleEntry, options, `@${packageJson.name}/`);
+    const result: string[] = [];
     resultSer.forEach(dep => {
-      const depPath = getDependencyPath(dep, options)
-      depPath && result.push(path.dirname(depPath))
-    })
-    return result
+      const depPath = getDependencyPath(dep, options);
+      depPath && result.push(path.dirname(depPath));
+    });
+    return result;
   }
 
   async findLibraryCrossDependencies(moduleEntries: string[]): Promise<Set<string>> {
-    this.logger.log('find cross dependencies in progress')
-    const tsconfigPath = getLibraryTsconfigPath(this.libName)
-    const options = await this.readConfigFile(tsconfigPath)
+    this.logger.log('find cross dependencies in progress');
+    const tsconfigPath = getLibraryTsconfigPath(this.libName);
+    const options = await this.readConfigFile(tsconfigPath);
     if (!options) {
-      return new Set<string>()
+      return new Set<string>();
     }
-    const packageJson = await getProjectPackageJson()
-    const resultList: string[] = []
-    const libFullName = getLibraryFullName(packageJson.name, this.libName)
+    const packageJson = await getProjectPackageJson();
+    const resultList: string[] = [];
+    const libFullName = getLibraryFullName(packageJson.name, this.libName);
     for (const moduleEntry of moduleEntries) {
       const result = await this.findAllDependencies(
         moduleEntry,
         options,
-          name => {
-        if (!name.startsWith(`@${packageJson.name}/`)) return false
-        if (name.startsWith(libFullName)) return false
-        return true
-      },
+        name => {
+          if (!name.startsWith(`@${packageJson.name}/`)) return false;
+          if (name.startsWith(libFullName)) return false;
+          return true;
+        },
         name => {
           const firstSlashIndex = name.indexOf('/');
           const secondSlashIndex = name.indexOf('/', firstSlashIndex + 1);
@@ -76,14 +76,14 @@ export class DependenciesFinder {
           }
           return name.substring(0, secondSlashIndex);
         }
-      )
-      resultList.push(...result.values())
+      );
+      resultList.push(...result.values());
     }
-    return new Set(resultList)
+    return new Set(resultList);
   }
 
   private async readConfigFile(filePath: string) {
-    const configFileText = await fs.readFile(filePath, "utf8");
+    const configFileText = await fs.readFile(filePath, 'utf8');
     const result = ts.parseConfigFileTextToJson(filePath, configFileText);
     const configObject = result.config;
 
@@ -93,7 +93,7 @@ export class DependenciesFinder {
 
     const configParseResult = ts.parseJsonConfigFileContent(configObject, ts.sys, path.dirname(filePath));
     if (configParseResult.errors.length > 0) {
-      console.error("Error parsing tsconfig.json content", configParseResult.errors);
+      console.error('Error parsing tsconfig.json content', configParseResult.errors);
       return null;
     }
 
@@ -140,7 +140,7 @@ export class DependenciesFinder {
       }
     }
 
-    ts.forEachChild(node, child => this.findImportsInNode(child, imports, target));
+    ts.forEachChild(node, child => this.findImportsInNode(child, imports, target, transformer));
   }
 
 }

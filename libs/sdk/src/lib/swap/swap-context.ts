@@ -1,5 +1,4 @@
 import {
-  IConnectWalletController,
   ISwapContext,
   IToken,
   Pair,
@@ -9,9 +8,12 @@ import {
   SwapSettings,
   SettingsValue,
   ISwapContextStrategyDataSnapshot,
-  ChainId,
-  FusionQuoteReceiveDto,
-  TokenType, IApplicationContext
+  TokenType,
+  IApplicationContext,
+  IOneInchDevPortalAdapter,
+  IConnectWalletController,
+  ISwapContextStrategy,
+  FusionQuoteReceiveDto
 } from '@one-inch-community/models';
 import {
   defer,
@@ -34,35 +36,33 @@ import { PairHolder } from './pair-holder';
 import { SwapContextOnChainStrategy } from './swap-context-onchain.strategy';
 import { SwapContextFusionStrategy } from './swap-context-fusion.strategy';
 import {
-  estimateWrap, getBlockEmitter, getClient,
+  estimateWrap, getApproveSimulation, getBlockEmitter,
   getOneInchRouterV6ContractAddress, getPermit,
   getPermit2TypeData,
-  isNativeToken, preparePermit2ForSwap,
+  isNativeToken,
   savePermit
 } from '@one-inch-community/sdk/chain';
-import type { BlockchainProviderConnector, EIP712TypedData, HttpProviderConnector, OrderParams } from '@1inch/fusion-sdk';
-import { Address, Hex } from 'viem';
-import { OneInchDevPortalAdapter } from '@one-inch-community/sdk/api';
 import { SettingsController } from '@one-inch-community/core/settings';
-import { BigMath } from '@one-inch-community/core/math'
-import { getEnvironmentValue } from '@one-inch-community/core/environment';
+import { Hash, maxUint256 } from 'viem';
+
+type ContextStrategy = {
+  onChain: ISwapContextStrategy<unknown>
+  fusion: ISwapContextStrategy<FusionQuoteReceiveDto | null>
+}
 
 
 export class SwapContext implements ISwapContext {
 
-  private readonly pairHolder = new PairHolder(this.applicationContext);
+  private readonly pairHolder: PairHolder;
+  private readonly oneInchApiAdapter: IOneInchDevPortalAdapter;
+  private readonly walletController: IConnectWalletController
+  private readonly contextStrategy: ContextStrategy
+
   private readonly subscription = new Subscription();
-  private readonly oneInchApiAdapter = new OneInchDevPortalAdapter();
-  private readonly walletController = this.applicationContext.connectWalletController
 
   private readonly settings: SwapSettings = {
     slippage: new SettingsController('slippage'),
     auctionTime: new SettingsController('auctionTime')
-  };
-
-  private readonly contextStrategy = {
-    onChain: new SwapContextOnChainStrategy(this.pairHolder, this.walletController, this.applicationContext.tokenRateProvider),
-    fusion: new SwapContextFusionStrategy(this, this.pairHolder, this.walletController, this.settings, this.oneInchApiAdapter)
   };
 
   readonly loading$ = new BehaviorSubject(false);
@@ -84,8 +84,8 @@ export class SwapContext implements ISwapContext {
     this.block$,
     this.chainId$,
     this.connectedWalletAddress$,
-    this.pairHolder.streamSnapshot('source'),
-    this.pairHolder.streamSnapshot('destination'),
+    defer(() => this.pairHolder.streamSnapshot('source')),
+    defer(() => this.pairHolder.streamSnapshot('destination')),
     this.updateData$
   ).pipe(
     debounceTime(500),
@@ -152,6 +152,13 @@ export class SwapContext implements ISwapContext {
   constructor(
     private readonly applicationContext: IApplicationContext
   ) {
+    this.pairHolder = new PairHolder(this.applicationContext)
+    this.oneInchApiAdapter = this.applicationContext.oneInchDevPortalAdapter
+    this.walletController = this.applicationContext.connectWalletController
+    this.contextStrategy = {
+      onChain: new SwapContextOnChainStrategy(this.pairHolder, this.walletController, this.applicationContext.tokenRateProvider),
+      fusion: new SwapContextFusionStrategy(this, this.pairHolder, this.walletController, this.settings, this.oneInchApiAdapter)
+    }
   }
 
   init() {
@@ -174,8 +181,14 @@ export class SwapContext implements ISwapContext {
     throw new Error('Method not implemented.');
   }
 
-  getApprove(): Promise<void> {
-    throw new Error('Method not implemented.');
+  async getApprove(): Promise<Hash> {
+    const chainId = await this.applicationContext.connectWalletController.data.getChainId()
+    const sourceTokenSnapshot = this.pairHolder.getSnapshot('source')
+    const owner = await this.applicationContext.connectWalletController.data.getActiveAddress()
+    if (!chainId || !sourceTokenSnapshot || !sourceTokenSnapshot.token || !owner) throw new Error('');
+    const spender = getOneInchRouterV6ContractAddress(chainId)
+    const result = await getApproveSimulation(chainId, sourceTokenSnapshot.token.address, owner, spender, maxUint256)
+    return await this.applicationContext.connectWalletController.writeContract(result.request)
   }
 
   getSettingsController<V extends keyof SwapSettings>(name: V): SwapSettings[V] {
@@ -247,52 +260,9 @@ export class SwapContext implements ISwapContext {
     } as SwapSnapshot;
   }
 
-  async fusionSwap(swapSnapshot: SwapSnapshot<FusionQuoteReceiveDto | null>) {
-    const {
-      chainId,
-      sourceToken,
-      destinationToken,
-      sourceTokenAmount,
-      destinationTokenAmount,
-      slippage,
-      auctionTime,
-      rawResponseData
-    } = swapSnapshot
-    const walletAddress = await this.walletController.data.getActiveAddress()
-    if (walletAddress === null) {
-      throw new Error('Wallet not connected')
-    }
-    if (!rawResponseData) {
-      throw new Error('')
-    }
-    const fusionSDK = await this.getFusionSDKInstance(chainId)
-    const permitData = await getPermit(chainId, sourceToken.address, walletAddress, getOneInchRouterV6ContractAddress(chainId))
-    const orderParams: OrderParams = {
-      walletAddress,
-      fromTokenAddress: sourceToken.address,
-      toTokenAddress: destinationToken.address,
-      amount: sourceTokenAmount.toString(),
-      preset: rawResponseData.recommended_preset as any
-    }
-    if (permitData) {
-      orderParams.permit = await preparePermit2ForSwap(chainId, walletAddress, permitData.signature, permitData.permitSingle)
-      orderParams.isPermit2 = true
-    }
-    const { type: slippageType, value: slippageValue } = slippage
-    const { type: auctionTimeType, value: auctionTimeValue } = auctionTime
-    if (slippageType !== 'auto' || auctionTimeType !== 'auto') {
-      const preset = rawResponseData.presets[rawResponseData.recommended_preset]
-      const auctionEndAmount = destinationTokenAmount - BigMath.calculatePercentage(destinationTokenAmount, slippageValue ?? rawResponseData.autoK)
-      orderParams.customPreset = {
-        auctionEndAmount: auctionEndAmount.toString(),
-        auctionDuration: auctionTimeValue ?? preset.auctionDuration,
-        auctionStartAmount: preset.auctionStartAmount,
-      }
-      orderParams.preset = 'custom' as any
-    }
-
-    const createOrderResponse = await fusionSDK.createOrder(orderParams)
-    await fusionSDK.submitOrder(createOrderResponse.order, createOrderResponse.quoteId)
+  async swap(swapSnapshot: SwapSnapshot): Promise<Hash> {
+    const strategy = await this.getActiveStrategy()
+    return await strategy.swap(swapSnapshot)
   }
 
   async getMaxAmount() {
@@ -352,14 +322,12 @@ export class SwapContext implements ISwapContext {
     this.pairHolder.setAmount(type, value);
   }
 
-  private async getFusionSDKInstance(chainId: ChainId) {
-    const { FusionSDK } = await import('@1inch/fusion-sdk');
-    return new FusionSDK({
-      url: getEnvironmentValue('oneInchDevPortalHost') + '/fusion',
-      network: chainId as any,
-      blockchainProvider: new BlockchainFusionProviderConnector(chainId, this.walletController),
-      httpProvider: new FusionHttpProviderConnector()
-    });
+  private async getActiveStrategy(): Promise<ISwapContextStrategy<unknown>> {
+    const address = await this.walletController.data.getActiveAddress()
+    if (address === null) {
+      return this.contextStrategy.onChain
+    }
+    return this.contextStrategy.fusion
   }
 
   private async getDataSnapshot(useOnChainStrategy: boolean): Promise<ISwapContextStrategyDataSnapshot | null> {
@@ -381,42 +349,4 @@ export class SwapContext implements ISwapContext {
 
 function isTokenSnapshotNotNullable(snapshot: NullableValue<TokenSnapshot>): snapshot is TokenSnapshot {
   return snapshot.token !== null && snapshot.amount !== null;
-}
-
-class BlockchainFusionProviderConnector implements BlockchainProviderConnector {
-
-  private readonly client = getClient(this.chainId)
-
-  constructor(
-    private readonly chainId: ChainId,
-    private readonly walletController: IConnectWalletController
-  ) {
-  }
-
-  async signTypedData(_: string, typedData: EIP712TypedData): Promise<string> {
-    return await this.walletController.signTypedData(typedData as any)
-  }
-
-  async ethCall(contractAddress: string, callData: string): Promise<string> {
-    const resp = await this.client.call({
-      to: contractAddress as Address,
-      data: callData as Hex
-    })
-    return resp.data ?? ''
-  }
-
-}
-
-class FusionHttpProviderConnector implements HttpProviderConnector {
-    async get<T>(url: string): Promise<T> {
-      const resp = await fetch(url)
-      return resp.json()
-    }
-    async post<T>(url: string, data: unknown): Promise<T> {
-      const resp = await fetch(url, {
-        method: 'POST',
-        body: JSON.stringify(data)
-      })
-      return resp.json().catch(() => void 0)
-    }
 }

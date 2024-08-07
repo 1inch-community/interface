@@ -2,12 +2,14 @@ import {
   IConnectWalletController,
   ISwapContextStrategy,
   ISwapContextStrategyDataSnapshot,
-  ITokenRateProvider
+  ITokenRateProvider,
+  SwapSnapshot
 } from '@one-inch-community/models';
 import { PairHolder } from './pair-holder';
 import { BigMath } from '@one-inch-community/core/math';
+import { Hash } from 'viem';
 
-export class SwapContextOnChainStrategy implements ISwapContextStrategy {
+export class SwapContextOnChainStrategy implements ISwapContextStrategy<unknown> {
 
   constructor(
     private readonly pairHolder: PairHolder,
@@ -15,6 +17,11 @@ export class SwapContextOnChainStrategy implements ISwapContextStrategy {
     private readonly rateProvider: ITokenRateProvider
   ) {
   }
+
+  swap(swapSnapshot: SwapSnapshot<unknown>): Promise<Hash> {
+    throw new Error('OnChain strategy not support swap');
+  }
+
 
   async getDataSnapshot(): Promise<ISwapContextStrategyDataSnapshot> {
     const sourceTokenSnapshot = this.pairHolder.getSnapshot('source')

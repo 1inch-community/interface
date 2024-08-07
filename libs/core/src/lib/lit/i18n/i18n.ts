@@ -2,7 +2,7 @@ import { Locale, Translations } from '@one-inch-community/models';
 import { isRTL } from './locale';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 
-export const defaultLocaleCode: Locale = Locale.en
+export const defaultLocaleCode: Locale = getDefaultLocaleCode()
 const translations = new Map<Locale, (() => Promise<Translations>)[]>()
 const currentTranslations$ = new BehaviorSubject<Translations | null>(null)
 let defaultTranslations!: Translations
@@ -12,6 +12,7 @@ let lastDefaultTranslationsStorageSize = 0
 let lastCurrentTranslationsStorageSize = 0
 
 let isInitialized = false
+
 
 export const localeChange$ = currentTranslations$.pipe(
   map(() => currentLocaleCode)
@@ -24,17 +25,18 @@ export async function addTranslation(translationsRecord: Record<Locale, (() => P
     storage.push(translation);
     translations.set(localeCode as Locale, storage)
   }
+  if (!isInitialized) return
   await updateLocaleAndTranslations(currentLocaleCode)
 }
 
-export async function changeLocale(localeCode: Locale) {
+export async function changeLocaleAndUpdate(localeCode: Locale) {
+  if (!isInitialized) return
   await updateLocaleAndTranslations(localeCode)
 }
 
-export async function initLocale() {
-  const localeCode = localStorage.getItem('1inch_locale') as (Locale | undefined) ?? Locale.en
-  isInitialized = true
+export async function initLocale(localeCode: Locale) {
   await updateLocaleAndTranslations(localeCode)
+  isInitialized = true
 }
 
 export function listenChangesByPath(path: string, context?: Record<string, unknown>): Observable<string> {
@@ -60,36 +62,55 @@ function interpolateString(value: string, context: Record<string, unknown>) {
   return newValue
 }
 
+const translationsListToRecord = (translationsList: Translations[]): Translations =>
+  translationsList.reduce((record, translations) =>
+    ({ ...record, ...translations }), {})
+
 async function updateLocaleAndTranslations(newLocaleCode: Locale) {
-  if (!isInitialized) return
   const html = document.querySelector('html')!
   html.dir = isRTL(newLocaleCode) ? 'rtl' : 'ltr'
 
+
+  await Promise.all([
+    updateDefaultTranslationsMap(),
+    updateCurrentTranslationsMap(newLocaleCode)
+  ])
+  currentLocaleCode = newLocaleCode
+  html.lang = newLocaleCode
+}
+
+async function updateDefaultTranslationsMap() {
   const defaultTranslationsByLocale = translations.get(defaultLocaleCode) ?? []
-  const translationsByLocale = translations.get(newLocaleCode) ?? []
-
-  const translationsListToRecord = (translationsList: Translations[]): Translations =>
-    translationsList.reduce((record, translations) =>
-      ({ ...record, ...translations }), {})
-
   if (defaultTranslationsByLocale.length !== lastDefaultTranslationsStorageSize) {
     const translationsList = await Promise.all(defaultTranslationsByLocale.map(fn => fn()))
     defaultTranslations = translationsListToRecord(translationsList)
     lastDefaultTranslationsStorageSize = defaultTranslationsByLocale.length
   }
+}
 
+async function updateCurrentTranslationsMap(newLocaleCode: Locale) {
+  const translationsByLocale = translations.get(newLocaleCode) ?? []
   if (currentLocaleCode !== newLocaleCode || translationsByLocale.length !== lastCurrentTranslationsStorageSize) {
     const translationsList = await Promise.all(translationsByLocale.map(fn => fn()))
     const currentTranslations = translationsListToRecord(translationsList)
     currentTranslations$.next({ ...defaultTranslations, ...currentTranslations })
     lastCurrentTranslationsStorageSize = translationsByLocale.length
   }
-  currentLocaleCode = newLocaleCode
-
 }
 
 export function isRTLCurrentLocale() {
   return isRTL(currentLocaleCode)
 }
 
-Reflect.set(window, 'changeLocale', changeLocale)
+function getDefaultLocaleCode(): Locale {
+  try {
+    const userLocale: string = navigator.language || (navigator as any).userLanguage
+    const code = userLocale.slice(0, 2)
+    if (!(code in Locale)) return Locale.en
+    return code as Locale
+  } catch (error) {
+    return Locale.en
+  }
+}
+
+Reflect.set(window, 'changeLocale', changeLocaleAndUpdate)
