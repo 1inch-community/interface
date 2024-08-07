@@ -1,3 +1,11 @@
+# [1.0.0-dev.39](https://github.com/1inch-community/interface/compare/v1.0.0-dev.38...v1.0.0-dev.39) (2024-08-07)
+
+
+### Features
+
+* Add new locales and enhance localization features ([47a052d](https://github.com/1inch-community/interface/commit/47a052de8569931e64687ffe8f69940b4304567b))
+* Refactor Dexie integration and enhance notifications ([75f5ec4](https://github.com/1inch-community/interface/commit/75f5ec42009b95af81c71c709db2e184523e9720))
+
 # [1.0.0-dev.38](https://github.com/1inch-community/interface/compare/v1.0.0-dev.37...v1.0.0-dev.38) (2024-07-24)
 
 
