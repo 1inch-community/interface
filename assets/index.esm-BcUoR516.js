@@ -1,0 +1,2 @@
+function l(c){const e=new WeakMap,o=s=>{let t=e.get(s);return t||(t=new Map,e.set(s,t)),t};return function(s,t,a){const h=a.value;return a.value=function(...f){const n=o(this),i=c?c(this,...f):JSON.stringify(f,r);if(n.has(i))return n.get(i);const u=h.apply(this,f).finally(()=>n.delete(i));return n.set(i,u),u},a}}function r(c,e){return typeof e=="bigint"?e.toString():e}export{l as C};
+//# sourceMappingURL=index.esm-BcUoR516.js.map
