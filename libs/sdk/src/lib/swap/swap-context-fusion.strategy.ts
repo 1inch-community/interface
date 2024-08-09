@@ -87,8 +87,8 @@ export class SwapContextFusionStrategy implements ISwapContextStrategy<FusionQuo
       }
       orderParams.customPreset = {
         auctionDuration,
-        auctionStartAmount: (BigInt(auctionStartAmount) * 2n).toString(),
-        auctionEndAmount: (auctionEndAmount * 2n).toString(),
+        auctionStartAmount: (BigInt(auctionStartAmount)).toString(),
+        auctionEndAmount: (auctionEndAmount).toString(),
         // points: [
         //   ...preset.points.map((point, index) => ({
         //       delay: getDelay(point.delay),
