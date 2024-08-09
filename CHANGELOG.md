@@ -1,3 +1,10 @@
+# [1.0.0-dev.40](https://github.com/1inch-community/interface/compare/v1.0.0-dev.39...v1.0.0-dev.40) (2024-08-09)
+
+
+### Bug Fixes
+
+* add loader state and asyncTimeout ([0a983bf](https://github.com/1inch-community/interface/commit/0a983bffbd40a18c6d5a3e4f78073b185945eedc))
+
 # [1.0.0-dev.39](https://github.com/1inch-community/interface/compare/v1.0.0-dev.38...v1.0.0-dev.39) (2024-08-07)
 
 
