@@ -1,5 +1,5 @@
 import { html, LitElement } from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { notificationFusionSwapViewStyles } from './notification-fusion-swap-view.styles';
 import { Address, formatUnits, Hash } from 'viem';
 import { Task, TaskStatus } from '@lit/task';
@@ -47,6 +47,8 @@ export class NotificationFusionSwapViewElement extends LitElement {
 
   @consume({ context: ApplicationContextToken })
   applicationContext!: IApplicationContext
+
+  @state() private cancelInProgress = false
 
   private chainId?: ChainId
 
@@ -181,7 +183,12 @@ export class NotificationFusionSwapViewElement extends LitElement {
             class="cancel-button"
             size="s"
             type="secondary-critical"
-            @click="${() => this.applicationContext.oneInchDevPortalAdapter.cancelFusionOrder(this.chainId!, this.orderHash!)}"
+            loader="${ifDefined(this.cancelInProgress ? '' : undefined)}"
+            @click="${async () => {
+              this.cancelInProgress = true
+              await this.applicationContext.oneInchDevPortalAdapter.cancelFusionOrder(this.chainId!, this.orderHash!).catch(() => null)
+              await this.task.run([ this.orderHash ])
+            } }"
           >${translate('widgets.notifications.fusion-swap-view.control.cancel')}</inch-button>
         `)}
       </div>

@@ -4,7 +4,8 @@ import { segmentedControlContainerStyle, segmentedControlItemStyle } from './seg
 import { classMap } from 'lit/directives/class-map.js';
 import { map } from 'lit/directives/map.js';
 import { buildEvent, isRTLCurrentLocale, localeChange$, resizeObserver, subscribe } from '@one-inch-community/core/lit';
-import { tap } from 'rxjs';
+import { of, tap } from 'rxjs';
+import { asyncTimeout } from '@one-inch-community/ui-components/async';
 
 type SegmentedControlSize = 'm' | 'l'
 
@@ -49,16 +50,17 @@ export class SegmentedControlElement extends LitElement {
     this.caretRef = this.renderRoot.querySelector<HTMLElement>('.caret')
     await this.updateComplete
     this.requestUpdate()
-    await new Promise(resolve => setTimeout(resolve, 60))
+    await asyncTimeout(60)
     this.caretRef?.classList.add('caret-transition')
     this.requestUpdate()
+    await asyncTimeout(60)
     subscribe(this, [
       localeChange$.pipe(
         tap(() => this.updated())
       ),
-      resizeObserver(this.parentElement!).pipe(
+      this.parentElement ? resizeObserver(this.parentElement).pipe(
         tap(() => this.updated())
-      )
+      ) : of()
     ])
   }
 
