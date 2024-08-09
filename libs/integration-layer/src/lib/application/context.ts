@@ -1,7 +1,4 @@
-import { ApplicationContext, ApplicationContextToken } from '@one-inch-community/core/application-context';
-import { css, html, LitElement } from 'lit';
-import { provide } from '@lit/context';
-import { customElement } from 'lit/decorators.js';
+import { ApplicationContext } from '@one-inch-community/core/application-context';
 
 let GlobalApplicationContext: ApplicationContext;
 
@@ -24,28 +21,7 @@ export async function bootstrapApplicationContext() {
   await GlobalApplicationContext.init()
 }
 
-@customElement('global-application-context')
-export class GlobalApplicationContextElement extends LitElement {
-
-  static override readonly styles = css`
-    :host {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-    }
-  `
-
-  @provide({ context: ApplicationContextToken })
-  context = GlobalApplicationContext
-
-  protected render() {
-    return html`<slot></slot>`;
-  }
-
-}
-
-declare global {
-  interface HTMLElementTagNameMap {
-    'global-application-context': GlobalApplicationContextElement
-  }
+export function getContext(): ApplicationContext {
+  if (!GlobalApplicationContext) throw new Error('ApplicationContext not bootstrapped')
+  return GlobalApplicationContext
 }

@@ -39,6 +39,9 @@
       ],
       "@one-inch-community/widgets/*": [
         "dist/libs/widgets/*"
+      ],
+      "@one-inch-community/integration-layer/*": [
+        "dist/libs/integration-layer/*"
       ]
     }
   },

@@ -1,0 +1,12 @@
+{
+  "name": "integration-layer",
+  "version": "1.0.0",
+  "peerDependencies": {
+    "@one-inch-community/models": "1.0.0",
+    "@one-inch-community/core": "1.0.0",
+    "@one-inch-community/sdk": "1.0.0",
+    "@one-inch-community/widgets": "1.0.0",
+    "tslib": "2.3.0",
+    "rxjs": "7.8.x"
+  }
+}

@@ -1,18 +1,7 @@
-import { bootstrapApplicationContext } from './context';
-import { html, render } from 'lit';
+import { bootstrapApplication } from '@one-inch-community/integration-layer/application';
 
-Promise.all([
-  import('./app/app.element'),
-  bootstrapApplicationContext(),
-]).then(() => {
-  const template = html`
-    <global-application-context>
-      <app-root id="app-root"></app-root>
-      <div id="overlay-container"></div>
-    </global-application-context>
-  `
-  render(template, document.body)
-})
+bootstrapApplication(() => import('./app/app.element'))
+  .catch(console.error)
 
 import('virtual:pwa-register').then(({ registerSW }) => {
   registerSW({

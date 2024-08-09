@@ -1,9 +1,9 @@
 {
   "name": "ui-components",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "peerDependencies": {
-    "@one-inch-community/models": "0.1.x",
-    "@one-inch-community/core/lit": "0.1.x",
+    "@one-inch-community/models": "1.0.0",
+    "@one-inch-community/core/lit": "1.0.0",
     "@lit/context": "1.1.x",
     "@lit/task": "1.0.x",
     "lit": "3.1.x",
