@@ -3,6 +3,7 @@ import { Locale } from '../i18n';
 import { ColorHex } from './bootstrap-config';
 
 export interface IEmbeddedController {
+  readonly isDestroyed: boolean;
   setChainId(chainId: ChainId): Promise<void>
   setLocale(localeCode: Locale): Promise<void>
   setThemeType(themeType: 'dark' | 'light'): Promise<void>;

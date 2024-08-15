@@ -1,0 +1,29 @@
+.main {
+    display: flex;
+    gap: 16px;
+}
+
+#container {
+    min-height: 100px;
+    width: 450px;
+    border: 1px solid red;
+}
+
+.controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    height: fit-content;
+}
+
+.config-view {
+    margin-top: 16px;
+    width: 450px;
+    height: 300px;
+    resize: none;
+}
+
+.input {
+    display: flex;
+    flex-direction: column;
+}

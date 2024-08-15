@@ -10,6 +10,8 @@ import { safeContextMap } from './safe-context';
 
 export abstract class BaseEmbeddedController implements IEmbeddedController {
 
+  isDestroyed = false
+
   constructor(
     context: IApplicationContext,
     root: IGlobalEmbeddedContextElement
@@ -20,6 +22,7 @@ export abstract class BaseEmbeddedController implements IEmbeddedController {
   destroy() {
     const safeContext = safeContextMap.get(this)!
     safeContext.root.remove()
+    this.isDestroyed = true;
   }
 
   async setChainId(chainId: ChainId): Promise<void> {
