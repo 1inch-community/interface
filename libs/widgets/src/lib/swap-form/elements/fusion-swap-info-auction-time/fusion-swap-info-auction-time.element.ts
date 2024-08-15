@@ -8,7 +8,9 @@ import { dispatchEvent, appendStyle, subscribe, getMobileMatchMediaAndSubscribe 
 import { Maskito } from '@maskito/core';
 import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import { fromEvent, tap } from 'rxjs';
-import { SwapSettings } from '@one-inch-community/models';
+import { IApplicationContext, SwapSettings } from '@one-inch-community/models';
+import { consume } from '@lit/context';
+import { ApplicationContextToken } from '@one-inch-community/core/application-context';
 
 @customElement(FusionSwapInfoAuctionTimeElement.tagName)
 export class FusionSwapInfoAuctionTimeElement extends LitElement {
@@ -20,22 +22,21 @@ export class FusionSwapInfoAuctionTimeElement extends LitElement {
 
   @property({ type: Object }) settings?: SwapSettings['auctionTime']
 
+  @consume({ context: ApplicationContextToken })
+  applicationContext!: IApplicationContext
+
   private readonly segmentsCustom = { label: 'Custom', value: 'custom', template: () => html`${this.customAuctionTimeInput}` }
 
-  private readonly segments: SegmentedControlItem[] = [
-    { label: 'Auto', value: 'auto' },
-    { label: '3m', value: 60 * 3 },
-    { label: '5m', value: 60 * 5 },
-    { label: '10m', value: 60 * 10 },
-    { label: '30m', value: 60 * 30 },
-    this.mobileMedia.matches ? null : { label: '1H', value: 60 * 60 },
-    this.mobileMedia.matches ? null : { label: '2H', value: 60 * 60 * 2 },
-    this.segmentsCustom,
-  ].filter(Boolean) as SegmentedControlItem[]
+  private segments!: SegmentedControlItem[]
 
   private readonly postfix = 's'
 
   private readonly customAuctionTimeInput = document.createElement('input')
+
+  constructor() {
+    super();
+    this.updateSegments()
+  }
 
   override connectedCallback() {
     super.connectedCallback();
@@ -54,6 +55,7 @@ export class FusionSwapInfoAuctionTimeElement extends LitElement {
       fontSize: '16px',
       textAlign: 'center',
     })
+    this.updateSegments()
     subscribe(this, [
       fromEvent(this.customAuctionTimeInput, 'input').pipe(
         tap(() => {
@@ -136,6 +138,19 @@ export class FusionSwapInfoAuctionTimeElement extends LitElement {
       .replaceAll(' ', '')
       .replace(this.postfix, '')
     return parseInt(strValue, 10)
+  }
+
+  private updateSegments() {
+    this.segments = [
+      { label: 'Auto', value: 'auto' },
+      { label: '3m', value: 60 * 3 },
+      { label: '5m', value: 60 * 5 },
+      { label: '10m', value: 60 * 10 },
+      { label: '30m', value: 60 * 30 },
+      (this.mobileMedia.matches || this.applicationContext?.isEmbedded) ? null : { label: '1H', value: 60 * 60 },
+      (this.mobileMedia.matches || this.applicationContext?.isEmbedded) ? null : { label: '2H', value: 60 * 60 * 2 },
+      this.segmentsCustom,
+    ].filter(Boolean) as SegmentedControlItem[]
   }
 
 }

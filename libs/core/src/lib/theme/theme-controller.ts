@@ -23,7 +23,7 @@ export class ThemeController implements IThemesController {
     return this.brandColorSettings.value ?? BrandColors.community
   }
 
-  async init(context: IApplicationContext): Promise<void> {
+  async init(): Promise<void> {
     const mainColorName = this.getActiveMainColor()
     const brandColorName = this.getActiveBrandColor()
     await themeInit(mainColorName, brandColorName)

@@ -9,6 +9,7 @@ import { ITokenRateProvider } from '../token-price';
 import { IOneInchDevPortalAdapter } from '../api';
 
 export interface IApplicationContext {
+  readonly isEmbedded: boolean
   readonly connectWalletController: IConnectWalletController
   readonly tokenController: ITokenController
   readonly tokenRateProvider: ITokenRateProvider
@@ -19,4 +20,5 @@ export interface IApplicationContext {
   readonly oneInchDevPortalAdapter: IOneInchDevPortalAdapter
 
   makeSwapContext(): Promise<ISwapContext>
+  getActiveSwapContext(): ISwapContext | null
 }

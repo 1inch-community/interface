@@ -18,7 +18,12 @@ import { maskitoNumberOptionsGenerator } from '@maskito/kit';
 import "@one-inch-community/widgets/token-icon"
 import "@one-inch-community/ui-components/icon"
 import "@one-inch-community/ui-components/button"
-import { ISwapContext, IToken, TokenType } from '@one-inch-community/models';
+import {
+  ISwapContext,
+  EmbeddedBootstrapConfigSwapForm,
+  IToken,
+  TokenType
+} from '@one-inch-community/models';
 import { formatNumber } from '@one-inch-community/core/formatters';
 import '../balance'
 import '../fiat-balance'
@@ -28,6 +33,7 @@ import { Address, formatUnits, parseUnits } from 'viem';
 import { when } from 'lit/directives/when.js';
 import { choose } from 'lit/directives/choose.js';
 import { SwapContextToken } from '@one-inch-community/sdk/swap';
+import { EmbeddedConfigToken } from '@one-inch-community/core/application-context';
 
 @customElement(InputElement.tagName)
 export class InputElement extends LitElement {
@@ -45,6 +51,9 @@ export class InputElement extends LitElement {
 
   @consume({ context: SwapContextToken })
   context?: ISwapContext
+
+  @consume({ context: EmbeddedConfigToken })
+  config?: EmbeddedBootstrapConfigSwapForm;
 
   private token: IToken | null = null
 
@@ -205,16 +214,28 @@ export class InputElement extends LitElement {
 
   private tokenView(token: IToken) {
     const { name, symbol, address } = token
+    const classes = {
+      'symbol-container': true,
+      'symbol-container_disabled': this.config?.swapFromParams.disabledTokenChanging ?? false,
+    }
     return html`
-      <button @click="${(event: MouseEvent) => dispatchEvent(this, 'openTokenSelector', this.tokenType, event)}"
-              class="symbol-container">
-        <inch-token-icon symbol="${symbol}" address="${address}"
-                         chainId="${observe(this.chainId$)}"></inch-token-icon>
+      <button @click="${(event: MouseEvent) => this.openTokenSelector(event)}"
+              class="${classMap(classes)}">
+        <inch-token-icon
+          symbol="${symbol}"
+          address="${address}"
+          chainId="${observe(this.chainId$)}"
+        ></inch-token-icon>
         <span class="symbol">${symbol}</span>
-        <inch-icon icon="chevronDown16"></inch-icon>
+        ${when(!(this.config?.swapFromParams.disabledTokenChanging), () => html`<inch-icon icon="chevronDown16"></inch-icon>`)}
       </button>
       <div class="token-name">${name}</div>
     `
+  }
+
+  private openTokenSelector(event: MouseEvent) {
+    if ((this.config?.swapFromParams.disabledTokenChanging)) return
+    dispatchEvent(this, 'openTokenSelector', this.tokenType, event)
   }
 
   private updateInputRtl() {

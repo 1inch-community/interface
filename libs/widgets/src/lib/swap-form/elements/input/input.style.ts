@@ -54,6 +54,10 @@ export const inputStyle = css`
         width: fit-content;
         -webkit-tap-highlight-color: transparent;
     }
+
+    .symbol-container_disabled {
+        cursor: auto;
+    }
     
     .symbol {
         font-size: 24px;
@@ -153,7 +157,7 @@ export const inputStyle = css`
         .input-container:not(.disabled):hover {
             box-shadow: inset 0 0 0 1px var(--color-background-bg-positive-hover);
         }
-        .symbol-container:hover {
+        .symbol-container:not(.symbol-container_disabled):hover {
             background-color: var(--color-background-bg-positive-hover);
         }
     }
@@ -176,7 +180,7 @@ export const inputStyle = css`
         }
     `)}
     
-    .symbol-container:active {
+    .symbol-container:not(.symbol-container_disabled):active {
         transform: scale(.98);
         background-color: var(--color-background-bg-positive-hover);
     }

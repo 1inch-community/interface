@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "peerDependencies": {
     "tslib": "2.3.0",
-    "viem": "2.9.x",
+    "viem": "2.x.x",
     "rxjs": "7.x.x"
   }
 }

@@ -6,6 +6,7 @@ import { BrandColors, MainColors } from '@one-inch-community/models';
 
 let currentMainColor: MainColors
 let currentBrandColor: BrandColors
+let isEmbeddedMode = false
 
 const browserMetaColors: Record<MainColors, (() => string)> = {
   [MainColors.systemSync]: () => getBrowserMetaColor(),
@@ -21,6 +22,10 @@ const changeAppTheme$ = new ReplaySubject<{mainColor: MainColors, brandColor: Br
 
 let metaColorFilter: ((currentColor: string, isDarkTheme: boolean) => string) | null = null
 
+export function setEmbeddedMode() {
+  isEmbeddedMode = true
+}
+
 export function getBrowserMetaColor() {
   if (mediaQuery.matches) {
     return browserMetaColors[MainColors.dark]();
@@ -34,6 +39,7 @@ export function setBrowserMetaColorFilter(filter: typeof metaColorFilter) {
 }
 
 function setBrowserMetaColorColor(color: string) {
+  if (isEmbeddedMode) return;
   const themeMetaElement = document.head.querySelector('#theme-color') as HTMLMetaElement
   if (!themeMetaElement) {
     createAndAppendInHeaderElement('meta', (meta) => {

@@ -31,7 +31,7 @@ export class OneInchDevPortalAdapter implements IOneInchDevPortalAdapter {
   async getWhiteListedTokens(chainId: ChainId): Promise<ITokenDto[]> {
     const response = await fetch(`${this.host}/token/v1.2/${chainId}/token-list`);
     const data: { tokens: ITokenDto[] } = await response.json();
-    return data.tokens;
+    return data.tokens ?? [];
   }
 
   @CacheActivePromise()

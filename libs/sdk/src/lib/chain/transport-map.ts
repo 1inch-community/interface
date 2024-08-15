@@ -13,14 +13,14 @@ export function getTransport(chainId: ChainId) {
   const wsTransports = transportWSMap[chainId];
 
   const transport = [
-    ...httpTransports.map(rpc => http(rpc, {
-      batch: batchConfig
-    })),
     ...wsTransports.map(rpc => webSocket(rpc, {
       reconnect: {
         attempts: 5,
         delay: 5_000
       }
+    })),
+    ...httpTransports.map(rpc => http(rpc, {
+      batch: batchConfig
     })),
   ]
 

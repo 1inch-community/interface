@@ -4,8 +4,8 @@ import { customElement } from 'lit/decorators.js';
 import '@one-inch-community/ui-components/card'
 import "@one-inch-community/ui-components/icon"
 import "@one-inch-community/ui-components/button"
-import { ApplicationContextToken } from '@one-inch-community/core/application-context';
-import { ISwapContext, IApplicationContext } from '@one-inch-community/models';
+import { ApplicationContextToken, EmbeddedConfigToken } from '@one-inch-community/core/application-context';
+import { ISwapContext, IApplicationContext, EmbeddedBootstrapConfigSwapForm } from '@one-inch-community/models';
 import { SwapContextToken } from '@one-inch-community/sdk/swap';
 import { combineLatest, defer, distinctUntilChanged, map, startWith } from 'rxjs';
 import { observe, translate } from '@one-inch-community/core/lit';
@@ -25,6 +25,9 @@ export class SwapFromElement extends LitElement {
 
   @consume({ context: SwapContextToken, subscribe: true })
   swapContext?: ISwapContext
+
+  @consume({ context: EmbeddedConfigToken })
+  config?: EmbeddedBootstrapConfigSwapForm;
 
   private readonly fusionView$ = combineLatest([
     defer(() => this.getWalletController().data.activeAddress$),

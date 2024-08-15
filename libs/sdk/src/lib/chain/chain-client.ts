@@ -33,5 +33,5 @@ export function getClient(chainId: ChainId): PublicClient {
   if (!viemClients[chainId]) {
     viemClients[chainId] = buildViemDefaultClient(chainId)
   }
-  return viemClients[chainId] as any
+  return viemClients[chainId] as PublicClient
 }
