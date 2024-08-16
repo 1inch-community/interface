@@ -1,46 +1,90 @@
-# Getting Started with Create React App
+# React Example Application
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This application demonstrates how to integrate the 1inch community swap form into your React application.
 
-## Available Scripts
+## Dependency Installation
 
-In the project directory, you can run:
+Before running the application, you need to install the necessary packages. You can do this by running the following command in the project directory:
 
-### `npm start`
+```bash
+npm install
+```
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+## Running the Application
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+After installing all dependencies, you can start the project with the following command:
 
-### `npm test`
+```bash
+npm start
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Once the application is running, open the following link in your browser:
 
-### `npm run build`
+[http://localhost:3000](http://localhost:3000)
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## Integration Details
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+You can see the integration code example in the [App.tsx](src/App.tsx) file:
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+```javascript
+import { useEffect } from 'react';
+import { bootstrapEmbedded } from 'one-inch-community';
 
-### `npm run eject`
+function App() {
+  useEffect(() => {
+    const initSwapForm = async () => {
+      const swapFromController = await bootstrapEmbedded({
+        renderContainer: '#container',
+        widgetName: 'swap-from',
+        themeType: 'dark',
+        locale: 'en',
+        primaryColor: '#00a0b5',
+        walletProvider: window.ethereum,
+        chainId: 1,
+        swapFromParams: {
+          disabledTokenChanging: true,
+          sourceTokenSymbol: 'usdt',
+          destinationTokenSymbol: 'dai',
+        },
+      });
+    };
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+    initSwapForm();
+  }, []);
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+  return <div id="container"></div>;
+}
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+export default App;
+```
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+### Parameter Descriptions
 
-## Learn More
+- **renderContainer** - The selector of the element where the widget will be displayed.
+- **widgetName** - The type of the widget.
+- **themeType** - The theme name (`dark` | `light`).
+- **locale** - The form's locale. All available locales can be found [here](../../libs/models/src/lib/i18n/i18n-controller.ts).
+- **primaryColor** - The primary accent color.
+- **walletProvider** - The wallet provider.
+- **chainId** - The chain ID.
+- **swapFromParams** - Required only when `widgetName === 'swap-from'`. Contains specific settings for the swap form:
+    - **disabledTokenChanging** - Flag indicating whether the user can change the selected tokens.
+    - **sourceTokenSymbol** & **destinationTokenSymbol** - The symbols of the tokens to be swapped.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### EmbeddedController
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+After calling `bootstrapEmbedded`, an `EmbeddedController` will be created, which allows you to manage the embedded widget. The `EmbeddedController` includes the following methods and fields:
+
+- **`readonly isDestroyed: boolean`** - A flag indicating whether the widget has been destroyed, which changes after calling `destroy()`.
+- **`setChainId(chainId: ChainId): Promise<void>`** - Sends a request to change the chain ID.
+- **`setLocale(localeCode: Locale): Promise<void>`** - Changes the widget's locale.
+- **`setThemeType(themeType: 'dark' | 'light'): Promise<void>`** - Changes the widget's theme.
+- **`setThemePrimaryColor(primaryColor: ColorHex): Promise<void>`** - Changes the widget's accent color.
+- **`destroy(): void`** - Destroys the widget.
+
+### SwapFormEmbeddedController
+
+Additionally, if `widgetName === 'swap-from'`, a `SwapFormEmbeddedController` will be created, extending the `EmbeddedController` with the following methods:
+
+- **`setToken(tokenType: TokenType, symbol: string): Promise<void>`** - Allows changing the token.
+- **`setSourceTokenAmount(tokenAmount: string): Promise<void>`** - Allows setting the amount for the source token.

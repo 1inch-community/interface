@@ -1,27 +1,81 @@
-# OneInchCommunityEmbeddedExample
+# Angular Example Application
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 17.2.0.
+This application demonstrates how to integrate the 1inch community swap form into your Angular application.
 
-## Development server
+## Dependency Installation
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The application will automatically reload if you change any of the source files.
+Before running the application, you need to build the dependencies. You can do this by running the following command:
 
-## Code scaffolding
+```bash
+nx run one-inch-community:build-all-libs
+```
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive|pipe|service|class|guard|interface|enum|module`.
+Then, install the necessary packages while in the Angular project directory:
 
-## Build
+```bash
+pnpm install
+```
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
+## Running the Application
 
-## Running unit tests
+After installing all dependencies, you can start the project with the following command:
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+```bash
+npm run start
+```
 
-## Running end-to-end tests
+Once the application is running, open the following link in your browser:
 
-Run `ng e2e` to execute the end-to-end tests via a platform of your choice. To use this command, you need to first add a package that implements end-to-end testing capabilities.
+[http://localhost:4201](http://localhost:4201)
 
-## Further help
+## Integration Details
 
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI Overview and Command Reference](https://angular.io/cli) page.
+You can see the integration code example in the [app.component.ts](src/app/app.component.ts) file, within the `onBootstrap` method:
+
+```typescript
+const swapFromController = await bootstrapEmbedded({
+  renderContainer: '#container',
+  widgetName: 'swap-from',
+  themeType: 'dark',
+  locale: 'en',
+  primaryColor: '#00a0b5',
+  walletProvider: window.ethereum,
+  chainId: 1,
+  swapFromParams: {
+    disabledTokenChanging: true,
+    sourceTokenSymbol: 'usdt',
+    destinationTokenSymbol: 'dai',
+  }
+});
+```
+
+### Parameter Descriptions
+
+- **renderContainer** - The selector of the element where the widget will be displayed.
+- **widgetName** - The type of the widget.
+- **themeType** - The theme name (`dark` | `light`).
+- **locale** - The form's locale. All available locales can be found [here](../../../libs/models/src/lib/i18n/i18n-controller.ts).
+- **primaryColor** - The primary accent color.
+- **walletProvider** - The wallet provider.
+- **chainId** - The chain ID.
+- **swapFromParams** - Required only when `widgetName === 'swap-from'`. Contains specific settings for the swap form:
+  - **disabledTokenChanging** - Flag indicating whether the user can change the selected tokens.
+  - **sourceTokenSymbol** & **destinationTokenSymbol** - The symbols of the tokens to be swapped.
+
+### EmbeddedController
+
+After calling `bootstrapEmbedded`, an `EmbeddedController` will be created, which allows you to manage the embedded widget. The `EmbeddedController` includes the following methods and fields:
+
+- **`readonly isDestroyed: boolean`** - A flag indicating whether the widget has been destroyed, which changes after calling `destroy()`.
+- **`setChainId(chainId: ChainId): Promise<void>`** - Sends a request to change the chain ID.
+- **`setLocale(localeCode: Locale): Promise<void>`** - Changes the widget's locale.
+- **`setThemeType(themeType: 'dark' | 'light'): Promise<void>`** - Changes the widget's theme.
+- **`setThemePrimaryColor(primaryColor: ColorHex): Promise<void>`** - Changes the widget's accent color.
+- **`destroy(): void`** - Destroys the widget.
+
+### SwapFormEmbeddedController
+
+Additionally, if `widgetName === 'swap-from'`, a `SwapFormEmbeddedController` will be created, extending the `EmbeddedController` with the following methods:
+
+- **`setToken(tokenType: TokenType, symbol: string): Promise<void>`** - Allows changing the token.
+- **`setSourceTokenAmount(tokenAmount: string): Promise<void>`** - Allows setting the amount for the source token.
