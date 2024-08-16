@@ -1,0 +1,25 @@
+{
+  "name": "one-inch-community-embedded-vue-example",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build"
+  },
+  "dependencies": {
+    "core-js": "^3.8.3",
+    "vue": "^3.2.13",
+    "@one-inch-community/models": "file://../../dist/libs/models",
+    "@one-inch-community/core": "file://../../dist/libs/core",
+    "@one-inch-community/integration-layer": "file://../../dist/libs/integration-layer",
+    "@one-inch-community/sdk": "file://../../dist/libs/sdk",
+    "@one-inch-community/ui-components": "file://../../dist/libs/ui-components",
+    "@one-inch-community/widgets": "file://../../dist/libs/widgets"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-typescript": "~5.0.0",
+    "@vue/cli-service": "~5.0.0",
+    "typescript": "~4.5.5"
+  }
+}
