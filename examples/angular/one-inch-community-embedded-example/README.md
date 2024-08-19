@@ -40,6 +40,7 @@ const swapFromController = await bootstrapEmbedded({
   locale: 'en',
   primaryColor: '#00a0b5',
   walletProvider: window.ethereum,
+  oneInchDevPortal: '{{ proxy host }}',
   chainId: 1,
   swapFromParams: {
     disabledTokenChanging: true,
@@ -58,6 +59,7 @@ const swapFromController = await bootstrapEmbedded({
 - **primaryColor** - The primary accent color.
 - **walletProvider** - The wallet provider.
 - **chainId** - The chain ID.
+- **oneInchDevPortal** - parameter receiving or url proxy or api Key or object with url proxy and apiKey at the same time
 - **swapFromParams** - Required only when `widgetName === 'swap-from'`. Contains specific settings for the swap form:
   - **disabledTokenChanging** - Flag indicating whether the user can change the selected tokens.
   - **sourceTokenSymbol** & **destinationTokenSymbol** - The symbols of the tokens to be swapped.
