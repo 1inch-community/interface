@@ -1,10 +1,13 @@
-import { EmbeddedBootstrapConfig, EmbeddedControllerType } from '@one-inch-community/models';
+import { EmbeddedBootstrapConfig, EmbeddedControllerType, OneInchDevPortal } from '@one-inch-community/models';
 import { bootstrapApplicationContext } from './context';
 import { widgets } from './widgets';
 import { ElementContainer } from './model/element-container';
 import { getController } from './embedded-controllers';
+import { enabledEmbeddedMode, setEnvironmentValue } from '@one-inch-community/core/environment';
 
 export async function bootstrapEmbedded<Config extends EmbeddedBootstrapConfig = EmbeddedBootstrapConfig>(config: Config): Promise<EmbeddedControllerType[Config['widgetName']]> {
+  enabledEmbeddedMode()
+  applyEnvironmentApi(config.oneInchDevPortal)
   const container: HTMLElement | null = typeof config.renderContainer === 'string' ? document.querySelector(config.renderContainer) : config.renderContainer
   const widgetFactory = widgets[config.widgetName]
   if (!(container instanceof HTMLElement)) throw new Error('Container is missing');
@@ -19,4 +22,20 @@ export async function bootstrapEmbedded<Config extends EmbeddedBootstrapConfig =
   container.appendChild(contextElement)
   await widgetElement.setConfig(config)
   return getController(config.widgetName, globalContext, contextElement)
+}
+
+function applyEnvironmentApi(config: OneInchDevPortal) {
+  if (typeof config === 'object') {
+    setEnvironmentValue('oneInchDevPortalHost', config.devPortalHost)
+    setEnvironmentValue('oneInchDevPortalToken', config.devPortalToken)
+    return
+  }
+  if (config.startsWith('https://')) {
+    setEnvironmentValue('oneInchDevPortalHost', config)
+    return;
+  }
+  if (config.startsWith('Bearer ')) {
+    setEnvironmentValue('oneInchDevPortalToken', config)
+    return;
+  }
 }

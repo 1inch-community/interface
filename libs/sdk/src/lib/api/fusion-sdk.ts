@@ -8,6 +8,7 @@ export async function buildFusionSdk(chainId: ChainId, walletController: IConnec
   const { FusionSDK } = await import('@1inch/fusion-sdk');
   return new FusionSDK({
     url: getEnvironmentValue('oneInchDevPortalHost') + '/fusion',
+    authKey: getEnvironmentValue('oneInchDevPortalToken'),
     network: chainId as any,
     blockchainProvider: new BlockchainFusionProviderConnector(chainId, walletController),
     httpProvider: new FusionHttpProviderConnector()

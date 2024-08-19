@@ -29,6 +29,7 @@ function App() {
     locale,
     primaryColor,
     chainId,
+    oneInchDevPortal: 'https://jellyfish-app-8xwqz.ondigitalocean.app',
     renderContainer: '#container',
     widgetName: 'swap-from',
     walletProvider: window.ethereum,

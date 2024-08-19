@@ -101,6 +101,7 @@ export class AppComponent implements OnInit {
     return {
       renderContainer: '#container',
       widgetName: 'swap-from',
+      oneInchDevPortal: 'https://jellyfish-app-8xwqz.ondigitalocean.app',
       themeType: this.themeType,
       locale: this.locale,
       primaryColor: this.primaryColor,

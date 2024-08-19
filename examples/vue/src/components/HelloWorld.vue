@@ -98,6 +98,7 @@ export default defineComponent({
       renderContainer: '#container',
       widgetName: 'swap-from',
       walletProvider: window.ethereum,
+      oneInchDevPortal: 'https://jellyfish-app-8xwqz.ondigitalocean.app',
       swapFromParams: {
         sourceTokenSymbol: sourceTokenSymbol.value,
         destinationTokenSymbol: destinationTokenSymbol.value,
