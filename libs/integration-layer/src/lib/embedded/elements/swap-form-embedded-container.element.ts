@@ -2,6 +2,7 @@ import { html, LitElement } from 'lit';
 import { ElementContainer } from '../model/element-container';
 import { customElement } from 'lit/decorators.js';
 import {
+  __ISwapFormEmbeddedController,
   EmbeddedBootstrapConfigSwapForm,
   IApplicationContext,
   ISwapContext, SwapSnapshot, TokenType
@@ -29,6 +30,8 @@ export class SwapFormEmbeddedContainerElement extends LitElement implements Elem
 
   private swapSnapshot: SwapSnapshot | null = null;
 
+  private swapFormEmbeddedController?: __ISwapFormEmbeddedController
+
   private readonly scene = new SceneController('swapForm', {
     swapForm: { minWidth: 434, maxHeight: 625, lazyRender: true },
     selectToken: { minWidth: 434, maxHeight: 680 },
@@ -48,6 +51,10 @@ export class SwapFormEmbeddedContainerElement extends LitElement implements Elem
     ])
   }
 
+  bindEmbeddedController(controller: __ISwapFormEmbeddedController) {
+    this.swapFormEmbeddedController = controller
+  }
+
   protected render() {
     return html`
       <inch-card>
@@ -55,9 +62,9 @@ export class SwapFormEmbeddedContainerElement extends LitElement implements Elem
           swapForm: () => html`
             <inch-swap-form
               @confirmSwap="${(event: CustomEvent) => this.onOpenConfirmSwap(event)}"
-              @changeChain="${() => {}}"
+              @changeChain="${() => this.swapFormEmbeddedController?.emitter.emit('changeChain')}"
               @openTokenSelector="${(event: CustomEvent) => this.onOpenSelectToken(event)}"
-              @connectWallet="${() =>  {}}"
+              @connectWallet="${() => this.swapFormEmbeddedController?.emitter.emit('connectWallet')}"
             ></inch-swap-form>
           `,
           confirmSwap: () => html`

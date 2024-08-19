@@ -3,6 +3,7 @@ import { BrandColors, IApplicationContext, IThemesController, MainColors } from 
 export class ThemeEmbeddedController implements IThemesController {
 
   async init(context: IApplicationContext): Promise<void> {
+    //
   }
 
   async onChangeTheme(mainColorName: MainColors, brandColorName: BrandColors, event?: MouseEvent): Promise<void> {

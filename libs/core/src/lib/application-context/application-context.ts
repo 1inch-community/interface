@@ -78,7 +78,7 @@ export class ApplicationContext implements IApplicationContext {
 
   constructor(
     private readonly payload: ApplicationContextPayload,
-    public readonly isEmbedded: boolean = false,
+    public readonly isEmbedded = false,
   ) {
   }
 

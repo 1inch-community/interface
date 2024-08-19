@@ -21,7 +21,9 @@ export async function bootstrapEmbedded<Config extends EmbeddedBootstrapConfig =
   contextElement.appendChild(widgetElement)
   container.appendChild(contextElement)
   await widgetElement.setConfig(config)
-  return getController(config.widgetName, globalContext, contextElement)
+  const controller = getController(config.widgetName, globalContext, contextElement)
+  widgetElement.bindEmbeddedController(controller)
+  return controller
 }
 
 function applyEnvironmentApi(config: OneInchDevPortal) {
