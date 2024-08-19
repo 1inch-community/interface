@@ -72,7 +72,7 @@ export class GlobalEmbeddedContextElement extends LitElement implements IGlobalE
   }
 
   private async setFounts() {
-    this.styles.set('fonts', fontStyle);
+    this.styles.set('fonts', fontStyle(':host'));
   }
 
   private updateStyles() {

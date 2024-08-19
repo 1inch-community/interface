@@ -12,7 +12,7 @@ export async function themeInit(
 ) {
   document.head.appendChild(mainColorStyleElement)
   document.head.appendChild(brandColorStyleElement)
-  createAndApplyStyle(fontStyle)
+  createAndApplyStyle(fontStyle())
   createAndApplyStyle(bodyStyle)
   createAndApplyStyle(scrollbarStyle)
   await themeChange(mainColorName, brandColorName)
