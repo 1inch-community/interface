@@ -23,6 +23,9 @@ jobs:
         with:
           node-version: ${{ vars.NODE_VERSION }}
 
+      - name: Clean nx cache
+        run: nx reset
+
       - name: Run link check
         run: npx nx run-many --target=lint --all
 
