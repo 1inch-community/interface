@@ -4,6 +4,8 @@ import { asapScheduler, observeOn, Subscription } from 'rxjs';
 import { listenChangesByPath } from '../i18n';
 import { objectsEqual } from '@one-inch-community/core/utils';
 
+const stubText = ''
+
 class TranslateDirective extends LitAsyncDirective {
 
   private subscription?: Subscription;
@@ -13,7 +15,7 @@ class TranslateDirective extends LitAsyncDirective {
 
   override render(path: string, context?: Record<string, unknown>): string {
     if (this.subscription && this.lastPath === path && objectsEqual(this.lastContext, context)) {
-      return this.lastValue ?? ''
+      return this.lastValue ?? stubText
     } else {
       this.disconnected()
     }
@@ -25,7 +27,7 @@ class TranslateDirective extends LitAsyncDirective {
       this.lastPath = path
       this.lastContext = context
     })
-    return ''
+    return stubText
   }
 
   override disconnected() {

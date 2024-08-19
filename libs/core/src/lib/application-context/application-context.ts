@@ -34,6 +34,8 @@ export class ApplicationContext implements IApplicationContext {
   private _tokenRateProvider?: ITokenRateProvider
   private _oneInchDevPortalAdapter?: IOneInchDevPortalAdapter
 
+  private _activeSwapContext: WeakRef<ISwapContext> | null = null
+
   get connectWalletController(): IConnectWalletController {
     if (!this._connectWalletController) throw new Error(contextNotInitErrorMessage)
     return this._connectWalletController
@@ -74,7 +76,10 @@ export class ApplicationContext implements IApplicationContext {
     return this._oneInchDevPortalAdapter
   }
 
-  constructor(private readonly payload: ApplicationContextPayload) {
+  constructor(
+    private readonly payload: ApplicationContextPayload,
+    public readonly isEmbedded: boolean = false,
+  ) {
   }
 
   async init(): Promise<void> {
@@ -116,7 +121,13 @@ export class ApplicationContext implements IApplicationContext {
   }
 
   async makeSwapContext(): Promise<ISwapContext> {
-    return await this.payload.swapContextFactory(this)
+    const context = await this.payload.swapContextFactory(this)
+    this._activeSwapContext = new WeakRef(context)
+    return context
+  }
+
+  getActiveSwapContext(): ISwapContext | null {
+    return this._activeSwapContext?.deref() ?? null
   }
 
 }

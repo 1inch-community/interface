@@ -39,17 +39,12 @@ export class BalanceElement extends LitElement {
     ]);
   }).pipe(
     filter(([address]) => !!address),
-    switchMap(([ walletAddress, token, chainId ]) => {
-      if (!walletAddress || !token || !chainId) return [html`<br>`]
-      return this.applicationContext.tokenController.liveQuery(() =>
-        this.applicationContext.tokenController.getTokenBalance(chainId, token.address, walletAddress)).pipe(
-          filter(Boolean),
-          map(balanceRecord => {
-            return formatNumber(formatUnits(BigInt(balanceRecord.amount), token.decimals), 6)
-          }),
-          map(balance => this.getBalanceView(balance)),
-          catchError(() => [html`<br>`])
-      )
+    switchMap(async ([ walletAddress, token, chainId ]) => {
+      if (!walletAddress || !token || !chainId) return html`<br>`
+      const balanceRecord = await this.applicationContext.tokenController.getTokenBalance(chainId, token.address, walletAddress)
+      if (!balanceRecord) return html`<br>`
+      const balance = formatNumber(formatUnits(BigInt(balanceRecord.amount), token.decimals), 6)
+      return this.getBalanceView(balance)
     }),
 
   );

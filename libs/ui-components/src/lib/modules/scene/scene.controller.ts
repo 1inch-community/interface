@@ -4,8 +4,8 @@ import { SceneWrapperElement } from './scene-wrapper.element';
 import { Animation } from './animations/animation';
 import { slideAnimation } from './animations';
 import { appendStyle } from '@one-inch-community/core/lit';
-import { asyncFrame } from '../async/async-frame';
 import { ScrollViewProviderElement } from '@one-inch-community/ui-components/scroll';
+import { asyncFrame } from '@one-inch-community/core/async';
 
 export type RenderConfig<T extends string> = Record<T, () => TemplateResult>
 

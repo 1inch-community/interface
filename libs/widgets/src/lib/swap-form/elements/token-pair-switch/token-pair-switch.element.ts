@@ -5,9 +5,10 @@ import { consume } from '@lit/context';
 import { combineLatest, defer, fromEvent, map, switchMap, tap } from 'rxjs';
 import '@one-inch-community/ui-components/icon'
 import { observe, dispatchEvent, subscribe, appendStyle, getMobileMatchMedia } from '@one-inch-community/core/lit';
-import { ISwapContext } from '@one-inch-community/models';
+import { EmbeddedBootstrapConfigSwapForm, ISwapContext } from '@one-inch-community/models';
 import { tokenPairSwitchStyle } from './token-pair-switch.style';
 import { SwapContextToken } from '@one-inch-community/sdk/swap';
+import { EmbeddedConfigToken } from '@one-inch-community/core/application-context';
 
 @customElement(TokenPairSwitchElement.tagName)
 export class TokenPairSwitchElement extends LitElement {
@@ -17,6 +18,9 @@ export class TokenPairSwitchElement extends LitElement {
 
   @consume({ context: SwapContextToken })
   context?: ISwapContext
+
+  @consume({ context: EmbeddedConfigToken })
+  config?: EmbeddedBootstrapConfigSwapForm;
 
   private readonly iconRef = createRef<HTMLElement>()
   private readonly buttonRef = createRef()
@@ -31,11 +35,16 @@ export class TokenPairSwitchElement extends LitElement {
       this.context.getTokenByType('destination')
     ])
   }).pipe(
-    map(([ sourceToken, destinationToken ]) => !sourceToken || !destinationToken),
+    map(([ sourceToken, destinationToken ]) =>
+      !sourceToken
+      || !destinationToken
+      || this.config?.swapFromParams.disabledTokenChanging
+    ),
   )
 
   protected override firstUpdated() {
     if (!this.buttonRef.value) return
+    if (this.config?.swapFromParams.disabledTokenChanging) return
     if (!this.mobileMedia.matches) {
       const options = {
         duration: 200,
@@ -86,6 +95,7 @@ export class TokenPairSwitchElement extends LitElement {
   }
 
   protected async onClick() {
+    if (this.config?.swapFromParams.disabledTokenChanging) return
     if (!this.iconRef.value || (!this.isUp && !this.mobileMedia.matches)) return
     this.context?.switchPair()
     const options = {

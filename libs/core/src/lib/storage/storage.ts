@@ -1,9 +1,11 @@
+import { IStorageController } from '@one-inch-community/models';
+
 type StorageConfig = {
   storagePrefix?: string
   storageSeparator?: string
 }
 
-export class Storage {
+export class Storage implements IStorageController {
 
   private readonly storage: globalThis.Storage | null = getStorage()
 

@@ -1,8 +1,8 @@
 {
   "name": "core",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "peerDependencies": {
-    "@one-inch-community/models": "0.0.1",
+    "@one-inch-community/models": "1.0.0",
     "tslib": "2.3.0",
     "rxjs": "7.8.x"
   }

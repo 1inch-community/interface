@@ -1,0 +1,71 @@
+<div>
+  <div id="container"></div>
+
+  <textarea
+    class="config-view"
+    readonly
+    [ngModel]="exampleConfig"
+  ></textarea>
+</div>
+<div class="controls">
+  <button (click)="onBootstrap()">Bootstrap</button>
+  <button (click)="onDestroy()">Destroy</button>
+
+  <label class="input">
+    <span>source token symbol</span>
+    <input [(ngModel)]="sourceTokenSymbol" placeholder="source token symbol">
+  </label>
+  <button (click)="setSourceTokenSymbol()">Set</button>
+
+  <label class="input">
+    <span>destination token symbol</span>
+    <input [(ngModel)]="destinationTokenSymbol" placeholder="destination token symbol">
+  </label>
+  <button (click)="setDestinationTokenSymbol()">Set</button>
+
+  <label class="input">
+    <span>amount</span>
+    <input [(ngModel)]="amount" placeholder="amount">
+  </label>
+  <button (click)="setAmount()">Set</button>
+
+  <label class="input">
+    <span>chain id</span>
+    <input [(ngModel)]="chainId" placeholder="chain id">
+  </label>
+  <button (click)="setChainId()">Set</button>
+
+  <label class="input">
+    <span>primary color</span>
+    <input [(ngModel)]="primaryColor" placeholder="primary color">
+  </label>
+  <button (click)="setPrimaryColor()">Set</button>
+
+  <label class="input">
+    <span>locale</span>
+    <select [(ngModel)]="locale" name="locale">
+      <option value="{{Locale.en}}">{{Locale.en}}</option>
+      <option value="{{Locale.fr}}">{{Locale.fr}}</option>
+      <option value="{{Locale.ar}}">{{Locale.ar}}</option>
+      <option value="{{Locale.de}}">{{Locale.de}}</option>
+      <option value="{{Locale.es}}">{{Locale.es}}</option>
+    </select>
+  </label>
+  <button (click)="setLocale()">Set</button>
+
+  <label class="input">
+    <span>disabled change token</span>
+  </label>
+  <input type="checkbox" [(ngModel)]="disabledTokenChanging" placeholder="disabled change token">
+
+  <span>theme</span>
+
+  <div>
+    <span>dark</span>
+    <input type="radio" value="dark" [(ngModel)]="themeType">
+
+    <span>light</span>
+    <input type="radio" value="light" [(ngModel)]="themeType">
+  </div>
+
+</div>

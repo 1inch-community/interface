@@ -11,7 +11,7 @@ import { INotificationsControllerInternal, NotificationRecord } from './notifica
 import { getNotificationId } from './notifications-id';
 import { getContainer } from '@one-inch-community/ui-components/overlay';
 import { distinctUntilChanged, map, startWith, Subject } from 'rxjs';
-import { asyncFrame } from '@one-inch-community/ui-components/async';
+import { asyncFrame } from '@one-inch-community/core/async';
 
 export class NotificationsController implements INotificationsControllerInternal, INotificationsController {
 

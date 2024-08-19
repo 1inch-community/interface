@@ -8,7 +8,7 @@ import { scrollbarStyle } from '@one-inch-community/core/theme';
 import { consume } from '@lit/context';
 import { IApplicationContext } from '@one-inch-community/models';
 import { ApplicationContextToken } from '@one-inch-community/core/application-context';
-import { asyncTimeout } from '@one-inch-community/ui-components/async';
+import { asyncTimeout } from '@one-inch-community/core/async';
 import "@one-inch-community/widgets/notifications"
 
 

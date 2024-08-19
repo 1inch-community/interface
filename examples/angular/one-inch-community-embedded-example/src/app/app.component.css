@@ -1,0 +1,29 @@
+:host {
+  display: flex;
+  gap: 16px;
+}
+
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  height: fit-content;
+}
+
+.input {
+  display: flex;
+  flex-direction: column;
+}
+
+.config-view {
+  margin-top: 16px;
+  width: 450px;
+  height: 300px;
+  resize: none;
+}
+
+#container {
+  min-height: 100px;
+  width: 450px;
+  border: 1px solid red;
+}

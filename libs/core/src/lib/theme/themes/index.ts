@@ -1,12 +1,12 @@
 import type { CSSResult } from 'lit';
 import { BrandColors, MainColors } from '@one-inch-community/models';
 
-export const mainColorMap: Record<MainColors, () => Promise<CSSResult>> = {
-  [MainColors.systemSync]: () => getSystemTheme(),
-  [MainColors.dark]: () => import('./main-color-schemes/dark.style').then(m => m.themeDark),
-  [MainColors.darkBlue]: () => import('./main-color-schemes/dark-blue.style').then(m => m.themeDarkBlue),
-  [MainColors.light]: () => import('./main-color-schemes/light.style').then(m => m.themeLight),
-  [MainColors.lightBlue]: () => import('./main-color-schemes/light-blue.style').then(m => m.themeLightBlue),
+export const mainColorMap: Record<MainColors, (targetName?: string) => Promise<CSSResult>> = {
+  [MainColors.systemSync]: (targetName?: string) => getSystemTheme(targetName),
+  [MainColors.dark]: (targetName?: string) => import('./main-color-schemes/dark.style').then(m => m.themeDark(targetName)),
+  [MainColors.darkBlue]: (targetName?: string) => import('./main-color-schemes/dark-blue.style').then(m => m.themeDarkBlue(targetName)),
+  [MainColors.light]: (targetName?: string) => import('./main-color-schemes/light.style').then(m => m.themeLight(targetName)),
+  [MainColors.lightBlue]: (targetName?: string) => import('./main-color-schemes/light-blue.style').then(m => m.themeLightBlue(targetName)),
 }
 
 export const brandColorMap: Record<BrandColors, () => Promise<CSSResult>> = {
@@ -17,11 +17,11 @@ export const brandColorMap: Record<BrandColors, () => Promise<CSSResult>> = {
   [BrandColors.violet]: () => import('./brand-color-schemes/violet.style').then(m => m.violetStyle),
 }
 
-function getSystemTheme() {
+function getSystemTheme(targetName?: string) {
   if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-    if ((window as any)?.ethereum?.isOneInchIOSWallet) return mainColorMap[MainColors.darkBlue]();
-    return mainColorMap[MainColors.dark]();
+    if ((window as any)?.ethereum?.isOneInchIOSWallet) return mainColorMap[MainColors.darkBlue](targetName);
+    return mainColorMap[MainColors.dark](targetName);
   }
-  if ((window as any)?.ethereum?.isOneInchIOSWallet) return mainColorMap[MainColors.lightBlue]();
-  return mainColorMap[MainColors.light]();
+  if ((window as any)?.ethereum?.isOneInchIOSWallet) return mainColorMap[MainColors.lightBlue](targetName);
+  return mainColorMap[MainColors.light](targetName);
 }

@@ -1,14 +1,17 @@
 {
   "name": "widgets",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "peerDependencies": {
-    "@one-inch-community/models": "0.1.x",
+    "@one-inch-community/models": "1.0.0",
+    "@one-inch-community/sdk": "1.0.0",
+    "@one-inch-community/core": "1.0.0",
+    "@one-inch-community/ui-components": "1.0.0",
     "@lit-labs/virtualizer": "2.0.x",
     "@lit/context": "1.1.x",
     "@lit/task": "1.0.x",
     "lit": "3.1.x",
     "tslib": "2.3.0",
-    "viem": "2.9.x",
+    "viem": "2.x.x",
     "rxjs": "7.x.x"
   }
 }

@@ -29,7 +29,7 @@ import {
   appendStyle,
   dispatchEvent
 } from '@one-inch-community/core/lit';
-import { asyncFrame } from '@one-inch-community/ui-components/async';
+import { asyncFrame } from '@one-inch-community/core/async';
 import { createRef, ref } from 'lit/directives/ref.js';
 import { ApplicationContextToken } from '@one-inch-community/core/application-context';
 

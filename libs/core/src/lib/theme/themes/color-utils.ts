@@ -222,9 +222,9 @@ export function applyColorBrightness(hex: string, brightness: number) {
   return rgbToHex(Math.round(r), Math.round(g), Math.round(b));
 }
 
-export function makeColorSchema(primaryColor: string) {
+export function makeColorSchema(primaryColor: string, targetName = ':root') {
   return css`
-      :root {
+      ${unsafeCSS(targetName)} {
           --primary: ${unsafeCSS(primaryColor)};
           --primary-50: ${hexToRGBA(primaryColor, 50)};
           --primary-12: ${hexToRGBA(primaryColor, 12)};

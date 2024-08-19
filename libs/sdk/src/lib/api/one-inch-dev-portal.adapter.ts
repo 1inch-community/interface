@@ -21,6 +21,7 @@ const gasPriceCache = new TimeCache<ChainId, GasPriceDto>(5000)
 export class OneInchDevPortalAdapter implements IOneInchDevPortalAdapter {
 
   private readonly host: string = getEnvironmentValue('oneInchDevPortalHost')
+  private readonly apiToken = getEnvironmentValue('oneInchDevPortalToken')
   private context!: IApplicationContext
 
   async init(context: IApplicationContext): Promise<void> {
@@ -29,14 +30,14 @@ export class OneInchDevPortalAdapter implements IOneInchDevPortalAdapter {
 
   @CacheActivePromise()
   async getWhiteListedTokens(chainId: ChainId): Promise<ITokenDto[]> {
-    const response = await fetch(`${this.host}/token/v1.2/${chainId}/token-list`);
+    const response = await fetch(`${this.host}/token/v1.2/${chainId}/token-list`, { headers: this.makeHeaders() });
     const data: { tokens: ITokenDto[] } = await response.json();
-    return data.tokens;
+    return data.tokens ?? [];
   }
 
   @CacheActivePromise()
   async getBalancesByWalletAddress(chainId: ChainId, walletAddress: Address): Promise<Record<Address, string>> {
-    const response = await fetch(`${this.host}/balance/v1.2/${chainId}/balances/${walletAddress}`);
+    const response = await fetch(`${this.host}/balance/v1.2/${chainId}/balances/${walletAddress}`, { headers: this.makeHeaders() });
     return await response.json();
   }
 
@@ -48,7 +49,7 @@ export class OneInchDevPortalAdapter implements IOneInchDevPortalAdapter {
       return cacheValue
     }
     const queryParams = new URLSearchParams({ currency: 'USD' });
-    const response = await fetch(`${this.host}/price/v1.1/${chainId}?${queryParams}`);
+    const response = await fetch(`${this.host}/price/v1.1/${chainId}?${queryParams}`, { headers: this.makeHeaders() });
     const result = await response.json();
     tokenPriceCache.set(chainId, result)
     return result
@@ -89,7 +90,8 @@ export class OneInchDevPortalAdapter implements IOneInchDevPortalAdapter {
 
     const response = await fetch(`${this.host}/fusion/quoter/v2.0/${chainId}/quote/receive?${queryParams}`, {
       method: !customPreset ? 'GET' : 'POST',
-      body: customPreset && JSON.stringify(customPreset)
+      body: customPreset && JSON.stringify(customPreset),
+      headers: this.makeHeaders()
     });
     if (!response.ok) {
       fusionQuoteReceiveCache.set(id, null)
@@ -109,7 +111,7 @@ export class OneInchDevPortalAdapter implements IOneInchDevPortalAdapter {
     if (cacheValue) {
       return cacheValue
     }
-    const response = await fetch(`${this.host}/gas-price/v1.5/${chainId}`);
+    const response = await fetch(`${this.host}/gas-price/v1.5/${chainId}`, { headers: this.makeHeaders() });
     if (!response.ok) {
       return null
     }
@@ -131,5 +133,13 @@ export class OneInchDevPortalAdapter implements IOneInchDevPortalAdapter {
     if (!wallet) throw new Error('')
     const result = await cancelFusionOrder(chainId, wallet, status.order.makerTraits, orderHash)
     return this.context.connectWalletController.writeContract(result.request)
+  }
+
+  private makeHeaders() {
+    const headers = new Headers()
+    headers.set('Accept', 'application/json')
+    headers.set('Content-Type', 'application/json')
+    this.apiToken && headers.set('Authorization', this.apiToken)
+    return headers
   }
 }

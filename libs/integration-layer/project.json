@@ -1,0 +1,40 @@
+{
+  "name": "integration-layer",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/integration-layer/src",
+  "projectType": "library",
+  "targets": {
+    "build": {
+      "executor": "nx:run-commands",
+      "options": {
+        "env": {
+          "libName": "integration-layer"
+        },
+        "commands": [
+          "pnpm run build:lib"
+        ]
+      }
+    },
+    "watch": {
+      "executor": "nx:run-commands",
+      "options": {
+        "env": {
+          "libName": "integration-layer",
+          "isWatch": "true"
+        },
+        "commands": [
+          "pnpm run build:lib"
+        ]
+      }
+    },
+    "type-check": {
+      "executor": "nx:run-commands",
+      "options": {
+        "commands": [
+          "tsc --project libs/integration-layer/tsconfig.json --noEmit --skipLibCheck"
+        ]
+      }
+    }
+  },
+  "tags": []
+}

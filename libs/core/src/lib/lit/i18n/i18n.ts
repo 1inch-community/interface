@@ -13,10 +13,16 @@ let lastCurrentTranslationsStorageSize = 0
 
 let isInitialized = false
 
+let targetHost: HTMLElement = document.querySelector('html')!
+
 
 export const localeChange$ = currentTranslations$.pipe(
   map(() => currentLocaleCode)
 )
+
+export function setTargetHost(host: HTMLElement) {
+  targetHost = host
+}
 
 export async function addTranslation(translationsRecord: Record<Locale, (() => Promise<Translations>)>) {
   for (const localeCode in translationsRecord) {
@@ -67,8 +73,7 @@ const translationsListToRecord = (translationsList: Translations[]): Translation
     ({ ...record, ...translations }), {})
 
 async function updateLocaleAndTranslations(newLocaleCode: Locale) {
-  const html = document.querySelector('html')!
-  html.dir = isRTL(newLocaleCode) ? 'rtl' : 'ltr'
+  targetHost.dir = isRTL(newLocaleCode) ? 'rtl' : 'ltr'
 
 
   await Promise.all([
@@ -76,7 +81,7 @@ async function updateLocaleAndTranslations(newLocaleCode: Locale) {
     updateCurrentTranslationsMap(newLocaleCode)
   ])
   currentLocaleCode = newLocaleCode
-  html.lang = newLocaleCode
+  targetHost.lang = newLocaleCode
 }
 
 async function updateDefaultTranslationsMap() {

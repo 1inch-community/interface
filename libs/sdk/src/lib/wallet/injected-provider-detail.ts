@@ -4,10 +4,10 @@ export function getInjectedProviderSupported() {
   return !!window.ethereum
 }
 
-export async function getInjectedProviderDetail(): Promise<EIP6963ProviderDetail> {
-  if (!window.ethereum) throw new Error('injected provider not supported');
+export async function getInjectedProviderDetail(provider = window.ethereum): Promise<EIP6963ProviderDetail> {
+  if (!provider) throw new Error('injected provider not supported');
   return {
-    provider: window.ethereum,
+    provider: provider,
     info: {
       walletId: 'injectedWalletId',
       uuid: 'injectedWallet',
