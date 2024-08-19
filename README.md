@@ -4,6 +4,8 @@ This project implements a swap interface and SDK based on the 1inch Fusion proto
 exchange process more transparent, secure, and user-friendly. The project also provides the ability to integrate the
 swap form directly into other applications, which can greatly improve the user experience.
 
+You can view the latest version [here](https://1inch-community.github.io/interface/)
+
 ## Table of Contents
 
 1. [Project Structure](#project-structure)
@@ -14,7 +16,7 @@ swap form directly into other applications, which can greatly improve the user e
     - [UI Components](#ui-components)
     - [Widgets](#widgets)
     - [Applications](#applications)
-2. [Dapp Development Preparation](#dapp-development-preparation)
+2. [Development Preparation](#development-preparation)
 3. [Running Dapp for Development](#running-dapp-for-development)
 4. [Running Embedded for Development](#running-embedded-for-development)
 5. [Important Note](#important-note)
