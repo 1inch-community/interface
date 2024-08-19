@@ -2,7 +2,7 @@ import { IOverlayController } from './overlay-controller.interface';
 import { html, render, TemplateResult } from 'lit';
 import { getContainer } from './overlay-container';
 import { appendStyle, getMobileMatchMediaEmitter, isSafari, isStandalone, resizeObserver } from '@one-inch-community/core/lit';
-import { asyncFrame } from '@one-inch-community/ui-components/async';
+import { asyncFrame } from '@one-inch-community/core/async';
 import { getBrowserMetaColor, applyColorBrightness, interpolateColorRange, getCssValue, setBrowserMetaColorFilter } from '@one-inch-community/core/theme';
 import { getOverlayId } from './overlay-id-generator';
 import {

@@ -5,7 +5,7 @@ import { classMap } from 'lit/directives/class-map.js';
 import { map } from 'lit/directives/map.js';
 import { buildEvent, isRTLCurrentLocale, localeChange$, resizeObserver, subscribe } from '@one-inch-community/core/lit';
 import { of, tap } from 'rxjs';
-import { asyncTimeout } from '@one-inch-community/ui-components/async';
+import { asyncTimeout } from '@one-inch-community/core/async';
 
 type SegmentedControlSize = 'm' | 'l'
 

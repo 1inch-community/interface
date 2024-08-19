@@ -24,30 +24,30 @@ swap form directly into other applications, which can greatly improve the user e
 The project is implemented using the Lit library for HTML rendering and is built on a modular architecture, making the
 development process flexible and extensible. The main set of modules is located in the `libs` directory:
 
-### [Core](libs/core)
+### [Core](libs/core/readme.md)
 
 A module that handles tasks not related to the business logic of the application. It simplifies the development process
 and systematizes some processes.
 
-### [Integration Layer](libs/integration-layer)
+### [Integration Layer](libs/integration-layer/readme.md)
 
 A module responsible for integrating widgets into various runtime environments. It implements the logic for both
 monolithic applications and embedded widgets.
 
-### [Models](libs/models)
+### [Models](libs/models/readme.md)
 
 A module for models that doesn’t carry any logical payload. It solves the problem of loose coupling between modules
 through interfaces.
 
-### [SDK](libs/sdk)
+### [SDK](libs/sdk/readme.md)
 
 The main business logic module, simplifying the work with Web3 networks and encapsulating the Fusion Swap logic.
 
-### [UI Components](libs/ui-components)
+### [UI Components](libs/ui-components/readme.md)
 
 A module that implements reusable UI components without any business logic.
 
-### [Widgets](libs/widgets)
+### [Widgets](libs/widgets/readme.md)
 
 The main module that implements complex widgets like swap forms, wallet connection, and others. It presents business
 logic through UI.
@@ -60,7 +60,7 @@ The project also includes two applications in the [`apps`](apps) directory:
   screen depending on the type of device.
 - [**electron-dapp**](apps/electron-dapp): A wrapper for the regular dapp in Electron.
 
-## Dapp Development Preparation
+## Development Preparation
 
 The project uses the Dev Portal API. To start development, you need to create an API key on
 the [1inch Dev Portal](https://portal.1inch.dev/). After obtaining the key, run the following command to create the
@@ -81,6 +81,12 @@ the `WALLET_CONNECT_PROJECT_ID` field in the `.env` file.
 Additionally, if necessary, you can provide an Infura key to improve the stability of the application by specifying it
 in the `INFURA_API_KEY` field. However, this is optional since the application already includes a significant set of
 public Web3 nodes.
+
+You can also start your proxy by running the command:
+```bash
+docker build -t one-inch-proxy .
+docker run -d -p 8080:80 -e TOKEN="{{YOU TOKEN FROM DEV PORTAL}}" one-inch-proxy
+```
 
 ## Running Dapp for Development
 

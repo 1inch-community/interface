@@ -34,16 +34,6 @@
           "tsc --project libs/integration-layer/tsconfig.json --noEmit --skipLibCheck"
         ]
       }
-    },
-    "test": {
-      "executor": "@nx/vite:test",
-      "outputs": ["{options.reportsDirectory}"],
-      "options": {
-        "reportsDirectory": "../../coverage/temp/sdk"
-      },
-      "dependsOn": [
-        { "projects": "models", "target": "build" }
-      ]
     }
   },
   "tags": []

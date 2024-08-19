@@ -1,5 +1,5 @@
 import { Animation } from './animation';
-import { asyncTimeout } from '../../async/async-timeout';
+import { asyncTimeout } from '@one-inch-community/core/async';
 
 export function noopAnimation(): Animation {
   return {
