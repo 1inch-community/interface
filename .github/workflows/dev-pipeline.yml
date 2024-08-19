@@ -27,13 +27,13 @@ jobs:
         run: nx reset
 
       - name: Run link check
-        run: npx nx run-many --target=lint --all
+        run: npx nx run-many --target=lint --all --verbose
 
       - name: Run building all libs
-        run: nx run one-inch-community:build-all-libs
+        run: nx run one-inch-community:build-all-libs --verbose
 
       - name: Run tests for all projects
-        run: npx nx run-many --target=test --all
+        run: npx nx run-many --target=test --all --verbose
 
   release:
     runs-on: macos-latest
