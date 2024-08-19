@@ -24,30 +24,30 @@ swap form directly into other applications, which can greatly improve the user e
 The project is implemented using the Lit library for HTML rendering and is built on a modular architecture, making the
 development process flexible and extensible. The main set of modules is located in the `libs` directory:
 
-### [Core](libs/core/readme.md)
+### [Core](libs/core/README.md)
 
 A module that handles tasks not related to the business logic of the application. It simplifies the development process
 and systematizes some processes.
 
-### [Integration Layer](libs/integration-layer/readme.md)
+### [Integration Layer](libs/integration-layer/README.md)
 
 A module responsible for integrating widgets into various runtime environments. It implements the logic for both
 monolithic applications and embedded widgets.
 
-### [Models](libs/models/readme.md)
+### [Models](libs/models/README.md)
 
 A module for models that doesn’t carry any logical payload. It solves the problem of loose coupling between modules
 through interfaces.
 
-### [SDK](libs/sdk/readme.md)
+### [SDK](libs/sdk/README.md)
 
 The main business logic module, simplifying the work with Web3 networks and encapsulating the Fusion Swap logic.
 
-### [UI Components](libs/ui-components/readme.md)
+### [UI Components](libs/ui-components/README.md)
 
 A module that implements reusable UI components without any business logic.
 
-### [Widgets](libs/widgets/readme.md)
+### [Widgets](libs/widgets/README.md)
 
 The main module that implements complex widgets like swap forms, wallet connection, and others. It presents business
 logic through UI.
