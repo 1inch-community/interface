@@ -27,7 +27,7 @@ class TranslateDirective extends LitAsyncDirective {
       this.lastPath = path
       this.lastContext = context
     })
-    return stubText
+    return this.lastValue ?? stubText
   }
 
   override disconnected() {

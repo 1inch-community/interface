@@ -59,6 +59,8 @@ export default defineConfig(({ mode }) => {
   const baseHref = process.env['BASE_HREF']
   const baseVite = process.env['BASE_VITE']
 
+  console.log('mode is ', isProduction ? 'production' : 'development')
+
 
   return {
     base: baseVite,
