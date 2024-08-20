@@ -1,7 +1,7 @@
 import { css, unsafeCSS } from 'lit';
 
 export const themeDark = (targetName = ':root') => css`
-
+    /* @Builder: skip minify */
     ${unsafeCSS(targetName)} {
         --logo-text-color: var(--color-core-white);
 

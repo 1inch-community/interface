@@ -1,12 +1,12 @@
 import { defineConfig } from 'vite';
 import { nxViteTsPaths } from '@nx/vite/plugins/nx-tsconfig-paths.plugin';
 import { createHtmlPlugin } from 'vite-plugin-html';
-import minifyHTML from 'rollup-plugin-minify-html-literals'
-import { defaultShouldMinify } from 'minify-html-literals'
-import basicSsl from '@vitejs/plugin-basic-ssl'
-import preload from "vite-plugin-preload"
+import minifyHTML from 'rollup-plugin-minify-html-literals';
+import { defaultShouldMinify, defaultShouldMinifyCSS } from 'minify-html-literals';
+import preload from 'vite-plugin-preload';
 import { VitePWA } from 'vite-plugin-pwa';
 import { manifest } from './manifest.mjs';
+import type { Template } from 'parse-literals';
 
 function isCSS(text: string): boolean {
   return (
@@ -16,6 +16,7 @@ function isCSS(text: string): boolean {
     || text.includes('@media')
     || text.includes('@font-face')
     || text.includes('var(--')
+    || text.match(/#([a-fA-F0-9]{6}|[a-fA-F0-9]{3})/g) !== null
   );
 }
 
@@ -29,16 +30,28 @@ function isHTML(text: string): boolean {
   );
 }
 
-function shouldMinify(template: any) {
+function shouldMinifyHTML(template: Template) {
+  if (template.parts.some(path => path.text.includes('@Builder: skip minify'))) {
+    return false
+  }
   return (
-    defaultShouldMinify(template) ||
-    template.parts.some((part: { text: string }) => {
-      return (
-        isCSS(part.text) ||
-        isHTML(part.text)
-      );
+    defaultShouldMinify(template)
+    || template.parts.some((part: { text: string }) => {
+      return isHTML(part.text)
     })
   );
+}
+
+function shouldMinifyCSS(template: Template) {
+  if (template.parts.some(path => path.text.includes('@Builder: skip minify'))) {
+    return false
+  }
+  return (
+    defaultShouldMinifyCSS(template)
+    || template.parts.some((part: { text: string }) => {
+      return isCSS(part.text)
+    })
+  )
 }
 
 export default defineConfig(({ mode }) => {
@@ -83,7 +96,7 @@ export default defineConfig(({ mode }) => {
       preload({
         mode: 'prefetch'
       }),
-      isProduction ? (minifyHTML as any).default({ options: { shouldMinify } }) : null,
+      isProduction ? (minifyHTML as any).default({ options: { shouldMinify: shouldMinifyHTML, shouldMinifyCSS: shouldMinifyCSS } }) : null,
       createHtmlPlugin({
         inject: {
           data: {

@@ -1,7 +1,7 @@
 import { css, unsafeCSS } from 'lit';
 
 export const themeLightBlue = (targetName = ':root') => css`
-
+    /* @Builder: skip minify */
     ${unsafeCSS(targetName)} {
         --logo-text-color: #1B314F;
 
