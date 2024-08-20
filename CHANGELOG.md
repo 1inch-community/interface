@@ -1,3 +1,10 @@
+# [1.0.0-dev.43](https://github.com/1inch-community/interface/compare/v1.0.0-dev.42...v1.0.0-dev.43) (2024-08-20)
+
+
+### Bug Fixes
+
+* Add skip minification directive and enhance minify logic ([0cbb73e](https://github.com/1inch-community/interface/commit/0cbb73e9bf1bd234824a21db078e4786cdf538e9))
+
 # [1.0.0-dev.42](https://github.com/1inch-community/interface/compare/v1.0.0-dev.41...v1.0.0-dev.42) (2024-08-19)
 
 
