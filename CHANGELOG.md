@@ -5,6 +5,29 @@
 
 *  Fix README links to module documentation ([3d10968](https://github.com/1inch-community/interface/commit/3d10968087ab6ab2f676cb5641b593c98d3f0c9d))
 * Enable verbose output in dev-pipeline workflow ([882e995](https://github.com/1inch-community/interface/commit/882e9951d43091de5979ce86def5e2263574098a))
+* Enhance font style handling in theme module ([f875044](https://github.com/1inch-community/interface/commit/f875044e7dd5e9aa701daabdba73e286e02eae69))
+
+
+### Features
+
+* Add embedded controller functionality ([0eacce4](https://github.com/1inch-community/interface/commit/0eacce4a219a5d128cafffff372e8f03a5cf36c9))
+* Add EventEmitter integration to SwapForm controller ([acc89ba](https://github.com/1inch-community/interface/commit/acc89ba7ee9b588651417a8917024a44608afb06))
+* Add initial Vue.js example project ([ea5ba69](https://github.com/1inch-community/interface/commit/ea5ba6908d98e05dbc3f68106c8f0e5cdbed480e))
+* Add new React example app ([9c589f7](https://github.com/1inch-community/interface/commit/9c589f73aaf794f7e101c37edfe00a2ecc08b950))
+* Add oneInchDevPortal parameter to examples ([5cb37fa](https://github.com/1inch-community/interface/commit/5cb37fa0bab6fd50847a894c28461c6537425807))
+* Add step to clean NX cache in CI pipeline ([3120a77](https://github.com/1inch-community/interface/commit/3120a772817be768eb1513060f4e9ea15d3f82b5))
+* Add support for 1inch Dev Portal token configuration ([b090644](https://github.com/1inch-community/interface/commit/b090644dbea2c0de2414cf13f8f8e621b879b031))
+* Delete Vite config and improve codebase structure ([525f354](https://github.com/1inch-community/interface/commit/525f3544af4ac25ee53bac7e392a38a2118bfda8))
+* Refactor context initialization and bump versions to 1.0.0 ([23b99e8](https://github.com/1inch-community/interface/commit/23b99e88287ef581d26d946481659744d76d4e3d))
+* Update example app READMEs with integration instructions ([12ee0db](https://github.com/1inch-community/interface/commit/12ee0db66e8d77007fa44ed0e6316120a7a58055))
+
+# [1.0.0-dev.42](https://github.com/1inch-community/interface/compare/v1.0.0-dev.41...v1.0.0-dev.42) (2024-08-19)
+
+
+### Bug Fixes
+
+*  Fix README links to module documentation ([3d10968](https://github.com/1inch-community/interface/commit/3d10968087ab6ab2f676cb5641b593c98d3f0c9d))
+* Enable verbose output in dev-pipeline workflow ([882e995](https://github.com/1inch-community/interface/commit/882e9951d43091de5979ce86def5e2263574098a))
 
 
 ### Features
