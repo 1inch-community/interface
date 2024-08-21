@@ -1,3 +1,10 @@
+# [1.0.0-dev.44](https://github.com/1inch-community/interface/compare/v1.0.0-dev.43...v1.0.0-dev.44) (2024-08-20)
+
+
+### Bug Fixes
+
+* Enhance translate directive and add logging in config ([1d9aa17](https://github.com/1inch-community/interface/commit/1d9aa17fc3dca693aa394a8f635caeab028fbefd))
+
 # [1.0.0-dev.43](https://github.com/1inch-community/interface/compare/v1.0.0-dev.42...v1.0.0-dev.43) (2024-08-20)
 
 
