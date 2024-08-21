@@ -1,3 +1,10 @@
+# [1.0.0-dev.46](https://github.com/1inch-community/interface/compare/v1.0.0-dev.45...v1.0.0-dev.46) (2024-08-21)
+
+
+### Bug Fixes
+
+* Refactor i18n initialization logic ([4c94a8b](https://github.com/1inch-community/interface/commit/4c94a8b3d01432e4a5407cb56d02d6656397c754))
+
 # [1.0.0-dev.45](https://github.com/1inch-community/interface/compare/v1.0.0-dev.44...v1.0.0-dev.45) (2024-08-21)
 
 
