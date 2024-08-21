@@ -1,3 +1,10 @@
+# [1.0.0-dev.45](https://github.com/1inch-community/interface/compare/v1.0.0-dev.44...v1.0.0-dev.45) (2024-08-21)
+
+
+### Bug Fixes
+
+* Fix translations state management in i18n module ([7eb19c3](https://github.com/1inch-community/interface/commit/7eb19c37f0425a87bb24b927c1eeb2bb8debfd77))
+
 # [1.0.0-dev.44](https://github.com/1inch-community/interface/compare/v1.0.0-dev.43...v1.0.0-dev.44) (2024-08-20)
 
 
