@@ -6,6 +6,7 @@ export const defaultLocaleCode: Locale = getDefaultLocaleCode()
 const translations = new Map<Locale, (() => Promise<Translations>)[]>()
 const currentTranslations$ = new BehaviorSubject<Translations | null>(null)
 let defaultTranslations!: Translations
+let currentTranslations!: Translations
 let currentLocaleCode: Locale = Locale.en
 
 let lastDefaultTranslationsStorageSize = 0
@@ -89,6 +90,7 @@ async function updateDefaultTranslationsMap() {
   if (defaultTranslationsByLocale.length !== lastDefaultTranslationsStorageSize) {
     const translationsList = await Promise.all(defaultTranslationsByLocale.map(fn => fn()))
     defaultTranslations = translationsListToRecord(translationsList)
+    currentTranslations$.next({ ...defaultTranslations, ...currentTranslations })
     lastDefaultTranslationsStorageSize = defaultTranslationsByLocale.length
   }
 }
@@ -97,7 +99,7 @@ async function updateCurrentTranslationsMap(newLocaleCode: Locale) {
   const translationsByLocale = translations.get(newLocaleCode) ?? []
   if (currentLocaleCode !== newLocaleCode || translationsByLocale.length !== lastCurrentTranslationsStorageSize) {
     const translationsList = await Promise.all(translationsByLocale.map(fn => fn()))
-    const currentTranslations = translationsListToRecord(translationsList)
+    currentTranslations = translationsListToRecord(translationsList)
     currentTranslations$.next({ ...defaultTranslations, ...currentTranslations })
     lastCurrentTranslationsStorageSize = translationsByLocale.length
   }
