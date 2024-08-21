@@ -12,8 +12,6 @@ let currentLocaleCode: Locale = Locale.en
 let lastDefaultTranslationsStorageSize = 0
 let lastCurrentTranslationsStorageSize = 0
 
-let isInitialized = false
-
 let targetHost: HTMLElement = document.querySelector('html')!
 
 
@@ -32,18 +30,11 @@ export async function addTranslation(translationsRecord: Record<Locale, (() => P
     storage.push(translation);
     translations.set(localeCode as Locale, storage)
   }
-  if (!isInitialized) return
   await updateLocaleAndTranslations(currentLocaleCode)
 }
 
 export async function changeLocaleAndUpdate(localeCode: Locale) {
-  if (!isInitialized) return
   await updateLocaleAndTranslations(localeCode)
-}
-
-export async function initLocale(localeCode: Locale) {
-  await updateLocaleAndTranslations(localeCode)
-  isInitialized = true
 }
 
 export function listenChangesByPath(path: string, context?: Record<string, unknown>): Observable<string> {

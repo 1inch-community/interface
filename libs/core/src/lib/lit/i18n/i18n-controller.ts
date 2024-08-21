@@ -1,5 +1,5 @@
 import { Ii18nController, Locale } from '@one-inch-community/models';
-import { changeLocaleAndUpdate, defaultLocaleCode, initLocale } from './i18n';
+import { changeLocaleAndUpdate, defaultLocaleCode } from './i18n';
 import { SettingsController } from '@one-inch-community/core/settings';
 
 export class I18nController implements Ii18nController {
@@ -11,7 +11,7 @@ export class I18nController implements Ii18nController {
 
   async init(): Promise<void> {
     const settingsValue = this.i18nSettings.value ?? defaultLocaleCode
-    await initLocale(settingsValue)
+    await changeLocaleAndUpdate(settingsValue)
   }
 
   async changeLocale(localeCode: Locale): Promise<void> {

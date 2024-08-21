@@ -1,5 +1,5 @@
 import { Ii18nController, Locale } from '@one-inch-community/models';
-import { changeLocaleAndUpdate, initLocale, setTargetHost } from './i18n';
+import { changeLocaleAndUpdate, setTargetHost } from './i18n';
 
 export class I18nEmbeddedController implements Ii18nController {
 
@@ -9,7 +9,7 @@ export class I18nEmbeddedController implements Ii18nController {
   }
 
   async init(): Promise<void> {
-    await initLocale(this.localeCode)
+    await changeLocaleAndUpdate(this.localeCode)
   }
 
   async changeLocale(localeCode: Locale): Promise<void> {
