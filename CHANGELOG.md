@@ -1,3 +1,10 @@
+# [1.0.0-dev.47](https://github.com/1inch-community/interface/compare/v1.0.0-dev.46...v1.0.0-dev.47) (2024-08-23)
+
+
+### Bug Fixes
+
+* prioritize __environment__ values over env ([1972284](https://github.com/1inch-community/interface/commit/1972284ab212437c83d4bc2a0bf42ec5f105a2ee))
+
 # [1.0.0-dev.46](https://github.com/1inch-community/interface/compare/v1.0.0-dev.45...v1.0.0-dev.46) (2024-08-21)
 
 
