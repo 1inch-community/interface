@@ -144,6 +144,8 @@
     --primary: #00a0b5; /* #00a0b5 */
     --primary-50: rgb(0 160 181 / 50%);
     --primary-12: rgb(0 160 181 / 12%);
+    --primary-5: rgb(0 160 181 / 5%);
+    --primary-1: rgb(0 160 181 / 1%);
     --primary-hover: #007e8f;
     --secondary: #00a0b51f;
     --secondary-hover: #00a0b53d;
@@ -152,6 +154,8 @@
     --primary: #f79009;
     --primary-50: rgb(247 144 9 / 50%);
     --primary-12: rgb(247 144 9 / 12%);
+    --primary-7: rgb(247 144 9 / 7%);
+    --primary-5: rgb(247 144 9 / 5%);
     --primary-hover: #dc6803;
     --secondary: #f790091f;
     --secondary-hover: #dc68033d;
@@ -160,6 +164,8 @@
     --primary: #9e77ed;
     --primary-50: rgb(158 119 237 / 50%);
     --primary-12: rgb(158 119 237 / 12%);
+    --primary-5: rgb(158 119 237 / 5%);
+    --primary-1: rgb(158 119 237 / 1%);
     --primary-hover: #7f56d9;
     --secondary: #9e77ed1f;
     --secondary-hover: #7f56d93d;

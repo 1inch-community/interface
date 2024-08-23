@@ -15,7 +15,6 @@ export const tokenListStubItemStyle = css`
         align-items: center;
         cursor: pointer;
         border-radius: 16px;
-        transition: background-color .2s;
     }
 
     .name-and-balance {
@@ -23,13 +22,10 @@ export const tokenListStubItemStyle = css`
         flex-direction: column;
         gap: 4px;
         width: 100%;
+        position: relative;
+        overflow: hidden;
     }
-
-    .stub-loader {
-        will-change: filter;
-        animation: stub-loader-animation 3s ease-in-out infinite;
-    }
-
+    
     .stub-token-icon {
         min-width: 40px;
         min-height: 40px;

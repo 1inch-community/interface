@@ -228,6 +228,8 @@ export function makeColorSchema(primaryColor: string, targetName = ':root') {
           --primary: ${unsafeCSS(primaryColor)};
           --primary-50: ${hexToRGBA(primaryColor, 50)};
           --primary-12: ${hexToRGBA(primaryColor, 12)};
+          --primary-5: ${hexToRGBA(primaryColor, 5)};
+          --primary-1: ${hexToRGBA(primaryColor, 1)};
           --primary-hover: ${transformColor(primaryColor)};
           --secondary: ${unsafeCSS(primaryColor)}1f;
           --secondary-hover: ${unsafeCSS(primaryColor)}3d;
