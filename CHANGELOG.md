@@ -1,3 +1,10 @@
+# [1.0.0-dev.48](https://github.com/1inch-community/interface/compare/v1.0.0-dev.47...v1.0.0-dev.48) (2024-08-23)
+
+
+### Features
+
+* Add skeleton loading animation to token list stub items ([72d3088](https://github.com/1inch-community/interface/commit/72d30885f9a6d3c37615febd7cb8a7b45cac20be))
+
 # [1.0.0-dev.47](https://github.com/1inch-community/interface/compare/v1.0.0-dev.46...v1.0.0-dev.47) (2024-08-23)
 
 
