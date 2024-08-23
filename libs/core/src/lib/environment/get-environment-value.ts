@@ -28,7 +28,7 @@ export function getEnvironmentValue<K extends keyof Environment>(valueName: K): 
   if (embeddedMode) {
     return env[valueName]!
   }
-  return env[valueName] ?? __environment__[valueName]
+  return __environment__[valueName] ?? env[valueName]!
 }
 
 export function setEnvironmentValue<K extends keyof Environment>(valueName: K, value:  Environment[K]) {
