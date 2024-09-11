@@ -98,7 +98,7 @@ export default defineConfig(({ mode }) => {
       preload({
         mode: 'prefetch'
       }),
-      isProduction ? (minifyHTML as any).default({ options: { shouldMinify: shouldMinifyHTML, shouldMinifyCSS: shouldMinifyCSS } }) : null,
+      // isProduction ? (minifyHTML as any).default({ options: { shouldMinify: shouldMinifyHTML, shouldMinifyCSS: shouldMinifyCSS } }) : null,
       createHtmlPlugin({
         inject: {
           data: {
