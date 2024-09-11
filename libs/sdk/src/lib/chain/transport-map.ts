@@ -24,6 +24,8 @@ export function getTransport(chainId: ChainId) {
     })),
   ]
 
+  transport.push(buildOneInchDevPortalRPCTransport(chainId))
+
   const infuraRpc = getInfuraRpc(chainId)
   if (infuraRpc) {
     transport.push(viemCustomHttpTransport(infuraRpc, {
@@ -75,7 +77,6 @@ const transportMap: Record<ChainId, string[]> = {
     'https://rpc.mevblocker.io',
     'https://eth.merkle.io',
     'https://1rpc.io/eth',
-    'https://rpc.flashbots.net',
     'https://eth-pokt.nodies.app',
     'https://eth.meowrpc.com',
     'https://eth.drpc.org',
@@ -83,15 +84,7 @@ const transportMap: Record<ChainId, string[]> = {
     'https://eth-mainnet.public.blastapi.io',
     'https://rpc.ankr.com/eth',
     'https://cloudflare-eth.com',
-    'https://eth-mainnet.gateway.pokt.network/v1/5f3453978e354ab992c4da79',
-    'https://nodes.mewapi.io/rpc/eth',
     'https://endpoints.omniatech.io/v1/eth/mainnet/public',
-    'https://ethereum-mainnet-rpc.allthatnode.com', // global
-    'https://ethereum-mainnet-archive.allthatnode.com', // archive global
-    'https://ethereum-mainnet-rpc-germany.allthatnode.com', // germany
-    'https://ethereum-mainnet-archive-germany.allthatnode.com', // archive germany
-    'https://ethereum-mainnet-rpc-korea.allthatnode.com', // korea
-    'https://ethereum-mainnet-archive-korea.allthatnode.com', // archive korea
   ],
   [ChainId.bnb]: [
     'https://bsc.publicnode.com',
@@ -100,7 +93,6 @@ const transportMap: Record<ChainId, string[]> = {
     'https://bsc-pokt.nodies.app',
     'https://bsc.meowrpc.com',
     'https://bsc.drpc.org',
-    'https://1rpc.io/bnb'
   ],
   [ChainId.matic]: [
     'https://polygon-bor-rpc.publicnode.com',
@@ -127,7 +119,6 @@ const transportMap: Record<ChainId, string[]> = {
     'https://arb-pokt.nodies.app',
     'https://arbitrum.meowrpc.com',
     'https://arbitrum.drpc.org',
-    'https://endpoints.omniatech.io/v1/arbitrum/one/public'
   ],
   [ChainId.gnosis]: [
     'https://gnosis.publicnode.com',
@@ -210,3 +201,17 @@ const transportWSMap: Record<ChainId, string[]> = {
     'wss://mainnet.era.zksync.io/ws'
   ]
 };
+
+function buildOneInchDevPortalRPCTransport(chainId: ChainId) {
+  const host = getEnvironmentValue('oneInchDevPortalHost')
+  const token = getEnvironmentValue('oneInchDevPortalToken')
+  const rpc = `${host}/web3/${chainId}`
+  return http(rpc, {
+    batch: false,
+    fetchOptions: token ? {
+      headers: {
+        'Authorization': token
+      }
+    } : undefined
+  })
+}

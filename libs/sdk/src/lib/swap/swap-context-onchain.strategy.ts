@@ -29,14 +29,12 @@ export class SwapContextOnChainStrategy implements ISwapContextStrategy<unknown>
     const { token: sourceToken, amount: sourceTokenAmount } = sourceTokenSnapshot
     const { token: destinationToken } = destinationTokenSnapshot
     const chainId = await this.walletController.data.getChainId()
-    const activeAddress = await this.walletController.data.getActiveAddress()
 
     if (
       chainId === null
       || sourceToken === null
       || destinationToken === null
       || sourceTokenAmount === null
-      || activeAddress === null
     ) {
       throw new Error('')
     }
@@ -52,12 +50,12 @@ export class SwapContextOnChainStrategy implements ISwapContextStrategy<unknown>
     }
 
     let destinationTokenAmount: bigint
-    if (rate.revertedRate) {
+    if (rate.isReverted) {
       destinationTokenAmount = BigMath.div(
         sourceTokenAmount,
         rate.revertedRate,
         sourceToken.decimals,
-        destinationToken.decimals,
+        sourceToken.decimals,
         destinationToken.decimals
       )
     } else {
@@ -65,7 +63,7 @@ export class SwapContextOnChainStrategy implements ISwapContextStrategy<unknown>
         sourceTokenAmount,
         rate.rate,
         sourceToken.decimals,
-        sourceToken.decimals,
+        destinationToken.decimals,
         destinationToken.decimals
       )
     }
