@@ -1,2 +1,0 @@
-import{makeColorSchema as m}from"./index.esm-C6IL658q.js";import"./index-tS3VRiGF.js";import"./index.esm-DhwY4kHm.js";import"./index.esm-BCMfxeUc.js";import"./index.esm-OIwjBXxl.js";import"./index.esm-COc-PyqV.js";import"./combineLatest-Bzt_9bb6.js";import"./defer-BRewiDsk.js";import"./asap-D-qxMtYG.js";var y=m("#00a0b5");export{y as communityStyle};
-//# sourceMappingURL=community.style-RWKB44BC-Cx1EgCcF.js.map

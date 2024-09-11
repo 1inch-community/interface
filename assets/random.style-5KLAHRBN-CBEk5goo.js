@@ -1,0 +1,2 @@
+import{makeColorSchema as o,getRandomBrightColor as r}from"./index.esm-CH2W14bC.js";import"./index-DuIRcoZI.js";import"./index.esm-DhwY4kHm.js";import"./index.esm-CXOrnIqP.js";import"./index.esm-OIwjBXxl.js";import"./index.esm-COc-PyqV.js";import"./combineLatest-Bzt_9bb6.js";import"./defer-BRewiDsk.js";import"./asap-D-qxMtYG.js";var h=()=>o(r());export{h as randomStyle};
+//# sourceMappingURL=random.style-5KLAHRBN-CBEk5goo.js.map
