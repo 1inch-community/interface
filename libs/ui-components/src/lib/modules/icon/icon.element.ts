@@ -36,15 +36,9 @@ export class IconElement extends LitElement {
       width: this.width ?? this.iconRecord?.width,
       height: this.height ?? this.iconRecord?.height
     }
-    if (this.icon === 'logoFull') {
-      debugger
-    }
     return this.iconLoadTask.render({
       pending: () => html`<div style="${styleMap(styles)}"></div>`,
       complete: (svg) => {
-        if (this.icon === 'logoFull') {
-          debugger
-        }
         if (typeof svg === 'function') {
           return svg({ ...styles, props: this.props })
         }
@@ -54,7 +48,6 @@ export class IconElement extends LitElement {
   }
 
   protected async loadImage(iconName?: string) {
-    if (iconName === 'logoFull') debugger
     if (!iconName) {
       throw new Error('icon is required field for inch-icon element')
     }
