@@ -126,7 +126,7 @@ export const inputStyle = css`
     }
     
     .focus:not(.disabled) {
-        box-shadow: 0 0 0 1px var(--color-background-bg-positive-hover); 
+        box-shadow: inset 0 0 0 1px var(--primary-50);
     }
     
     .balance-and-max {
@@ -154,8 +154,8 @@ export const inputStyle = css`
     }
     
     @media (hover: hover) {
-        .input-container:not(.disabled):hover {
-            box-shadow: inset 0 0 0 1px var(--color-background-bg-positive-hover);
+        .input-container:not(.disabled):not(.focus):hover {
+            box-shadow: inset 0 0 0 1px var(--primary-12);
         }
         .symbol-container:not(.symbol-container_disabled):hover {
             background-color: var(--color-background-bg-positive-hover);
