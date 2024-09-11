@@ -1,3 +1,15 @@
+# [1.0.0-dev.49](https://github.com/1inch-community/interface/compare/v1.0.0-dev.48...v1.0.0-dev.49) (2024-09-11)
+
+
+### Bug Fixes
+
+* Update dependency versions in pnpm-lock.yaml ([6fa3002](https://github.com/1inch-community/interface/commit/6fa30024546c48027a220c7f31f387829a3004bc))
+
+
+### Features
+
+* Update dependencies in package.json ([4b50bf7](https://github.com/1inch-community/interface/commit/4b50bf75c8522a0f00af8faafc821546918ecfbc))
+
 # [1.0.0-dev.48](https://github.com/1inch-community/interface/compare/v1.0.0-dev.47...v1.0.0-dev.48) (2024-08-23)
 
 
