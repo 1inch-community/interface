@@ -14,6 +14,7 @@ import { sushiswapV3Adapter } from './adapters/sushiswap-v3-adapter';
 import { spookyswapV3Adapter } from './adapters/spookyswap-v3-adapter';
 import { BlockTimeCache } from '@one-inch-community/sdk/chain';
 import { CacheActivePromise } from '@one-inch-community/core/decorators';
+// import { oneInchOracleAdapter } from './adapters/one-inch-oracle-adapter';
 
 export class TokenRateProvider implements ITokenRateProvider {
 
@@ -72,6 +73,7 @@ export class TokenRateProvider implements ITokenRateProvider {
 
 export function buildDefaultTokenRateProvider() {
   return new TokenRateProvider([
+    // oneInchOracleAdapter,
     // v3
     uniswapV3Adapter,
     pancakeswapV3Adapter,

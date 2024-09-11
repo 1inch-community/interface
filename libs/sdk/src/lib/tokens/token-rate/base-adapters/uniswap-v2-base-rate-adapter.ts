@@ -48,14 +48,14 @@ export class UniswapV2BaseRateAdapter implements ITokenRateSourceAdapter {
         isRevertRate ? reserves[1] : reserves[0],
         destinationToken.decimals,
         sourceToken.decimals,
-        sourceToken.decimals,
+        destinationToken.decimals,
       )
       const revertedRate = BigMath.div(
         isRevertRate ? reserves[1] : reserves[0],
         isRevertRate ? reserves[0] : reserves[1],
         sourceToken.decimals,
         destinationToken.decimals,
-        destinationToken.decimals
+        sourceToken.decimals
       )
       return {
         chainId,
