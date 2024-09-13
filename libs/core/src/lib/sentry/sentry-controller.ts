@@ -1,12 +1,10 @@
 import { IApplicationContext, ISentryController } from '@one-inch-community/models';
 import * as Sentry from '@sentry/browser';
-import type { Client } from '@sentry/types';
 
 export class SentryController implements ISentryController {
-  private client?: Client
 
   async init(context: IApplicationContext): Promise<void> {
-    this.client = Sentry.init({
+    Sentry.init({
       dsn: 'https://8380a0d8cfa4e34cc5d742141c1b926f@o4506434492628992.ingest.us.sentry.io/4507944504852480',
       integrations: [
         Sentry.browserTracingIntegration(),
@@ -21,17 +19,18 @@ export class SentryController implements ISentryController {
       replaysOnErrorSampleRate: 1.0 // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
     });
 
-    if (this.client) {
-      context.connectWalletController.data.activeAddress$.subscribe(address => {
-        Sentry.setTag('activeAddress', address);
-        this.updateActiveWallet(context)
-      })
-      context.connectWalletController.data.chainId$.subscribe(chainId => {
-        Sentry.setTag('activeChainId', chainId);
-        this.updateActiveWallet(context)
-      })
+    context.connectWalletController.data.activeAddress$.subscribe(address => {
+      Sentry.setTag('activeAddress', address);
+      this.updateActiveWallet(context)
+    })
+    context.connectWalletController.data.chainId$.subscribe(chainId => {
+      Sentry.setTag('activeChainId', chainId);
+      this.updateActiveWallet(context)
+    })
+  }
 
-    }
+  error(error: unknown) {
+    Sentry.captureException(error);
   }
 
   private updateActiveWallet(context: IApplicationContext) {

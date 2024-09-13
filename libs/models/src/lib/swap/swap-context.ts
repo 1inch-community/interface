@@ -6,7 +6,6 @@ import { NullableValue } from '../base';
 import { Rate } from '../token-price';
 import { SwapSnapshot } from './swap-snapshot';
 import { SwapSettings } from './swap-settings';
-import { FusionQuoteReceiveDto } from '../dto';
 
 export type SettingsValue = {
   type: 'auto' | 'custom' | 'preset'
