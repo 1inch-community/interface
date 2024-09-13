@@ -30,7 +30,7 @@ importers:
         specifier: 8.30.0
         version: 8.30.0
       '@sentry/types':
-        specifier: ^8.30.0
+        specifier: 8.30.0
         version: 8.30.0
       '@walletconnect/ethereum-provider':
         specifier: 2.16.1
