@@ -1,3 +1,16 @@
+# [1.0.0-dev.50](https://github.com/1inch-community/interface/compare/v1.0.0-dev.49...v1.0.0-dev.50) (2024-09-13)
+
+
+### Bug Fixes
+
+* Fix dependency specifier format for @sentry/types ([c0cf3a1](https://github.com/1inch-community/interface/commit/c0cf3a11a7b48d61bc82f354be9c284fa2d3aea0))
+* Refactor SentryController and remove redundant imports ([9692c51](https://github.com/1inch-community/interface/commit/9692c51e6453ad8bed8e36f3bbfb6f724210efc6))
+
+
+### Features
+
+* Add Sentry integration ([2573e6f](https://github.com/1inch-community/interface/commit/2573e6fe3d6f3875a1c19da1039e6a51243f7aa2))
+
 # [1.0.0-dev.49](https://github.com/1inch-community/interface/compare/v1.0.0-dev.48...v1.0.0-dev.49) (2024-09-11)
 
 
