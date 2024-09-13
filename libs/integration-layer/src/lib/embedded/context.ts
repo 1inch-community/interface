@@ -14,6 +14,7 @@ export async function bootstrapApplicationContext(config: EmbeddedBootstrapConfi
     storageControllerFactory: () => import('@one-inch-community/core/storage').then(m => m.storage),
     tokenRateProviderFactory: () => import('@one-inch-community/sdk/tokens').then(m => m.buildDefaultTokenRateProvider()),
     oneInchDevPortalAdapterFactory: () => import('@one-inch-community/sdk/api').then(m => new m.OneInchDevPortalAdapter()),
+    sentryControllerFactory: () => import('@one-inch-community/core/sentry').then(m => new m.SentryController()),
     swapContextFactory: (context) => import('@one-inch-community/sdk/swap').then(m => {
       const swapContext = new m.SwapContext(context)
       swapContext.init()

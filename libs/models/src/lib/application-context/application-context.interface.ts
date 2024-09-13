@@ -7,6 +7,7 @@ import { IThemesController } from '../themes';
 import { IStorageController } from '../storage';
 import { ITokenRateProvider } from '../token-price';
 import { IOneInchDevPortalAdapter } from '../api';
+import { ISentryController } from '../sentry';
 
 export interface IApplicationContext {
   readonly isEmbedded: boolean
@@ -18,6 +19,7 @@ export interface IApplicationContext {
   readonly themesController: IThemesController
   readonly storageController: IStorageController
   readonly oneInchDevPortalAdapter: IOneInchDevPortalAdapter
+  readonly sentryController: ISentryController
 
   makeSwapContext(): Promise<ISwapContext>
   getActiveSwapContext(): ISwapContext | null

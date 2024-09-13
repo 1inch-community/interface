@@ -7,7 +7,9 @@ import {
   Ii18nController,
   IThemesController,
   IStorageController,
-  ITokenRateProvider, IOneInchDevPortalAdapter
+  ITokenRateProvider,
+  IOneInchDevPortalAdapter,
+  ISentryController
 } from '@one-inch-community/models';
 
 export type ApplicationContextPayload = {
@@ -19,6 +21,7 @@ export type ApplicationContextPayload = {
   storageControllerFactory: () => Promise<IStorageController>
   tokenRateProviderFactory: () => Promise<ITokenRateProvider>
   oneInchDevPortalAdapterFactory: () => Promise<IOneInchDevPortalAdapter>
+  sentryControllerFactory: () => Promise<ISentryController>
   swapContextFactory: (context: IApplicationContext) => Promise<ISwapContext>
 }
 
@@ -33,6 +36,7 @@ export class ApplicationContext implements IApplicationContext {
   private _storageController?: IStorageController
   private _tokenRateProvider?: ITokenRateProvider
   private _oneInchDevPortalAdapter?: IOneInchDevPortalAdapter
+  private _sentryController?: ISentryController
 
   private _activeSwapContext: WeakRef<ISwapContext> | null = null
 
@@ -76,6 +80,11 @@ export class ApplicationContext implements IApplicationContext {
     return this._oneInchDevPortalAdapter
   }
 
+  get sentryController(): ISentryController {
+    if (!this._sentryController) throw new Error(contextNotInitErrorMessage)
+    return this._sentryController
+  }
+
   constructor(
     private readonly payload: ApplicationContextPayload,
     public readonly isEmbedded = false,
@@ -91,7 +100,8 @@ export class ApplicationContext implements IApplicationContext {
       themesController,
       storageController,
       tokenRateProvider,
-      oneInchDevPortalAdapter
+      oneInchDevPortalAdapter,
+      sentryController
     ] = await Promise.all([
       this.payload.connectWalletControllerFactory(),
       this.payload.tokenControllerFactory(),
@@ -100,7 +110,8 @@ export class ApplicationContext implements IApplicationContext {
       this.payload.themesControllerFactory(),
       this.payload.storageControllerFactory(),
       this.payload.tokenRateProviderFactory(),
-      this.payload.oneInchDevPortalAdapterFactory()
+      this.payload.oneInchDevPortalAdapterFactory(),
+      this.payload.sentryControllerFactory(),
     ])
     this._connectWalletController = connectWalletController
     this._tokenController = tokenController
@@ -110,7 +121,9 @@ export class ApplicationContext implements IApplicationContext {
     this._storageController = storageController;
     this._tokenRateProvider = tokenRateProvider
     this._oneInchDevPortalAdapter = oneInchDevPortalAdapter
+    this._sentryController = sentryController
     await Promise.all([
+      this._sentryController.init(this),
       this._i18nController.init(this),
       this._themesController.init(this),
       this._connectWalletController.init(this),

@@ -30,6 +30,10 @@ export class ConnectWalletEmbeddedController implements IConnectWalletController
     return true
   }
 
+  get connectedWalletInfo() {
+    return this.currentActiveAdapter?.info ?? null
+  }
+
   constructor(private readonly config: EmbeddedBootstrapConfig) {
   }
 

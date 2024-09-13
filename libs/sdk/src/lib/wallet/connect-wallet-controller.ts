@@ -36,6 +36,10 @@ export class WalletControllerImpl implements IConnectWalletController, IConnectW
     return this.currentActiveAdapter !== null
   }
 
+  get connectedWalletInfo() {
+    return this.currentActiveAdapter?.info ?? null
+  }
+
   get currentActiveAdapter(): IWalletAdapter | null {
     if (!this.currentActiveAdapterId) return null
     return this.activeAdapters.get(this.currentActiveAdapterId) ?? null

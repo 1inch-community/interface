@@ -24,7 +24,7 @@ export function getTransport(chainId: ChainId) {
     })),
   ]
 
-  transport.push(buildOneInchDevPortalRPCTransport(chainId))
+  // transport.push(buildOneInchDevPortalRPCTransport(chainId))
 
   const infuraRpc = getInfuraRpc(chainId)
   if (infuraRpc) {

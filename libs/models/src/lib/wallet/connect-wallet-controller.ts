@@ -9,6 +9,7 @@ import { InitializingEntity } from '../base';
 export interface IConnectWalletController extends InitializingEntity {
   readonly data: IDataAdapter & IGlobalDataAdapter;
   readonly isConnected: boolean;
+  readonly connectedWalletInfo: EIP6963ProviderInfo | null
   getSupportedWallets(): Promise<EIP6963ProviderInfo[]>
   connect(info: EIP6963ProviderInfo): Promise<boolean>
   addConnection(info: EIP6963ProviderInfo): Promise<boolean>

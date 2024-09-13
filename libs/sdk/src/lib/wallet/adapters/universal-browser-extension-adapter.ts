@@ -17,6 +17,10 @@ export class UniversalBrowserExtensionAdapter implements IWalletAdapter {
 
   client: WalletClient | null = null;
 
+  get info() {
+    return this.providerDetail.info;
+  }
+
   constructor(private readonly providerDetail: EIP6963ProviderDetail) {
     this.data = new ProviderDataAdapter(this.providerDetail.info);
   }

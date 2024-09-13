@@ -43,3 +43,6 @@ testem.log
 Thumbs.db
 .env
 
+
+# Sentry Config File
+.env.sentry-build-plugin

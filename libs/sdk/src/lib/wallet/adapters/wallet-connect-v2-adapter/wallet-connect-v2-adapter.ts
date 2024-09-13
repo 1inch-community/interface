@@ -26,6 +26,10 @@ export class WalletConnectV2Adapter implements IWalletAdapter {
 
   client: WalletClient | null = null;
 
+  get info() {
+    return this.providerDetail.info;
+  }
+
   constructor(private readonly providerDetail: Omit<EIP6963ProviderDetail, 'provider'>) {
     this.data = new ProviderDataAdapter(this.providerDetail.info);
   }

@@ -8,10 +8,12 @@ import type {
   WriteContractReturnType
 } from 'viem';
 import { IDataAdapter, IProviderDataAdapterInternal } from './data-adapter';
+import { EIP6963ProviderInfo } from './provider';
 
 export interface IWalletAdapter {
   readonly data: IDataAdapter & IProviderDataAdapterInternal
   readonly client: WalletClient | null
+  readonly info: EIP6963ProviderInfo
   isConnected(): Promise<boolean>
   connect(chainId: ChainId): Promise<boolean>
   restoreConnect(chainId: ChainId, force?: boolean): Promise<boolean>
