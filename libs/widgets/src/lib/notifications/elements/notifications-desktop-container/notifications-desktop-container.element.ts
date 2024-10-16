@@ -118,8 +118,11 @@ export class NotificationsDesktopContainerElement extends NotificationsBaseConta
   protected override render() {
     return html`
       <div class="close-button-container">
+        <inch-button @click="${() => this.controller.removeNotifications()}" size="l" type="tertiary-gray">
+          <inch-icon icon="trash16"></inch-icon>
+        </inch-button>
         <inch-button @click="${() => this.controller.closeNotifications()}" size="l" type="tertiary-gray">
-          <inch-icon icon="cross8"></inch-icon>
+          <inch-icon icon="xCircle16"></inch-icon>
         </inch-button>
       </div>
       ${animationMap(

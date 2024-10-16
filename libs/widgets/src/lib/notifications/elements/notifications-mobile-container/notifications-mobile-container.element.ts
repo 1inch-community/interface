@@ -102,7 +102,7 @@ export class NotificationsMobileContainerElement extends NotificationsBaseContai
 
   async closeNotification(id: string) {
     if (this.fullView) {
-      await this.controller.closeNotification(id)
+      await this.controller.removeNotification(id)
       return
     }
     await this.controller.closeNotifications()

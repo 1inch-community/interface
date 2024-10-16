@@ -62,7 +62,14 @@ export class NotificationsController implements INotificationsControllerInternal
     this.update$.next()
   }
 
-  async closeNotification(id: string) {
+  async removeNotifications() {
+    this.notifications.clear()
+    await this.cache.clear()
+    await this.closeNotifications()
+    this.update$.next()
+  }
+
+  async removeNotification(id: string) {
     if (!this.notifications.has(id)) return
     this.notifications.delete(id)
     await this.cache.delete(id)

@@ -68,9 +68,8 @@ export const notificationViewStyle = css`
         .notification-container.warning:hover {
             --border-color: var(--color-background-bg-warning-hover);
         }
-
-
-        .notification-close-container:hover .close-notification-button {
+        
+        .notification-container:hover .close-notification-button {
             transform: scale(1);
         }
     }

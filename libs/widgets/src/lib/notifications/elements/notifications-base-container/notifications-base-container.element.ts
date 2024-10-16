@@ -69,7 +69,7 @@ export abstract class NotificationsBaseContainerElement extends LitElement imple
   }
 
   async closeNotification(id: string) {
-    await this.controller.closeNotification(id)
+    await this.controller.removeNotification(id)
   }
 
   makeNotificationTemplate(record: NotificationRecord) {

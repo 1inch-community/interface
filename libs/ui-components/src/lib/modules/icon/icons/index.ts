@@ -9,6 +9,9 @@ import { sun24Svg } from './sun_24.svg';
 import { moon24Svg } from './moon_24.svg';
 import { command24Svg } from './command_24.svg';
 import { wallet24Svg } from './wallet_24.svg';
+import { trash24Svg } from './trash_24.svg';
+import { trash16Svg } from './trash_16.svg';
+import { xCircle16Svg } from './x-circle_16.svg';
 
 export type IconsRecord = {
   loader: () => Promise<TemplateResult | ((context: IconContext) => TemplateResult)>
@@ -27,12 +30,15 @@ export const icons: Record<string, IconsRecord> = {
   fusion16: { width: '16px', height: '16px', loader: () => import('./fusion_16.svg').then(m => m.fusion16Svg) },
   link16: { width: '16px', height: '16px', loader: () => import('./link_16.svg').then(m => m.link16Svg) },
   plusCircle16: { width: '16px', height: '16px', loader: () => import('./plus-circle_16.svg').then(m => m.plusCircle16Svg) },
+  trash16: { width: '16px', height: '16px', loader: () => import('./trash_16.svg').then(m => m.trash16Svg) },
+  xCircle16: { width: '16px', height: '16px', loader: () => import('./x-circle_16.svg').then(m => m.xCircle16Svg) },
   circle24: { width: '24px', height: '24px', loader: () => import('./circle_24.svg').then(m => m.circle24Svg) },
   arrowDown24: { width: '24px', height: '24px', loader: () => import('./arrow-down_24.svg').then(m => m.arrowDown24Svg) },
   arrowLeft24: { width: '24px', height: '24px', loader: () => import('./arrow-left_24.svg').then(m => m.arrowLeft24Svg) },
   cross24: { width: '24px', height: '24px', loader: () => import('./cross_24.svg').then(m => m.cross24Svg) },
   search24: { width: '24px', height: '24px', loader: () => import('./search_24.svg').then(m => m.search24Svg) },
   edit24: { width: '24px', height: '24px', loader: () => import('./edit_24.svg').then(m => m.edit24Svg) },
+  trash24: { width: '24px', height: '24px', loader: () => import('./trash_24.svg').then(m => m.trash24Svg) },
   connect24: { width: '24px', height: '24px', loader: () => import('./connect_24.svg').then(m => m.connect24Svg) },
   link24: { width: '24px', height: '24px', loader: () => import('./link_24.svg').then(m => m.link24Svg) },
   bell24: { width: '24px', height: '24px', loader: () => import('./bell_24.svg').then(m => m.bell24Svg) },

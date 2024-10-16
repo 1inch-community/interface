@@ -3,7 +3,8 @@ import { NotificationConfig } from '@one-inch-community/models';
 
 export interface INotificationsControllerInternal {
   closeNotifications(): Promise<void>
-  closeNotification(id: string): Promise<void>
+  removeNotifications(): Promise<void>
+  removeNotification(id: string): Promise<void>
 }
 
 export type NotificationRecord = {

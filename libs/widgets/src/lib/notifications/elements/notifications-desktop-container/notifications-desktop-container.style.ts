@@ -21,5 +21,9 @@ export const notificationsDesktopContainerStyle = css`
         overflow-x: hidden;
         pointer-events: none;
     }
+    
+    .close-button-container {
+        display: flex;
+    }
 
 `
