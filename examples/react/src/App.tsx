@@ -29,7 +29,6 @@ function App() {
     locale,
     primaryColor,
     chainId,
-    // @ts-ignore
     oneInchDevPortal: 'https://jellyfish-app-8xwqz.ondigitalocean.app',
     renderContainer: '#container',
     widgetName: 'swap-from',

@@ -10,22 +10,22 @@ importers:
     dependencies:
       '@one-inch-community/core':
         specifier: file://../../dist/libs/core
-        version: file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(rxjs@7.8.1)(tslib@2.6.3)
+        version: file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(rxjs@7.8.1)(tslib@2.6.3)
       '@one-inch-community/integration-layer':
         specifier: file://../../dist/libs/integration-layer
-        version: file:../../dist/libs/integration-layer(m6pb3ooq5i7j7p7bmikcmfg7qy)
+        version: file:../../dist/libs/integration-layer(fmm72ujbhuewlthlu3wtnxwjk4)
       '@one-inch-community/models':
         specifier: file://../../dist/libs/models
-        version: file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5))
+        version: file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3))
       '@one-inch-community/sdk':
         specifier: file://../../dist/libs/sdk
-        version: file:../../dist/libs/sdk(@one-inch-community/core@file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(rxjs@7.8.1)(tslib@2.6.3))(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(@walletconnect/ethereum-provider@2.12.2(@types/react@18.3.3)(react@18.3.1))(@walletconnect/modal@2.6.2(@types/react@18.3.3)(react@18.3.1))(@walletconnect/universal-provider@2.12.2)(dexie@3.2.7)(eventemitter3@4.0.7)(evm-proxy-detection@2.0.1)(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5))
+        version: file:../../dist/libs/sdk(@one-inch-community/core@file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(rxjs@7.8.1)(tslib@2.6.3))(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(@walletconnect/ethereum-provider@2.12.2(@types/react@18.3.3)(react@18.3.1))(@walletconnect/modal@2.6.2(@types/react@18.3.3)(react@18.3.1))(@walletconnect/universal-provider@2.12.2)(dexie@3.2.7)(eventemitter3@4.0.7)(evm-proxy-detection@2.0.1)(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3))
       '@one-inch-community/ui-components':
         specifier: file://../../dist/libs/ui-components
-        version: file:../../dist/libs/ui-components(@lit/context@1.1.2)(@lit/task@1.0.1)(@one-inch-community/core@file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(rxjs@7.8.1)(tslib@2.6.3))(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(lit@3.1.4)(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5))
+        version: file:../../dist/libs/ui-components(@lit/context@1.1.2)(@lit/task@1.0.1)(@one-inch-community/core@file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(rxjs@7.8.1)(tslib@2.6.3))(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(lit@3.2.0)(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3))
       '@one-inch-community/widgets':
         specifier: file://../../dist/libs/widgets
-        version: file:../../dist/libs/widgets(c5yzdzqhrpdy4zkb3x5ccvqgde)
+        version: file:../../dist/libs/widgets(xaxbuswalsdtudvziukp3e76pa)
       '@testing-library/jest-dom':
         specifier: ^5.17.0
         version: 5.17.0
@@ -55,10 +55,10 @@ importers:
         version: 18.3.1(react@18.3.1)
       react-scripts:
         specifier: 5.0.1
-        version: 5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(@types/babel__core@7.20.5)(eslint@8.57.0)(react@18.3.1)(type-fest@0.21.3)(typescript@4.9.5)
+        version: 5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(@types/babel__core@7.20.5)(eslint@8.57.0)(react@18.3.1)(type-fest@0.21.3)(typescript@5.3.3)
       typescript:
-        specifier: ^4.9.5
-        version: 4.9.5
+        specifier: ~5.3.2
+        version: 5.3.3
       web-vitals:
         specifier: ^2.1.4
         version: 2.1.4
@@ -4054,9 +4054,6 @@ packages:
   lit@2.8.0:
     resolution: {integrity: sha512-4Sc3OFX9QHOJaHbmTMk28SYgVxLN3ePDjg7hofEft2zWlehFL3LiAuapWc4U/kYwMYJSh2hTCPZ6/LIC7ii0MA==}
 
-  lit@3.1.4:
-    resolution: {integrity: sha512-q6qKnKXHy2g1kjBaNfcoLlgbI3+aSOZ9Q4tiGa9bGYXq5RBXxkVTqTIVmP2VWMp29L4GyvCFm8ZQ2o56eUAMyA==}
-
   lit@3.2.0:
     resolution: {integrity: sha512-s6tI33Lf6VpDu7u4YqsSX78D28bYQulM+VAzsGch4fx2H0eLZnJsUBsPWmGYSGoKDNbjtRv02rio1o+UdPVwvw==}
 
@@ -5843,9 +5840,9 @@ packages:
   typedarray-to-buffer@3.1.5:
     resolution: {integrity: sha512-zdu8XMNEDepKKR+XYOXAVPtWui0ly0NtohUscw+UmaHiAWT8hrV1rr//H6V+0DvJ3OQ19S979M0laLfX8rm82Q==}
 
-  typescript@4.9.5:
-    resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
-    engines: {node: '>=4.2.0'}
+  typescript@5.3.3:
+    resolution: {integrity: sha512-pXWcraxM0uxAS+tN0AG/BF2TyqmHO014Z070UsJ+pFvYuRSq8KH8DmWpnbXe0pEPDHXZV3FcAbJkijJ5oNEnWw==}
+    engines: {node: '>=14.17'}
     hasBin: true
 
   ufo@1.5.4:
@@ -7702,31 +7699,31 @@ snapshots:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.17.1
 
-  '@one-inch-community/core@file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(rxjs@7.8.1)(tslib@2.6.3)':
+  '@one-inch-community/core@file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(rxjs@7.8.1)(tslib@2.6.3)':
     dependencies:
-      '@one-inch-community/models': file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5))
+      '@one-inch-community/models': file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3))
       rxjs: 7.8.1
       tslib: 2.6.3
 
-  '@one-inch-community/integration-layer@file:../../dist/libs/integration-layer(m6pb3ooq5i7j7p7bmikcmfg7qy)':
+  '@one-inch-community/integration-layer@file:../../dist/libs/integration-layer(fmm72ujbhuewlthlu3wtnxwjk4)':
     dependencies:
-      '@one-inch-community/core': file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(rxjs@7.8.1)(tslib@2.6.3)
-      '@one-inch-community/models': file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5))
-      '@one-inch-community/sdk': file:../../dist/libs/sdk(@one-inch-community/core@file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(rxjs@7.8.1)(tslib@2.6.3))(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(@walletconnect/ethereum-provider@2.12.2(@types/react@18.3.3)(react@18.3.1))(@walletconnect/modal@2.6.2(@types/react@18.3.3)(react@18.3.1))(@walletconnect/universal-provider@2.12.2)(dexie@3.2.7)(eventemitter3@4.0.7)(evm-proxy-detection@2.0.1)(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5))
-      '@one-inch-community/widgets': file:../../dist/libs/widgets(c5yzdzqhrpdy4zkb3x5ccvqgde)
+      '@one-inch-community/core': file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(rxjs@7.8.1)(tslib@2.6.3)
+      '@one-inch-community/models': file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3))
+      '@one-inch-community/sdk': file:../../dist/libs/sdk(@one-inch-community/core@file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(rxjs@7.8.1)(tslib@2.6.3))(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(@walletconnect/ethereum-provider@2.12.2(@types/react@18.3.3)(react@18.3.1))(@walletconnect/modal@2.6.2(@types/react@18.3.3)(react@18.3.1))(@walletconnect/universal-provider@2.12.2)(dexie@3.2.7)(eventemitter3@4.0.7)(evm-proxy-detection@2.0.1)(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3))
+      '@one-inch-community/widgets': file:../../dist/libs/widgets(xaxbuswalsdtudvziukp3e76pa)
       rxjs: 7.8.1
       tslib: 2.6.3
 
-  '@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5))':
+  '@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3))':
     dependencies:
       rxjs: 7.8.1
       tslib: 2.6.3
-      viem: 2.19.4(typescript@4.9.5)
+      viem: 2.19.4(typescript@5.3.3)
 
-  '@one-inch-community/sdk@file:../../dist/libs/sdk(@one-inch-community/core@file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(rxjs@7.8.1)(tslib@2.6.3))(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(@walletconnect/ethereum-provider@2.12.2(@types/react@18.3.3)(react@18.3.1))(@walletconnect/modal@2.6.2(@types/react@18.3.3)(react@18.3.1))(@walletconnect/universal-provider@2.12.2)(dexie@3.2.7)(eventemitter3@4.0.7)(evm-proxy-detection@2.0.1)(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5))':
+  '@one-inch-community/sdk@file:../../dist/libs/sdk(@one-inch-community/core@file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(rxjs@7.8.1)(tslib@2.6.3))(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(@walletconnect/ethereum-provider@2.12.2(@types/react@18.3.3)(react@18.3.1))(@walletconnect/modal@2.6.2(@types/react@18.3.3)(react@18.3.1))(@walletconnect/universal-provider@2.12.2)(dexie@3.2.7)(eventemitter3@4.0.7)(evm-proxy-detection@2.0.1)(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3))':
     dependencies:
-      '@one-inch-community/core': file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(rxjs@7.8.1)(tslib@2.6.3)
-      '@one-inch-community/models': file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5))
+      '@one-inch-community/core': file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(rxjs@7.8.1)(tslib@2.6.3)
+      '@one-inch-community/models': file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3))
       '@walletconnect/ethereum-provider': 2.12.2(@types/react@18.3.3)(react@18.3.1)
       '@walletconnect/modal': 2.6.2(@types/react@18.3.3)(react@18.3.1)
       '@walletconnect/universal-provider': 2.12.2
@@ -7735,32 +7732,32 @@ snapshots:
       evm-proxy-detection: 2.0.1
       rxjs: 7.8.1
       tslib: 2.6.3
-      viem: 2.19.4(typescript@4.9.5)
+      viem: 2.19.4(typescript@5.3.3)
 
-  '@one-inch-community/ui-components@file:../../dist/libs/ui-components(@lit/context@1.1.2)(@lit/task@1.0.1)(@one-inch-community/core@file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(rxjs@7.8.1)(tslib@2.6.3))(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(lit@3.1.4)(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5))':
+  '@one-inch-community/ui-components@file:../../dist/libs/ui-components(@lit/context@1.1.2)(@lit/task@1.0.1)(@one-inch-community/core@file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(rxjs@7.8.1)(tslib@2.6.3))(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(lit@3.2.0)(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3))':
     dependencies:
       '@lit/context': 1.1.2
       '@lit/task': 1.0.1
-      '@one-inch-community/core': file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(rxjs@7.8.1)(tslib@2.6.3)
-      '@one-inch-community/models': file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5))
-      lit: 3.1.4
+      '@one-inch-community/core': file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(rxjs@7.8.1)(tslib@2.6.3)
+      '@one-inch-community/models': file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3))
+      lit: 3.2.0
       rxjs: 7.8.1
       tslib: 2.6.3
-      viem: 2.19.4(typescript@4.9.5)
+      viem: 2.19.4(typescript@5.3.3)
 
-  '@one-inch-community/widgets@file:../../dist/libs/widgets(c5yzdzqhrpdy4zkb3x5ccvqgde)':
+  '@one-inch-community/widgets@file:../../dist/libs/widgets(xaxbuswalsdtudvziukp3e76pa)':
     dependencies:
       '@lit-labs/virtualizer': 2.0.14
       '@lit/context': 1.1.2
       '@lit/task': 1.0.1
-      '@one-inch-community/core': file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(rxjs@7.8.1)(tslib@2.6.3)
-      '@one-inch-community/models': file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5))
-      '@one-inch-community/sdk': file:../../dist/libs/sdk(@one-inch-community/core@file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(rxjs@7.8.1)(tslib@2.6.3))(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(@walletconnect/ethereum-provider@2.12.2(@types/react@18.3.3)(react@18.3.1))(@walletconnect/modal@2.6.2(@types/react@18.3.3)(react@18.3.1))(@walletconnect/universal-provider@2.12.2)(dexie@3.2.7)(eventemitter3@4.0.7)(evm-proxy-detection@2.0.1)(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5))
-      '@one-inch-community/ui-components': file:../../dist/libs/ui-components(@lit/context@1.1.2)(@lit/task@1.0.1)(@one-inch-community/core@file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(rxjs@7.8.1)(tslib@2.6.3))(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5)))(lit@3.1.4)(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@4.9.5))
-      lit: 3.1.4
+      '@one-inch-community/core': file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(rxjs@7.8.1)(tslib@2.6.3)
+      '@one-inch-community/models': file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3))
+      '@one-inch-community/sdk': file:../../dist/libs/sdk(@one-inch-community/core@file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(rxjs@7.8.1)(tslib@2.6.3))(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(@walletconnect/ethereum-provider@2.12.2(@types/react@18.3.3)(react@18.3.1))(@walletconnect/modal@2.6.2(@types/react@18.3.3)(react@18.3.1))(@walletconnect/universal-provider@2.12.2)(dexie@3.2.7)(eventemitter3@4.0.7)(evm-proxy-detection@2.0.1)(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3))
+      '@one-inch-community/ui-components': file:../../dist/libs/ui-components(@lit/context@1.1.2)(@lit/task@1.0.1)(@one-inch-community/core@file:../../dist/libs/core(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(rxjs@7.8.1)(tslib@2.6.3))(@one-inch-community/models@file:../../dist/libs/models(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3)))(lit@3.2.0)(rxjs@7.8.1)(tslib@2.6.3)(viem@2.19.4(typescript@5.3.3))
+      lit: 3.2.0
       rxjs: 7.8.1
       tslib: 2.6.3
-      viem: 2.19.4(typescript@4.9.5)
+      viem: 2.19.4(typescript@5.3.3)
 
   '@parcel/watcher-android-arm64@2.4.1':
     optional: true
@@ -8277,42 +8274,42 @@ snapshots:
     dependencies:
       '@types/yargs-parser': 21.0.3
 
-  '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.9.5))(eslint@8.57.0)(typescript@4.9.5)':
+  '@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.3.3))(eslint@8.57.0)(typescript@5.3.3)':
     dependencies:
       '@eslint-community/regexpp': 4.11.0
-      '@typescript-eslint/parser': 5.62.0(eslint@8.57.0)(typescript@4.9.5)
+      '@typescript-eslint/parser': 5.62.0(eslint@8.57.0)(typescript@5.3.3)
       '@typescript-eslint/scope-manager': 5.62.0
-      '@typescript-eslint/type-utils': 5.62.0(eslint@8.57.0)(typescript@4.9.5)
-      '@typescript-eslint/utils': 5.62.0(eslint@8.57.0)(typescript@4.9.5)
+      '@typescript-eslint/type-utils': 5.62.0(eslint@8.57.0)(typescript@5.3.3)
+      '@typescript-eslint/utils': 5.62.0(eslint@8.57.0)(typescript@5.3.3)
       debug: 4.3.6
       eslint: 8.57.0
       graphemer: 1.4.0
       ignore: 5.3.2
       natural-compare-lite: 1.4.0
       semver: 7.6.3
-      tsutils: 3.21.0(typescript@4.9.5)
+      tsutils: 3.21.0(typescript@5.3.3)
     optionalDependencies:
-      typescript: 4.9.5
+      typescript: 5.3.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/experimental-utils@5.62.0(eslint@8.57.0)(typescript@4.9.5)':
+  '@typescript-eslint/experimental-utils@5.62.0(eslint@8.57.0)(typescript@5.3.3)':
     dependencies:
-      '@typescript-eslint/utils': 5.62.0(eslint@8.57.0)(typescript@4.9.5)
+      '@typescript-eslint/utils': 5.62.0(eslint@8.57.0)(typescript@5.3.3)
       eslint: 8.57.0
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  '@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.9.5)':
+  '@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.3.3)':
     dependencies:
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/types': 5.62.0
-      '@typescript-eslint/typescript-estree': 5.62.0(typescript@4.9.5)
+      '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.3.3)
       debug: 4.3.6
       eslint: 8.57.0
     optionalDependencies:
-      typescript: 4.9.5
+      typescript: 5.3.3
     transitivePeerDependencies:
       - supports-color
 
@@ -8321,21 +8318,21 @@ snapshots:
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/visitor-keys': 5.62.0
 
-  '@typescript-eslint/type-utils@5.62.0(eslint@8.57.0)(typescript@4.9.5)':
+  '@typescript-eslint/type-utils@5.62.0(eslint@8.57.0)(typescript@5.3.3)':
     dependencies:
-      '@typescript-eslint/typescript-estree': 5.62.0(typescript@4.9.5)
-      '@typescript-eslint/utils': 5.62.0(eslint@8.57.0)(typescript@4.9.5)
+      '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.3.3)
+      '@typescript-eslint/utils': 5.62.0(eslint@8.57.0)(typescript@5.3.3)
       debug: 4.3.6
       eslint: 8.57.0
-      tsutils: 3.21.0(typescript@4.9.5)
+      tsutils: 3.21.0(typescript@5.3.3)
     optionalDependencies:
-      typescript: 4.9.5
+      typescript: 5.3.3
     transitivePeerDependencies:
       - supports-color
 
   '@typescript-eslint/types@5.62.0': {}
 
-  '@typescript-eslint/typescript-estree@5.62.0(typescript@4.9.5)':
+  '@typescript-eslint/typescript-estree@5.62.0(typescript@5.3.3)':
     dependencies:
       '@typescript-eslint/types': 5.62.0
       '@typescript-eslint/visitor-keys': 5.62.0
@@ -8343,20 +8340,20 @@ snapshots:
       globby: 11.1.0
       is-glob: 4.0.3
       semver: 7.6.3
-      tsutils: 3.21.0(typescript@4.9.5)
+      tsutils: 3.21.0(typescript@5.3.3)
     optionalDependencies:
-      typescript: 4.9.5
+      typescript: 5.3.3
     transitivePeerDependencies:
       - supports-color
 
-  '@typescript-eslint/utils@5.62.0(eslint@8.57.0)(typescript@4.9.5)':
+  '@typescript-eslint/utils@5.62.0(eslint@8.57.0)(typescript@5.3.3)':
     dependencies:
       '@eslint-community/eslint-utils': 4.4.0(eslint@8.57.0)
       '@types/json-schema': 7.0.15
       '@types/semver': 7.5.8
       '@typescript-eslint/scope-manager': 5.62.0
       '@typescript-eslint/types': 5.62.0
-      '@typescript-eslint/typescript-estree': 5.62.0(typescript@4.9.5)
+      '@typescript-eslint/typescript-estree': 5.62.0(typescript@5.3.3)
       eslint: 8.57.0
       eslint-scope: 5.1.1
       semver: 7.6.3
@@ -8782,9 +8779,9 @@ snapshots:
 
   abab@2.0.6: {}
 
-  abitype@1.0.5(typescript@4.9.5):
+  abitype@1.0.5(typescript@5.3.3):
     optionalDependencies:
-      typescript: 4.9.5
+      typescript: 5.3.3
 
   accepts@1.3.8:
     dependencies:
@@ -9947,25 +9944,25 @@ snapshots:
     optionalDependencies:
       source-map: 0.6.1
 
-  eslint-config-react-app@7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(eslint@8.57.0)(jest@27.5.1)(typescript@4.9.5):
+  eslint-config-react-app@7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(eslint@8.57.0)(jest@27.5.1)(typescript@5.3.3):
     dependencies:
       '@babel/core': 7.25.2
       '@babel/eslint-parser': 7.25.1(@babel/core@7.25.2)(eslint@8.57.0)
       '@rushstack/eslint-patch': 1.10.4
-      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.9.5))(eslint@8.57.0)(typescript@4.9.5)
-      '@typescript-eslint/parser': 5.62.0(eslint@8.57.0)(typescript@4.9.5)
+      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.3.3))(eslint@8.57.0)(typescript@5.3.3)
+      '@typescript-eslint/parser': 5.62.0(eslint@8.57.0)(typescript@5.3.3)
       babel-preset-react-app: 10.0.1
       confusing-browser-globals: 1.0.11
       eslint: 8.57.0
       eslint-plugin-flowtype: 8.0.3(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(eslint@8.57.0)
-      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.9.5))(eslint@8.57.0)
-      eslint-plugin-jest: 25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.9.5))(eslint@8.57.0)(typescript@4.9.5))(eslint@8.57.0)(jest@27.5.1)(typescript@4.9.5)
+      eslint-plugin-import: 2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.3.3))(eslint@8.57.0)
+      eslint-plugin-jest: 25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.3.3))(eslint@8.57.0)(typescript@5.3.3))(eslint@8.57.0)(jest@27.5.1)(typescript@5.3.3)
       eslint-plugin-jsx-a11y: 6.9.0(eslint@8.57.0)
       eslint-plugin-react: 7.35.0(eslint@8.57.0)
       eslint-plugin-react-hooks: 4.6.2(eslint@8.57.0)
-      eslint-plugin-testing-library: 5.11.1(eslint@8.57.0)(typescript@4.9.5)
+      eslint-plugin-testing-library: 5.11.1(eslint@8.57.0)(typescript@5.3.3)
     optionalDependencies:
-      typescript: 4.9.5
+      typescript: 5.3.3
     transitivePeerDependencies:
       - '@babel/plugin-syntax-flow'
       - '@babel/plugin-transform-react-jsx'
@@ -9982,11 +9979,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  eslint-module-utils@2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.9.5))(eslint-import-resolver-node@0.3.9)(eslint@8.57.0):
+  eslint-module-utils@2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.3.3))(eslint-import-resolver-node@0.3.9)(eslint@8.57.0):
     dependencies:
       debug: 3.2.7
     optionalDependencies:
-      '@typescript-eslint/parser': 5.62.0(eslint@8.57.0)(typescript@4.9.5)
+      '@typescript-eslint/parser': 5.62.0(eslint@8.57.0)(typescript@5.3.3)
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
     transitivePeerDependencies:
@@ -10000,7 +9997,7 @@ snapshots:
       lodash: 4.17.21
       string-natural-compare: 3.0.1
 
-  eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.9.5))(eslint@8.57.0):
+  eslint-plugin-import@2.29.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.3.3))(eslint@8.57.0):
     dependencies:
       array-includes: 3.1.8
       array.prototype.findlastindex: 1.2.5
@@ -10010,7 +10007,7 @@ snapshots:
       doctrine: 2.1.0
       eslint: 8.57.0
       eslint-import-resolver-node: 0.3.9
-      eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.9.5))(eslint-import-resolver-node@0.3.9)(eslint@8.57.0)
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.3.3))(eslint-import-resolver-node@0.3.9)(eslint@8.57.0)
       hasown: 2.0.2
       is-core-module: 2.15.0
       is-glob: 4.0.3
@@ -10021,18 +10018,18 @@ snapshots:
       semver: 6.3.1
       tsconfig-paths: 3.15.0
     optionalDependencies:
-      '@typescript-eslint/parser': 5.62.0(eslint@8.57.0)(typescript@4.9.5)
+      '@typescript-eslint/parser': 5.62.0(eslint@8.57.0)(typescript@5.3.3)
     transitivePeerDependencies:
       - eslint-import-resolver-typescript
       - eslint-import-resolver-webpack
       - supports-color
 
-  eslint-plugin-jest@25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.9.5))(eslint@8.57.0)(typescript@4.9.5))(eslint@8.57.0)(jest@27.5.1)(typescript@4.9.5):
+  eslint-plugin-jest@25.7.0(@typescript-eslint/eslint-plugin@5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.3.3))(eslint@8.57.0)(typescript@5.3.3))(eslint@8.57.0)(jest@27.5.1)(typescript@5.3.3):
     dependencies:
-      '@typescript-eslint/experimental-utils': 5.62.0(eslint@8.57.0)(typescript@4.9.5)
+      '@typescript-eslint/experimental-utils': 5.62.0(eslint@8.57.0)(typescript@5.3.3)
       eslint: 8.57.0
     optionalDependencies:
-      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@4.9.5))(eslint@8.57.0)(typescript@4.9.5)
+      '@typescript-eslint/eslint-plugin': 5.62.0(@typescript-eslint/parser@5.62.0(eslint@8.57.0)(typescript@5.3.3))(eslint@8.57.0)(typescript@5.3.3)
       jest: 27.5.1
     transitivePeerDependencies:
       - supports-color
@@ -10084,9 +10081,9 @@ snapshots:
       string.prototype.matchall: 4.0.11
       string.prototype.repeat: 1.0.0
 
-  eslint-plugin-testing-library@5.11.1(eslint@8.57.0)(typescript@4.9.5):
+  eslint-plugin-testing-library@5.11.1(eslint@8.57.0)(typescript@5.3.3):
     dependencies:
-      '@typescript-eslint/utils': 5.62.0(eslint@8.57.0)(typescript@4.9.5)
+      '@typescript-eslint/utils': 5.62.0(eslint@8.57.0)(typescript@5.3.3)
       eslint: 8.57.0
     transitivePeerDependencies:
       - supports-color
@@ -10365,7 +10362,7 @@ snapshots:
       cross-spawn: 7.0.3
       signal-exit: 4.1.0
 
-  fork-ts-checker-webpack-plugin@6.5.3(eslint@8.57.0)(typescript@4.9.5)(webpack@5.93.0):
+  fork-ts-checker-webpack-plugin@6.5.3(eslint@8.57.0)(typescript@5.3.3)(webpack@5.93.0):
     dependencies:
       '@babel/code-frame': 7.24.7
       '@types/json-schema': 7.0.15
@@ -10380,7 +10377,7 @@ snapshots:
       schema-utils: 2.7.0
       semver: 7.6.3
       tapable: 1.1.3
-      typescript: 4.9.5
+      typescript: 5.3.3
       webpack: 5.93.0
     optionalDependencies:
       eslint: 8.57.0
@@ -11544,12 +11541,6 @@ snapshots:
       lit-element: 3.3.3
       lit-html: 2.8.0
 
-  lit@3.1.4:
-    dependencies:
-      '@lit/reactive-element': 2.0.4
-      lit-element: 4.1.0
-      lit-html: 3.2.0
-
   lit@3.2.0:
     dependencies:
       '@lit/reactive-element': 2.0.4
@@ -12553,7 +12544,7 @@ snapshots:
       regenerator-runtime: 0.13.11
       whatwg-fetch: 3.6.20
 
-  react-dev-utils@12.0.1(eslint@8.57.0)(typescript@4.9.5)(webpack@5.93.0):
+  react-dev-utils@12.0.1(eslint@8.57.0)(typescript@5.3.3)(webpack@5.93.0):
     dependencies:
       '@babel/code-frame': 7.24.7
       address: 1.2.2
@@ -12564,7 +12555,7 @@ snapshots:
       escape-string-regexp: 4.0.0
       filesize: 8.0.7
       find-up: 5.0.0
-      fork-ts-checker-webpack-plugin: 6.5.3(eslint@8.57.0)(typescript@4.9.5)(webpack@5.93.0)
+      fork-ts-checker-webpack-plugin: 6.5.3(eslint@8.57.0)(typescript@5.3.3)(webpack@5.93.0)
       global-modules: 2.0.0
       globby: 11.1.0
       gzip-size: 6.0.0
@@ -12581,7 +12572,7 @@ snapshots:
       text-table: 0.2.0
       webpack: 5.93.0
     optionalDependencies:
-      typescript: 4.9.5
+      typescript: 5.3.3
     transitivePeerDependencies:
       - eslint
       - supports-color
@@ -12603,7 +12594,7 @@ snapshots:
 
   react-refresh@0.11.0: {}
 
-  react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(@types/babel__core@7.20.5)(eslint@8.57.0)(react@18.3.1)(type-fest@0.21.3)(typescript@4.9.5):
+  react-scripts@5.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(@types/babel__core@7.20.5)(eslint@8.57.0)(react@18.3.1)(type-fest@0.21.3)(typescript@5.3.3):
     dependencies:
       '@babel/core': 7.25.2
       '@pmmmwh/react-refresh-webpack-plugin': 0.5.15(react-refresh@0.11.0)(type-fest@0.21.3)(webpack-dev-server@4.15.2(webpack@5.93.0))(webpack@5.93.0)
@@ -12621,7 +12612,7 @@ snapshots:
       dotenv: 10.0.0
       dotenv-expand: 5.1.0
       eslint: 8.57.0
-      eslint-config-react-app: 7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(eslint@8.57.0)(jest@27.5.1)(typescript@4.9.5)
+      eslint-config-react-app: 7.0.1(@babel/plugin-syntax-flow@7.24.7(@babel/core@7.25.2))(@babel/plugin-transform-react-jsx@7.25.2(@babel/core@7.25.2))(eslint@8.57.0)(jest@27.5.1)(typescript@5.3.3)
       eslint-webpack-plugin: 3.2.0(eslint@8.57.0)(webpack@5.93.0)
       file-loader: 6.2.0(webpack@5.93.0)
       fs-extra: 10.1.0
@@ -12639,7 +12630,7 @@ snapshots:
       prompts: 2.4.2
       react: 18.3.1
       react-app-polyfill: 3.0.0
-      react-dev-utils: 12.0.1(eslint@8.57.0)(typescript@4.9.5)(webpack@5.93.0)
+      react-dev-utils: 12.0.1(eslint@8.57.0)(typescript@5.3.3)(webpack@5.93.0)
       react-refresh: 0.11.0
       resolve: 1.22.8
       resolve-url-loader: 4.0.0
@@ -12655,7 +12646,7 @@ snapshots:
       workbox-webpack-plugin: 6.6.0(@types/babel__core@7.20.5)(webpack@5.93.0)
     optionalDependencies:
       fsevents: 2.3.3
-      typescript: 4.9.5
+      typescript: 5.3.3
     transitivePeerDependencies:
       - '@babel/plugin-syntax-flow'
       - '@babel/plugin-transform-react-jsx'
@@ -13413,10 +13404,10 @@ snapshots:
 
   tslib@2.6.3: {}
 
-  tsutils@3.21.0(typescript@4.9.5):
+  tsutils@3.21.0(typescript@5.3.3):
     dependencies:
       tslib: 1.14.1
-      typescript: 4.9.5
+      typescript: 5.3.3
 
   type-check@0.3.2:
     dependencies:
@@ -13475,7 +13466,7 @@ snapshots:
     dependencies:
       is-typedarray: 1.0.0
 
-  typescript@4.9.5: {}
+  typescript@5.3.3: {}
 
   ufo@1.5.4: {}
 
@@ -13604,19 +13595,19 @@ snapshots:
 
   vary@1.1.2: {}
 
-  viem@2.19.4(typescript@4.9.5):
+  viem@2.19.4(typescript@5.3.3):
     dependencies:
       '@adraffy/ens-normalize': 1.10.0
       '@noble/curves': 1.4.0
       '@noble/hashes': 1.4.0
       '@scure/bip32': 1.4.0
       '@scure/bip39': 1.3.0
-      abitype: 1.0.5(typescript@4.9.5)
+      abitype: 1.0.5(typescript@5.3.3)
       isows: 1.0.4(ws@8.17.1)
       webauthn-p256: 0.0.5
       ws: 8.17.1
     optionalDependencies:
-      typescript: 4.9.5
+      typescript: 5.3.3
     transitivePeerDependencies:
       - bufferutil
       - utf-8-validate
