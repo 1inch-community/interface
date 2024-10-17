@@ -21,7 +21,7 @@ pnpm install
 After installing all dependencies, you can start the project with the following command:
 
 ```bash
-npm run start
+pnpm run start
 ```
 
 Once the application is running, open the following link in your browser:

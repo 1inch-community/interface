@@ -7,7 +7,7 @@ This application demonstrates how to integrate the 1inch community swap form int
 Before running the application, you need to install the necessary packages. You can do this by running the following command in the project directory:
 
 ```bash
-npm install
+pnpm install
 ```
 
 ## Running the Application
@@ -15,7 +15,7 @@ npm install
 After installing all dependencies, you can start the project with the following command:
 
 ```bash
-npm start
+pnpm start
 ```
 
 Once the application is running, open the following link in your browser:
