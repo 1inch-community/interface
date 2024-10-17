@@ -1,3 +1,10 @@
+# [1.0.0-dev.51](https://github.com/1inch-community/interface/compare/v1.0.0-dev.50...v1.0.0-dev.51) (2024-10-17)
+
+
+### Bug Fixes
+
+* Add Sentry initialization check and update dependencies ([bb93b45](https://github.com/1inch-community/interface/commit/bb93b4511ba1d1211ccf9cbded78f64c6d7f50a9))
+
 # [1.0.0-dev.50](https://github.com/1inch-community/interface/compare/v1.0.0-dev.49...v1.0.0-dev.50) (2024-09-13)
 
 
